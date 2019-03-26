@@ -2,6 +2,7 @@
 #'
 #' @param dataModel a RelDataModel object
 #' @param dbTable a list of tables
+#' @param dbInfo a list of information values regarding the DB
 #' @param checkTables a single logical. If TRUE (default), tables are confronted
 #' to the dataModel.
 #'
@@ -9,12 +10,26 @@
 #'
 #' @export
 #'
-internalMDB <- function(dataModel, dbTables, checkTables=TRUE){
+internalMDB <- function(
+   dataModel, dbTables, dbInfo,
+   checkTables=TRUE
+){
 
    ## Checks ----
-   stopifnot(is.RelDataModel(dataModel))
+   stopifnot(
+      is.RelDataModel(dataModel),
+      is.list(dbInfo),
+      is.character(dbInfo$name), length(dbInfo$name)==1,
+      is.character(dbInfo$title), length(dbInfo$title)==1,
+      is.character(dbInfo$description), length(dbInfo$description)==1,
+      is.character(dbInfo$url), length(dbInfo$url)==1,
+      is.character(dbInfo$version), length(dbInfo$version)==1
+   )
    if("___dataModel___" %in% names(dataModel)){
       stop('"___dataModel___" is reserved and cannot be used as a table name')
+   }
+   if("___dbInfo___" %in% names(dataModel)){
+      stop('"___dbInfo___" is reserved and cannot be used as a table name')
    }
    lapply(
       names(dataModel),
@@ -52,11 +67,19 @@ internalMDB <- function(dataModel, dbTables, checkTables=TRUE){
    
    toRet <- dbTables[names(dataModel)]
    toRet$"___dataModel___" <- dataModel
+   toRet$"___dbInfo___" <- dbInfo
    class(toRet) <- c("internalMDB", class(toRet))
 
    ## Returning the DB ----
    return(toRet)
 
+}
+
+###############################################################################@
+#' @export
+#'
+is.internalMDB <- function(x){
+   inherits(x, "internalMDB")
 }
 
 ###############################################################################@
@@ -153,6 +176,13 @@ checkTable <- function(x, tableModel){
 ###############################################################################@
 #' @export
 #'
+dbInfo.internalMDB <- function(x, ...){
+   x$"___dbInfo___"
+}
+
+###############################################################################@
+#' @export
+#'
 dataModel.internalMDB <- function(x, ...){
    x$"___dataModel___"
 }
@@ -161,8 +191,21 @@ dataModel.internalMDB <- function(x, ...){
 #' @export
 #'
 dataTables.internalMDB <- function(x, ...){
+   m <- dataModel(x)
    x <- unclass(x)
-   x[which(names(x)!="___dataModel___")]
+   toTake <- unlist(list(...))
+   if(length(toTake)>0){
+      notInDb <- setdiff(toTake, names(m))
+      if(length(notInDb)>0){
+         stop(
+            "The following tables are not in the InternalDB: ",
+            paste(notInDb, sep=", ")
+         )
+      }
+   }else{
+      toTake <- names(m)
+   }
+   x[toTake]
 }
 
 ###############################################################################@
@@ -176,19 +219,26 @@ format.internalMDB <- function(x){
    u <- sunits[hu+1]
    return(sprintf(
       paste(
-         "internalMDB:",
+         "internalMDB %s (version %s): %s",
          "   - %s tables",
          "   - %s records",
          "   - %s %s",
+         "",
+         "%s (%s)",
          sep="\n"
       ),
+      dbInfo(x)$name,
+      dbInfo(x)$version,
+      dbInfo(x)$title,
       length(x),
       format(
          sum(unlist(lapply(dataTables(x), nrow))),
          big.mark=",",
          scientific=FALSE
       ),
-      round(hs, 1), u
+      round(hs, 1), u,
+      dbInfo(x)$description,
+      dbInfo(x)$url
    ))
 }
 
@@ -241,7 +291,10 @@ c.internalMDB <- function(..., checkTables=FALSE){
 #' @export
 #'
 names.internalMDB <- function(x, ...){
-   setdiff(names(unclass(x)), "___dataModel___")
+   setdiff(
+      names(unclass(x)),
+      c("___dataModel___", "___dbInfo___")
+   )
 }
 
 
@@ -251,7 +304,8 @@ names.internalMDB <- function(x, ...){
 'names<-.internalMDB' <- function(x, ...){
    x <- unclass(x)
    names(x$"___dataModel___") <- c(...)
-   names(x)[which(names(x)!= "___dataModel___")] <- c(...)
+   names(x)[which(!names(x) %in% c("___dataModel___", "___dbInfo___"))] <-
+      c(...)
    class(x) <- c("internalMDB", class(x))
    return(x)
 }

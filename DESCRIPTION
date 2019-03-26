@@ -12,10 +12,11 @@ Depends:
    magrittr,
    tibble,
    dplyr,
-   readr
-Imports:
+   readr,
    DBI,
    RClickhouse
+Imports:
+   jsonlite
 Suggests:
    knitr,
    rmarkdown

@@ -1,6 +1,7 @@
 #' Read files and create an internal database with a documented data model
 #'
 #' @param dataModel a \code{\link{RelDataModel}} object
+#' @param descriptionFile a json file with DB information
 #' @param directory a path to the directory where to read the data
 #' @param ext the file extension to consider (default: "ext"),
 #' @param delim delimiter (default: '\\t')
@@ -12,10 +13,12 @@
 #' @return An \code{\link{internalMDB}} object
 #'
 #' @importFrom readr read_tsv
+#' @importFrom jsonlite read_json
 #' @export
 #'
 readInternalMDB <- function(
    dataModel,
+   descriptionFile,
    directory,
    ext='txt',
    delim='\t',
@@ -28,8 +31,24 @@ readInternalMDB <- function(
       is.RelDataModel(dataModel),
       is.character(directory),
       length(directory)==1,
-      !is.na(directory)
+      !is.na(directory),
+      length(descriptionFile)==1,
+      file.exists(descriptionFile)
    )
+   
+   ## Read description
+   dbInfo <- read_json(descriptionFile)
+   stopifnot(
+      is.character(dbInfo$name), length(dbInfo$name)==1,
+      is.character(dbInfo$title), length(dbInfo$title)==1,
+      is.character(dbInfo$description), length(dbInfo$description)==1,
+      is.character(dbInfo$`reference URL`), length(dbInfo$`reference URL`)==1,
+      is.character(dbInfo$version), length(dbInfo$version)==1
+   )
+   names(dbInfo) <- sub("^reference URL$", "url", names(dbInfo))
+   dbInfo <- dbInfo[c("name", "title", "description", "url", "version")]
+   
+   ## Read Tables ----
    availableTables <- sub(
       paste0(".", ext, "$"),
       "",
@@ -88,7 +107,11 @@ readInternalMDB <- function(
       checkTable(d, dataModel[[tn]])
       toRet[[tn]] <- d
    }
-   toRet <- internalMDB(dataModel=dataModel, dbTables=toRet, checkTables=FALSE)
+   toRet <- internalMDB(
+      dataModel=dataModel, dbTables=toRet,
+      dbInfo=dbInfo,
+      checkTables=FALSE
+   )
    return(toRet)
 
 }

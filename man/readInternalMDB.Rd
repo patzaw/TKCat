@@ -4,11 +4,13 @@
 \alias{readInternalMDB}
 \title{Read files and create an internal database with a documented data model}
 \usage{
-readInternalMDB(dataModel, directory, ext = "txt", delim = "\\t",
-  quoted_na = FALSE, ...)
+readInternalMDB(dataModel, descriptionFile, directory, ext = "txt",
+  delim = "\\t", quoted_na = FALSE, ...)
 }
 \arguments{
 \item{dataModel}{a \code{\link{RelDataModel}} object}
+
+\item{descriptionFile}{a json file with DB information}
 
 \item{directory}{a path to the directory where to read the data}
 
