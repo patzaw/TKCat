@@ -1,0 +1,147 @@
+{
+	"title": "Collection schema",
+	"type": "object",
+	"description": "Schema for defining collections of concepts",
+	"properties": {
+		"title": {"type": "string"},
+		"type": {"enum":["object"]},
+		"description": {"type": "string"},
+		"properties": {
+			"type": "object",
+			"properties": {
+				"collection": {
+					"type":"object",
+					"properties":{
+						"enum": {
+							"type": "array",
+							"minItems": 1,
+							"maxItems": 1,
+							"items": {"type": "string"}
+						}
+					},
+					"required": ["enum"],
+					"additionalProperties": false
+				},
+				"resource": {
+					"type":"object",
+					"properties":{
+						"type": {"enum": ["string"]}
+					},
+					"required": ["type"],
+					"additionalProperties": false
+				},
+				"tables": {
+					"type": "object",
+					"properties":{
+						"type": {"enum": ["array"]},
+						"minItems": {"type": "number"},
+						"items": {
+							"type": "object",
+							"properties":{
+								"type": {"enum": ["object"]},
+								"properties": {
+									"type":"object",
+									"properties":{
+										"name": {
+											"type": "object",
+											"properties": {
+												"type": {"enum":["string"]}
+											},
+											"required": ["type"],
+											"additionalProperties": false
+										},
+										"fields": {
+											"type": "object",
+											"properties": {
+												"type": {"enum":["object"]},
+												"properties": {
+													"type": "object",
+													"minItems": 1,
+													"items": {
+														"type": "object",
+														"properties":{
+															"type": {"enum": ["object"]},
+															"properties": {
+																"type": "object",
+																"properties":{
+																	"static":{
+																		"type":"object",
+																		"properties":{
+																			"type": {"enum":["boolean"]}
+																		},
+																		"required": ["type"],
+																		"additionalProperties": false
+																	},
+																	"value":{
+																		"type":"object",
+																		"properties":{
+																			"type": {"enum":["string"]}
+																		},
+																		"required": ["type"],
+																		"additionalProperties": false
+																	},
+																	"type":{
+																		"type":"object",
+																		"properties":{
+																			"enum": {
+																				"type": "array",
+																				"minItems": 1,
+																				"items": {
+																					"type": "string"
+																				}
+																			}
+																		},
+																		"required": ["enum"],
+																		"additionalProperties": false
+																	}
+																},
+																"required": ["static", "value"],
+																"additionalProperties": false
+															}
+														},
+														"required": ["type", "properties", "additionalProperties"],
+														"additionalProperties": false
+													}
+												},
+												"required": {
+													"type": "array",
+													"minItems": 1,
+													"items": {"type": "string"}
+												},
+												"additionalProperties": {"enum": [false]}
+											},
+											"required": ["type", "properties", "additionalProperties"],
+											"additionalProperties": false
+										}
+									},
+									"required": ["name", "fields"],
+									"additionalProperties": false
+								},
+								"required": {
+									"type": "array",
+									"minItems": 1,
+									"items": {"type": "string"}
+								},
+								"additionalProperties": {"enum": [false]}
+							},
+							"required": ["type", "properties", "additionalProperties"],
+							"additionalProperties": false
+						}
+					},
+					"required": ["type", "minItems", "items"],
+					"additionalProperties": false
+				}
+			},
+			"required": ["collection", "resource", "tables"],
+			"additionalProperties": false
+		},
+		"required": {
+			"type": "array",
+			"minItems": 1,
+			"items": {"type": "string"}
+		},
+		"additionalProperties": {"enum": [false]}
+	},
+	"required": ["title", "type", "description", "properties", "additionalProperties"],
+	"additionalProperties": false
+}	

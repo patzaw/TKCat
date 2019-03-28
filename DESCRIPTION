@@ -14,9 +14,12 @@ Depends:
    dplyr,
    readr,
    DBI,
-   RClickhouse
+   RClickhouse,
+   shiny,
+   DT
 Imports:
-   jsonlite
+   jsonlite,
+   jsonvalidate
 Suggests:
    knitr,
    rmarkdown

@@ -1,0 +1,67 @@
+{
+	"title": "BE collection",
+	"type": "object",
+	"description": "An array of tables where the biological entity (BE) concepts can be found",
+	"properties": {
+		"collection": {"enum":["BE collection"]},
+		"resource": {"type": "string"},
+		"tables": {
+			"type": "array",
+			"minItems": 1,
+			"items":{
+				"type": "object",
+				"properties":{
+					"name": {"type": "string"},
+					"fields": {
+						"type": "object",
+						"properties": {
+							"be": {
+								"type": "object",
+								"properties": {
+									"static": {"type": "boolean"},
+									"value": {"type": "string"}
+								},
+								"required": ["static", "value"],
+								"additionalProperties": false
+							},
+							"source": {
+								"type": "object",
+								"properties": {
+									"static": {"type": "boolean"},
+									"value": {"type": "string"}
+								},
+								"required": ["static", "value"],
+								"additionalProperties": false
+							},
+							"organism": {
+								"type": "object",
+								"properties": {
+									"static": {"type": "boolean"},
+									"value": {"type": "string"},
+									"type": {"enum": ["Scientific name", "NCBI taxon identifier"]}
+								},
+								"required": ["static", "value", "type"],
+								"additionalProperties": false
+							},
+							"identifier": {
+								"type": "object",
+								"properties": {
+									"static": {"type": "boolean"},
+									"value": {"type": "string"}
+								},
+								"required": ["static", "value"],
+								"additionalProperties": false
+							}
+						},
+						"required": ["be", "source", "identifier"],
+						"additionalProperties": false
+					}
+				},
+				"required": ["name", "fields"],
+				"additionalProperties": false
+			}
+		}
+	},
+	"required": ["collection", "resource", "tables"],
+	"additionalProperties": false
+}

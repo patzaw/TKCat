@@ -30,9 +30,22 @@ is.chMDB <- function(x){
 #' @export
 #'
 dbInfo.chMDB <- function(x, ...){
-   x <- unclass(x)
-   adbs <- listMDBs(x$tkcon)
-   adbs %>% filter(name==x$dbName) %>% as.list()
+   xl <- unclass(x)
+   adbs <- listMDBs(xl$tkcon)
+   toRet <- adbs %>% filter(name==xl$dbName) %>% as.list()
+   toRet$records <- sum(unlist(lapply(
+      names(x),
+      function(y){
+         suppressWarnings(dbGetQuery(
+            tkcon$chcon,
+            sprintf(
+               "select count() from `%s`.`%s`",
+               xl$dbName, y
+            )
+         ))[,1]
+      }
+   )))
+   return(toRet)
 }
 
 ###############################################################################@
@@ -105,6 +118,7 @@ dataTables.chMDB <- function(x, ...){
 #'
 format.chMDB <- function(x){
    xl <- unclass(x)
+   dbi <- dbInfo(x)
    return(sprintf(
       paste(
          "chMDB %s (version %s): %s",
@@ -115,29 +129,18 @@ format.chMDB <- function(x){
          "%s (%s)",
          sep="\n"
       ),
-      dbInfo(x)$name,
-      dbInfo(x)$version,
-      dbInfo(x)$title,
+      dbi$name,
+      dbi$version,
+      dbi$title,
       length(x),
       format(
-         sum(unlist(lapply(
-            names(x),
-            function(y){
-               suppressWarnings(dbGetQuery(
-                  tkcon$chcon,
-                  sprintf(
-                     "select count() from `%s`.`%s`",
-                     xl$dbName, y
-                  )
-               ))[,1]
-            }
-         ))),
+         dbi$records,
          big.mark=",",
          scientific=FALSE
       ),
       # round(hs, 1), u,
-      dbInfo(x)$description,
-      dbInfo(x)$url
+      dbi$description,
+      dbi$url
    ))
 }
 
