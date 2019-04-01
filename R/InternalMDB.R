@@ -3,6 +3,8 @@
 #' @param dataModel a RelDataModel object
 #' @param dbTable a list of tables
 #' @param dbInfo a list of information values regarding the DB
+#' @param colMembers the collection members of the MDB. If NULL (default),
+#' collection members are not defined.
 #' @param checkTables a single logical. If TRUE (default), tables are confronted
 #' to the dataModel.
 #'
@@ -12,6 +14,7 @@
 #'
 internalMDB <- function(
    dataModel, dbTables, dbInfo,
+   colMembers=NULL,
    checkTables=TRUE
 ){
 
@@ -69,6 +72,11 @@ internalMDB <- function(
    toRet$"___dataModel___" <- dataModel
    toRet$"___dbInfo___" <- dbInfo
    class(toRet) <- c("internalMDB", class(toRet))
+   
+   ## Collection members ----
+   if(!is.null(colMembers)){
+      collectionMembers(toRet) <- colMembers
+   }
 
    ## Returning the DB ----
    return(toRet)
@@ -177,7 +185,64 @@ checkTable <- function(x, tableModel){
 #' @export
 #'
 dbInfo.internalMDB <- function(x, ...){
-   x$"___dbInfo___"
+   x$"___dbInfo___"[which(names(x$"___dbInfo___")!="collectionMembers")]
+}
+
+###############################################################################@
+#' @export
+#'
+collectionMembers.internalMDB <- function(
+   x,
+   collections=x$"___dbInfo___"$"collectionMembers"$collection,
+   ...
+){
+   toRet <- x$"___dbInfo___"$"collectionMembers"
+   toRet <- toRet[which(toRet$collection %in% collections),]
+   return(toRet)
+}
+
+###############################################################################@
+#' @export
+#'
+'collectionMembers<-.internalMDB' <- function(x, value, ...){
+   if(is.null(value)){
+      x <- unclass(x)
+      x$"___dbInfo___"$"collectionMembers" <- value
+      class(x) <- c("internalMDB", class(x))
+      return(x)
+   }
+   
+   stopifnot(
+      is.data.frame(value),
+      is.character(value$collection),
+      is.character(value$resource),
+      is.character(value$table),
+      is.character(value$field),
+      is.logical(value$static),
+      is.character(value$value),
+      all(value$resource==dbInfo(x)$name),
+      all(value$collection %in% listLocalCollections()$title),
+      sum(duplicated(value %>% select(collection, table, field)))==0
+   )
+   for(mbt in unique(value$table)){
+      notFound <- setdiff(
+         value$value[which(value$table==mbt & !value$static)],
+         dataModel(x)[[mbt]]$fields$name
+      )
+      if(length(notFound)>0){
+         stop(
+            sprintf(
+               "Cannot find the following fields in the %s table: ",
+               mbt
+            ),
+            paste(notFound, collapse=", ")
+         )
+      }
+   }
+   x <- unclass(x)
+   x$"___dbInfo___"$"collectionMembers" <- value
+   class(x) <- c("internalMDB", class(x))
+   return(x)
 }
 
 ###############################################################################@
@@ -301,12 +366,25 @@ names.internalMDB <- function(x, ...){
 ###############################################################################@
 #' @export
 #'
-'names<-.internalMDB' <- function(x, ...){
+'names<-.internalMDB' <- function(x, value, ...){
+   colMb <- collectionMembers(x)
+   ovalues <- names(x)
    x <- unclass(x)
-   names(x$"___dataModel___") <- c(...)
+   if(!is.null(colMb)){
+      ncolMb <- NULL
+      for(i in 1:length(ovalues)){
+         toAdd <- colMb %>% filter(table==ovalues[i])
+         if(nrow(toAdd)>0){
+            toAdd$table <- value[i]
+            ncolMb <- ncolMb %>% bind_rows(toAdd)
+         }
+      }
+   }
+   names(x$"___dataModel___") <- value
    names(x)[which(!names(x) %in% c("___dataModel___", "___dbInfo___"))] <-
-      c(...)
+      value
    class(x) <- c("internalMDB", class(x))
+   collectionMembers(x) <- ncolMb
    return(x)
 }
 

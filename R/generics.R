@@ -8,6 +8,25 @@ dbInfo <- function(x, ...){
 }
 
 ###############################################################################@
+#' Get collection members
+#'
+#' @export
+#'
+collectionMembers <- function(x, ...){
+   UseMethod("collectionMembers", x)
+}
+
+###############################################################################@
+#' Set collection members
+#'
+#' @export
+#'
+'collectionMembers<-' <- function(x, value, ...){
+   UseMethod("collectionMembers<-", x)
+}
+
+
+###############################################################################@
 #' Get object dataModel
 #'
 #' @export

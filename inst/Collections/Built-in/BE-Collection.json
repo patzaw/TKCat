@@ -1,7 +1,7 @@
 {
 	"title": "BE collection",
 	"type": "object",
-	"description": "An array of tables where the biological entity (BE) concepts can be found",
+	"description": "Collection of biological entity (BE) concepts",
 	"properties": {
 		"collection": {"enum":["BE collection"]},
 		"resource": {"type": "string"},

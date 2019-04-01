@@ -1,7 +1,7 @@
 {
 	"title": "Condition collection",
 	"type": "object",
-	"description": "An array of tables where the condition concepts can be found",
+	"description": "Collection of condition concepts",
 	"properties": {
 	   "collection": {"enum":["Condition collection"]},
 		"resource": {"type": "string"},

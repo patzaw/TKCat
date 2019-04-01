@@ -4,12 +4,16 @@
 \alias{internalMDB}
 \title{Create an internal database: a set of tables with a data model}
 \usage{
-internalMDB(dataModel, dbTables, dbInfo, checkTables = TRUE)
+internalMDB(dataModel, dbTables, dbInfo, colMembers = NULL,
+  checkTables = TRUE)
 }
 \arguments{
 \item{dataModel}{a RelDataModel object}
 
 \item{dbInfo}{a list of information values regarding the DB}
+
+\item{colMembers}{the collection members of the MDB. If NULL (default),
+collection members are not defined.}
 
 \item{checkTables}{a single logical. If TRUE (default), tables are confronted
 to the dataModel.}
