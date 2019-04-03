@@ -62,7 +62,7 @@ collectionMembers.chMDB <- function(
       is.null(collections) || is.character(collections)
    )
    toRet <- dbGetQuery(
-      conn=x$tkcon$chcon,
+      conn=unclass(x)$tkcon$chcon,
       statement=
          sprintf(
             "SELECT * FROM default.CollectionMembers WHERE resource='%s' %s",
@@ -104,7 +104,10 @@ setChMDBcollectionMembers <- function(x, value){
          is.character(value$value),
          is.character(value$type),
          all(value$resource==dbInfo(x, countRecords=FALSE)$name),
-         all(value$collection %in% listChTKCatCollections(x$tkcon)$title),
+         all(
+            value$collection %in%
+               listChTKCatCollections(unlcass(x)$tkcon)$title
+         ),
          sum(duplicated(value %>% select(collection, table, field)))==0
       )
       dm <- dataModel(x)
@@ -125,14 +128,14 @@ setChMDBcollectionMembers <- function(x, value){
       }
    }
    dbSendQuery(
-      conn=x$tkcon$chcon,
+      conn=unclass(x)$tkcon$chcon,
       statement=sprintf(
          "ALTER TABLE default.CollectionMembers DELETE WHERE resource='%s'",
          unique(value$resource)
       )
    )
    .dbinsert(
-      conn=x$tkcon$chcon,
+      conn=unclass(x)$tkcon$chcon,
       dbName="default",
       tableName="CollectionMembers",
       value=value
@@ -273,7 +276,49 @@ length.chMDB <- function(x){
 ###############################################################################@
 #' @export
 #'
-'[<-.chlMDB' <- function(x, i, value){
+'[.chMDB' <- function(x, i=NULL){
+   dbi <- dbInfo(x)
+   if(is.null(i)){
+      i <- names(x)
+      dbi$name <- dbi$name
+   }else{
+      dbi$name <- sprintf("SUBSET of %s", dbi$name)
+   }
+   stopifnot(
+      is.character(i),
+      all(i %in% names(x))
+   )
+   dm <- dataModel(x)[i, rmForeignKeys=TRUE]
+   dt <- dataTables(x, i)
+   cm <- collectionMembers(x) %>%
+      filter(table %in% i) %>%
+      mutate(resource=dbi$name)
+   toRet <- internalMDB(
+      dataModel=dm,
+      dbTables=dt,
+      dbInfo=dbi,
+      colMembers=cm,
+      checkTables=FALSE
+   )
+   return(toRet)
+}
+
+###############################################################################@
+#' @export
+#'
+'[[.chMDB' <- '$.chMDB' <- function(x, i){
+   stopifnot(
+      is.character(i),
+      length(i)==1,
+      all(i %in% names(x))
+   )
+   return(dataTables(x, i)[[1]])
+}
+
+###############################################################################@
+#' @export
+#'
+'[<-.chMDB' <- function(x, i, value){
    stop("'[<-' is not supported for chMDB")
 }
 
@@ -294,7 +339,7 @@ length.chMDB <- function(x){
 ###############################################################################@
 #' @export
 #'
-c.internalMDB <- function(...){
+c.chMDB <- function(...){
    stop("Cannot concatenate several chMDB")
 }
 

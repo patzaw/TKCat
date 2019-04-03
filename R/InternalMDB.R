@@ -185,7 +185,10 @@ checkTable <- function(x, tableModel){
 #' @export
 #'
 dbInfo.internalMDB <- function(x, ...){
-   x$"___dbInfo___"[which(names(x$"___dbInfo___")!="collectionMembers")]
+   x <- unclass(x)
+   x$"___dbInfo___"[
+      which(names(x$"___dbInfo___")!="collectionMembers")
+   ]
 }
 
 ###############################################################################@
@@ -196,6 +199,7 @@ collectionMembers.internalMDB <- function(
    collections=x$"___dbInfo___"$"collectionMembers"$collection,
    ...
 ){
+   x <- unclass(x)
    toRet <- x$"___dbInfo___"$"collectionMembers"
    toRet <- toRet[which(toRet$collection %in% collections),]
    return(toRet)
@@ -257,7 +261,7 @@ collectionMembers.internalMDB <- function(
 #' @export
 #'
 dataModel.internalMDB <- function(x, ...){
-   x$"___dataModel___"
+   unclass(x)$"___dataModel___"
 }
 
 ###############################################################################@
@@ -349,31 +353,69 @@ length.internalMDB <- function(x){
 ###############################################################################@
 #' @export
 #'
+'[.internalMDB' <- function(x, i=NULL){
+   if(is.null(i)){
+      return(x)
+   }
+   stopifnot(
+      is.character(i),
+      all(i %in% names(x))
+   )
+   dbi <- dbInfo(x)
+   dbi$name <- sprintf("SUBSET of %s", dbi$name)
+   dm <- dataModel(x)[i, rmForeignKeys=TRUE]
+   dt <- dataTables(x, i)
+   cm <- collectionMembers(x) %>%
+      filter(table %in% i) %>%
+      mutate(resource=dbi$name)
+   toRet <- internalMDB(
+      dataModel=dm,
+      dbTables=dt,
+      dbInfo=dbi,
+      colMembers=cm,
+      checkTables=FALSE
+   )
+   return(toRet)
+}
+
+###############################################################################@
+#' @export
+#'
+'[[.internalMDB' <- '$.internalMDB' <- function(x, i){
+   stopifnot(
+      is.character(i),
+      length(i)==1,
+      all(i %in% names(x))
+   )
+   return(unclass(x)[[i]])
+}
+
+###############################################################################@
+#' @export
+#'
 '[<-.internalMDB' <- function(x, i, value){
-   stop("'[<-' is not supported for internalMDB: use 'c' instead")
+   stop("'[<-' is not supported for internalMDB")
 }
 
 ###############################################################################@
 #' @export
 #'
 '[[<-.internalMDB' <- function(x, i, value){
-   stop("'[[<-' is not supported for internalMDB: use 'c' instead")
+   stop("'[[<-' is not supported for internalMDB")
 }
 
 ###############################################################################@
 #' @export
 #'
 '$<-.internalMDB' <- function(x, i, value){
-   stop("'$<-' is not supported for internalMDB: use 'c' instead")
+   stop("'$<-' is not supported for internalMDB")
 }
 
 ###############################################################################@
 #' @export
 #'
 c.internalMDB <- function(..., checkTables=FALSE){
-   dm <- do.call(c, lapply(list(...), dataModel))
-   d <- do.call(c, lapply(list(...), dataTables))
-   return(internalMDB(dm, d, checkTables=checkTables))
+   stop("'c' is not supported for internalMDB")
 }
 
 
