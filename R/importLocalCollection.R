@@ -6,15 +6,28 @@
 #' @importFrom jsonvalidate json_validate
 #' @export
 #' 
-importLocalCollection <- function(f){
+importLocalCollection <- function(f, overwrite=FALSE){
    raw <- readLines(f) %>% paste(collapse="\n")
    if(!json_validate(raw, tkcatEnv$COL_SCHEMA, verbose=TRUE)){
       stop("Not a valid collection")
    }
    def <- fromJSON(raw)
+   if(
+      def$properties$collection$enum %in% listLocalCollections()$title &&
+      !overwrite
+   ){
+      stop(
+         sprintf(
+            'A "%s" has already been imported.',
+            def$properties$collection$enum
+         ),
+         " Set overwrite to TRUE if you want to replace it."
+      )
+   }
    assign(
       x="COLLECTIONS",
       value=tkcatEnv$COLLECTIONS %>%
+         filter(title != def$properties$collection$enum) %>%
          bind_rows(tibble(
             title=def$properties$collection$enum,
             description=def$description,

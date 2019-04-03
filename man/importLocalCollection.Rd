@@ -4,7 +4,7 @@
 \alias{importLocalCollection}
 \title{Import a collection definition in the local environment}
 \usage{
-importLocalCollection(f)
+importLocalCollection(f, overwrite = FALSE)
 }
 \arguments{
 \item{f}{the JSON file to import}

@@ -29,24 +29,116 @@ is.chMDB <- function(x){
 ###############################################################################@
 #' @export
 #'
-dbInfo.chMDB <- function(x, ...){
+dbInfo.chMDB <- function(x, countRecords=TRUE, ...){
    xl <- unclass(x)
    adbs <- listMDBs(xl$tkcon)
    toRet <- adbs %>% filter(name==xl$dbName) %>% as.list()
-   toRet$records <- sum(unlist(lapply(
-      names(x),
-      function(y){
-         suppressWarnings(dbGetQuery(
-            tkcon$chcon,
-            sprintf(
-               "select count() from `%s`.`%s`",
-               xl$dbName, y
-            )
-         ))[,1]
-      }
-   )))
+   if(countRecords){
+      toRet$records <- sum(unlist(lapply(
+         names(x),
+         function(y){
+            suppressWarnings(dbGetQuery(
+               tkcon$chcon,
+               sprintf(
+                  "SELECT count() FROM `%s`.`%s`",
+                  xl$dbName, y
+               )
+            ))[,1]
+         }
+      )))
+   }
    return(toRet)
 }
+
+###############################################################################@
+#' @export
+#'
+collectionMembers.chMDB <- function(
+   x,
+   collections=NULL,
+   ...
+){
+   stopifnot(
+      is.null(collections) || is.character(collections)
+   )
+   toRet <- dbGetQuery(
+      conn=x$tkcon$chcon,
+      statement=
+         sprintf(
+            "SELECT * FROM default.CollectionMembers WHERE resource='%s' %s",
+            dbInfo(x, countRecords=FALSE)$name,
+            if(is.null(collections)){
+               ""
+            }else{
+               sprintf(
+                  "AND collection IN ('%s')",
+                  paste(collections, collapse="', '")
+               )
+            }
+         )
+   ) %>%
+      as_tibble() %>%
+      select(collection, resource, table, field, static, value, type) %>%
+      mutate(static=as.logical(static))
+   return(toRet)
+}
+
+###############################################################################@
+setChMDBcollectionMembers <- function(x, value){
+   stopifnot(is.chMDB(x))
+   if(!is.null(value)){
+      stopifnot(
+         is.data.frame(value),
+         all(
+            colnames(value) %in%
+               c(
+                  "collection", "resource", "table",
+                  "field", "static", "value", "type"
+               )
+         ),
+         is.character(value$collection),
+         is.character(value$resource),
+         is.character(value$table),
+         is.character(value$field),
+         is.logical(value$static),
+         is.character(value$value),
+         is.character(value$type),
+         all(value$resource==dbInfo(x, countRecords=FALSE)$name),
+         all(value$collection %in% listChTKCatCollections(x$tkcon)$title),
+         sum(duplicated(value %>% select(collection, table, field)))==0
+      )
+      dm <- dataModel(x)
+   }
+   for(mbt in unique(value$table)){
+      notFound <- setdiff(
+         value$value[which(value$table==mbt & !value$static)],
+         dm[[mbt]]$fields$name
+      )
+      if(length(notFound)>0){
+         stop(
+            sprintf(
+               "Cannot find the following fields in the %s table: ",
+               mbt
+            ),
+            paste(notFound, collapse=", ")
+         )
+      }
+   }
+   dbSendQuery(
+      conn=x$tkcon$chcon,
+      statement=sprintf(
+         "ALTER TABLE default.CollectionMembers DELETE WHERE resource='%s'",
+         unique(value$resource)
+      )
+   )
+   .dbinsert(
+      conn=x$tkcon$chcon,
+      dbName="default",
+      tableName="CollectionMembers",
+      value=value
+   )
+}
+
 
 ###############################################################################@
 #' @export
@@ -61,10 +153,12 @@ dataModel.chMDB <- function(x, ...){
          x$tkcon$chcon, sprintf("SELECT * FROM `%s`.`___fields___`", x$dbName)
       ),
       primaryKeys=dbGetQuery(
-         x$tkcon$chcon, sprintf("SELECT * FROM `%s`.`___primaryKeys___`", x$dbName)
+         x$tkcon$chcon,
+         sprintf("SELECT * FROM `%s`.`___primaryKeys___`", x$dbName)
       ),
       foreignKeys=dbGetQuery(
-         x$tkcon$chcon, sprintf("SELECT * FROM `%s`.`___foreignKeys___`", x$dbName)
+         x$tkcon$chcon,
+         sprintf("SELECT * FROM `%s`.`___foreignKeys___`", x$dbName)
       ),
       indexes=dbGetQuery(
          x$tkcon$chcon, sprintf("SELECT * FROM `%s`.`___indexes___`", x$dbName)
@@ -119,12 +213,16 @@ dataTables.chMDB <- function(x, ...){
 format.chMDB <- function(x){
    xl <- unclass(x)
    dbi <- dbInfo(x)
+   cm <- collectionMembers(x)
    return(sprintf(
       paste(
          "chMDB %s (version %s): %s",
          "   - %s tables",
          "   - %s records",
          # "   - %s %s",
+         "",
+         "Collections: ",
+         "%s",
          "",
          "%s (%s)",
          sep="\n"
@@ -139,6 +237,19 @@ format.chMDB <- function(x){
          scientific=FALSE
       ),
       # round(hs, 1), u,
+      paste(
+         unlist(lapply(
+            unique(cm$collection),
+            function(y){
+               return(sprintf(
+                  "   - %s %s members",
+                  length(unique(cm$table[which(cm$collection==y)])),
+                  y
+               ))
+            }
+         )),
+         collapse="\n"
+      ),
       dbi$description,
       dbi$url
    ))

@@ -214,12 +214,20 @@ collectionMembers.internalMDB <- function(
    
    stopifnot(
       is.data.frame(value),
+      all(
+         colnames(value) %in%
+            c(
+               "collection", "resource", "table",
+               "field", "static", "value", "type"
+            )
+      ),
       is.character(value$collection),
       is.character(value$resource),
       is.character(value$table),
       is.character(value$field),
       is.logical(value$static),
       is.character(value$value),
+      is.character(value$type),
       all(value$resource==dbInfo(x)$name),
       all(value$collection %in% listLocalCollections()$title),
       sum(duplicated(value %>% select(collection, table, field)))==0
@@ -282,12 +290,16 @@ format.internalMDB <- function(x){
    hu <- log2(s)%/%10
    hs <- s/(2^(10*hu))
    u <- sunits[hu+1]
+   cm <- collectionMembers(x)
    return(sprintf(
       paste(
          "internalMDB %s (version %s): %s",
          "   - %s tables",
          "   - %s records",
          "   - %s %s",
+         "",
+         "Collections: ",
+         "%s",
          "",
          "%s (%s)",
          sep="\n"
@@ -302,6 +314,19 @@ format.internalMDB <- function(x){
          scientific=FALSE
       ),
       round(hs, 1), u,
+      paste(
+         unlist(lapply(
+            unique(cm$collection),
+            function(y){
+               return(sprintf(
+                  "   - %s %s members",
+                  length(unique(cm$table[which(cm$collection==y)])),
+                  y
+               ))
+            }
+         )),
+         collapse="\n"
+      ),
       dbInfo(x)$description,
       dbInfo(x)$url
    ))

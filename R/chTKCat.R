@@ -129,6 +129,32 @@ init_chTKCat <- function(x, instance, version){
          "ENGINE = MergeTree() ORDER BY (name)"
       )
    )
+   dbSendQuery(
+      conn=x$chcon,
+      statement=paste(
+         "CREATE TABLE default.Collections (",
+         "title String,",
+         "description String,",
+         "json String",
+         ")",
+         "ENGINE = MergeTree() ORDER BY (title)"
+      )
+   )
+   dbSendQuery(
+      conn=x$chcon,
+      statement=paste(
+         "CREATE TABLE default.CollectionMembers (",
+         "collection String,",
+         "resource String,",
+         "table String,",
+         "field String,",
+         "static UInt8,",
+         "value String,",
+         "type Nullable(String)",
+         ")",
+         "ENGINE = MergeTree() ORDER BY (collection, resource, table, field)"
+      )
+   )
    x$init <- TRUE
    return(check_chTKCat(x))
 }
@@ -196,12 +222,102 @@ check_chTKCat <- function(x, verbose=FALSE){
 ###############################################################################@
 #' List available database
 #' 
+#' @importFrom jsonlite fromJSON
+#' @importFrom jsonvalidate json_validate
+#' 
+addChTKCatCollection <- function(tkcon, json, overwrite=FALSE){
+   stopifnot(
+      is.chTKCat(tkcon),
+      is.character(json),
+      length(json)==1
+   )
+   if(file.exists(json)){
+      raw <- readLines(f) %>% paste(collapse="\n")
+   }else if(json %in% listLocalCollections()$title){
+      env <- environment()
+      raw <- tkcatEnv$COLLECTIONS %>%
+         filter(title==get("json", env)) %>%
+         pull(json)
+   }else{
+      raw <- json
+   }
+   if(!json_validate(raw, tkcatEnv$COL_SCHEMA, verbose=TRUE)){
+      stop("Not a valid collection")
+   }
+   def <- fromJSON(raw)
+   ctitle <- def$properties$collection$enum 
+   if(
+      ctitle %in% listChTKCatCollections(tkcon)$title &&
+      !overwrite
+   ){
+      stop(
+         sprintf(
+            'A "%s" has already been imported.',
+            ctitle
+         ),
+         " Set overwrite to TRUE if you want to replace it."
+      )
+   }
+   dbSendQuery(
+      conn=tkcon$chcon,
+      statement=sprintf(
+         "ALTER TABLE default.Collections DELETE WHERE title='%s'",
+         ctitle
+      )
+   )
+   toWrite<- tibble(
+      title=ctitle,
+      description=def$description,
+      json=raw
+   )
+   .dbinsert(
+      conn=tkcon$chcon,
+      dbName="default",
+      tableName="Collections",
+      value=toWrite
+   )
+}
+
+###############################################################################@
+#' List collections available in a chTKCat
+#' 
+#' @export
+#' 
+listChTKCatCollections <- function(tkcon){
+   as_tibble(dbGetQuery(
+      conn=tkcon$chcon,
+      statement="SELECT title, description FROM default.Collections"
+   ))
+}
+
+###############################################################################@
+#' List available database
+#' 
 #' @export
 #' 
 listMDBs <- function(tkcon){
    check_chTKCat(tkcon, verbose=TRUE)
    dbGetQuery(tkcon$chcon, "SELECT * FROM default.MDB") %>% as_tibble()
 }
+
+
+
+###############################################################################@
+#' @export
+#'
+collectionMembers.chTKCat <- function(
+   x,
+   collections=NULL,
+   ...
+){
+   toRet <- NULL
+   for(db in listMDBs(x)$name){
+      mdb <- chMDB(x, db)
+      toRet <- bind_rows(toRet, collectionMembers(mdb, collections=collections))
+   }
+   return(toRet)
+}
+
 
 ###############################################################################@
 #' Explore a chTKCat

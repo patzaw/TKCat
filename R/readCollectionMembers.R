@@ -36,9 +36,16 @@ readCollectionMembers <- function(f){
          return(toRet)
       }
    ))
+   if(!"type" %in% colnames(toRet)){
+      toRet$type <- NA
+   }
    toRet$collection <- mbl$collection
    toRet$resource <- mbl$resource
    toRet <- toRet %>%
-      select("collection", "resource", "table", "field", "static", "value")
+      mutate(type=as.character(type)) %>%
+      select(
+         "collection", "resource", "table",
+         "field", "static", "value", "type"
+      )
    return(toRet)
 }
