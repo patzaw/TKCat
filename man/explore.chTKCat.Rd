@@ -4,7 +4,7 @@
 \alias{explore.chTKCat}
 \title{Explore a chTKCat}
 \usage{
-\method{explore}{chTKCat}(x, ...)
+\method{explore}{chTKCat}(x, Tabix = NA, ...)
 }
 \description{
 Explore a chTKCat

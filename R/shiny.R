@@ -417,11 +417,11 @@ buildServer <- function(tkcon, mdbList){
 #' @importFrom base64enc base64encode
 #' @export
 #' 
-explore.chTKCat <- function(x, ...){
+explore.chTKCat <- function(x, Tabix=NA, ...){
    
    mdbList <- listMDBs(x)
    
-   shinyApp(ui=buildUi(x), server=buildServer(x, mdbList))
+   shinyApp(ui=buildUi(x, Tabix=Tabix), server=buildServer(x, mdbList))
    # runGadget(
    #    ui, server,
    #    viewer = dialogViewer("Explore chTKCat", height=900, width=1600)
