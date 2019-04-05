@@ -4,6 +4,8 @@
 #' database (default: localhost)
 #' @param port an integer specifying the port on which the 
 #' database is listening (default: 9101)
+#' @param http an integer specifying the HTTP port of the 
+#' ClickHouse database (default: 9111). Used for documentation only.
 #'
 #' @return a chTKCat object
 #'
@@ -14,7 +16,8 @@
 #'
 chTKCat <- function(
    host="localhost",
-   port=9101
+   port=9101L,
+   http=9111L
    # username=NULL,
    # password=NULL,
    # readOnly=TRUE
@@ -27,7 +30,8 @@ chTKCat <- function(
    )
    
    toRet <- list(
-      chcon=chcon
+      chcon=chcon,
+      http=http
    )
    class(toRet) <- "chTKCat"
    
@@ -316,155 +320,4 @@ collectionMembers.chTKCat <- function(
       toRet <- bind_rows(toRet, collectionMembers(mdb, collections=collections))
    }
    return(toRet)
-}
-
-
-###############################################################################@
-#' Explore a chTKCat
-#' 
-#' @export
-#' 
-explore.chTKCat <- function(x, ...){
-   
-   mdbList <- listMDBs(x)
-   
-   ui <- fluidPage(
-      
-      title = "Diamonds Explorer",
-      
-      fluidRow(
-         column(
-            8,
-            dataTableOutput("mdbList")
-         ),
-         column(
-            4,
-            uiOutput("dbInfo")
-         )
-      ),
-      
-      fluidRow(
-         column(
-            8,
-            visNetworkOutput("dataModel")
-         ),
-         column(
-            4,
-            uiOutput("tableInfo")
-         )
-      )
-   )
-   
-   server <- function(input, output, session) {
-      output$mdbList <- renderDataTable({
-         datatable(
-            mdbList %>%
-               select(name, title) %>%
-               rename("Database"="name", "Title"="title"),
-            filter="top",
-            selection = 'single',
-            extensions='Scroller',
-            options = list(
-               deferRender = TRUE,
-               scrollY = 150,
-               scroller = TRUE,
-               dom=c("ti")
-            )
-         )
-      })
-      
-      output$dbInfo <- renderUI({
-         s <- input$mdbList_rows_selected
-         validate(need(s, FALSE))
-         dbi <- dbInfo(chMDB(x, mdbList$name[s]))
-         do.call(tags$ul, lapply(
-            names(dbi),
-            function(n){
-               tags$li(tags$span(
-                  tags$strong(paste0(n, ":")),
-                  if(n=="url"){
-                     tags$a(dbi[[n]], href=dbi[[n]], target="_blank")
-                  }else if(is.numeric(dbi[[n]])){
-                     format(dbi[[n]], big.mark=",")
-                  }else{
-                     dbi[[n]]
-                  }
-               ))
-            }
-         ))
-      })
-      
-      output$dataModel <- renderVisNetwork({
-         s <- input$mdbList_rows_selected
-         validate(need(s, FALSE))
-         dm <- dataModel(chMDB(x, mdbList$name[s]))
-         plot(dm) %>%
-            visOptions(
-               nodesIdSelection=list(enabled=TRUE, useLabels=FALSE),
-               highlightNearest=TRUE
-            ) 
-      })
-      
-      output$tableInfo <- renderUI({
-         # h2(input$dataModel_selected)
-         st <- input$dataModel_selected
-         s <- isolate(input$mdbList_rows_selected)
-         validate(need(st, FALSE))
-         validate(need(s, FALSE))
-         dm <- dataModel(chMDB(x, mdbList$name[s]))
-         list(
-            h2(st),
-            tags$ul(
-               tags$li(
-                  tags$strong("Records"),
-                  ":",
-                  suppressWarnings(dbGetQuery(
-                     x$chcon,
-                     sprintf(
-                        "SELECT count() from `%s`.`%s`",
-                        mdbList$name[s],
-                        st
-                     )
-                  ))[,1] %>% format(big.mark=",")
-               )
-            ),
-            dataTableOutput("dataSample")
-         )
-      })
-      
-      output$dataSample <- renderDataTable({
-         st <- input$dataModel_selected
-         s <- isolate(input$mdbList_rows_selected)
-         validate(need(st, FALSE))
-         validate(need(s, FALSE))
-         dm <- dataModel(chMDB(x, mdbList$name[s]))
-         datatable(
-            suppressWarnings(dbGetQuery(
-               x$chcon,
-               sprintf(
-                  "SELECT * from `%s`.`%s` limit 100",
-                  mdbList$name[s],
-                  st
-               )
-            )),
-            selection = 'single',
-            extensions='Scroller',
-            options = list(
-               deferRender = TRUE,
-               scrollX=TRUE,
-               scrollY = 300,
-               scroller = TRUE,
-               dom=c("ti")
-            )
-         )
-      })
-      
-      
-   }
-   
-   runGadget(
-      ui, server,
-      viewer = dialogViewer("Explore chTKCat", height=900, width=1600)
-   )
-   
 }

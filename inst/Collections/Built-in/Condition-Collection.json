@@ -3,7 +3,7 @@
 	"type": "object",
 	"description": "Collection of condition concepts",
 	"properties": {
-	   "collection": {"enum":["Condition collection"]},
+	   "collection": {"enum":["Condition"]},
 		"resource": {"type": "string"},
 		"tables": {
 			"type": "array",

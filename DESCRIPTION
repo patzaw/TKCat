@@ -19,7 +19,8 @@ Depends:
    DT
 Imports:
    jsonlite,
-   jsonvalidate
+   jsonvalidate,
+   base64enc
 Suggests:
    knitr,
    rmarkdown

@@ -3,7 +3,7 @@
 	"type": "object",
 	"description": "Collection of biological entity (BE) concepts",
 	"properties": {
-		"collection": {"enum":["BE collection"]},
+		"collection": {"enum":["BE"]},
 		"resource": {"type": "string"},
 		"tables": {
 			"type": "array",

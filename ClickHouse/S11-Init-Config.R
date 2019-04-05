@@ -25,6 +25,6 @@ tkcon <- chTKCat(
 )
 try(tkcon <- TKCat:::init_chTKCat(
    tkcon,
-   instance="UCB_NM_Brain",
+   instance="UCB - New Medicines - Braine",
    version=as.character(Sys.Date())
 ))

@@ -8,7 +8,7 @@
 #####################################################
 ## Configuration
 
-export TKCAT_HOME=/data/pgodard/Projects/UCB_NM_TKcat
+export TKCAT_HOME=/data/pgodard/Projects/TKCat_UCB_NM_Braine
 mkdir -p $TKCAT_HOME
 
 export TKCAT_NAT_PORT=9101

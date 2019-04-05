@@ -38,7 +38,7 @@ dbInfo.chMDB <- function(x, countRecords=TRUE, ...){
          names(x),
          function(y){
             suppressWarnings(dbGetQuery(
-               tkcon$chcon,
+               xl$tkcon$chcon,
                sprintf(
                   "SELECT count() FROM `%s`.`%s`",
                   xl$dbName, y
@@ -106,7 +106,7 @@ setChMDBcollectionMembers <- function(x, value){
          all(value$resource==dbInfo(x, countRecords=FALSE)$name),
          all(
             value$collection %in%
-               listChTKCatCollections(unlcass(x)$tkcon)$title
+               listChTKCatCollections(unclass(x)$tkcon)$title
          ),
          sum(duplicated(value %>% select(collection, table, field)))==0
       )

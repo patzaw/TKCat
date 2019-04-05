@@ -30,5 +30,5 @@ docker volume prune
 Remove the folder with all the data: `$TKCAT_HOME`.
 
 ```
-sudo rm -rf ~/Documents/Projects/UCB_NM_TKcat
+sudo rm -rf ~/Documents/Projects/TKCat_UCB_NM_Braine
 ```
