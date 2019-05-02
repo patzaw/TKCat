@@ -42,6 +42,12 @@ chTKCat <- function(
 }
 
 ###############################################################################@
+#' Check the object is  an [chTKCat] object
+#' 
+#' @param x any object
+#' 
+#' @return A single logical: TRUE if x is an chTKCat object
+#' 
 #' @export
 #'
 is.chTKCat <- function(x){
@@ -49,6 +55,12 @@ is.chTKCat <- function(x){
 }
 
 ###############################################################################@
+#' Format an [chTKCat] object for printing
+#' 
+#' @param x an [chTKCat] object
+#' 
+#' @return A single character
+#' 
 #' @export
 #'
 format.chTKCat <- function(x){
@@ -89,15 +101,13 @@ disconnect_chTKCat <- function(x){
 }
 
 ###############################################################################@
-#' Check the chTKCat object
+#' Initialize a chTKCat database
 #'
-#' @param x a chTKCat object
+#' @param x a [chTKCat] object
 #' @param instance instance name of the database
 #' @param version version name of the database
 #'
-#' @return a chTKCat
-#'
-#' @seealso \code{\link{connectToTbkm}}
+#' @return a [chTKCat]
 #'
 init_chTKCat <- function(x, instance, version){
    check_chTKCat(x)
@@ -150,6 +160,7 @@ init_chTKCat <- function(x, instance, version){
          "CREATE TABLE default.CollectionMembers (",
          "collection String,",
          "resource String,",
+         "cid Int32,",
          "table String,",
          "field String,",
          "static UInt8,",
@@ -164,21 +175,19 @@ init_chTKCat <- function(x, instance, version){
 }
 
 ###############################################################################@
-#' Check the chTKCat object
+#' Check a [chTKCat] object
 #'
-#' @param x a chTKCat object
+#' @param x a [chTKCat] object
 #' @param verbose a logical indicating if information messages should be
 #' displayed.
 #'
-#' @return Invisible result: chTKCat object
-#'
-#' @seealso \code{\link{connectToTbkm}}
+#' @return Invisible result: [chTKCat] object
 #'
 #' @importFrom DBI dbGetQuery dbReadTable
 #' @export
 #'
 check_chTKCat <- function(x, verbose=FALSE){
-   stopifnot(inherits(x, "chTKCat"))
+   stopifnot(is.chTKCat(x))
    toRet <- x
    defaultTables <- dbGetQuery(
       x$chcon,
@@ -224,7 +233,13 @@ check_chTKCat <- function(x, verbose=FALSE){
 }
 
 ###############################################################################@
-#' List available database
+#' Import a collection in a [chTKCat] database
+#' 
+#' @param tkcon a [chTKCat] object
+#' @param json a single charcter indicating the collection to import. Can be:
+#' - a path to a file
+#' - the name of a local collection (see [listLocalCollections()])
+#' - the json text defining the collection
 #' 
 #' @importFrom jsonlite fromJSON
 #' @importFrom jsonvalidate json_validate
@@ -280,14 +295,18 @@ addChTKCatCollection <- function(tkcon, json, overwrite=FALSE){
       tableName="Collections",
       value=toWrite
    )
+   invisible(NULL)
 }
 
 ###############################################################################@
-#' List collections available in a chTKCat
+#' List collections available in a [chTKCat]
+#' 
+#' @param tkcon a [chTKCat] object
 #' 
 #' @export
 #' 
 listChTKCatCollections <- function(tkcon){
+   stopifnot(is.chTKCat(tkcon))
    as_tibble(dbGetQuery(
       conn=tkcon$chcon,
       statement="SELECT title, description FROM default.Collections"
@@ -295,7 +314,9 @@ listChTKCatCollections <- function(tkcon){
 }
 
 ###############################################################################@
-#' List available database
+#' List available database in a [chTKCat]
+#' 
+#' @param tkcon a [chTKCat] object
 #' 
 #' @export
 #' 
@@ -307,17 +328,40 @@ listMDBs <- function(tkcon){
 
 
 ###############################################################################@
+#' Get collection members of a [chTKCat] object
+#' 
+#' @param x a [chTKCat] object
+#' @param collection a character vector indicating the name of the collections
+#' to focus on (default: NULL ==> all of them)
+#' 
+#' @return See [collectionMembers.chMDB()]
+#' 
 #' @export
 #'
 collectionMembers.chTKCat <- function(
    x,
-   collections=NULL,
-   ...
+   collections=NULL
 ){
-   toRet <- NULL
-   for(db in listMDBs(x)$name){
-      mdb <- chMDB(x, db)
-      toRet <- bind_rows(toRet, collectionMembers(mdb, collections=collections))
-   }
+   stopifnot(
+      is.null(collections) || is.character(collections)
+   )
+   toRet <- dbGetQuery(
+      conn=x$chcon,
+      statement=
+         sprintf(
+            "SELECT * FROM default.CollectionMembers %s",
+            if(is.null(collections)){
+               ""
+            }else{
+               sprintf(
+                  "WHERE collection IN ('%s')",
+                  paste(collections, collapse="', '")
+               )
+            }
+         )
+   ) %>%
+      as_tibble() %>%
+      select(collection, resource, cid, table, field, static, value, type) %>%
+      mutate(static=as.logical(static))
    return(toRet)
 }

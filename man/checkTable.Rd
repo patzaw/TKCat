@@ -9,7 +9,10 @@ checkTable(x, tableModel)
 \arguments{
 \item{x}{a data.frame}
 
-\item{tableModel}{a \code{\link{RelTableModel}} object}
+\item{tableModel}{a \link[ReDaMoR:RelTableModel]{ReDaMoR::RelTableModel} object}
+}
+\value{
+Nothing. The function throws an error if check fails.
 }
 \description{
 Check table according to a data model

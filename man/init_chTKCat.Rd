@@ -2,23 +2,20 @@
 % Please edit documentation in R/chTKCat.R
 \name{init_chTKCat}
 \alias{init_chTKCat}
-\title{Check the chTKCat object}
+\title{Initialize a chTKCat database}
 \usage{
 init_chTKCat(x, instance, version)
 }
 \arguments{
-\item{x}{a chTKCat object}
+\item{x}{a \link{chTKCat} object}
 
 \item{instance}{instance name of the database}
 
 \item{version}{version name of the database}
 }
 \value{
-a chTKCat
+a \link{chTKCat}
 }
 \description{
-Check the chTKCat object
-}
-\seealso{
-\code{\link{connectToTbkm}}
+Initialize a chTKCat database
 }

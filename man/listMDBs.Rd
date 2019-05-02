@@ -2,10 +2,13 @@
 % Please edit documentation in R/chTKCat.R
 \name{listMDBs}
 \alias{listMDBs}
-\title{List available database}
+\title{List available database in a \link{chTKCat}}
 \usage{
 listMDBs(tkcon)
 }
+\arguments{
+\item{tkcon}{a \link{chTKCat} object}
+}
 \description{
-List available database
+List available database in a \link{chTKCat}
 }

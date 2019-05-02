@@ -1,3 +1,4 @@
+## Managing local collections ----
 tkcatEnv <- new.env(hash=TRUE, parent=emptyenv())
 assign(
    x="COLLECTIONS",
@@ -7,6 +8,7 @@ assign(
    envir=tkcatEnv
 )
 
+## Importing built-in collections when loading the library ----
 .onLoad <- function(libname, pkgname){
    assign(
       x="COL_SCHEMA",
