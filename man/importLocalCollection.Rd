@@ -8,6 +8,9 @@ importLocalCollection(f, overwrite = FALSE)
 }
 \arguments{
 \item{f}{the JSON file to import}
+
+\item{overwrite}{a single logical. If TRUE the collection is overwritten
+if it already exists (default: FALSE)}
 }
 \description{
 Import a collection definition in the local environment

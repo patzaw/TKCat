@@ -2,10 +2,13 @@
 % Please edit documentation in R/chTKCat.R
 \name{listChTKCatCollections}
 \alias{listChTKCatCollections}
-\title{List collections available in a chTKCat}
+\title{List collections available in a \link{chTKCat}}
 \usage{
 listChTKCatCollections(tkcon)
 }
+\arguments{
+\item{tkcon}{a \link{chTKCat} object}
+}
 \description{
-List collections available in a chTKCat
+List collections available in a \link{chTKCat}
 }

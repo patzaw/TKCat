@@ -15,7 +15,7 @@ readCollectionMembers <- function(f){
    if(!"collection" %in% names(mbl)){
       stop("Not a valid collection members JSON file")
    }
-   schema <-TKCat:::tkcatEnv$COLLECTIONS %>%
+   schema <- TKCat:::tkcatEnv$COLLECTIONS %>%
       filter(title==mbl$collection) %>%
       pull(json)
    if(length(schema)==0){
@@ -24,18 +24,21 @@ readCollectionMembers <- function(f){
    if(!json_validate(raw, schema, verbose=TRUE)){
       stop(sprintf("Not valid %s members", mbl$collection))
    }
-   toRet <- do.call(bind_rows, lapply(
-      mbl$tables,
-      function(mb){
-         toRet <- do.call(bind_rows, lapply(
-            mb$fields,
-            as_tibble
-         ))
-         toRet$field <- names(mb$fields)
-         toRet$table <- mb$name
-         return(toRet)
-      }
-   ))
+   mbl$tables <- unique(mbl$tables)
+   
+   toRet <- c()
+   for(i in 1:length(mbl$tables)){
+      mb <- mbl$tables[[i]]
+      toAdd <- do.call(bind_rows, lapply(
+         mb$fields,
+         as_tibble
+      ))
+      toAdd$field <- names(mb$fields)
+      toAdd$table <- mb$name
+      toAdd$cid <- i
+      toRet <- bind_rows(toRet, toAdd)
+   }
+   
    if(!"type" %in% colnames(toRet)){
       toRet$type <- NA
    }
@@ -44,7 +47,7 @@ readCollectionMembers <- function(f){
    toRet <- toRet %>%
       mutate(type=as.character(type)) %>%
       select(
-         "collection", "resource", "table",
+         "collection", "resource", "cid", "table",
          "field", "static", "value", "type"
       )
    return(toRet)

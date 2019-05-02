@@ -13,7 +13,9 @@
 #' @export
 #'
 internalMDB <- function(
-   dataModel, dbTables, dbInfo,
+   dataModel,
+   dbTables,
+   dbInfo,
    colMembers=NULL,
    checkTables=TRUE
 ){
@@ -60,7 +62,6 @@ internalMDB <- function(
       )
    }
 
-
    ## Creating the DB ----
    # toRet <- new.env(hash=TRUE, parent=emptyenv())
    # assign("___dataModel___", dataModel, toRet)
@@ -84,6 +85,12 @@ internalMDB <- function(
 }
 
 ###############################################################################@
+#' Check the object is  an [internalMDB] object
+#' 
+#' @param x any object
+#' 
+#' @return A single logical: TRUE if x is an internalMDB object
+#' 
 #' @export
 #'
 is.internalMDB <- function(x){
@@ -94,7 +101,9 @@ is.internalMDB <- function(x){
 #' Check table according to a data model
 #'
 #' @param x a data.frame
-#' @param tableModel a \code{\link{RelTableModel}} object
+#' @param tableModel a [ReDaMoR::RelTableModel] object
+#' 
+#' @return Nothing. The function throws an error if check fails.
 #'
 #' @export
 #'
@@ -178,13 +187,25 @@ checkTable <- function(x, tableModel){
          }
       }
    }
+   invisible(NULL)
 
 }
 
 ###############################################################################@
+#' Get DB information of an [internalMDB] object
+#' 
+#' @param x an [internalMDB] object
+#' 
+#' @return A list with the following elements:
+#' - **name**: a single character
+#' - **title**: a single character
+#' - **description**: a single character
+#' - **url**: a single character
+#' - **version**: a single character
+#' 
 #' @export
 #'
-dbInfo.internalMDB <- function(x, ...){
+dbInfo.internalMDB <- function(x){
    x <- unclass(x)
    x$"___dbInfo___"[
       which(names(x$"___dbInfo___")!="collectionMembers")
@@ -192,12 +213,27 @@ dbInfo.internalMDB <- function(x, ...){
 }
 
 ###############################################################################@
+#' Get collection members of an [internalMDB] object
+#' 
+#' @param x an [internalMDB] object
+#' 
+#' @return A [tibble::tibble] with the following columns:
+#' - **collection** (character): The name of the collection
+#' - **resource** (character): The name of the resource
+#' - **cid** (integer): collection member ID by resource
+#' - **table** (character): The table recording collection information
+#' - **field** (character): The collection field.
+#' - **static** (logical): TRUE if the field value is common to all elements.
+#' - **value** (character): The name of the table column if static is FALSE
+#' or the field value if static is TRUE.
+#' - **type** (character): the type of the field.
+#' (not necessarily used ==> NA if not)
+#' 
 #' @export
 #'
 collectionMembers.internalMDB <- function(
    x,
-   collections=x$"___dbInfo___"$"collectionMembers"$collection,
-   ...
+   collections=x$"___dbInfo___"$"collectionMembers"$collection
 ){
    x <- unclass(x)
    toRet <- x$"___dbInfo___"$"collectionMembers"
@@ -206,9 +242,25 @@ collectionMembers.internalMDB <- function(
 }
 
 ###############################################################################@
+#' Set collection members of an [internalMDB] object
+#' 
+#' @param x an [internalMDB] object
+#' 
+#' @param value A data.frame with the following columns:
+#' - **collection** (character): The name of the collection
+#' - **resource** (character): The name of the resource
+#' - **cid** (integer): collection member ID by resource
+#' - **table** (character): The table recording collection information
+#' - **field** (character): The collection field.
+#' - **static** (logical): TRUE if the field value is common to all elements.
+#' - **value** (character): The name of the table column if static is FALSE
+#' or the field value if static is TRUE.
+#' - **type** (character): the type of the field.
+#' (not necessarily used ==> NA if not)
+#' 
 #' @export
 #'
-'collectionMembers<-.internalMDB' <- function(x, value, ...){
+'collectionMembers<-.internalMDB' <- function(x, value){
    if(is.null(value)){
       x <- unclass(x)
       x$"___dbInfo___"$"collectionMembers" <- value
@@ -221,12 +273,13 @@ collectionMembers.internalMDB <- function(
       all(
          colnames(value) %in%
             c(
-               "collection", "resource", "table",
+               "collection", "resource", "cid", "table",
                "field", "static", "value", "type"
             )
       ),
       is.character(value$collection),
       is.character(value$resource),
+      is.integer(value$cid),
       is.character(value$table),
       is.character(value$field),
       is.logical(value$static),
@@ -258,13 +311,26 @@ collectionMembers.internalMDB <- function(
 }
 
 ###############################################################################@
+#' Get the [ReDaMoR::RelDataModel] of an [internalMDB] object
+#' 
+#' @param x an [internalMDB] object
+#' 
+#' @return A [ReDaMoR::RelDataModel] object
+#' 
 #' @export
 #'
-dataModel.internalMDB <- function(x, ...){
+dataModel.internalMDB <- function(x){
    unclass(x)$"___dataModel___"
 }
 
 ###############################################################################@
+#' Get data tables from an [internalMDB] object
+#' 
+#' @param x an [internalMDB] object
+#' @param ... the name of the tables to get (default: all of them)
+#' 
+#' @return A list of [tibble::tibble]
+#' 
 #' @export
 #'
 dataTables.internalMDB <- function(x, ...){
@@ -286,6 +352,12 @@ dataTables.internalMDB <- function(x, ...){
 }
 
 ###############################################################################@
+#' Format an [internalMDB] object for printing
+#' 
+#' @param x an [internalMDB] object
+#' 
+#' @return A single character
+#' 
 #' @export
 #'
 format.internalMDB <- function(x){
@@ -344,6 +416,12 @@ print.internalMDB <- function(x, ...){
 }
 
 ###############################################################################@
+#' Get the number of tables in an [internalMDB] object
+#' 
+#' @param x an [internalMDB] object
+#' 
+#' @return A single integer value
+#' 
 #' @export
 #'
 length.internalMDB <- function(x){
@@ -379,16 +457,25 @@ length.internalMDB <- function(x){
 }
 
 ###############################################################################@
-#' @export
-#'
-'[[.internalMDB' <- '$.internalMDB' <- function(x, i){
+subset_internalMDB <- function(x, i){
    stopifnot(
       is.character(i),
       length(i)==1,
       all(i %in% names(x))
    )
-   return(unclass(x)[[i]])
+   ## Rstudio hack to avoid DB call when just looking for names
+   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
+   if(length(cc)!=0){
+      invisible(NULL)
+   }else{
+      return(unclass(x)[[i]])
+   }
 }
+#' @export
+'[[.internalMDB' <- subset_internalMDB
+#' @export
+'$.internalMDB' <- subset_internalMDB
+rm(subset_internalMDB)
 
 ###############################################################################@
 #' @export
@@ -422,7 +509,7 @@ c.internalMDB <- function(..., checkTables=FALSE){
 ###############################################################################@
 #' @export
 #'
-names.internalMDB <- function(x, ...){
+names.internalMDB <- function(x){
    setdiff(
       names(unclass(x)),
       c("___dataModel___", "___dbInfo___")
@@ -433,7 +520,7 @@ names.internalMDB <- function(x, ...){
 ###############################################################################@
 #' @export
 #'
-'names<-.internalMDB' <- function(x, value, ...){
+'names<-.internalMDB' <- function(x, value){
    colMb <- collectionMembers(x)
    ovalues <- names(x)
    x <- unclass(x)
@@ -456,8 +543,12 @@ names.internalMDB <- function(x, ...){
 }
 
 ###############################################################################@
+#' Plot the underlying [ReDaMoR::RelDataModel]
+#' 
+#' @seealso [ReDaMoR::plot.RelDataModel]
+#' 
 #' @export
 #'
-plot.internalMDB <- function(x, ...){
+plot.internalMDB <- function(x){
    plot(dataModel(x))
 }

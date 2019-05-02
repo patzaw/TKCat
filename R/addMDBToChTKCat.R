@@ -1,3 +1,9 @@
+###############################################################################@
+#' Add an MDB (modeled database) to a [chTKCat] database
+#' 
+#' @param tkcon a [chTKCat] object
+#' @param imdb an [internalMDB] object
+#' 
 addMDBToChTKCat <- function(
    tkcon,
    imdb
@@ -191,6 +197,22 @@ addMDBToChTKCat <- function(
    
 }
 
+###############################################################################@
+#' Write a Clickhouse
+#' [MergeTree](https://clickhouse.yandex/docs/en/operations/table_engines/mergetree/)
+#' table
+#' 
+#' @param conn the clickhouse connection
+#' @param dbName the name of the database
+#' @param tableName the name of the table
+#' @param value the table to import
+#' @param rtypes a named character vector giving the R type of each and every
+#' columns
+#' @param nullable a character vector indicating the name of the columns
+#' which are nullable (default: NULL)
+#' @param indexes a character vector indicating the name of the columns
+#' which are indexes (default: NULL)
+#' 
 writeMergeTree <- function(
    conn,
    dbName,
@@ -255,15 +277,25 @@ writeMergeTree <- function(
       statement=tst
    )
    
-   ct <- dbGetQuery(
-      conn=conn,
-      statement=sprintf("SELECT * FROM `%s`.`%s`", dbName, tableName)
-   )
+   # ct <- dbGetQuery(
+   #    conn=conn,
+   #    statement=sprintf("SELECT * FROM `%s`.`%s`", dbName, tableName)
+   # )
    
    .dbinsert(conn, dbName, tableName, value)
    
 }
 
+###############################################################################@
+#' Insert records by batches in a Clickhouse table
+#' 
+#' @param conn the clickhouse connection
+#' @param dbName the name of the database
+#' @param tableName the name of the table
+#' @param value the table to import
+#' @param by the size of the batch: number of records to import
+#' together (default: 10^6)
+#' 
 .dbinsert <- function(
    conn,
    dbName,
@@ -319,11 +351,29 @@ writeMergeTree <- function(
    }
 }
 
+###############################################################################@
+#' Remove an MDB (modeled database) from a [chTKCat] database
+#' 
+#' @param tkcon a [chTKCat] object
+#' @param name the name of the MDB to remove
+#' 
 rmMDBFromChTKCat <- function(
    tkcon,
    name
 ){
+   stopifnot(
+      is.chTKCat(tkcon),
+      is.character(name),
+      length(name)==1
+   )
    try(dbSendQuery(tkcon$chcon, sprintf("drop database `%s`", name)))
+   try(dbSendQuery(
+      tkcon$chcon,
+      sprintf(
+         "alter table default.CollectionMembers DELETE where resource='%s'",
+         name
+      )
+   ))
    try(dbSendQuery(
       tkcon$chcon,
       sprintf("alter table default.MDB DELETE where name='%s'", name)

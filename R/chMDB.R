@@ -13,23 +13,65 @@ chMDB <- function(tkcon, dbName){
       is.chTKCat(tkcon),
       dbName %in% listMDBs(tkcon)$name
    )
-   toRet <- list(tkcon=tkcon, dbName=dbName)
+   dbm <- list(
+      tables=dbGetQuery(
+         tkcon$chcon, sprintf("SELECT * FROM `%s`.`___tables___`", dbName)
+      ),
+      fields=dbGetQuery(
+         tkcon$chcon, sprintf("SELECT * FROM `%s`.`___fields___`", dbName)
+      ),
+      primaryKeys=dbGetQuery(
+         tkcon$chcon,
+         sprintf("SELECT * FROM `%s`.`___primaryKeys___`", dbName)
+      ),
+      foreignKeys=dbGetQuery(
+         tkcon$chcon,
+         sprintf("SELECT * FROM `%s`.`___foreignKeys___`", dbName)
+      ),
+      indexes=dbGetQuery(
+         tkcon$chcon, sprintf("SELECT * FROM `%s`.`___indexes___`", dbName)
+      )
+   )
+   dbm$fields$nullable <- as.logical(dbm$fields$nullable)
+   dbm$indexes$unique <- as.logical(dbm$indexes$unique)
+   m <- fromDBM(dbm)
+   toRet <- list(tkcon=tkcon, dbName=dbName, dbModel=m)
    class(toRet) <- "chMDB"
    return(toRet)
 }
 
 ###############################################################################@
-#' @export
+#' Check the object is  a [chMDB] object
 #' 
+#' @param x any object
+#' 
+#' @return A single logical: TRUE if x is a [chMDB] object
+#' 
+#' @export
+#'
 is.chMDB <- function(x){
    inherits(x, "chMDB")
 }
 
 
 ###############################################################################@
+#' Get DB information of a [chMDB] object
+#' 
+#' @param x a [chMDB] object
+#' @param countRecords a single logical. If TRUE (default), the number of
+#' records is also returned.
+#' 
+#' @return A list with the following elements:
+#' - **name**: a single character
+#' - **title**: a single character
+#' - **description**: a single character
+#' - **url**: a single character
+#' - **version**: a single character
+#' - (**records**): a single numeric
+#' 
 #' @export
 #'
-dbInfo.chMDB <- function(x, countRecords=TRUE, ...){
+dbInfo.chMDB <- function(x, countRecords=TRUE){
    xl <- unclass(x)
    adbs <- listMDBs(xl$tkcon)
    toRet <- adbs %>% filter(name==xl$dbName) %>% as.list()
@@ -51,12 +93,29 @@ dbInfo.chMDB <- function(x, countRecords=TRUE, ...){
 }
 
 ###############################################################################@
+#' Get collection members of a [chMDB] object
+#' 
+#' @param x a [chMDB] object
+#' @param collection a character vector indicating the name of the collections
+#' to focus on (default: NULL ==> all of them)
+#' 
+#' @return A [tibble::tibble] with the following columns:
+#' - **collection** (character): The name of the collection
+#' - **resource** (character): The name of the resource
+#' - **cid** (integer): collection member ID by resource
+#' - **table** (character): The table recording collection information
+#' - **field** (character): The collection field.
+#' - **static** (logical): TRUE if the field value is common to all elements.
+#' - **value** (character): The name of the table column if static is FALSE
+#' or the field value if static is TRUE.
+#' - **type** (character): the type of the field.
+#' (not necessarily used ==> NA if not)
+#' 
 #' @export
 #'
 collectionMembers.chMDB <- function(
    x,
-   collections=NULL,
-   ...
+   collections=NULL
 ){
    stopifnot(
       is.null(collections) || is.character(collections)
@@ -78,12 +137,28 @@ collectionMembers.chMDB <- function(
          )
    ) %>%
       as_tibble() %>%
-      select(collection, resource, table, field, static, value, type) %>%
+      select(collection, resource, cid, table, field, static, value, type) %>%
       mutate(static=as.logical(static))
    return(toRet)
 }
 
 ###############################################################################@
+#' Set collection members of a [chMDB] object
+#' 
+#' @param x a [chMDB] object
+#' 
+#' @param value A data.frame with the following columns:
+#' - **collection** (character): The name of the collection
+#' - **resource** (character): The name of the resource
+#' - **cid** (integer): collection member ID by resource
+#' - **table** (character): The table recording collection information
+#' - **field** (character): The collection field.
+#' - **static** (logical): TRUE if the field value is common to all elements.
+#' - **value** (character): The name of the table column if static is FALSE
+#' or the field value if static is TRUE.
+#' - **type** (character): the type of the field.
+#' (not necessarily used ==> NA if not)
+#' 
 setChMDBcollectionMembers <- function(x, value){
    stopifnot(is.chMDB(x))
    if(!is.null(value)){
@@ -92,12 +167,13 @@ setChMDBcollectionMembers <- function(x, value){
          all(
             colnames(value) %in%
                c(
-                  "collection", "resource", "table",
+                  "collection", "resource", "cid", "table",
                   "field", "static", "value", "type"
                )
          ),
          is.character(value$collection),
          is.character(value$resource),
+         is.integer(value$cid),
          is.character(value$table),
          is.character(value$field),
          is.logical(value$static),
@@ -144,35 +220,27 @@ setChMDBcollectionMembers <- function(x, value){
 
 
 ###############################################################################@
+#' Get the [ReDaMoR::RelDataModel] of a [chMDB] object
+#' 
+#' @param x a [chMDB] object
+#' 
+#' @return A [ReDaMoR::RelDataModel] object
+#' 
 #' @export
 #'
-dataModel.chMDB <- function(x, ...){
+dataModel.chMDB <- function(x){
    x <- unclass(x)
-   dbm <- list(
-      tables=dbGetQuery(
-         x$tkcon$chcon, sprintf("SELECT * FROM `%s`.`___tables___`", x$dbName)
-      ),
-      fields=dbGetQuery(
-         x$tkcon$chcon, sprintf("SELECT * FROM `%s`.`___fields___`", x$dbName)
-      ),
-      primaryKeys=dbGetQuery(
-         x$tkcon$chcon,
-         sprintf("SELECT * FROM `%s`.`___primaryKeys___`", x$dbName)
-      ),
-      foreignKeys=dbGetQuery(
-         x$tkcon$chcon,
-         sprintf("SELECT * FROM `%s`.`___foreignKeys___`", x$dbName)
-      ),
-      indexes=dbGetQuery(
-         x$tkcon$chcon, sprintf("SELECT * FROM `%s`.`___indexes___`", x$dbName)
-      )
-   )
-   dbm$fields$nullable <- as.logical(dbm$fields$nullable)
-   dbm$indexes$unique <- as.logical(dbm$indexes$unique)
-   return(fromDBM(dbm))
+   return(x[["dbModel"]])
 }
 
 ###############################################################################@
+#' Get data tables from a [chMDB] object
+#' 
+#' @param x a [chMDB] object
+#' @param ... the name of the tables to get (default: all of them)
+#' 
+#' @return A list of [tibble::tibble]
+#' 
 #' @export
 #'
 dataTables.chMDB <- function(x, ...){
@@ -211,6 +279,12 @@ dataTables.chMDB <- function(x, ...){
 }
 
 ###############################################################################@
+#' Format a [chMDB] object for printing
+#' 
+#' @param x a [chMDB] object
+#' 
+#' @return A single character
+#' 
 #' @export
 #'
 format.chMDB <- function(x){
@@ -267,6 +341,12 @@ print.chMDB <- function(x, ...){
 
 
 ###############################################################################@
+#' Get the number of tables in a [chMDB] object
+#' 
+#' @param x a [chMDB] object
+#' 
+#' @return A single integer value
+#' 
 #' @export
 #'
 length.chMDB <- function(x){
@@ -274,10 +354,16 @@ length.chMDB <- function(x){
 }
 
 ###############################################################################@
+#' Load a subset of tables from a [chMDB] object as an [internalMDB] object
+#' 
+#' @param i the name of the tables to be taken. If NULL (default), all
+#' the tables are loaded
+#' 
 #' @export
 #'
 '[.chMDB' <- function(x, i=NULL){
    dbi <- dbInfo(x)
+   dbi <- dbi[which(names(dbi)!="records")]
    if(is.null(i)){
       i <- names(x)
       dbi$name <- dbi$name
@@ -304,16 +390,25 @@ length.chMDB <- function(x){
 }
 
 ###############################################################################@
-#' @export
-#'
-'[[.chMDB' <- '$.chMDB' <- function(x, i){
+subset_chMDB <- function(x, i){
    stopifnot(
       is.character(i),
       length(i)==1,
       all(i %in% names(x))
    )
-   return(dataTables(x, i)[[1]])
+   ## Rstudio hack to avoid DB call when just looking for names
+   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
+   if(length(cc)!=0){
+      invisible(NULL)
+   }else{
+      return(dataTables(x, i)[[1]])
+   }
 }
+#' @export
+'[[.chMDB' <- subset_chMDB
+#' @export
+'$.chMDB' <- subset_chMDB
+rm(subset_chMDB)
 
 ###############################################################################@
 #' @export
@@ -347,7 +442,7 @@ c.chMDB <- function(...){
 ###############################################################################@
 #' @export
 #'
-names.chMDB <- function(x, ...){
+names.chMDB <- function(x){
    names(dataModel(x))
 }
 
@@ -360,9 +455,13 @@ names.chMDB <- function(x, ...){
 }
 
 ###############################################################################@
+#' Plot the underlying [ReDaMoR::RelDataModel]
+#' 
+#' @seealso [ReDaMoR::plot.RelDataModel]
+#' 
 #' @export
 #'
-plot.chMDB <- function(x, ...){
+plot.chMDB <- function(x){
    plot(dataModel(x))
 }
 

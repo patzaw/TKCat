@@ -1,6 +1,8 @@
 #' Import a collection definition in the local environment
 #' 
 #' @param f the JSON file to import
+#' @param overwrite a single logical. If TRUE the collection is overwritten
+#' if it already exists (default: FALSE)
 #' 
 #' @importFrom jsonlite fromJSON
 #' @importFrom jsonvalidate json_validate

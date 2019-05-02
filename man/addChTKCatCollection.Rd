@@ -2,10 +2,20 @@
 % Please edit documentation in R/chTKCat.R
 \name{addChTKCatCollection}
 \alias{addChTKCatCollection}
-\title{List available database}
+\title{Import a collection in a \link{chTKCat} database}
 \usage{
 addChTKCatCollection(tkcon, json, overwrite = FALSE)
 }
+\arguments{
+\item{tkcon}{a \link{chTKCat} object}
+
+\item{json}{a single charcter indicating the collection to import. Can be:
+\itemize{
+\item a path to a file
+\item the name of a local collection (see \code{\link[=listLocalCollections]{listLocalCollections()}})
+\item the json text defining the collection
+}}
+}
 \description{
-List available database
+Import a collection in a \link{chTKCat} database
 }
