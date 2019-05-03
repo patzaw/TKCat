@@ -367,15 +367,21 @@ buildServer <- function(tkcon, mdbList){
          validate(need(st, FALSE))
          validate(need(s, FALSE))
          dm <- dataModel(chMDB(tkcon, mdbList$name[s]))
+         toShow <- suppressWarnings(dbGetQuery(
+            tkcon$chcon,
+            sprintf(
+               "SELECT * from `%s`.`%s` limit 100",
+               mdbList$name[s],
+               st
+            )
+         ))
+         if(object.size(toShow) > 2^19){
+            toShow <- toShow[
+               1:max(c(1, ceiling(nrow(toShow)*(2^19/object.size(toShow))))),
+            ]
+         }
          datatable(
-            suppressWarnings(dbGetQuery(
-               tkcon$chcon,
-               sprintf(
-                  "SELECT * from `%s`.`%s` limit 100",
-                  mdbList$name[s],
-                  st
-               )
-            )),
+            toShow,
             selection = 'single',
             extensions='Scroller',
             options = list(

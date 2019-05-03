@@ -10,7 +10,7 @@ is.internalMDB(x)
 \item{x}{any object}
 }
 \value{
-A single logical: TRUE if x is an internalMDB object
+A single logical: TRUE if x is an \link{internalMDB} object
 }
 \description{
 Check the object is  an \link{internalMDB} object

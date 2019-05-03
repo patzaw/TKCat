@@ -89,7 +89,7 @@ internalMDB <- function(
 #' 
 #' @param x any object
 #' 
-#' @return A single logical: TRUE if x is an internalMDB object
+#' @return A single logical: TRUE if x is an [internalMDB] object
 #' 
 #' @export
 #'
