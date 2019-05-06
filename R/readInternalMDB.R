@@ -4,7 +4,7 @@
 #' @param descriptionFile a json file with DB information
 #' @param directory a path to the directory where to read the data
 #' @param ext the file extension to consider (default: "ext"),
-#' @param delim delimiter (default: '\\t')
+#' @param delim delimiter (default: '\\\\t')
 #' @param quoted_na Should missing values inside quotes be treated
 #' as missing values or as strings (the default).
 #' @param ... additional  parameters for the \code{\link{read_delim}} function

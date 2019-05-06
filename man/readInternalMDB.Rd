@@ -16,7 +16,7 @@ readInternalMDB(dataModel, descriptionFile, directory, ext = "txt",
 
 \item{ext}{the file extension to consider (default: "ext"),}
 
-\item{delim}{delimiter (default: '\t')}
+\item{delim}{delimiter (default: '\\t')}
 
 \item{quoted_na}{Should missing values inside quotes be treated
 as missing values or as strings (the default).}

@@ -86,8 +86,8 @@ buildUi <- function(tkcon, Tabix=NA){
          fluidRow(
             column(
                7,
-               visNetworkOutput("dataModel"),
-               style="border:solid; min-height:800px;"
+               visNetworkOutput("dataModel", height="80vh"),
+               style="border:solid; min-height:85vh;"
             ),
             column(
                5,
@@ -287,7 +287,7 @@ buildServer <- function(tkcon, mdbList){
          plot(dm) %>%
             visOptions(
                nodesIdSelection=list(enabled=TRUE, useLabels=FALSE),
-               highlightNearest=TRUE, height="700px"
+               highlightNearest=TRUE, height="100%"
             ) 
       })
       
