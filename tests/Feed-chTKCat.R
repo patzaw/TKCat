@@ -6,6 +6,8 @@ dsr <- "~/Shared/Data-Science/Data-Source-Model-Repository"
 tkcon <- chTKCat()
 
 resources <- c(
+   "HPO",
+   "Reactome",
    "ClinVar",
    "CortellisDD",
    "CortellisID",
@@ -13,10 +15,8 @@ resources <- c(
    "CortellisTAR",
    "CTen",
    "GO",
-   "HPO",
    "MetaBase",
    "PubMed",
-   "Reactome",
    NULL
 )
 for(r in resources){

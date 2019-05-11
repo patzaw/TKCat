@@ -140,10 +140,11 @@ checkTable <- function(x, tableModel){
 
    ## Field requirements ----
    it <- indexTable(tableModel)
-   uq <- c()
-   if(!is.null(it)){
-      uq <- unique(c(uq, unique(it$field[which(it$unique)])))
-   }
+   # uq <- c()
+   # if(!is.null(it)){
+   #    uq <- unique(c(uq, unique(it$field[which(it$unique)])))
+   # }
+   uq <- tft$name[which(tft$unique)]
    nullable <- tft$name[which(tft$nullable)]
    for(f in tf){
       ft <- tft %>% slice(match(f, name)) %>% pull(type)

@@ -205,9 +205,10 @@ buildUi <- function(tkcon, Tabix=NA){
    ))
 }
 
-buildServer <- function(tkcon, mdbList){
+buildServer <- function(tkcon){
    
    tkcon <- tkcon
+   mdbList <- listMDBs(tkcon)
    
    function(input, output, session) {
       
@@ -425,9 +426,7 @@ buildServer <- function(tkcon, mdbList){
 #' 
 explore.chTKCat <- function(x, Tabix=NA, ...){
    
-   mdbList <- listMDBs(x)
-   
-   shinyApp(ui=buildUi(x, Tabix=Tabix), server=buildServer(x, mdbList))
+   shinyApp(ui=buildUi(x, Tabix=Tabix), server=buildServer(x))
    # runGadget(
    #    ui, server,
    #    viewer = dialogViewer("Explore chTKCat", height=900, width=1600)

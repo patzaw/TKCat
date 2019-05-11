@@ -33,6 +33,7 @@ chMDB <- function(tkcon, dbName){
       )
    )
    dbm$fields$nullable <- as.logical(dbm$fields$nullable)
+   dbm$fields$unique <- as.logical(dbm$fields$unique)
    dbm$indexes$unique <- as.logical(dbm$indexes$unique)
    m <- fromDBM(dbm)
    toRet <- list(tkcon=tkcon, dbName=dbName, dbModel=m)
