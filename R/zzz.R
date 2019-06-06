@@ -9,13 +9,15 @@ assign(
 )
 
 ## Importing built-in collections when loading the library ----
+#' @importFrom dplyr select
+#' @importFrom magrittr %>%
 .onLoad <- function(libname, pkgname){
    assign(
       x="COL_SCHEMA",
-      value=readLines(system.file(
+      value=paste(readLines(system.file(
          "Collections", "Collection-Schema.json",
          package=pkgname
-      )) %>% paste(collapse="\n"),
+      )), collapse="\n"),
       envir=tkcatEnv
    )
    files <- list.files(

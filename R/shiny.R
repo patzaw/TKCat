@@ -422,6 +422,7 @@ buildServer <- function(tkcon){
 #' Explore a chTKCat
 #' 
 #' @importFrom base64enc base64encode
+#' @importFrom ReDaMoR explore
 #' @export
 #' 
 explore.chTKCat <- function(x, Tabix=NA, ...){

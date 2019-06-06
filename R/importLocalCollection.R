@@ -6,6 +6,9 @@
 #' 
 #' @importFrom jsonlite fromJSON
 #' @importFrom jsonvalidate json_validate
+#' @importFrom magrittr %>%
+#' @importFrom dplyr filter bind_rows
+#' @importFrom tibble tibble
 #' @export
 #' 
 importLocalCollection <- function(f, overwrite=FALSE){
