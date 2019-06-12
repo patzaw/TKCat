@@ -226,6 +226,7 @@ buildServer <- function(tkcon){
          toShow <- left_join(toShow, cm, by=c("Database"="resource"))
          datatable(
             toShow,
+            rownames=FALSE,
             filter="top",
             selection = 'single',
             extensions='Scroller',
@@ -309,6 +310,7 @@ buildServer <- function(tkcon){
          cm <- collectionMembers(chMDB(tkcon, mdbList$name[s]))
          datatable(
             cm %>% select(-resource),
+            rownames=FALSE,
             selection = 'single',
             extensions='Scroller',
             options = list(
@@ -383,6 +385,7 @@ buildServer <- function(tkcon){
          }
          datatable(
             toShow,
+            rownames=FALSE,
             selection = 'single',
             extensions='Scroller',
             options = list(
