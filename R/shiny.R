@@ -208,11 +208,11 @@ buildUi <- function(tkcon, Tabix=NA){
 buildServer <- function(tkcon){
    
    tkcon <- tkcon
-   mdbList <- listMDBs(tkcon)
    
    function(input, output, session) {
       
       ## mdbList ----
+      mdbList <- listMDBs(tkcon)
       output$mdbList <- renderDataTable({
          toShow <- mdbList %>%
             select(name, title) %>%
@@ -232,7 +232,7 @@ buildServer <- function(tkcon){
             extensions='Scroller',
             options = list(
                deferRender = TRUE,
-               scrollY = 700,
+               scrollY = "65vh",
                scroller = TRUE,
                dom=c("ti")
             )
