@@ -66,6 +66,7 @@ if(test){
          directory=file.path(dsr, r, "data")
       )
       collectionMembers(toload) <- colMb
+      print(toload)
       rm(toload)
       gc()
    }
