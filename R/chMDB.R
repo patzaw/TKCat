@@ -90,6 +90,7 @@ dbInfo.chMDB <- function(x, countRecords=TRUE){
          }
       )))
    }
+   toRet$tkcon <- xl$tkcon
    return(toRet)
 }
 
@@ -403,6 +404,8 @@ subset_chMDB <- function(x, i){
       invisible(NULL)
    }else{
       return(dataTables(x, i)[[1]])
+      # dbi <- dbInfo(x)
+      # return(tbl(dbi$tkcon$chcon, in_schema(dbi$name, i)))
    }
 }
 #' @export

@@ -264,7 +264,7 @@ buildServer <- function(tkcon){
          list(
             h3(dbi$name),
             do.call(tags$ul, lapply(
-               setdiff(names(dbi), "name"),
+               setdiff(names(dbi), c("name", "tkcon")),
                function(n){
                   tags$li(tags$span(
                      tags$strong(paste0(n, ":")),
