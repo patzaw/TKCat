@@ -6,8 +6,15 @@
 \href{https://clickhouse.yandex/docs/en/operations/table_engines/mergetree/}{MergeTree}
 table}
 \usage{
-writeMergeTree(conn, dbName, tableName, value, rtypes, nullable = NULL,
-  indexes = NULL)
+writeMergeTree(
+  conn,
+  dbName,
+  tableName,
+  value,
+  rtypes,
+  nullable = NULL,
+  indexes = NULL
+)
 }
 \arguments{
 \item{conn}{the clickhouse connection}

@@ -76,7 +76,7 @@ addMDBToChTKCat <- function(
    ## Add the data model ----
    er <- try({
       rdbm <- dataModel(imdb)
-      dbm <- toDBM(rdbm)
+      dbm <- ReDaMoR::toDBM(rdbm)
       writeMergeTree(
          con=tkcon$chcon,
          dbName=dbInfo$name,
@@ -151,7 +151,7 @@ addMDBToChTKCat <- function(
             value=imdb[[tn]],
             rtypes=rtypes,
             nullable=rdbm[[tn]]$fields$name[which(rdbm[[tn]]$fields$nullable)],
-            indexes=unique(indexTable(rdbm[[tn]])$field)
+            indexes=unique(index_table(rdbm[[tn]])$field)
          )
       }
    }, silent=TRUE)
@@ -240,7 +240,7 @@ writeMergeTree <- function(
       indexes <- setdiff(indexes, nullable)
    }
    
-   chtypes <- typeRefConv(rtypes, to="ClickHouse")
+   chtypes <- conv_type_ref(rtypes, to="ClickHouse")
    names(chtypes) <- names(rtypes)
    
    tst <- paste(

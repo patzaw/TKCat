@@ -1,16 +1,23 @@
 #' Read files and create an internal database with a documented data model
 #'
-#' @param dataModel a \code{\link{RelDataModel}} object
+#' @param dataModel a [RelDataModel] object
 #' @param descriptionFile a json file with DB information
 #' @param directory a path to the directory where to read the data
+#' @param verbose if TRUE display the data confrontation report
+#' @param cr_variable_name a character with a single value indicating the name
+#' of the variable in the .GlobalEnv environment where to put the data
+#' confrontation report. If it's not a character with a single
+#' value (default: NULL), then the confrontation report is not exported.
 #' @param ext the file extension to consider (default: "ext"),
 #' @param delim delimiter (default: '\\\\t')
 #' @param quoted_na Should missing values inside quotes be treated
-#' as missing values or as strings (the default).
-#' @param ... additional  parameters for the \code{\link{read_delim}} function
+#' as missing values or as strings or strings (the default).
+#' Be aware that the default value here is different than the one for the
+#' original [readr::read_delim()] function.
+#' @param ... additional  parameters for the [readr::read_delim()] function
 #'
 #'
-#' @return An \code{\link{internalMDB}} object
+#' @return An [internalMDB] object
 #'
 #' @importFrom readr read_tsv
 #' @importFrom jsonlite read_json
@@ -20,6 +27,8 @@ readInternalMDB <- function(
    dataModel,
    descriptionFile,
    directory,
+   verbose=FALSE,
+   cr_variable_name=NULL,
    ext='txt',
    delim='\t',
    quoted_na=FALSE,
@@ -49,68 +58,34 @@ readInternalMDB <- function(
    dbInfo <- dbInfo[c("name", "title", "description", "url", "version")]
    
    ## Read Tables ----
-   availableTables <- sub(
-      paste0(".", ext, "$"),
-      "",
-      list.files(path=directory, pattern=paste0(".", ext, "$"))
+   cr <- ReDaMoR::confront_data(
+      dataModel,
+      paths=list.files(
+         path=directory,
+         pattern=paste0(".", ext, "$"),
+         full.names=TRUE
+      ),
+      returnData=TRUE,
+      verbose=verbose
    )
-   misTables <- setdiff(names(dataModel), availableTables)
-   if(length(misTables)>0){
-      stop(
-         "The following tables were not found in the directory: ",
-         paste(misTables, collapse=", ")
-      )
+   if(
+      is.character(cr_variable_name) &&
+      length(cr_variable_name)==1 &&
+      !is.na(cr_variable_name)
+   ){
+      assign(cr_variable_name, cr[-which(names(cr)=="data")], envir=.GlobalEnv)
    }
-   supTables <- setdiff(availableTables, names(dataModel))
-   if(length(supTables)>0){
-      warning(
-         "The following files in the directory are not part of ",
-         "the data model and won't be read: ",
-         paste(supTables, collapse=", ")
-      )
+   if(!cr$success){
+      stop(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
    }
-
-   toRet <- list()
-   for(tn in names(dataModel)){
-      message(sprintf ("Loading the %s table", tn))
-      d <- read_delim(
-         file=file.path(directory, paste(tn, ext, sep=".")),
-         delim=delim,
-         quoted_na=quoted_na,
-         col_types=col_types(dataModel[[tn]]),
-         ...
-      )
-      tft <- dataModel[[tn]]$fields
-      tf <- tft$name
-      misFields <- setdiff(tf, colnames(d))
-      if(length(misFields)>0){
-         stop(
-            sprintf(
-               "The following fields were not found in the %s table: ",
-               tn
-            ),
-            paste(misFields, collapse=", ")
-         )
-      }
-      supFields <- setdiff(colnames(d), tf)
-      if(length(supFields)>0){
-         warning(
-            sprintf(
-               "The following fields are not defined for the %s table",
-               tn
-            ),
-            " and won't be taken into account: ",
-            paste(misFields, collapse=", ")
-         )
-      }
-      d <- d[, tf]
-      checkTable(d, dataModel[[tn]])
-      toRet[[tn]] <- d
+   if(verbose){
+      cat(format_confrontation_report(cr, title=dbInfo[["name"]]))
    }
    toRet <- internalMDB(
-      dataModel=dataModel, dbTables=toRet,
+      dataModel=dataModel, dbTables=cr$data,
       dbInfo=dbInfo,
-      checkTables=FALSE
+      checks=c(),
+      verbose=FALSE
    )
    return(toRet)
 

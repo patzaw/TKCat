@@ -35,7 +35,7 @@ chMDB <- function(tkcon, dbName){
    dbm$fields$nullable <- as.logical(dbm$fields$nullable)
    dbm$fields$unique <- as.logical(dbm$fields$unique)
    dbm$indexes$unique <- as.logical(dbm$indexes$unique)
-   m <- fromDBM(dbm)
+   m <- ReDaMoR::fromDBM(dbm)
    toRet <- list(tkcon=tkcon, dbName=dbName, dbModel=m)
    class(toRet) <- "chMDB"
    return(toRet)
@@ -268,7 +268,7 @@ dataTables.chMDB <- function(x, ...){
             sprintf("SELECT * FROM `%s`.`%s`", x$dbName, tn)
          ) %>% as_tibble()
          for(cn in colnames(toRet)){
-            toRet[,cn] <- asType(
+            toRet[,cn] <- as_type(
                toRet %>% pull(get(cn)),
                m[[tn]]$fields$type[which(m[[tn]]$fields$name==cn)]
             )

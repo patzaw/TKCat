@@ -4,8 +4,10 @@
 \alias{collectionMembers.internalMDB}
 \title{Get collection members of an \link{internalMDB} object}
 \usage{
-\method{collectionMembers}{internalMDB}(x,
-  collections = x$"___dbInfo___"$collectionMembers$collection)
+\method{collectionMembers}{internalMDB}(
+  x,
+  collections = x$"___dbInfo___"$collectionMembers$collection
+)
 }
 \arguments{
 \item{x}{an \link{internalMDB} object}

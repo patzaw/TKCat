@@ -4,8 +4,14 @@
 \alias{internalMDB}
 \title{Create an internal database: a set of tables with a data model}
 \usage{
-internalMDB(dataModel, dbTables, dbInfo, colMembers = NULL,
-  checkTables = TRUE)
+internalMDB(
+  dataModel,
+  dbTables,
+  dbInfo,
+  colMembers = NULL,
+  checks = c("unique", "not nullable", "foreign keys"),
+  verbose = FALSE
+)
 }
 \arguments{
 \item{dataModel}{a RelDataModel object}
@@ -15,8 +21,10 @@ internalMDB(dataModel, dbTables, dbInfo, colMembers = NULL,
 \item{colMembers}{the collection members of the MDB. If NULL (default),
 collection members are not defined.}
 
-\item{checkTables}{a single logical. If TRUE (default), tables are confronted
-to the dataModel.}
+\item{checks}{a character vector with the name of optional checks to be
+done (all of them c("unique", "not nullable", "foreign keys"))}
+
+\item{verbose}{if TRUE display the data confrontation report}
 
 \item{dbTable}{a list of tables}
 }

@@ -5,8 +5,9 @@
 #' @param dbInfo a list of information values regarding the DB
 #' @param colMembers the collection members of the MDB. If NULL (default),
 #' collection members are not defined.
-#' @param checkTables a single logical. If TRUE (default), tables are confronted
-#' to the dataModel.
+#' @param checks a character vector with the name of optional checks to be
+#' done (all of them c("unique", "not nullable", "foreign keys"))
+#' @param verbose if TRUE display the data confrontation report
 #'
 #' @return An internalMDB object
 #'
@@ -17,7 +18,8 @@ internalMDB <- function(
    dbTables,
    dbInfo,
    colMembers=NULL,
-   checkTables=TRUE
+   checks=c("unique", "not nullable", "foreign keys"),
+   verbose=FALSE
 ){
 
    ## Checks ----
@@ -36,38 +38,16 @@ internalMDB <- function(
    if("___dbInfo___" %in% names(dataModel)){
       stop('"___dbInfo___" is reserved and cannot be used as a table name')
    }
-   lapply(
-      names(dataModel),
-      function(x){
-         if(!x %in% names(dbTables)){
-            stop(sprintf(
-               "The %s table is not in dbTables",
-               x
-            ))
-         }
-         dbt <- dbTables[[x]]
-         if(checkTables){
-            checkTable(dbt, dataModel[[x]])
-         }
-      }
+   cr <- ReDaMoR::confront_data(
+      dataModel, data=dbTables, checks=checks, verbose=verbose,
+      retunData=FALSE
    )
-   supTables <- setdiff(
-      names(dbTables),
-      names(dataModel)
-   )
-   if(length(supTables)>0){
-      stop(
-         "The following tables are not described in the data model: ",
-         paste(supTables, collapse=", ")
-      )
+   if(!cr$success){
+      stop(ReDaMoR::format_confrontation_report(cr))
    }
-
-   ## Creating the DB ----
-   # toRet <- new.env(hash=TRUE, parent=emptyenv())
-   # assign("___dataModel___", dataModel, toRet)
-   # for(dn in names(dbTables)){
-   #    assign(dn, dbTables[[dn]], toRet)
-   # }
+   if(verbose){
+      cat(format_confrontation_report(cr))
+   }
    
    toRet <- dbTables[names(dataModel)]
    toRet$"___dataModel___" <- dataModel
@@ -139,7 +119,7 @@ checkTable <- function(x, tableModel){
    }
 
    ## Field requirements ----
-   it <- indexTable(tableModel)
+   it <- index_table(tableModel)
    # uq <- c()
    # if(!is.null(it)){
    #    uq <- unique(c(uq, unique(it$field[which(it$unique)])))
