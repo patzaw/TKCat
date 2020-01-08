@@ -15,6 +15,8 @@
 compare_MDB <- function(current, new){
    infox <- dbInfo(current, countRecords=TRUE)
    infoy <- dbInfo(new, countRecords=TRUE)
+   
+   ## General information ----
    toRet <- tibble(
       "Information"=c("name", "title", "description", "url", "version"),
       "Current"=unlist(infox[
@@ -26,6 +28,8 @@ compare_MDB <- function(current, new){
    ) %>% mutate(
       "Identical"=Current==New
    )
+   
+   ## Data model ----
    toRet <- rbind(
       toRet,
       tibble(
@@ -37,6 +41,8 @@ compare_MDB <- function(current, new){
          )
       )
    )
+   
+   ## Records ----
    nrx <- infox$table_records
    nrx <- nrx[sort(names(nrx))]
    nry <- infoy$table_records
@@ -55,7 +61,36 @@ compare_MDB <- function(current, new){
             "Identical"=c(nrx, infox$records)==c(nry, infoy$records)
          )
       )
-   }else{
    }
+   
+   ## Collection members
+   ccm <- collectionMembers(current)
+   if(!is.null(ccm)){
+      ccm <- ccm %>% arrange_all()
+      ccoll <- ccm %>% distinct(collection, resource, cid) %>% nrow
+   }else{
+      ccoll <- 0
+   }
+   ncm <- collectionMembers(new)
+   if(!is.null(ncm)){
+      ncm <- ncm %>% arrange_all()
+      ncoll <- ncm %>% distinct(collection, resource, cid) %>% nrow
+   }else{
+      ncoll <- 0
+   }
+   toRet <- rbind(
+      toRet,
+      tibble(
+         "Information"="Collections",
+         "Current"=ccoll,
+         "New"=ncoll,
+         "Identical"=(
+            ccoll==ncoll && (
+               ccoll==0 || identical(ccm, ncm)
+            )
+         )
+      )
+   )
+   
    return(toRet)
 }
