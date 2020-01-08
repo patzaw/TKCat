@@ -4,10 +4,10 @@
 \alias{compare_MDB}
 \title{Compare two MDB}
 \usage{
-compare_MDB(current, new)
+compare_MDB(former, new)
 }
 \arguments{
-\item{current}{an MDB object (e.g. \link{internalMDB} or \link{chMDB})}
+\item{former}{an MDB object (e.g. \link{internalMDB} or \link{chMDB})}
 
 \item{new}{an MDB object (e.g. \link{internalMDB} or \link{chMDB})}
 }
@@ -15,7 +15,7 @@ compare_MDB(current, new)
 A tibble with 3 columns:
 \itemize{
 \item \strong{Information}: Compared information
-\item \strong{Current}: current value
+\item \strong{Former}: former value
 \item \strong{New}: new value
 \item \strong{Identical}: a logical indicating if the 2 values are identical
 }

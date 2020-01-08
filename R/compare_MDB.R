@@ -1,32 +1,32 @@
 ###############################################################################@
 #' Compare two MDB
 #' 
-#' @param current an MDB object (e.g. [internalMDB] or [chMDB])
+#' @param former an MDB object (e.g. [internalMDB] or [chMDB])
 #' @param new an MDB object (e.g. [internalMDB] or [chMDB])
 #' 
 #' @return A tibble with 3 columns:
 #' - **Information**: Compared information
-#' - **Current**: current value
+#' - **Former**: former value
 #' - **New**: new value
 #' - **Identical**: a logical indicating if the 2 values are identical
 #'
 #' @export
 #'
-compare_MDB <- function(current, new){
-   infox <- dbInfo(current, countRecords=TRUE)
+compare_MDB <- function(former, new){
+   infox <- dbInfo(former, countRecords=TRUE)
    infoy <- dbInfo(new, countRecords=TRUE)
    
    ## General information ----
    toRet <- tibble(
       "Information"=c("name", "title", "description", "url", "version"),
-      "Current"=unlist(infox[
+      "Former"=unlist(infox[
          c("name", "title", "description", "url", "version")
       ]),
       "New"=unlist(infoy[
          c("name", "title", "description", "url", "version")
       ])
    ) %>% mutate(
-      "Identical"=Current==New
+      "Identical"=Former==New
    )
    
    ## Data model ----
@@ -34,10 +34,10 @@ compare_MDB <- function(current, new){
       toRet,
       tibble(
          "Information"="Model",
-         "Current"=sprintf("%s tables", length(current)),
+         "Former"=sprintf("%s tables", length(former)),
          "New"=sprintf("%s tables", length(new)),
          "Identical"=ReDaMoR::identical_RelDataModel(
-            dataModel(current), dataModel(new)
+            dataModel(former), dataModel(new)
          )
       )
    )
@@ -55,7 +55,7 @@ compare_MDB <- function(current, new){
          toRet,
          tibble(
             "Information"=c(sprintf("Table %s", names(nrx)), "Total"),
-            "Current"=format(c(nrx, infox$records), big.mark=",", trim=FALSE),
+            "Former"=format(c(nrx, infox$records), big.mark=",", trim=FALSE),
             "New"=format(c(nry, infoy$records), big.mark=",", trim=FALSE)
          ) %>% mutate(
             "Identical"=c(nrx, infox$records)==c(nry, infoy$records)
@@ -64,7 +64,7 @@ compare_MDB <- function(current, new){
    }
    
    ## Collection members
-   ccm <- collectionMembers(current)
+   ccm <- collectionMembers(former)
    if(!is.null(ccm)){
       ccm <- ccm %>% arrange_all()
       ccoll <- ccm %>% distinct(collection, resource, cid) %>% nrow
@@ -82,7 +82,7 @@ compare_MDB <- function(current, new){
       toRet,
       tibble(
          "Information"="Collections",
-         "Current"=ccoll,
+         "Former"=ccoll,
          "New"=ncoll,
          "Identical"=(
             ccoll==ncoll && (
