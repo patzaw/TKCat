@@ -289,7 +289,8 @@ buildServer <- function(tkcon){
          plot(dm) %>%
             visOptions(
                nodesIdSelection=list(enabled=TRUE, useLabels=FALSE),
-               highlightNearest=TRUE, height="100%"
+               # highlightNearest=TRUE,
+               height="100%"
             ) 
       })
       
