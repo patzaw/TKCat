@@ -8,6 +8,7 @@ internalMDB(
   dataModel,
   dbTables,
   dbInfo,
+  optional_info_fields = c(),
   colMembers = NULL,
   checks = c("unique", "not nullable", "foreign keys"),
   verbose = FALSE

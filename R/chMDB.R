@@ -68,6 +68,7 @@ is.chMDB <- function(x){
 #' - **description**: a single character
 #' - **url**: a single character
 #' - **version**: a single character
+#' - (**table_records**): a numeric giving the number of records per table
 #' - (**records**): a single numeric
 #' 
 #' @export
@@ -77,7 +78,7 @@ dbInfo.chMDB <- function(x, countRecords=TRUE){
    adbs <- listMDBs(xl$tkcon)
    toRet <- adbs %>% filter(name==xl$dbName) %>% as.list()
    if(countRecords){
-      toRet$records <- sum(unlist(lapply(
+      toRet$table_records <- unlist(lapply(
          names(x),
          function(y){
             suppressWarnings(dbGetQuery(
@@ -88,7 +89,9 @@ dbInfo.chMDB <- function(x, countRecords=TRUE){
                )
             ))[,1]
          }
-      )))
+      ))
+      names(toRet$table_records) <- names(x)
+      toRet$records <- sum(toRet$table_records)
    }
    toRet$tkcon <- xl$tkcon
    return(toRet)

@@ -17,6 +17,7 @@ internalMDB <- function(
    dataModel,
    dbTables,
    dbInfo,
+   optional_info_fields=c(),
    colMembers=NULL,
    checks=c("unique", "not nullable", "foreign keys"),
    verbose=FALSE
@@ -51,7 +52,11 @@ internalMDB <- function(
    
    toRet <- dbTables[names(dataModel)]
    toRet$"___dataModel___" <- dataModel
-   toRet$"___dbInfo___" <- dbInfo
+   toRet$"___dbInfo___" <- dbInfo[c(
+      "name", "title", "description", "url", "version",
+      optional_info_fields
+      
+   )]
    class(toRet) <- c("internalMDB", class(toRet))
    
    ## Collection members ----
@@ -78,9 +83,31 @@ is.internalMDB <- function(x){
 }
 
 ###############################################################################@
+#' Convert an object in an [internalMDB] object
+#' 
+#' @param x any object with relevant `dataModel`, `dataTables`, `dbInfo`
+#' and `collectionMembers` methods
+#' 
+#' @return An [internalMDB] object
+#' 
+#' @export
+#'
+as.internalMDB <- function(x, checks=c()){
+   internalMDB(
+      dataModel=dataModel(x),
+      dbTables=dataTables(x),
+      dbInfo=dbInfo(x),
+      colMembers=collectionMembers(x),
+      checks=checks
+   )
+}
+
+###############################################################################@
 #' Get DB information of an [internalMDB] object
 #' 
 #' @param x an [internalMDB] object
+#' @param countRecords a single logical. If TRUE (default), the number of
+#' records is also returned.
 #' 
 #' @return A list with the following elements:
 #' - **name**: a single character
@@ -88,14 +115,25 @@ is.internalMDB <- function(x){
 #' - **description**: a single character
 #' - **url**: a single character
 #' - **version**: a single character
+#' - (**table_records**): a numeric giving the number of records per table
+#' - (**records**): a single numeric
 #' 
 #' @export
 #'
-dbInfo.internalMDB <- function(x){
-   x <- unclass(x)
-   x$"___dbInfo___"[
-      which(names(x$"___dbInfo___")!="collectionMembers")
+dbInfo.internalMDB <- function(x, countRecords=TRUE){
+   y <- unclass(x)
+   toRet <- y$"___dbInfo___"[
+      which(names(y$"___dbInfo___")!="collectionMembers")
    ]
+   if(countRecords){
+      toRet$table_records <- unlist(lapply(
+         dataTables(x),
+         nrow
+      ))
+      names(toRet$table_records) <- names(x)
+      toRet$records <- sum(toRet$table_records)
+   }
+   return(toRet)
 }
 
 ###############################################################################@

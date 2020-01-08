@@ -4,10 +4,13 @@
 \alias{dbInfo.internalMDB}
 \title{Get DB information of an \link{internalMDB} object}
 \usage{
-\method{dbInfo}{internalMDB}(x)
+\method{dbInfo}{internalMDB}(x, countRecords = TRUE)
 }
 \arguments{
 \item{x}{an \link{internalMDB} object}
+
+\item{countRecords}{a single logical. If TRUE (default), the number of
+records is also returned.}
 }
 \value{
 A list with the following elements:
@@ -17,6 +20,8 @@ A list with the following elements:
 \item \strong{description}: a single character
 \item \strong{url}: a single character
 \item \strong{version}: a single character
+\item (\strong{table_records}): a numeric giving the number of records per table
+\item (\strong{records}): a single numeric
 }
 }
 \description{

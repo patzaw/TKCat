@@ -20,6 +20,7 @@ A list with the following elements:
 \item \strong{description}: a single character
 \item \strong{url}: a single character
 \item \strong{version}: a single character
+\item (\strong{table_records}): a numeric giving the number of records per table
 \item (\strong{records}): a single numeric
 }
 }
