@@ -33,11 +33,16 @@ compare_MDB <- function(former, new){
    toRet <- rbind(
       toRet,
       tibble(
-         "Information"="Model",
-         "Former"=sprintf("%s tables", length(former)),
-         "New"=sprintf("%s tables", length(new)),
-         "Identical"=ReDaMoR::identical_RelDataModel(
-            dataModel(former), dataModel(new)
+         "Information"=c("Model", "Model display"),
+         "Former"=c(sprintf("%s tables", length(former)), ""),
+         "New"=c(sprintf("%s tables", length(new)), ""),
+         "Identical"=c(
+            ReDaMoR::identical_RelDataModel(
+               dataModel(former), dataModel(new), includeDisplay=FALSE
+            ),
+            ReDaMoR::identical_RelDataModel(
+               dataModel(former), dataModel(new), includeDisplay=TRUE
+            )
          )
       )
    )

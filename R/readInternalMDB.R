@@ -66,7 +66,10 @@ readInternalMDB <- function(
          full.names=TRUE
       ),
       returnData=TRUE,
-      verbose=verbose
+      verbose=verbose,
+      delim=delim,
+      quoted_na=quoted_na,
+      ...
    )
    if(
       is.character(cr_variable_name) &&
