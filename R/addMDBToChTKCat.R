@@ -12,7 +12,7 @@ addMDBToChTKCat <- function(
    check_chTKCat(tkcon)
    stopifnot(is.internalMDB(imdb))
    
-   dbInfo <- dbInfo(imdb)
+   dbInfo <- dbInfo(imdb, countRecords=TRUE)
    
    ## Existing DB ----
    curDB <- dbGetQuery(
