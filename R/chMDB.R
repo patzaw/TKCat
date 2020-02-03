@@ -81,13 +81,13 @@ dbInfo.chMDB <- function(x, countRecords=TRUE){
       toRet$table_records <- unlist(lapply(
          names(x),
          function(y){
-            suppressWarnings(dbGetQuery(
+            as.numeric(suppressWarnings(dbGetQuery(
                xl$tkcon$chcon,
                sprintf(
                   "SELECT count() FROM `%s`.`%s`",
                   xl$dbName, y
                )
-            ))[,1]
+            ))[,1])
          }
       ))
       names(toRet$table_records) <- names(x)
