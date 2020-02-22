@@ -103,6 +103,15 @@ as.internalMDB <- function(x, checks=c()){
 }
 
 ###############################################################################@
+#' Convert an [internalMDB] in a list
+#' 
+#' @export
+#'
+as.list.internalMDB <- function(x){
+   unclass(x)[names(x)]
+}
+
+###############################################################################@
 #' Get DB information of an [internalMDB] object
 #' 
 #' @param x an [internalMDB] object
@@ -261,6 +270,9 @@ dataTables.internalMDB <- function(x, ...){
    m <- dataModel(x)
    x <- unclass(x)
    toTake <- unlist(list(...))
+   if(is.numeric(toTake)){
+      toTake <- names(m)[toTake]
+   }
    if(length(toTake)>0){
       notInDb <- setdiff(toTake, names(m))
       if(length(notInDb)>0){
@@ -359,10 +371,10 @@ length.internalMDB <- function(x){
    if(is.null(i)){
       return(x)
    }
-   stopifnot(
-      is.character(i),
-      all(i %in% names(x))
-   )
+   # stopifnot(
+   #    is.character(i),
+   #    all(i %in% names(x))
+   # )
    dbi <- dbInfo(x)
    dbi$name <- sprintf("SUBSET of %s", dbi$name)
    dm <- dataModel(x)[i, rmForeignKeys=TRUE]
@@ -375,7 +387,7 @@ length.internalMDB <- function(x){
       dbTables=dt,
       dbInfo=dbi,
       colMembers=cm,
-      checkTables=FALSE
+      checks=c()
    )
    return(toRet)
 }
@@ -383,15 +395,18 @@ length.internalMDB <- function(x){
 ###############################################################################@
 subset_internalMDB <- function(x, i){
    stopifnot(
-      is.character(i),
-      length(i)==1,
-      all(i %in% names(x))
+      # is.character(i),
+      length(i)==1
+      # all(i %in% names(x))
    )
    ## Rstudio hack to avoid DB call when just looking for names
    cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
    if(length(cc)!=0){
       invisible(NULL)
    }else{
+      if(is.numeric(i)){
+         i <- names(x)[i]
+      }
       return(unclass(x)[[i]])
    }
 }

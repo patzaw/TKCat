@@ -54,6 +54,15 @@ is.chMDB <- function(x){
    inherits(x, "chMDB")
 }
 
+###############################################################################@
+#' Convert a [chMDB] in a list
+#' 
+#' @export
+#'
+as.list.chMDB <- function(x){
+   dataTables(x)[names(x)]
+}
+
 
 ###############################################################################@
 #' Get DB information of a [chMDB] object
@@ -252,6 +261,9 @@ dataTables.chMDB <- function(x, ...){
    m <- dataModel(x)
    x <- unclass(x)
    toTake <- unlist(list(...))
+   if(is.numeric(toTake)){
+      toTake <- names(m)[toTake]
+   }
    if(length(toTake)>0){
       notInDb <- setdiff(toTake, names(m))
       if(length(notInDb)>0){
@@ -375,10 +387,10 @@ length.chMDB <- function(x){
    }else{
       dbi$name <- sprintf("SUBSET of %s", dbi$name)
    }
-   stopifnot(
-      is.character(i),
-      all(i %in% names(x))
-   )
+   # stopifnot(
+   #    is.character(i),
+   #    all(i %in% names(x))
+   # )
    dm <- dataModel(x)[i, rmForeignKeys=TRUE]
    dt <- dataTables(x, i)
    cm <- collectionMembers(x) %>%
@@ -389,7 +401,7 @@ length.chMDB <- function(x){
       dbTables=dt,
       dbInfo=dbi,
       colMembers=cm,
-      checkTables=FALSE
+      checks=c()
    )
    return(toRet)
 }
@@ -397,9 +409,9 @@ length.chMDB <- function(x){
 ###############################################################################@
 subset_chMDB <- function(x, i){
    stopifnot(
-      is.character(i),
-      length(i)==1,
-      all(i %in% names(x))
+      # is.character(i),
+      length(i)==1
+      # all(i %in% names(x))
    )
    ## Rstudio hack to avoid DB call when just looking for names
    cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
