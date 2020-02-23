@@ -484,3 +484,11 @@ plot.chMDB <- function(x){
    plot(dataModel(x))
 }
 
+###############################################################################@
+#' @export
+#'
+filter.chMDB <- function(x, ...){
+   dots <- enquos(...)
+   filter_mdb(x, dots)
+}
+
