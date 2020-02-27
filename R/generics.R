@@ -43,3 +43,12 @@ dataModel <- function(x, ...){
 dataTables <- function(x, ...){
    UseMethod("dataTables", x)
 }
+
+###############################################################################@
+#' Export an object in a folder
+#'
+#' @export
+#'
+export <- function(x, path, ...){
+   UseMethod("export", x)
+}

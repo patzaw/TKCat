@@ -440,8 +440,37 @@ rm(subset_internalMDB)
 ###############################################################################@
 #' @export
 #'
-c.internalMDB <- function(..., checkTables=FALSE){
-   stop("'c' is not supported for internalMDB")
+c.internalMDB <- function(...){
+   # stop("'c' is not supported for internalMDB")
+   alldb <- list(...)
+   if(length(alldb)==0){
+      stop("At least one internalMDB should be provided as an input")
+   }
+   for(i in 1:length(alldb)){
+      if(!is.internalMDB(alldb[[i]])){
+         stop("All objects should be internalMDB")
+      }
+   }
+   di <- dbInfo(alldb[[1]])
+   dm <- dataModel(alldb[[1]])
+   dd <- dataTables(alldb[[1]])
+   dc <- collectionMembers(alldb[[1]])
+   if(length(alldb)>1) for(i in 2:length(alldb)){
+      dm <- c(dm, dataModel(alldb[[i]]))
+      dd <- c(dd, dataTables(alldb[[i]]))
+      dc <- rbind(
+         dc,
+         collectionMembers(alldb[[i]]) %>%
+            mutate(resource=di$name)
+      )
+   }
+   internalMDB(
+      dataModel=dm,
+      dbTables=dd,
+      dbInfo=di,
+      colMembers=dc,
+      checks=c()
+   )
 }
 
 
@@ -498,5 +527,45 @@ plot.internalMDB <- function(x){
 filter.internalMDB <- function(x, ...){
    dots <- enquos(...)
    filter_mdb(x, dots)
+}
+
+###############################################################################@
+#' Export an [internalMDB] in a folder
+#' 
+#' @param x the [internalMDB] to export
+#' @param path the directory to create
+#' @param overwrite a logical indicating if an existing directory should
+#' be overwritten (default: FALSE)
+#'
+#' @export
+#'
+export.internalMDB <- function(x, path, overwrite=FALSE){
+   warning("Collection members are not exported ==> TO IMPLEMENT")
+   if(file.exists(path)){
+      if(!overwrite){
+         stop(sprintf(
+            "%s already exsits. Remove it or set overwrite to TRUE.", path
+         ))
+      }
+      if(!file.info(path)$isdir){
+         stop(sprintf("%s is not a directory. Cannot write into it.", path))
+      }
+      warning(sprintf("%s exists: writting into it.", path))
+   }
+   
+   dir.create(path, showWarnings=FALSE, recursive=TRUE)
+   dir.create(file.path(path, "model"), showWarnings=FALSE, recursive=TRUE)
+   dir.create(file.path(path, "data"), showWarnings=FALSE, recursive=TRUE)
+   
+   jsonlite::write_json(dbInfo(x), file.path(path, "DESCRIPTION.json"))
+   write_json_data_model(dataModel(x), file.path(path, "model", "model.json"))
+   for(tn in names(dataTables(x))){
+      readr::write_tsv(
+         x[[tn]],
+         file.path(path, "data", paste0(tn, ".txt"))
+      )
+   }
+   # colMembers <- collectionMembers(x)
+   
 }
 
