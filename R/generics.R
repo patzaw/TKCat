@@ -52,3 +52,12 @@ dataTables <- function(x, ...){
 export <- function(x, path, ...){
    UseMethod("export", x)
 }
+
+###############################################################################@
+#' Interactive exploration of an object
+#'
+#' @export
+#'
+explore <- function(x, ...){
+   UseMethod("explore", x)
+}
