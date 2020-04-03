@@ -138,7 +138,8 @@ init_chTKCat <- function(x, instance, version){
          "title String,",
          "description String,",
          "url String,",
-         "version String",
+         "version String,",
+         "maintainer String",
          ")",
          "ENGINE = MergeTree() ORDER BY (name)"
       )

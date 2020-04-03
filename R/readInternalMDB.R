@@ -47,15 +47,20 @@ readInternalMDB <- function(
    
    ## Read description
    dbInfo <- read_json(descriptionFile)
-   stopifnot(
-      is.character(dbInfo$name), length(dbInfo$name)==1,
-      is.character(dbInfo$title), length(dbInfo$title)==1,
-      is.character(dbInfo$description), length(dbInfo$description)==1,
-      is.character(dbInfo$`reference URL`), length(dbInfo$`reference URL`)==1,
-      is.character(dbInfo$version), length(dbInfo$version)==1
+   mandFields <- c(
+      "name", "title", "description", "reference URL",
+      "version", "maintainer"
    )
+   for(f in mandFields){
+      if(!is.character(dbInfo[[f]]) || length(dbInfo[[f]])!=1){
+         stop(sprintf(
+            "%s in %s should be a character vector of length 1",
+            f, descriptionFile
+         ))
+      }
+   }
+   dbInfo <- dbInfo[mandFields]
    names(dbInfo) <- sub("^reference URL$", "url", names(dbInfo))
-   dbInfo <- dbInfo[c("name", "title", "description", "url", "version")]
    
    ## Read Tables ----
    cr <- ReDaMoR::confront_data(

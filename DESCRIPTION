@@ -1,7 +1,7 @@
 Package: TKCat
 Type: Package
 Title: Tailored Knowledge Catalog
-Version: 0.4.2
+Version: 0.4.3
 Author: Patrice Godard
 Maintainer: Patrice Godard <patrice.godard@gmail.com>
 Description: This package provides tools to manage a catalog of
@@ -20,7 +20,8 @@ Depends:
 Imports:
    jsonlite,
    jsonvalidate,
-   base64enc
+   base64enc,
+   markdown
 Suggests:
    knitr,
    rmarkdown

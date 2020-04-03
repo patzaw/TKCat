@@ -17,14 +17,14 @@ compare_MDB <- function(former, new){
    infoy <- dbInfo(new, countRecords=TRUE)
    
    ## General information ----
+   mandFields <- c(
+      "name", "title", "description", "url",
+      "version", "maintainer"
+   )
    toRet <- tibble(
-      "Information"=c("name", "title", "description", "url", "version"),
-      "Former"=unlist(infox[
-         c("name", "title", "description", "url", "version")
-      ]),
-      "New"=unlist(infoy[
-         c("name", "title", "description", "url", "version")
-      ])
+      "Information"=mandFields,
+      "Former"=unlist(infox[mandFields]),
+      "New"=unlist(infoy[mandFields])
    ) %>% mutate(
       "Identical"=Former==New
    )

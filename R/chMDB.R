@@ -308,9 +308,10 @@ format.chMDB <- function(x){
    xl <- unclass(x)
    dbi <- dbInfo(x)
    cm <- collectionMembers(x)
+   maintainer <- dbi$maintainer
    return(sprintf(
       paste(
-         "chMDB %s (version %s): %s",
+         "chMDB %s (version %s%s): %s",
          "   - %s tables",
          "   - %s records",
          # "   - %s %s",
@@ -323,6 +324,7 @@ format.chMDB <- function(x){
       ),
       dbi$name,
       dbi$version,
+      ifelse(is.na(maintainer) || maintainer=="", "", paste(",", maintainer)),
       dbi$title,
       length(x),
       format(

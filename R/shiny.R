@@ -266,16 +266,24 @@ buildServer <- function(tkcon){
             do.call(tags$ul, lapply(
                setdiff(names(dbi), c("name", "tkcon", "table_records")),
                function(n){
-                  tags$li(tags$span(
-                     tags$strong(paste0(n, ":")),
+                  if(!is.na(dbi[[n]]) && dbi[[n]]!=""){
                      if(n=="url"){
-                        tags$a(dbi[[n]], href=dbi[[n]], target="_blank")
+                        vt <- tags$a(
+                           dbi[[n]], href=dbi[[n]], target="_blank"
+                        ) %>%
+                           as.character()
                      }else if(is.numeric(dbi[[n]])){
-                        format(dbi[[n]], big.mark=",")
+                        vt <- format(dbi[[n]], big.mark=",")
                      }else{
-                        dbi[[n]]
+                        vt <- dbi[[n]]
                      }
-                  ))
+                     tags$li(shiny::HTML(markdown::renderMarkdown(
+                        text=paste(
+                           tags$span(tags$strong(paste0(n, ":"))),
+                           vt
+                        )
+                     )))
+                  }
                }
             ))
          )

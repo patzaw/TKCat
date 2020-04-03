@@ -17,7 +17,6 @@ internalMDB <- function(
    dataModel,
    dbTables,
    dbInfo,
-   optional_info_fields=c(),
    colMembers=NULL,
    checks=c("unique", "not nullable", "foreign keys"),
    verbose=FALSE
@@ -26,13 +25,20 @@ internalMDB <- function(
    ## Checks ----
    stopifnot(
       is.RelDataModel(dataModel),
-      is.list(dbInfo),
-      is.character(dbInfo$name), length(dbInfo$name)==1,
-      is.character(dbInfo$title), length(dbInfo$title)==1,
-      is.character(dbInfo$description), length(dbInfo$description)==1,
-      is.character(dbInfo$url), length(dbInfo$url)==1,
-      is.character(dbInfo$version), length(dbInfo$version)==1
+      is.list(dbInfo)
    )
+   mandFields <- c(
+      "name", "title", "description", "url",
+      "version", "maintainer"
+   )
+   for(f in mandFields){
+      if(!is.character(dbInfo[[f]]) || length(dbInfo[[f]])!=1){
+         stop(sprintf(
+            "%s in dbInfo should be a character vector of length 1",
+            f
+         ))
+      }
+   }
    if("___dataModel___" %in% names(dataModel)){
       stop('"___dataModel___" is reserved and cannot be used as a table name')
    }
@@ -53,8 +59,8 @@ internalMDB <- function(
    toRet <- dbTables[names(dataModel)]
    toRet$"___dataModel___" <- dataModel
    toRet$"___dbInfo___" <- dbInfo[c(
-      "name", "title", "description", "url", "version",
-      optional_info_fields
+      mandFields,
+      setdiff(names(dbInfo), mandFields)
       
    )]
    class(toRet) <- c("internalMDB", class(toRet))
@@ -303,9 +309,10 @@ format.internalMDB <- function(x){
    hs <- s/(2^(10*hu))
    u <- sunits[hu+1]
    cm <- collectionMembers(x)
+   maintainer <- dbInfo(x)$maintainer
    return(sprintf(
       paste(
-         "internalMDB %s (version %s): %s",
+         "internalMDB %s (version %s%s): %s",
          "   - %s tables",
          "   - %s records",
          "   - %s %s",
@@ -318,6 +325,7 @@ format.internalMDB <- function(x){
       ),
       dbInfo(x)$name,
       dbInfo(x)$version,
+      ifelse(is.na(maintainer) || maintainer=="", "", paste(",", maintainer)),
       dbInfo(x)$title,
       length(x),
       format(
