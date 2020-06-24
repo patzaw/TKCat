@@ -1,23 +1,22 @@
-Package: TKCat
+Package: devTKCat
 Type: Package
 Title: Tailored Knowledge Catalog
-Version: 0.4.3
+Version: 0.5.0
 Author: Patrice Godard
 Maintainer: Patrice Godard <patrice.godard@gmail.com>
 Description: This package provides tools to manage a catalog of
    knowledge data.
 Depends:
-   R (>= 3.5),
+   R (>= 3.6),
    ReDaMoR,
    magrittr,
-   tibble,
    dplyr,
-   readr,
    DBI,
    RClickhouse,
+Imports:
    shiny,
    DT
-Imports:
+   readr,
    jsonlite,
    jsonvalidate,
    base64enc,
