@@ -6,10 +6,12 @@
 #' database is listening (default: 9101)
 #' @param http an integer specifying the HTTP port of the 
 #' ClickHouse database (default: 9111). Used for documentation only.
+#' @param user user name
+#' @param password user password
 #'
 #' @return a chTKCat object
 #'
-#' @seealso \code{\link{check_chTKCat}}, \code{\link{disconnect_chTKCat}}
+#' @seealso [check_chTKCat()], [disconnect_chTKCat()]
 #'
 #' @importFrom RClickhouse clickhouse dbConnect
 #' @export
@@ -17,16 +19,16 @@
 chTKCat <- function(
    host="localhost",
    port=9101L,
-   http=9111L
-   # username=NULL,
-   # password=NULL,
-   # readOnly=TRUE
+   http=9111L,
+   user="default",
+   password=""
 ){
    
-   chcon <- dbConnect(
-      drv=clickhouse(),
+   chcon <- RClickhouse::dbConnect(
+      drv=RClickhouse::clickhouse(),
       host=host,
-      port=port
+      port=port,
+      user=user, password=password
    )
    
    toRet <- list(
@@ -42,11 +44,11 @@ chTKCat <- function(
 }
 
 ###############################################################################@
-#' Check the object is  an [chTKCat] object
+#' Check the object is  a [chTKCat] object
 #' 
 #' @param x any object
 #' 
-#' @return A single logical: TRUE if x is an chTKCat object
+#' @return A single logical: TRUE if x is a [chTKCat] object
 #' 
 #' @export
 #'
@@ -72,6 +74,7 @@ format.chTKCat <- function(x){
          toRet,
          sprintf("   - Instance: %s", x$instance),
          sprintf("   - Version: %s", x$version),
+         sprintf("   - User: %s", x$chcon@user),
          sep="\n"
       )
    }
@@ -86,51 +89,82 @@ print.chTKCat <- function(x, ...){
 }
 
 ###############################################################################@
-#' Disconnect from a ClickHouse TKCat instance
+#' Disconnect from a [chTKCat] instance
 #'
-#' @param x a chTKCat object
-#'
-#' @seealso \code{\link{chTKCat}}
+#' @param x a [chTKCat] object
 #'
 #' @importFrom RClickhouse dbDisconnect
 #' @export
 #'
 disconnect_chTKCat <- function(x){
    stopifnot(inherits(x, "chTKCat"))
-   dbDisconnect(x[["chcon"]])
+   RClickhouse::dbDisconnect(x[["chcon"]])
 }
 
 ###############################################################################@
 #' Initialize a chTKCat database
+#' 
+#' The initialization can only be done locally (host=localhost)
 #'
 #' @param x a [chTKCat] object
 #' @param instance instance name of the database
 #' @param version version name of the database
+#' @param contact maintainer of the chTKCat instance
+#' @param path path to ClickHouse folder
+#' @param primaryUser user name of the primary administrator of the database
+#' @param password password for the primary administrator of the database
 #'
 #' @return a [chTKCat]
+#' 
+#' @importFrom RClickhouse dbSendQuery
+#' @importFrom DBI dbWriteTable dbGetQuery
 #'
-init_chTKCat <- function(x, instance, version){
+init_chTKCat <- function(
+   x, instance, version, contact, path,
+   primaryUser, password, userfile=NULL
+){
+   
+   ## Check that ClickHouse is empty and ready for initialization ----
    check_chTKCat(x)
-   defaultTables <- dbGetQuery(
+   if(x$chcon@host!="localhost"){
+      stop("Initialisation can only be done for localhost instances")
+   }
+   defaultTables <- DBI::dbGetQuery(
       x$chcon,
       "select name from system.tables where database='default'"
    )$name
    if("System" %in% defaultTables){
       stop("chTKCat already initialized")
    }
-   dbWriteTable(
+   
+   ## users.xml file ----
+   if(!is.null(userfile)){
+      stopifnot(file.exists(userfile))
+   }else{
+      userfile <- system.file(
+         "ClickHouse/users.xml",
+         package = packageName()
+      )
+   }
+   
+   ## Create default tables ----
+   ## > System < -----
+   DBI::dbWriteTable(
       conn=x$chcon,
       name="System",
       value=tibble(
          name="chTKCat",
          instance=instance,
-         version=version
+         version=version,
+         contact=contact,
+         path=path
       ),
       append=FALSE,
       overwrite=FALSE,
       row.names=FALSE
    )
-   dbSendQuery(
+   ## > MDBs < -----
+   RClickhouse::dbSendQuery(
       conn=x$chcon,
       statement=paste(
          "CREATE TABLE default.MDB (",
@@ -139,12 +173,115 @@ init_chTKCat <- function(x, instance, version){
          "description String,",
          "url String,",
          "version String,",
-         "maintainer String",
+         "maintainer String,",
+         "public UInt8",
          ")",
          "ENGINE = MergeTree() ORDER BY (name)"
       )
    )
-   dbSendQuery(
+   ## > Users, MDBUser < -----
+   RClickhouse::dbSendQuery(
+      conn=x$chcon,
+      statement=paste(
+         "CREATE TABLE default.Users (",
+         "login String,",
+         "name String,",
+         "contact String",
+         ")",
+         "ENGINE = MergeTree() ORDER BY (login)"
+      )
+   )
+   RClickhouse::dbSendQuery(
+      conn=x$chcon,
+      statement=paste(
+         "CREATE TABLE default.MDBUsers (",
+         "user String,",
+         "mdb String,",
+         "admin UInt8",
+         ")",
+         "ENGINE = MergeTree() ORDER BY (user, mdb)"
+      )
+   )
+   ## > Tables < ----
+   RClickhouse::dbSendQuery(
+      conn=x$chcon,
+      statement=paste(
+         "CREATE TABLE default.Tables (",
+         "mdb String,",
+         "name String,",
+         "x Nullable(Float64),",
+         "y Nullable(Float64),",
+         "color Nullable(String),",
+         "comment Nullable(String)",
+         ")",
+         "ENGINE = MergeTree() ORDER BY (mdb, name)"
+      )
+   )
+   ## > Fields < ----
+   RClickhouse::dbSendQuery(
+      conn=x$chcon,
+      statement=paste(
+         "CREATE TABLE default.Fields (",
+         "mdb String,",
+         "table String,",
+         "name String,",
+         "type String,",
+         "nullable UInt8,",
+         "unique UInt8,",
+         "comment String,",
+         "fieldOrder Int32",
+         ")",
+         "ENGINE = MergeTree() ORDER BY (mdb, table, name)"
+      )
+   )
+   ## > PrimaryKeys < ----
+   RClickhouse::dbSendQuery(
+      conn=x$chcon,
+      statement=paste(
+         "CREATE TABLE default.PrimaryKeys (",
+         "mdb String,",
+         "table String,",
+         "field String",
+         ")",
+         "ENGINE = MergeTree() ORDER BY (mdb, table, field)"
+      )
+   )
+   ## > Indexes < ----
+   RClickhouse::dbSendQuery(
+      conn=x$chcon,
+      statement=paste(
+         "CREATE TABLE default.Indexes (",
+         "mdb String,",
+         "table String,",
+         "idx Int32,",
+         "field String,",
+         "unique UInt8",
+         ")",
+         "ENGINE = MergeTree() ORDER BY (mdb, table, idx, field)"
+      )
+   )
+   ## > ForeignKeys < ----
+   RClickhouse::dbSendQuery(
+      conn=x$chcon,
+      statement=paste(
+         "CREATE TABLE default.ForeignKeys (",
+         "mdb String,",
+         "table String,",
+         "fki Int32,",
+         "field String,",
+         "refTable String,",
+         "refField String,",
+         "fmin Int32,",
+         "fmax Int32,",
+         "tmin Int32,",
+         "tmax Int32,",
+         ")",
+         "ENGINE = MergeTree()",
+         "ORDER BY (mdb, table, fki, field, refTable, refField)"
+      )
+   )
+   ## > Collections, CollectionMembers < ----
+   RClickhouse::dbSendQuery(
       conn=x$chcon,
       statement=paste(
          "CREATE TABLE default.Collections (",
@@ -155,23 +292,42 @@ init_chTKCat <- function(x, instance, version){
          "ENGINE = MergeTree() ORDER BY (title)"
       )
    )
-   dbSendQuery(
+   RClickhouse::dbSendQuery(
       conn=x$chcon,
       statement=paste(
          "CREATE TABLE default.CollectionMembers (",
          "collection String,",
-         "resource String,",
-         "cid Int32,",
+         "mdb String,",
          "table String,",
+         "cid Int32,",
          "field String,",
          "static UInt8,",
          "value String,",
          "type Nullable(String)",
          ")",
-         "ENGINE = MergeTree() ORDER BY (collection, resource, table, field)"
+         "ENGINE = MergeTree() ORDER BY (collection, mdb, table, cid, field)"
       )
    )
    x$init <- TRUE
+   
+   ## Create admin user ----
+   RClickhouse::dbSendQuery(x$chcon , "CREATE ROLE admin")
+   RClickhouse::dbSendQuery(
+      x$chcon, "GRANT ALL ON *.* TO admin WITH GRANT OPTION"
+   )
+   create_chTKCat_user(x$chcon, user=primaryUser, password=password, admin=TRUE)
+   file.copy(userfile, file.path(path, "conf", "users.xml"))
+   disconnect_chTKCat(x)
+   x <- chTKCat(
+      host=x$chcon@host,
+      port=x$chcon@port,
+      http=x$http,
+      user=primaryUser,
+      password=password
+   )
+   create_chTKCat_user(x$chcon, user="default", admin=FALSE)
+   
+   ## Finalize ----
    return(check_chTKCat(x))
 }
 

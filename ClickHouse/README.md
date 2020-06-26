@@ -7,7 +7,7 @@ The DBMS supporting TKCat are installed using the following shell script:
 
 The data are stored in the following folder:
 	
-	- `$TBKM_HOME`: **/data/pgodard/Projects/UCB_NM_TKcat**
+	- `$TBKM_HOME`: **/data/pgodard/Projects/TKCat_UCB_TBN**
 
 ----------------------------------------
 # Initialize and configure TKCat instance
@@ -22,13 +22,13 @@ The initialization and configuration procedure is described here:
 Stop and remove the docker containers.
 
 ```{sh, eval=FALSE}
-docker stop ucb_nm_tkcat
-docker rm ucb_nm_tkcat
+docker stop ucb_tbn_tkcat
+docker rm ucb_tbn_tkcat
 docker volume prune
 ```
 
 Remove the folder with all the data: `$TKCAT_HOME`.
 
 ```
-sudo rm -rf ~/Documents/Projects/TKCat_UCB_NM_Braine
+sudo rm -rf ~/Documents/Projects/TKCat_UCB_TBN
 ```
