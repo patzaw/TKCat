@@ -5,7 +5,7 @@ date:  "`r format(Sys.time(), '%B %d, %Y')`"
 output:
    html_document:
      number_sections: yes
-     self_contained: no
+     self_contained: yes
      theme: cerulean
      toc: yes
      toc_float: yes
