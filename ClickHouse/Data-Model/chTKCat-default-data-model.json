@@ -1,0 +1,218 @@
+{
+  "System": {
+    "tableName": ["System"],
+    "fields": [
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Always \"chTKCat\""
+      },
+      {
+        "name": "instance",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "The name of the chTKCat instance"
+      },
+      {
+        "name": "version",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Version of the chTKCat instance"
+      },
+      {
+        "name": "contact",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Maintainer of the chTKCat instance"
+      },
+      {
+        "name": "path",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Local path to the ClickHouse folder"
+      }
+    ],
+    "foreignKeys": [],
+    "indexes": {},
+    "display": {
+      "x": [-627],
+      "y": [-335],
+      "color": ["#F67FC4"],
+      "comment": ["Technical table for documenting the instance of chTKCat. This table has only one row."]
+    },
+    "primaryKey": []
+  },
+  "___MDB___": {
+    "tableName": ["___MDB___"],
+    "fields": [
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "The name of the modeled resource"
+      }
+    ],
+    "foreignKeys": [],
+    "indexes": [
+      {
+        "fields": ["name"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-367],
+      "y": [-110],
+      "color": ["#A9ECC9"],
+      "comment": ["Each MDB (modeled database) has a dedicated database in chTKCat. The model of the MDB is stored in dedicated tables of the database (see MDB data model), among which ___MDB___ provides a description of the resource."]
+    },
+    "primaryKey": ["name"]
+  },
+  "Collections": {
+    "tableName": ["Collections"],
+    "fields": [
+      {
+        "name": "title",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "The name of the collection"
+      },
+      {
+        "name": "description",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Description of the collection"
+      },
+      {
+        "name": "json",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "A formal definition of the collection in json format fitting the \"Collection-Schema.json\""
+      }
+    ],
+    "foreignKeys": [],
+    "indexes": [
+      {
+        "fields": ["title"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-611],
+      "y": [-117],
+      "color": ["#DFFB86"],
+      "comment": ["Collections of concepts: define information that must be provided by a table to identify a specific concept such as a disease or a biological entity."]
+    },
+    "primaryKey": ["title"]
+  },
+  "Users": {
+    "tableName": ["Users"],
+    "fields": [
+      {
+        "name": "login",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": ""
+      },
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "contact",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Contact information"
+      }
+    ],
+    "foreignKeys": [],
+    "indexes": [
+      {
+        "fields": ["login"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-366],
+      "y": [-347],
+      "color": ["#9BC8FE"],
+      "comment": ["NA"]
+    },
+    "primaryKey": ["login"]
+  },
+  "MDBUsers": {
+    "tableName": ["MDBUsers"],
+    "fields": [
+      {
+        "name": "user",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "user identifier"
+      },
+      {
+        "name": "mdb",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "MDB name"
+      },
+      {
+        "name": "admin",
+        "type": "logical",
+        "nullable": false,
+        "unique": false,
+        "comment": "If the user can edit the MDB: the data and the model"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["___MDB___"],
+        "key": [
+          {
+            "from": "mdb",
+            "to": "name"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      },
+      {
+        "refTable": ["Users"],
+        "key": [
+          {
+            "from": "user",
+            "to": "login"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["mdb", "user"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-366],
+      "y": [-225],
+      "color": ["#9BC8FE"],
+      "comment": ["Users having access to MDB"]
+    },
+    "primaryKey": []
+  }
+}

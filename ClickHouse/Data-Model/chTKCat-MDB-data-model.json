@@ -1,55 +1,6 @@
 {
-  "System": {
-    "tableName": ["System"],
-    "fields": [
-      {
-        "name": "name",
-        "type": "character",
-        "nullable": false,
-        "unique": true,
-        "comment": "Always \"chTKCat\""
-      },
-      {
-        "name": "instance",
-        "type": "character",
-        "nullable": false,
-        "unique": true,
-        "comment": "The name of the chTKCat instance"
-      },
-      {
-        "name": "version",
-        "type": "character",
-        "nullable": false,
-        "unique": true,
-        "comment": "Version of the chTKCat instance"
-      },
-      {
-        "name": "contact",
-        "type": "character",
-        "nullable": false,
-        "unique": true,
-        "comment": "Maintainer of the chTKCat instance"
-      },
-      {
-        "name": "path",
-        "type": "character",
-        "nullable": false,
-        "unique": true,
-        "comment": "Local path to the ClickHouse folder"
-      }
-    ],
-    "foreignKeys": [],
-    "indexes": {},
-    "display": {
-      "x": [-671],
-      "y": [-269],
-      "color": ["#D9D9D9"],
-      "comment": ["Technical table for documenting the instance of chTKCat. This table has only one row."]
-    },
-    "primaryKey": []
-  },
-  "MDBs": {
-    "tableName": ["MDBs"],
+  "___MDB___": {
+    "tableName": ["___MDB___"],
     "fields": [
       {
         "name": "name",
@@ -109,10 +60,10 @@
       }
     ],
     "display": {
-      "x": [-366],
-      "y": [-267],
+      "x": [-663],
+      "y": [-274],
       "color": ["#A9ECC9"],
-      "comment": ["The modeled DataBases in chTKCat"]
+      "comment": ["The modeled DataBase"]
     },
     "primaryKey": ["name"]
   },
@@ -125,20 +76,6 @@
         "nullable": false,
         "unique": true,
         "comment": "The name of the collection"
-      },
-      {
-        "name": "description",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": "Description of the collection"
-      },
-      {
-        "name": "json",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": "A formal definition of the collection in json format fitting the \"Collection-Schema.json\""
       }
     ],
     "foreignKeys": [],
@@ -149,15 +86,15 @@
       }
     ],
     "display": {
-      "x": [198],
-      "y": [-55],
+      "x": [-90],
+      "y": [-275],
       "color": ["#DFFB86"],
-      "comment": ["Collections of concepts: define information that must be provided by a table to identify a specific concept such as a disease or a biological entity."]
+      "comment": ["Collections of concepts are shared across MDBs and are defined in the default database (see the chTKCat default data model)"]
     },
     "primaryKey": ["title"]
   },
-  "CollectionMembers": {
-    "tableName": ["CollectionMembers"],
+  "___CollectionMembers___": {
+    "tableName": ["___CollectionMembers___"],
     "fields": [
       {
         "name": "collection",
@@ -165,13 +102,6 @@
         "nullable": false,
         "unique": false,
         "comment": "The title of the collection"
-      },
-      {
-        "name": "mdb",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": "The name of the MDB"
       },
       {
         "name": "table",
@@ -228,12 +158,8 @@
         "cardinality": [0, -1, 1, 1]
       },
       {
-        "refTable": ["Tables"],
+        "refTable": ["___Tables___"],
         "key": [
-          {
-            "from": "mdb",
-            "to": "mdb"
-          },
           {
             "from": "table",
             "to": "name"
@@ -242,35 +168,23 @@
         "cardinality": [0, -1, 1, 1]
       }
     ],
-    "indexes": [
-      {
-        "fields": ["cid", "collection", "field", "mdb", "table"],
-        "unique": [true]
-      }
-    ],
+    "indexes": [],
     "display": {
-      "x": [-75],
-      "y": [-54],
+      "x": [-352],
+      "y": [-274],
       "color": ["#DFFB86"],
       "comment": ["Tables in MDBs which provide a collection of concepts."]
     },
     "primaryKey": []
   },
-  "Tables": {
-    "tableName": ["Tables"],
+  "___Tables___": {
+    "tableName": ["___Tables___"],
     "fields": [
-      {
-        "name": "mdb",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": "MDB name"
-      },
       {
         "name": "name",
         "type": "character",
         "nullable": false,
-        "unique": false,
+        "unique": true,
         "comment": "Table name"
       },
       {
@@ -302,42 +216,24 @@
         "comment": "(ReDaMoR) table description"
       }
     ],
-    "foreignKeys": [
-      {
-        "refTable": ["MDBs"],
-        "key": [
-          {
-            "from": "mdb",
-            "to": "name"
-          }
-        ],
-        "cardinality": [0, -1, 1, 1]
-      }
-    ],
+    "foreignKeys": [],
     "indexes": [
       {
-        "fields": ["mdb", "name"],
+        "fields": ["name"],
         "unique": [true]
       }
     ],
     "display": {
-      "x": [-371],
-      "y": [-51],
-      "color": ["#A9ECC9"],
+      "x": [-355],
+      "y": [-112],
+      "color": ["#8FE6E0"],
       "comment": ["Tables belonging to each MDB"]
     },
-    "primaryKey": ["mdb", "name"]
+    "primaryKey": ["name"]
   },
-  "Fields": {
-    "tableName": ["Fields"],
+  "___Fields___": {
+    "tableName": ["___Fields___"],
     "fields": [
-      {
-        "name": "mdb",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": ""
-      },
       {
         "name": "table",
         "type": "character",
@@ -390,12 +286,8 @@
     ],
     "foreignKeys": [
       {
-        "refTable": ["Tables"],
+        "refTable": ["___Tables___"],
         "key": [
-          {
-            "from": "mdb",
-            "to": "mdb"
-          },
           {
             "from": "table",
             "to": "name"
@@ -406,28 +298,21 @@
     ],
     "indexes": [
       {
-        "fields": ["mdb", "name", "table"],
+        "fields": ["name", "table"],
         "unique": [true]
       }
     ],
     "display": {
-      "x": [-370],
-      "y": [258],
-      "color": ["#A9ECC9"],
+      "x": [-354],
+      "y": [197],
+      "color": ["#8FE6E0"],
       "comment": ["NA"]
     },
-    "primaryKey": ["mdb", "name", "table"]
+    "primaryKey": ["name", "table"]
   },
-  "PrimaryKeys": {
-    "tableName": ["PrimaryKeys"],
+  "___PrimaryKeys___": {
+    "tableName": ["___PrimaryKeys___"],
     "fields": [
-      {
-        "name": "mdb",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": ""
-      },
       {
         "name": "table",
         "type": "character",
@@ -445,12 +330,18 @@
     ],
     "foreignKeys": [
       {
-        "refTable": ["Fields"],
+        "refTable": ["___Tables___"],
         "key": [
           {
-            "from": "mdb",
-            "to": "mdb"
-          },
+            "from": "table",
+            "to": "name"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      },
+      {
+        "refTable": ["___Fields___"],
+        "key": [
           {
             "from": "table",
             "to": "table"
@@ -461,41 +352,20 @@
           }
         ],
         "cardinality": [0, -1, 1, 1]
-      },
-      {
-        "refTable": ["Tables"],
-        "key": [
-          {
-            "from": "mdb",
-            "to": "mdb"
-          },
-          {
-            "from": "table",
-            "to": "name"
-          }
-        ],
-        "cardinality": [0, -1, 1, 1]
       }
     ],
     "indexes": [],
     "display": {
-      "x": [-264],
-      "y": [97],
+      "x": [-248],
+      "y": [36],
       "color": ["#C6BDF1"],
       "comment": ["Table primary keys"]
     },
     "primaryKey": []
   },
-  "Indexes": {
-    "tableName": ["Indexes"],
+  "___Indexes___": {
+    "tableName": ["___Indexes___"],
     "fields": [
-      {
-        "name": "mdb",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": ""
-      },
       {
         "name": "table",
         "type": "character",
@@ -527,12 +397,8 @@
     ],
     "foreignKeys": [
       {
-        "refTable": ["Tables"],
+        "refTable": ["___Tables___"],
         "key": [
-          {
-            "from": "mdb",
-            "to": "mdb"
-          },
           {
             "from": "table",
             "to": "name"
@@ -541,12 +407,8 @@
         "cardinality": [0, -1, 1, 1]
       },
       {
-        "refTable": ["Fields"],
+        "refTable": ["___Fields___"],
         "key": [
-          {
-            "from": "mdb",
-            "to": "mdb"
-          },
           {
             "from": "table",
             "to": "table"
@@ -559,30 +421,18 @@
         "cardinality": [0, -1, 1, 1]
       }
     ],
-    "indexes": [
-      {
-        "fields": ["field", "idx", "mdb", "table"],
-        "unique": [true]
-      }
-    ],
+    "indexes": [],
     "display": {
-      "x": [-90],
-      "y": [98],
+      "x": [-74],
+      "y": [37],
       "color": ["#C6BDF1"],
       "comment": ["Table indexes"]
     },
     "primaryKey": []
   },
-  "ForeignKeys": {
-    "tableName": ["ForeignKeys"],
+  "___ForeignKeys___": {
+    "tableName": ["___ForeignKeys___"],
     "fields": [
-      {
-        "name": "mdb",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": ""
-      },
       {
         "name": "table",
         "type": "character",
@@ -649,12 +499,8 @@
     ],
     "foreignKeys": [
       {
-        "refTable": ["Tables"],
+        "refTable": ["___Tables___"],
         "key": [
-          {
-            "from": "mdb",
-            "to": "mdb"
-          },
           {
             "from": "table",
             "to": "name"
@@ -663,26 +509,8 @@
         "cardinality": [0, -1, 1, 1]
       },
       {
-        "refTable": ["Tables"],
+        "refTable": ["___Fields___"],
         "key": [
-          {
-            "from": "mdb",
-            "to": "mdb"
-          },
-          {
-            "from": "refTable",
-            "to": "name"
-          }
-        ],
-        "cardinality": [0, -1, 1, 1]
-      },
-      {
-        "refTable": ["Fields"],
-        "key": [
-          {
-            "from": "mdb",
-            "to": "mdb"
-          },
           {
             "from": "table",
             "to": "table"
@@ -695,12 +523,8 @@
         "cardinality": [0, -1, 1, 1]
       },
       {
-        "refTable": ["Fields"],
+        "refTable": ["___Fields___"],
         "key": [
-          {
-            "from": "mdb",
-            "to": "mdb"
-          },
           {
             "from": "refTable",
             "to": "table"
@@ -711,120 +535,24 @@
           }
         ],
         "cardinality": [0, -1, 1, 1]
-      }
-    ],
-    "indexes": [
-      {
-        "fields": ["field", "fki", "mdb", "refField", "refTable", "table"],
-        "unique": [true]
-      }
-    ],
-    "display": {
-      "x": [-674],
-      "y": [106],
-      "color": ["#C6BDF1"],
-      "comment": ["Table foreign keys"]
-    },
-    "primaryKey": []
-  },
-  "Users": {
-    "tableName": ["Users"],
-    "fields": [
-      {
-        "name": "login",
-        "type": "character",
-        "nullable": false,
-        "unique": true,
-        "comment": ""
       },
       {
-        "name": "name",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": ""
-      },
-      {
-        "name": "contact",
-        "type": "character",
-        "nullable": true,
-        "unique": false,
-        "comment": "Contact information"
-      }
-    ],
-    "foreignKeys": [],
-    "indexes": [
-      {
-        "fields": ["login"],
-        "unique": [true]
-      }
-    ],
-    "display": {
-      "x": [103],
-      "y": [-271],
-      "color": ["#9BC8FE"],
-      "comment": ["NA"]
-    },
-    "primaryKey": ["login"]
-  },
-  "MDBUsers": {
-    "tableName": ["MDBUsers"],
-    "fields": [
-      {
-        "name": "user",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": "user identifier"
-      },
-      {
-        "name": "mdb",
-        "type": "character",
-        "nullable": false,
-        "unique": false,
-        "comment": "MDB name"
-      },
-      {
-        "name": "admin",
-        "type": "logical",
-        "nullable": false,
-        "unique": false,
-        "comment": "If the user can edit the MDB: the data and the model"
-      }
-    ],
-    "foreignKeys": [
-      {
-        "refTable": ["MDBs"],
+        "refTable": ["___Tables___"],
         "key": [
           {
-            "from": "mdb",
+            "from": "refTable",
             "to": "name"
           }
         ],
         "cardinality": [0, -1, 1, 1]
-      },
-      {
-        "refTable": ["Users"],
-        "key": [
-          {
-            "from": "user",
-            "to": "login"
-          }
-        ],
-        "cardinality": [0, -1, 1, 1]
       }
     ],
-    "indexes": [
-      {
-        "fields": ["mdb", "user"],
-        "unique": [true]
-      }
-    ],
+    "indexes": [],
     "display": {
-      "x": [-133],
-      "y": [-272],
-      "color": ["#9BC8FE"],
-      "comment": ["Users having access to MDB"]
+      "x": [-658],
+      "y": [45],
+      "color": ["#C6BDF1"],
+      "comment": ["Table foreign keys"]
     },
     "primaryKey": []
   }
