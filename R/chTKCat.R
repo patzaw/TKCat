@@ -954,16 +954,19 @@ remove_chMDB_user <- function(x, mdb, login){
 ###############################################################################@
 #' List collections available in a [chTKCat]
 #' 
-#' @param tkcon a [chTKCat] object
+#' @param x a [chTKCat] object
+#' 
+#' @importFrom dplyr as_tibble
 #' 
 #' @export
 #' 
-list_ChTKCat_collections <- function(tkcon){
-   stopifnot(is.chTKCat(tkcon))
-   as_tibble(dbGetQuery(
-      conn=tkcon$chcon,
+list_chTKCat_collections <- function(x){
+   stopifnot(is.chTKCat(x))
+   dbGetQuery(
+      conn=x$chcon,
       statement="SELECT title, description FROM default.Collections"
-   )) %>% 
+   ) %>%
+      as_tibble() %>% 
       return()
 }
 
@@ -971,43 +974,45 @@ list_ChTKCat_collections <- function(tkcon){
 ###############################################################################@
 #' Import a collection in a [chTKCat] database
 #' 
-#' @param tkcon a [chTKCat] object
+#' @param x a [chTKCat] object
 #' @param json a single character indicating the collection to import. Can be:
 #' - a path to a file
-#' - the name of a local collection (see [listLocalCollections()])
+#' - the name of a local collection (see [list_local_collections()])
 #' - the json text defining the collection
 #' 
 #' @importFrom jsonlite fromJSON
 #' @importFrom jsonvalidate json_validate
+#' @importFrom dplyr tibble filter pull
+#' @importFrom RClickhouse dbSendQuery
 #' 
 #' @export
 #' 
-add_chTKCat_collection <- function(tkcon, json, overwrite=FALSE){
+add_chTKCat_collection <- function(x, json, overwrite=FALSE){
    stopifnot(
-      is.chTKCat(tkcon),
+      is.chTKCat(x),
       is.character(json),
       length(json)==1
    )
-   if(!tkcon$admin){
+   if(!x$admin){
       stop("Only chTKCat admin can add collections")
    }
    if(file.exists(json)){
       raw <- readLines(f) %>% paste(collapse="\n")
-   }else if(json %in% listLocalCollections()$title){
+   }else if(json %in% list_local_collections()$title){
       env <- environment()
       raw <- tkcatEnv$COLLECTIONS %>%
-         filter(title==get("json", env)) %>%
-         pull(json)
+         dplyr::filter(title==get("json", env)) %>%
+         dplyr::pull(json)
    }else{
       raw <- json
    }
-   if(!json_validate(raw, tkcatEnv$COL_SCHEMA, verbose=TRUE)){
+   if(!jsonvalidate::json_validate(raw, tkcatEnv$COL_SCHEMA, verbose=TRUE)){
       stop("Not a valid collection")
    }
-   def <- fromJSON(raw)
+   def <- jsonlite::fromJSON(raw)
    ctitle <- def$properties$collection$enum 
    if(
-      ctitle %in% listChTKCatCollections(tkcon)$title &&
+      ctitle %in% list_chTKCat_collections(x)$title &&
       !overwrite
    ){
       stop(
@@ -1018,20 +1023,20 @@ add_chTKCat_collection <- function(tkcon, json, overwrite=FALSE){
          " Set overwrite to TRUE if you want to replace it."
       )
    }
-   dbSendQuery(
-      conn=tkcon$chcon,
+   RClickhouse::dbSendQuery(
+      conn=x$chcon,
       statement=sprintf(
          "ALTER TABLE default.Collections DELETE WHERE title='%s'",
          ctitle
       )
    )
-   toWrite<- tibble(
+   toWrite<- dplyr::tibble(
       title=ctitle,
       description=def$description,
       json=raw
    )
    ch_insert(
-      con=tkcon$chcon,
+      con=x$chcon,
       dbName="default",
       tableName="Collections",
       value=toWrite
@@ -1043,14 +1048,29 @@ add_chTKCat_collection <- function(tkcon, json, overwrite=FALSE){
 ###############################################################################@
 #' Remove a collection from a [chTKCat] database
 #' 
-#' @param tkcon a [chTKCat] object
-#' @param name the name of the collection to remove
+#' @param x a [chTKCat] object
+#' @param title the title of the collection to remove
 #' 
 #' @export
 #' 
-remove_chTKCat_collection <- function(tkcon, name){
-   #### TODO ####
-   stop("TODO")
+remove_chTKCat_collection <- function(x, title){
+   stopifnot(
+      is.chTKCat(x),
+      is.character(title), length(title)==1, !is.na(title)
+   )
+   if(!x$admin){
+      stop("Only chTKCat admin can remove collections")
+   }
+   if(!title %in% list_chTKCat_collections(x)$title){
+      stop("The collection does not exist in the chTKCat")
+   }
+   RClickhouse::dbSendQuery(
+      conn=x$chcon,
+      statement=sprintf(
+         "ALTER TABLE default.Collections DELETE WHERE title='%s'",
+         title
+      )
+   )
    invisible()
 }
 

@@ -4,15 +4,15 @@
 \alias{add_chTKCat_collection}
 \title{Import a collection in a \link{chTKCat} database}
 \usage{
-add_chTKCat_collection(tkcon, json, overwrite = FALSE)
+add_chTKCat_collection(x, json, overwrite = FALSE)
 }
 \arguments{
-\item{tkcon}{a \link{chTKCat} object}
+\item{x}{a \link{chTKCat} object}
 
 \item{json}{a single character indicating the collection to import. Can be:
 \itemize{
 \item a path to a file
-\item the name of a local collection (see \code{\link[=listLocalCollections]{listLocalCollections()}})
+\item the name of a local collection (see \code{\link[=list_local_collections]{list_local_collections()}})
 \item the json text defining the collection
 }}
 }

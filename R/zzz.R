@@ -9,8 +9,6 @@ assign(
 )
 
 ## Importing built-in collections when loading the library ----
-#' @importFrom dplyr select
-#' @importFrom magrittr %>%
 .onLoad <- function(libname, pkgname){
    assign(
       x="COL_SCHEMA",
@@ -29,6 +27,6 @@ assign(
       full.names=TRUE
    )
    for(f in files){
-      importLocalCollection(f)
+      import_local_collection(f)
    }
 }

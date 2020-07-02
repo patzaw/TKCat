@@ -30,3 +30,5 @@ k <- devTKCat:::init_chTKCat(
    login="pgodard",
    contact="Patrice Godard <patrice.godard@ucb.com>"
 )
+add_chTKCat_collection(k, "BE")
+add_chTKCat_collection(k, "Condition")

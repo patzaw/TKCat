@@ -4,12 +4,12 @@
 \alias{remove_chTKCat_collection}
 \title{Remove a collection from a \link{chTKCat} database}
 \usage{
-remove_chTKCat_collection(tkcon, name)
+remove_chTKCat_collection(x, title)
 }
 \arguments{
-\item{tkcon}{a \link{chTKCat} object}
+\item{x}{a \link{chTKCat} object}
 
-\item{name}{the name of the collection to remove}
+\item{title}{the title of the collection to remove}
 }
 \description{
 Remove a collection from a \link{chTKCat} database

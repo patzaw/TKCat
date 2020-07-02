@@ -1,4 +1,5 @@
-#' Import a collection definition in the local environment
+###############################################################################@
+#' Import a  the definition of a collection of concepts in the local environment
 #' 
 #' @param f the JSON file to import
 #' @param overwrite a single logical. If TRUE the collection is overwritten
@@ -7,18 +8,17 @@
 #' @importFrom jsonlite fromJSON
 #' @importFrom jsonvalidate json_validate
 #' @importFrom magrittr %>%
-#' @importFrom dplyr filter bind_rows
-#' @importFrom tibble tibble
+#' @importFrom dplyr tibble filter bind_rows
 #' @export
 #' 
-importLocalCollection <- function(f, overwrite=FALSE){
+import_local_collection <- function(f, overwrite=FALSE){
    raw <- readLines(f) %>% paste(collapse="\n")
    if(!jsonvalidate::json_validate(raw, tkcatEnv$COL_SCHEMA, verbose=TRUE)){
       stop("Not a valid collection")
    }
    def <- jsonlite::fromJSON(raw)
    if(
-      def$properties$collection$enum %in% listLocalCollections()$title &&
+      def$properties$collection$enum %in% list_local_collections()$title &&
       !overwrite
    ){
       stop(
@@ -32,8 +32,8 @@ importLocalCollection <- function(f, overwrite=FALSE){
    assign(
       x="COLLECTIONS",
       value=tkcatEnv$COLLECTIONS %>%
-         filter(title != def$properties$collection$enum) %>%
-         bind_rows(tibble(
+         dplyr::filter(title != def$properties$collection$enum) %>%
+         dplyr::bind_rows(dplyr::tibble(
             title=def$properties$collection$enum,
             description=def$description,
             json=raw
@@ -42,11 +42,14 @@ importLocalCollection <- function(f, overwrite=FALSE){
    )
 }
 
+
 ###############################################################################@
-#' List local collections
+#' List local collections of concepts
+#' 
+#' @importFrom dplyr select
 #' 
 #' @export
 #'
-listLocalCollections <- function(){
+list_local_collections <- function(){
    tkcatEnv$COLLECTIONS %>% select(title, description)
 }
