@@ -1051,6 +1051,8 @@ add_chTKCat_collection <- function(x, json, overwrite=FALSE){
 #' @param x a [chTKCat] object
 #' @param title the title of the collection to remove
 #' 
+#' @importFrom RClickhouse dbSendQuery
+#' 
 #' @export
 #' 
 remove_chTKCat_collection <- function(x, title){
