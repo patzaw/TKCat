@@ -4,7 +4,16 @@
 \alias{init_chTKCat}
 \title{Initialize a chTKCat database}
 \usage{
-init_chTKCat(x, instance, version)
+init_chTKCat(
+  x,
+  instance,
+  version,
+  path,
+  login,
+  password,
+  contact,
+  userfile = NULL
+)
 }
 \arguments{
 \item{x}{a \link{chTKCat} object}
@@ -12,10 +21,24 @@ init_chTKCat(x, instance, version)
 \item{instance}{instance name of the database}
 
 \item{version}{version name of the database}
+
+\item{path}{path to ClickHouse folder}
+
+\item{login}{login of the primary administrator of the database}
+
+\item{password}{password for the primary administrator of the database}
+
+\item{contact}{contact information for the primary administrator of
+the database}
+
+\item{userFile}{path to a ClickHouse users.xml file. If NULL (default),
+the file provided within the TKCat
+package (\code{system.file("ClickHouse/users.xml", package="TKCat")})
+is used.}
 }
 \value{
 a \link{chTKCat}
 }
 \description{
-Initialize a chTKCat database
+The initialization can only be done locally (host="localhost")
 }

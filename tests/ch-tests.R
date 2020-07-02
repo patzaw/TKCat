@@ -41,7 +41,7 @@ dbGetQuery(con, "GRANT ALL ON db1.* TO db1_r")
 dbGetQuery(con , "show grants for db1_r")
 
 dbDisconnect(con)
-con <- DBI::dbConnect(RClickhouse::clickhouse(), host="localhost", port=9201, user="db1_u1")
+con <- DBI::dbConnect(RClickhouse::clickhouse(), host="localhost", port=9201, user="user1")
 dbGetQuery(con, "select * from system.tables where database<>'system'")
 
 # test <- tibble("abc"=1:3)
@@ -50,6 +50,24 @@ dbGetQuery(con, "select * from system.tables where database<>'system'")
 dbDisconnect(con)
 con <- DBI::dbConnect(
    RClickhouse::clickhouse(), host="localhost", port=9201,
-   user="pgodard", password="password"
+   user="pgodard", password="admin"
 )
 
+library(ReDaMoR)
+TKCat:::writeMergeTree(con, "default", "d", d, rtypes=c("a"="integer", "b"="integer"))
+
+
+dbSendQuery(con, 'create row policy dpgorr on d as restrictive for select to pgodard')
+dbSendQuery(con, 'create row policy dpgo on d as permissive using b>=18 to pgodard')
+dbSendQuery(con, 'create row policy dpgor on d as permissive for select using 1 to pgodard')
+dbSendQuery(con, 'alter table d delete where b=12')
+
+
+dbDisconnect(con2)
+con2 <- DBI::dbConnect(RClickhouse::clickhouse(), "localhost", 9101)
+db <- dbGetQuery(con2, "select * from system.tables")
+a <- c()
+for(x in 1:nrow(db))
+   a <- bind_rows(a, dbGetQuery(
+      con2, sprintf("select * from system.tables where database='%s' and name='%s'", db[x, 1, drop=T], db[x, 2, drop=T])
+   ))

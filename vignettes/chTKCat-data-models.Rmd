@@ -1,0 +1,56 @@
+---
+title: "chTKCat data models"
+author: "Patrice Godard"
+date:  "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+   html_document:
+     number_sections: yes
+     self_contained: yes
+     theme: cerulean
+     toc: yes
+     toc_float: yes
+vignette: >
+   %\VignetteIndexEntry{chTKCat data models}
+   %\VignetteEncoding{UTF-8}
+   %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+
+```{r setup, message=FALSE, echo=FALSE, include=FALSE, cache=FALSE}
+library(knitr)
+opts_chunk$set(
+   include=TRUE,
+   echo=FALSE,
+   message=FALSE,
+   warning=FALSE,
+   cache=FALSE,
+   cache.lazy=FALSE
+)
+library(devTKCat)
+```
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Data model of the default database
+
+The default database stores information about chTKCat instance, users
+and user access.
+
+```{r}
+plot(devTKCat:::DEFAULT_DATA_MODEL)
+```
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Data model of modeled databases
+
+Modeled databases (MDB) are stored in dedicated database in chTKCat.
+Their data model is provided in dedicated tables described below.
+
+```{r}
+plot(devTKCat:::CHMDB_DATA_MODEL)
+```
+

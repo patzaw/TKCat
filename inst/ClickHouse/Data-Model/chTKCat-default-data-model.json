@@ -1,0 +1,131 @@
+{
+  "System": {
+    "tableName": ["System"],
+    "fields": [
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Always \"chTKCat\""
+      },
+      {
+        "name": "instance",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "The name of the chTKCat instance"
+      },
+      {
+        "name": "version",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Version of the chTKCat instance"
+      },
+      {
+        "name": "contact",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Maintainer of the chTKCat instance"
+      },
+      {
+        "name": "path",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Local path to the ClickHouse folder"
+      }
+    ],
+    "foreignKeys": [],
+    "indexes": {},
+    "display": {
+      "x": [-627],
+      "y": [-335],
+      "color": ["#F67FC4"],
+      "comment": ["Technical table for documenting the instance of chTKCat. This table has only one row."]
+    },
+    "primaryKey": []
+  },
+  "Collections": {
+    "tableName": ["Collections"],
+    "fields": [
+      {
+        "name": "title",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "The name of the collection"
+      },
+      {
+        "name": "description",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Description of the collection"
+      },
+      {
+        "name": "json",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "A formal definition of the collection in json format fitting the \"Collection-Schema.json\""
+      }
+    ],
+    "foreignKeys": [],
+    "indexes": [
+      {
+        "fields": ["title"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-514],
+      "y": [-198],
+      "color": ["#DFFB86"],
+      "comment": ["Collections of concepts: define information that must be provided by a table to identify a specific concept such as a disease or a biological entity."]
+    },
+    "primaryKey": ["title"]
+  },
+  "Users": {
+    "tableName": ["Users"],
+    "fields": [
+      {
+        "name": "login",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": ""
+      },
+      {
+        "name": "contact",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Contact information"
+      },
+      {
+        "name": "admin",
+        "type": "logical",
+        "nullable": false,
+        "unique": false,
+        "comment": "If the user is an admin of the chTKCat instance"
+      }
+    ],
+    "foreignKeys": [],
+    "indexes": [
+      {
+        "fields": ["login"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-385],
+      "y": [-335],
+      "color": ["#9BC8FE"],
+      "comment": ["NA"]
+    },
+    "primaryKey": ["login"]
+  }
+}

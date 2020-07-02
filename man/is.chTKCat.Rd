@@ -2,7 +2,7 @@
 % Please edit documentation in R/chTKCat.R
 \name{is.chTKCat}
 \alias{is.chTKCat}
-\title{Check the object is  an \link{chTKCat} object}
+\title{Check the object is  a \link{chTKCat} object}
 \usage{
 is.chTKCat(x)
 }
@@ -10,8 +10,8 @@ is.chTKCat(x)
 \item{x}{any object}
 }
 \value{
-A single logical: TRUE if x is an chTKCat object
+A single logical: TRUE if x is a \link{chTKCat} object
 }
 \description{
-Check the object is  an \link{chTKCat} object
+Check the object is  a \link{chTKCat} object
 }

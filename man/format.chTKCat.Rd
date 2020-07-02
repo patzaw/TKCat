@@ -2,16 +2,16 @@
 % Please edit documentation in R/chTKCat.R
 \name{format.chTKCat}
 \alias{format.chTKCat}
-\title{Format an \link{chTKCat} object for printing}
+\title{Format a \link{chTKCat} object for printing}
 \usage{
 \method{format}{chTKCat}(x)
 }
 \arguments{
-\item{x}{an \link{chTKCat} object}
+\item{x}{a \link{chTKCat} object}
 }
 \value{
 A single character
 }
 \description{
-Format an \link{chTKCat} object for printing
+Format a \link{chTKCat} object for printing
 }

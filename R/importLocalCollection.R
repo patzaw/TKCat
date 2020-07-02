@@ -13,10 +13,10 @@
 #' 
 importLocalCollection <- function(f, overwrite=FALSE){
    raw <- readLines(f) %>% paste(collapse="\n")
-   if(!json_validate(raw, tkcatEnv$COL_SCHEMA, verbose=TRUE)){
+   if(!jsonvalidate::json_validate(raw, tkcatEnv$COL_SCHEMA, verbose=TRUE)){
       stop("Not a valid collection")
    }
-   def <- fromJSON(raw)
+   def <- jsonlite::fromJSON(raw)
    if(
       def$properties$collection$enum %in% listLocalCollections()$title &&
       !overwrite

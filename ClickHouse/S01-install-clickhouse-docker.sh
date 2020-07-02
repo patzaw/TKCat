@@ -3,7 +3,7 @@
 #####################################################
 ## Configuration
 
-export TKCAT_HOME=/data/pgodard/Projects/TKCat_UCB_TBN
+export TKCAT_HOME=/data/pgodard/Projects/TKCat_UCB_TBN # avoid space characters in the path
 mkdir -p $TKCAT_HOME
 
 export TKCAT_NAT_PORT=9201 # mv back to 9101 when tests are finished

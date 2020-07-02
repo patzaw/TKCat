@@ -4,7 +4,13 @@
 \alias{chTKCat}
 \title{Connect to a ClickHouse TKCat instance}
 \usage{
-chTKCat(host = "localhost", port = 9101L, http = 9111L)
+chTKCat(
+  host = "localhost",
+  port = 9101L,
+  http = 9111L,
+  user = "default",
+  password
+)
 }
 \arguments{
 \item{host}{a character string specifying the host heberging the
@@ -15,6 +21,10 @@ database is listening (default: 9101)}
 
 \item{http}{an integer specifying the HTTP port of the
 ClickHouse database (default: 9111). Used for documentation only.}
+
+\item{user}{user name}
+
+\item{password}{user password}
 }
 \value{
 a chTKCat object
@@ -23,5 +33,5 @@ a chTKCat object
 Connect to a ClickHouse TKCat instance
 }
 \seealso{
-\code{\link{check_chTKCat}}, \code{\link{disconnect_chTKCat}}
+\code{\link[=check_chTKCat]{check_chTKCat()}}, \code{\link[=disconnect_chTKCat]{disconnect_chTKCat()}}
 }

@@ -2,16 +2,13 @@
 % Please edit documentation in R/chTKCat.R
 \name{disconnect_chTKCat}
 \alias{disconnect_chTKCat}
-\title{Disconnect from a ClickHouse TKCat instance}
+\title{Disconnect from a \link{chTKCat} instance}
 \usage{
 disconnect_chTKCat(x)
 }
 \arguments{
-\item{x}{a chTKCat object}
+\item{x}{a \link{chTKCat} object}
 }
 \description{
-Disconnect from a ClickHouse TKCat instance
-}
-\seealso{
-\code{\link{chTKCat}}
+Disconnect from a \link{chTKCat} instance
 }

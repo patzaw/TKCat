@@ -24,11 +24,7 @@ Stop and remove the docker containers.
 ```{sh, eval=FALSE}
 docker stop ucb_tbn_tkcat
 docker rm ucb_tbn_tkcat
-docker volume prune
-```
-
-Remove the folder with all the data: `$TKCAT_HOME`.
-
-```
+docker volume prune -f
+# Remove the folder with all the data: `$TKCAT_HOME`.`
 sudo rm -rf ~/Documents/Projects/TKCat_UCB_TBN
 ```

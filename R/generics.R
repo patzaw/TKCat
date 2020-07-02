@@ -3,8 +3,8 @@
 #'
 #' @export
 #'
-dbInfo <- function(x, ...){
-   UseMethod("dbInfo", x)
+db_info <- function(x, ...){
+   UseMethod("db_info", x)
 }
 
 ###############################################################################@
@@ -12,8 +12,8 @@ dbInfo <- function(x, ...){
 #'
 #' @export
 #'
-collectionMembers <- function(x, ...){
-   UseMethod("collectionMembers", x)
+collection_members <- function(x, ...){
+   UseMethod("collection_members", x)
 }
 
 ###############################################################################@
@@ -21,18 +21,18 @@ collectionMembers <- function(x, ...){
 #'
 #' @export
 #'
-'collectionMembers<-' <- function(x, value, ...){
-   UseMethod("collectionMembers<-", x)
+'collection_members<-' <- function(x, value, ...){
+   UseMethod("collection_members<-", x)
 }
 
 
 ###############################################################################@
-#' Get object dataModel
+#' Get object data model
 #'
 #' @export
 #'
-dataModel <- function(x, ...){
-   UseMethod("dataModel", x)
+data_model <- function(x, ...){
+   UseMethod("data_model", x)
 }
 
 ###############################################################################@
@@ -40,24 +40,6 @@ dataModel <- function(x, ...){
 #'
 #' @export
 #'
-dataTables <- function(x, ...){
-   UseMethod("dataTables", x)
-}
-
-###############################################################################@
-#' Export an object in a folder
-#'
-#' @export
-#'
-export <- function(x, path, ...){
-   UseMethod("export", x)
-}
-
-###############################################################################@
-#' Interactive exploration of an object
-#'
-#' @export
-#'
-explore <- function(x, ...){
-   UseMethod("explore", x)
+data_tables <- function(x, ...){
+   UseMethod("data_tables", x)
 }
