@@ -597,7 +597,7 @@ list_chMDBs <- function(x, withInfo=TRUE){
 #' 
 #' @param tkcon a [chTKCat] object
 #' @param name the name of the new database
-#' @param public if the database data are accessible to any user (default:TRUE)
+#' @param public if the database data are accessible to any user (default:FALSE)
 #' 
 #' @importFrom RClickhouse dbSendQuery
 #' @importFrom dplyr pull
