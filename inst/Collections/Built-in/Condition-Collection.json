@@ -1,8 +1,12 @@
 {
+   "$schema": "TKCat_collections_1.0",
+   "$id":"TKCat_Condition_collection_1.0",
 	"title": "Condition collection",
 	"type": "object",
 	"description": "Collection of condition concepts",
 	"properties": {
+      "$schema": {"enum": ["TKCat_Condition_collection_1.0"]},
+      "$id": {"type": "string"},
 	   "collection": {"enum":["Condition"]},
 		"resource": {"type": "string"},
 		"tables": {

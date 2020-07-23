@@ -1,8 +1,12 @@
 {
+   "$schema": "TKCat_collections_1.0",
+   "$id":"TKCat_BE_collection_1.0",
 	"title": "BE collection",
 	"type": "object",
 	"description": "Collection of biological entity (BE) concepts",
 	"properties": {
+      "$schema": {"enum": ["TKCat_BE_collection_1.0"]},
+      "$id": {"type": "string"},
 		"collection": {"enum":["BE"]},
 		"resource": {"type": "string"},
 		"tables": {

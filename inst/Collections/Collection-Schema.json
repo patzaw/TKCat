@@ -1,14 +1,41 @@
 {
+   "$schema": "https://json-schema.org/draft/2019-09/schema",
+   "$id":"TKCat_collections_1.0",
 	"title": "Collection schema",
 	"type": "object",
 	"description": "Schema for defining collections of concepts",
 	"properties": {
+      "$schema": {"enum": ["TKCat_collections_1.0"]},
+      "$id": {"type": "string"},
 		"title": {"type": "string"},
 		"type": {"enum":["object"]},
 		"description": {"type": "string"},
 		"properties": {
 			"type": "object",
 			"properties": {
+            "$schema": {
+					"type":"object",
+					"properties":{
+						"enum": {
+							"type": "array",
+							"minItems": 1,
+							"maxItems": 1,
+							"items": {"type": "string"}
+						}
+					},
+					"required": ["enum"],
+					"additionalProperties": false
+				},
+            "$id": {
+					"type":"object",
+					"properties":{
+						"type": {
+							"enum": ["string"]
+						}
+					},
+					"required": ["type"],
+					"additionalProperties": false
+				},
 				"collection": {
 					"type":"object",
 					"properties":{
@@ -132,7 +159,7 @@
 					"additionalProperties": false
 				}
 			},
-			"required": ["collection", "resource", "tables"],
+			"required": ["$schema", "$id", "collection", "resource", "tables"],
 			"additionalProperties": false
 		},
 		"required": {
@@ -142,6 +169,6 @@
 		},
 		"additionalProperties": {"enum": [false]}
 	},
-	"required": ["title", "type", "description", "properties", "additionalProperties"],
+	"required": ["$schema", "$id", "title", "type", "description", "properties", "additionalProperties"],
 	"additionalProperties": false
 }	
