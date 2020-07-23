@@ -19,6 +19,15 @@
 					"fields": {
 						"type": "object",
 						"properties": {
+						   "condition": {
+								"type": "object",
+								"properties": {
+									"static": {"type": "boolean"},
+									"value": {"type": "string"}
+								},
+								"required": ["static", "value"],
+								"additionalProperties": false
+							},
 							"source": {
 								"type": "object",
 								"properties": {
