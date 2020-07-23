@@ -47,7 +47,7 @@
 								"additionalProperties": false
 							}
 						},
-						"required": ["source", "identifier"],
+						"required": ["condition", "source", "identifier"],
 						"additionalProperties": false
 					}
 				},
@@ -56,7 +56,7 @@
 			}
 		}
 	},
-	"required": ["collection", "resource", "tables"],
+	"required": ["$schema", "$id", "collection", "resource", "tables"],
 	"additionalProperties": false
 }
 	

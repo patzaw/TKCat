@@ -66,6 +66,6 @@
 			}
 		}
 	},
-	"required": ["collection", "resource", "tables"],
+	"required": ["$schema", "$id", "collection", "resource", "tables"],
 	"additionalProperties": false
 }
