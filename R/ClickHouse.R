@@ -53,6 +53,24 @@ ch_reconnect <- function(x, user, password, ntries=3){
    assign(xn, nv, envir=parent.frame(n=1))
 }
 
+###############################################################################@
+#' List tables from a ClickHouse database
+#' 
+#' @param con the clickhouse connection
+#' @param dbName the name of the database from which the tables should be listed
+#' 
+#' @return A character vector with table names
+#' 
+#' @export
+#' 
+ch_list_tables <- function(con, dbName=NA){
+   if(is.na(dbName)){
+      return(DBI::dbGetQuery(con, "SHOW TABLES")$name)
+   }else{
+      return(DBI::dbGetQuery(con, sprintf("SHOW TABLES FROM %s", dbName))$name)
+   }
+}
+
 
 ###############################################################################@
 #' Write a Clickhouse
@@ -170,7 +188,8 @@ ch_insert <- function(
       inherits(con, "ClickhouseConnection"),
       is.character(dbName), length(dbName)==1,
       is.character(tableName), length(tableName)==1,
-      is.data.frame(value)
+      is.data.frame(value),
+      tableName %in% ch_list_tables(con, dbName)
    )
    
    qname <- DBI::SQL(paste(
@@ -188,17 +207,19 @@ ch_insert <- function(
    )
    
    if(nrow(value)>0){
-      # classes <- unlist(lapply(value, function(v){
-      #    class(v)[[1]]
-      # }))
-      # for (c in names(classes[classes=="character"])) {
-      #    value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
-      # }
-      # for (c in names(classes[classes=="factor"])) {
-      #    levels(value[[c]]) <- .Internal(setEncoding(
-      #       levels(value[[c]]), "UTF-8"
-      #    ))
-      # }
+      classes <- unlist(lapply(value, function(v){
+         class(v)[[1]]
+      }))
+      for (c in names(classes[classes=="character"])) {
+         # value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
+         Encoding(value[[c]]) <- "UTF-8"
+      }
+      for (c in names(classes[classes=="factor"])) {
+         # levels(value[[c]]) <- .Internal(setEncoding(
+         #    levels(value[[c]]), "UTF-8"
+         # ))
+         Encoding(levels(value[[c]])) <- "UTF-8"
+      }
       s <- by*(0:(nrow(value)%/%by))
       e <- c(s[-1], nrow(value))
       s <- s+1
@@ -207,6 +228,10 @@ ch_insert <- function(
       for(i in 1:length(s)){
          em <- try(
             RClickhouse:::insert(con@ptr, qname, value[s[i]:e[i],,drop=FALSE]),
+            # DBI::dbWriteTable(
+            #    con, qname, value[s[i]:e[i],,drop=FALSE],
+            #    append=TRUE
+            # ),
             silent=TRUE
          )
          if(inherits(em, "try-error")){
