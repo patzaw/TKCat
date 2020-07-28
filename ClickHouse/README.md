@@ -1,30 +1,25 @@
 ----------------------------------------
-# Installation of underlying databases
+# Install ClickHouse, initialize and configure the TKCat instance
 
-The DBMS supporting TKCat are installed using the following shell script:
+The ClickHouse docker container supporting TKCat,
+its initialization and its configuration procedures
+are implemented here:
 	
-	- **S01-install-clickhouse-docker.sh**
-
-The data are stored in the following folder:
+	- **S01-install-and-init.R**
 	
-	- `$TBKM_HOME`: **/data/pgodard/Projects/TKCat_UCB_TBN**
+The data are stored in the `TBKM_HOME` folder.
 
 ----------------------------------------
-# Initialize and configure TKCat instance
-
-The initialization and configuration procedure is described here:
-	
-	- **S11-Init-Config.R**
-
-----------------------------------------
-# Cleaning and removing TKCat instance
+# Cleaning and removing a TKCat instance
 
 Stop and remove the docker containers.
 
 ```{sh, eval=FALSE}
+
 docker stop ucb_tbn_tkcat
 docker rm ucb_tbn_tkcat
 docker volume prune -f
 # Remove the folder with all the data: `$TKCAT_HOME`.`
 sudo rm -rf ~/Documents/Projects/TKCat_UCB_TBN
+
 ```
