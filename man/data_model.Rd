@@ -6,6 +6,11 @@
 \usage{
 data_model(x, ...)
 }
+\arguments{
+\item{x}{an object with an embedded data model}
+
+\item{...}{further arguments for the method}
+}
 \description{
 Get object data model
 }

@@ -6,6 +6,11 @@
 \usage{
 db_info(x, ...)
 }
+\arguments{
+\item{x}{an object with embedded database information}
+
+\item{...}{further arguments for the method}
+}
 \description{
 Get DB information
 }

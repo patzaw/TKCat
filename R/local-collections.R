@@ -5,10 +5,6 @@
 #' @param overwrite a single logical. If TRUE the collection is overwritten
 #' if it already exists (default: FALSE)
 #' 
-#' @importFrom jsonlite fromJSON
-#' @importFrom jsonvalidate json_validate
-#' @importFrom magrittr %>%
-#' @importFrom dplyr tibble filter bind_rows
 #' @export
 #' 
 import_local_collection <- function(f, overwrite=FALSE){
@@ -32,7 +28,7 @@ import_local_collection <- function(f, overwrite=FALSE){
    assign(
       x="COLLECTIONS",
       value=tkcatEnv$COLLECTIONS %>%
-         dplyr::filter(title != def$properties$collection$enum) %>%
+         dplyr::filter(.data$title != def$properties$collection$enum) %>%
          dplyr::bind_rows(dplyr::tibble(
             title=def$properties$collection$enum,
             description=def$description,
@@ -46,10 +42,8 @@ import_local_collection <- function(f, overwrite=FALSE){
 ###############################################################################@
 #' List local collections of concepts
 #' 
-#' @importFrom dplyr select
-#' 
 #' @export
 #'
 list_local_collections <- function(){
-   tkcatEnv$COLLECTIONS %>% select(title, description)
+   tkcatEnv$COLLECTIONS %>% dplyr::select("title", "description")
 }

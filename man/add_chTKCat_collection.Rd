@@ -15,6 +15,9 @@ add_chTKCat_collection(x, json, overwrite = FALSE)
 \item the name of a local collection (see \code{\link[=list_local_collections]{list_local_collections()}})
 \item the json text defining the collection
 }}
+
+\item{overwrite}{a logical indicating if the existing collection should
+be replaced.}
 }
 \description{
 Import a collection in a \link{chTKCat} database

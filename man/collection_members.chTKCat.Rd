@@ -4,16 +4,15 @@
 \alias{collection_members.chTKCat}
 \title{Get collection members of a \link{chTKCat} object}
 \usage{
-\method{collection_members}{chTKCat}(x, collections = NULL)
+\method{collection_members}{chTKCat}(x, collections = NULL, ...)
 }
 \arguments{
 \item{x}{a \link{chTKCat} object}
 
-\item{collection}{a character vector indicating the name of the collections
+\item{collections}{a character vector indicating the name of the collections
 to focus on (default: NULL ==> all of them)}
-}
-\value{
-See \code{\link[=collectionMembers.chMDB]{collectionMembers.chMDB()}}
+
+\item{...}{not used}
 }
 \description{
 Get collection members of a \link{chTKCat} object

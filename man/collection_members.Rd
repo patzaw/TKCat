@@ -6,6 +6,11 @@
 \usage{
 collection_members(x, ...)
 }
+\arguments{
+\item{x}{an object with embedded collection members}
+
+\item{...}{further arguments for the method}
+}
 \description{
 Get collection members
 }

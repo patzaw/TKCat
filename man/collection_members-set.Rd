@@ -4,7 +4,12 @@
 \alias{collection_members<-}
 \title{Set collection members}
 \usage{
-collection_members(x, ...) <- value
+collection_members(x) <- value
+}
+\arguments{
+\item{x}{an object with embedded collection members}
+
+\item{value}{the new collection members}
 }
 \description{
 Set collection members

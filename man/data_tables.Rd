@@ -6,6 +6,11 @@
 \usage{
 data_tables(x, ...)
 }
+\arguments{
+\item{x}{an object with embedded data tables}
+
+\item{...}{further arguments for the method}
+}
 \description{
 Get object data tables
 }

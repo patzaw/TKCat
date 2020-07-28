@@ -8,7 +8,6 @@
 #' user to provide a password.
 #' @param ntries the number of times the user can enter a wrong password
 #' 
-#' @importFrom RClickhouse dbConnect clickhouse dbDisconnect
 #' @importFrom getPass getPass
 #' 
 #' @export
@@ -70,10 +69,7 @@ ch_reconnect <- function(x, user, password, ntries=3){
 #' which are nullable (default: NULL)
 #' @param sortKey a character vector indicating the name of the columns
 #' used in the sort key. If NULL (default), all the non-nullable columns
-#' are used in the key. 
-#' 
-#' @importFrom ReDaMoR conv_type_ref
-#' @importFrom RClickhouse dbSendQuery
+#' are used in the key.
 #' 
 #' @export
 #' 
@@ -160,9 +156,6 @@ write_MergeTree <- function(
 #' @param by the size of the batch: number of records to import
 #' together (default: 10^6)
 #' 
-#' @importFrom RClickhouse dbQuoteIdentifier
-#' @importFrom DBI dbGetQuery
-#' 
 #' @export
 #' 
 ch_insert <- function(
@@ -180,7 +173,7 @@ ch_insert <- function(
       is.data.frame(value)
    )
    
-   qname <- SQL(paste(
+   qname <- DBI::SQL(paste(
       RClickhouse::dbQuoteIdentifier(con, dbName),
       RClickhouse::dbQuoteIdentifier(con, tableName),
       sep="."
@@ -195,17 +188,17 @@ ch_insert <- function(
    )
    
    if(nrow(value)>0){
-      classes <- unlist(lapply(value, function(v){
-         class(v)[[1]]
-      }))
-      for (c in names(classes[classes=="character"])) {
-         value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
-      }
-      for (c in names(classes[classes=="factor"])) {
-         levels(value[[c]]) <- .Internal(setEncoding(
-            levels(value[[c]]), "UTF-8"
-         ))
-      }
+      # classes <- unlist(lapply(value, function(v){
+      #    class(v)[[1]]
+      # }))
+      # for (c in names(classes[classes=="character"])) {
+      #    value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
+      # }
+      # for (c in names(classes[classes=="factor"])) {
+      #    levels(value[[c]]) <- .Internal(setEncoding(
+      #       levels(value[[c]]), "UTF-8"
+      #    ))
+      # }
       s <- by*(0:(nrow(value)%/%by))
       e <- c(s[-1], nrow(value))
       s <- s+1
@@ -240,7 +233,7 @@ mergeTrees_from_RelDataModel <- function(
    stopifnot(
       inherits(con, "ClickhouseConnection"),
       is.character(dbName), length(dbName)==1, !is.na(dbName),
-      is.RelDataModel(dbm)
+      ReDaMoR::is.RelDataModel(dbm)
    )
    for(tn in names(dbm)){
       mergeTree_from_RelTableModel(con, dbName, dbm[[tn]])
@@ -262,11 +255,11 @@ mergeTree_from_RelTableModel <- function(
    stopifnot(
       inherits(con, "ClickhouseConnection"),
       is.character(dbName), length(dbName)==1, !is.na(dbName),
-      is.RelTableModel(tm)
+      ReDaMoR::is.RelTableModel(tm)
    )
    rtypes <- tm$fields$type
    names(rtypes) <- tm$fields$name
-   value <- tibble()
+   value <- dplyr::tibble()
    for(i in 1:nrow(tm$fields)){
       toAdd <- character()
       class(toAdd) <- tm$fields$type[i]
@@ -278,7 +271,9 @@ mergeTree_from_RelTableModel <- function(
       tableName=tm$tableName,
       value=value,
       rtypes=rtypes,
-      nullable=tm$fields %>% filter(nullable) %>% pull(name),
+      nullable=tm$fields %>%
+         dplyr::filter(.data$nullable) %>%
+         pull("name"),
       sortKey=tm$primaryKey
    )
 }

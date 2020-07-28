@@ -4,7 +4,7 @@ Title: Tailored Knowledge Catalog
 Version: 0.5.0
 Author: Patrice Godard
 Maintainer: Patrice Godard <patrice.godard@gmail.com>
-Description: This package provides tools to manage a catalog of
+Description: Classes and methods to manage a catalog of
    knowledge data.
 Depends:
    R (>= 3.6),
@@ -14,6 +14,7 @@ Depends:
    DBI,
    RClickhouse
 Imports:
+   rlang,
    getPass,
    shiny,
    DT,
@@ -30,4 +31,4 @@ Encoding: UTF-8
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1

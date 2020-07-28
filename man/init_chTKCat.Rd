@@ -31,7 +31,7 @@ init_chTKCat(
 \item{contact}{contact information for the primary administrator of
 the database}
 
-\item{userFile}{path to a ClickHouse users.xml file. If NULL (default),
+\item{userfile}{path to a ClickHouse users.xml file. If NULL (default),
 the file provided within the TKCat
 package (\code{system.file("ClickHouse/users.xml", package="TKCat")})
 is used.}

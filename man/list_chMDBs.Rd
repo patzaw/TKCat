@@ -7,11 +7,11 @@
 list_chMDBs(x, withInfo = TRUE)
 }
 \arguments{
+\item{x}{a \link{chTKCat} object}
+
 \item{withInfo}{if TRUE (default), it returns only initialized MDBs along
 with general information. If FALSE, it returns all the available databases
 in the system (excepted those reserved by the system).}
-
-\item{tkcon}{a \link{chTKCat} object}
 }
 \description{
 List available databases in a \link{chTKCat}

@@ -18,8 +18,7 @@
 #' @return a chTKCat object
 #'
 #' @seealso [check_chTKCat()], [disconnect_chTKCat()]
-#'
-#' @importFrom RClickhouse clickhouse dbConnect
+#' 
 #' @export
 #'
 chTKCat <- function(
@@ -64,9 +63,7 @@ chTKCat <- function(
 #' displayed.
 #'
 #' @return Invisible result: [chTKCat] object
-#'
-#' @importFrom DBI dbGetQuery
-#' @importFrom dplyr pull
+#' 
 #' @export
 #'
 check_chTKCat <- function(x, verbose=FALSE){
@@ -103,7 +100,7 @@ check_chTKCat <- function(x, verbose=FALSE){
       admin <- DBI::dbGetQuery(
          con, sprintf("SELECT admin FROM Users WHERE login='%s'", con@user)
       ) %>% 
-         dplyr::pull(admin) %>%
+         dplyr::pull("admin") %>%
          as.logical()
       
       ## System information
@@ -163,12 +160,13 @@ is.chTKCat <- function(x){
 #' Format a [chTKCat] object for printing
 #' 
 #' @param x a [chTKCat] object
+#' @param ... not used
 #' 
 #' @return A single character
 #' 
 #' @export
 #'
-format.chTKCat <- function(x){
+format.chTKCat <- function(x, ...){
    toRet <- sprintf(
       "chTKCat on %s:%s", x$chcon@host, x$chcon@port
    )
@@ -202,8 +200,7 @@ print.chTKCat <- function(x, ...){
 #' Disconnect from a [chTKCat] instance
 #'
 #' @param x a [chTKCat] object
-#'
-#' @importFrom RClickhouse dbDisconnect
+#' 
 #' @export
 #'
 disconnect_chTKCat <- function(x){
@@ -216,11 +213,12 @@ disconnect_chTKCat <- function(x){
 #' Reconnect to a [chTKCat] instance
 #'
 #' @param x a [chTKCat] object
-#' @param user user name. If not provided, it's taken from x
-#' @param password user password. If not provided, first the function
-#' tries to connect without any password.If it fails, the function asks the
+#' @param ... further arguments for [ch_reconnect]:
+#' - **user**: user name. If not provided, it's taken from x
+#' - **password**: user password. If not provided, first the function
+#' tries to connect without any password. If it fails, the function asks the
 #' user to provide a password.
-#' @param ntries the number of times the user can enter a wrong password
+#' - **ntries**: the number of times the user can enter a wrong password
 #' 
 #' @export
 #'
@@ -269,15 +267,15 @@ reconnect_chTKCat <- function(x, ...){
 #' @param password password for the primary administrator of the database
 #' @param contact contact information for the primary administrator of
 #' the database
-#' @param userFile path to a ClickHouse users.xml file. If NULL (default),
+#' @param userfile path to a ClickHouse users.xml file. If NULL (default),
 #' the file provided within the TKCat
 #' package (`system.file("ClickHouse/users.xml", package="TKCat")`)
 #' is used.
 #'
 #' @return a [chTKCat]
 #' 
-#' @importFrom DBI dbGetQuery
 #' @importFrom getPass getPass
+#' @importFrom utils packageName
 #' 
 #' @export
 #'
@@ -317,7 +315,10 @@ init_chTKCat <- function(
    if(!is.null(userfile)){
       stopifnot(length(userfile)==1, file.exists(userfile))
    }else{
-      userfile <- system.file("ClickHouse/users.xml", package = packageName())
+      userfile <- system.file(
+         "ClickHouse/users.xml",
+         package=utils::packageName()
+      )
    }
    
    ## Create default tables ----
@@ -327,7 +328,7 @@ init_chTKCat <- function(
    )
    ch_insert(
       con, "default", "System",
-      value=tibble(
+      value=dplyr::tibble(
          name="chTKCat",
          instance=as.character(instance),
          version=as.character(version),
@@ -373,9 +374,7 @@ init_chTKCat <- function(
 #' - login: user login
 #' - contact: user contact information
 #' - admin: if the user is an admin of the chTKCat object
-#'
-#' @importFrom DBI dbGetQuery
-#' @importFrom dplyr as_tibble mutate
+#' 
 #' @export
 #'
 list_chTKCat_users <- function(x){
@@ -392,8 +391,7 @@ list_chTKCat_users <- function(x){
    ) %>% 
       dplyr::as_tibble()
    if("admin" %in% colnames(toRet)){
-      toRet <- toRet %>% 
-      dplyr::mutate(admin=as.logical(admin))
+      toRet$admin <- as.logical(toRet$admin)
    }
    return(toRet)
 }
@@ -408,10 +406,6 @@ list_chTKCat_users <- function(x){
 #' @param contact contact information (can be NA)
 #' @param admin a logical indicating if the user is an admin of the chTKCat
 #' instance
-#' 
-#' @importFrom RClickhouse dbSendQuery
-#' @importFrom DBI dbGetQuery
-#' @importFrom dplyr tibble
 #' 
 #' @export
 create_chTKCat_user <- function(
@@ -513,8 +507,7 @@ create_chTKCat_user <- function(
 #'
 #' @param x a [chTKCat] object
 #' @param login login of the user to drop
-#'
-#' @importFrom RClickhouse dbSendQuery
+#' 
 #' @export
 #'
 drop_chTKCat_user <- function(x, login){
@@ -553,20 +546,18 @@ drop_chTKCat_user <- function(x, login){
 ###############################################################################@
 #' List available databases in a [chTKCat]
 #' 
-#' @param tkcon a [chTKCat] object
+#' @param x a [chTKCat] object
 #' @param withInfo if TRUE (default), it returns only initialized MDBs along
 #' with general information. If FALSE, it returns all the available databases
 #' in the system (excepted those reserved by the system).
 #' 
-#' @importFrom DBI dbGetQuery
-#' @importFrom dplyr pull as_tibble bind_rows
 #' @export
 #' 
 list_chMDBs <- function(x, withInfo=TRUE){
    stopifnot(is.chTKCat(x))
    con <- x$chcon
    dbNames <- DBI::dbGetQuery(con, "SELECT * FROM system.databases") %>% 
-      dplyr::pull(name) %>% 
+      dplyr::pull("name") %>% 
       setdiff(CH_RESERVED_DB)
    if(!withInfo){
       return(dbNames)
@@ -595,12 +586,10 @@ list_chMDBs <- function(x, withInfo=TRUE){
 ###############################################################################@
 #' Create a database in a [chTKCat]
 #' 
-#' @param tkcon a [chTKCat] object
+#' @param x a [chTKCat] object
 #' @param name the name of the new database
 #' @param public if the database data are accessible to any user (default:FALSE)
 #' 
-#' @importFrom RClickhouse dbSendQuery
-#' @importFrom dplyr pull
 #' @export
 #' 
 create_chMDB <- function(x, name, public=FALSE){
@@ -620,7 +609,7 @@ create_chMDB <- function(x, name, public=FALSE){
       con, name,
       CHMDB_DATA_MODEL
    )
-   users <- list_chTKCat_users(x) %>% dplyr::pull(login)
+   users <- list_chTKCat_users(x) %>% dplyr::pull("login")
    for(tn in setdiff(names(CHMDB_DATA_MODEL), "___MDBUsers___")){
       RClickhouse::dbSendQuery(
          con,
@@ -639,11 +628,9 @@ create_chMDB <- function(x, name, public=FALSE){
 ###############################################################################@
 #' Drop a database from a [chTKCat]
 #' 
-#' @param tkcon a [chTKCat] object
+#' @param x a [chTKCat] object
 #' @param name the name of the database to remove
 #' 
-#' @importFrom RClickhouse dbSendQuery
-#' @importFrom dplyr filter pull
 #' @export
 #' 
 drop_chMDB <- function(x, name){
@@ -660,8 +647,8 @@ drop_chMDB <- function(x, name){
    con <- x$chcon
    RClickhouse::dbSendQuery(con, sprintf("DROP DATABASE %s", name))
    ul <- list_chTKCat_users(x) %>% 
-      filter(!admin) %>% 
-      pull(login)
+      dplyr::filter(!.data$admin) %>% 
+      dplyr::pull("login")
    RClickhouse::dbSendQuery(
       con,
       sprintf(
@@ -679,8 +666,6 @@ drop_chMDB <- function(x, name){
 #' @param x a [chTKCat] object
 #' @param mdb name of the modeled database
 #' 
-#' @importFrom DBI dbGetQuery
-#' 
 #' @export
 #' 
 is_chMDB_public <- function(x, mdb){
@@ -696,7 +681,7 @@ is_chMDB_public <- function(x, mdb){
       con, 
       sprintf("SELECT public from `%s`.Public", mdb)
    ) %>%
-      pull(public) %>% 
+      dplyr::pull("public") %>% 
       as.logical()
    if(length(toRet)==0){
       toRet <- FALSE
@@ -706,14 +691,11 @@ is_chMDB_public <- function(x, mdb){
 
 
 ###############################################################################@
-#' Set a chMDB public
+#' Set  chMDB access
 #' 
 #' @param x a [chTKCat] object
 #' @param mdb name of the modeled database
 #' @param public if access is public
-#' 
-#' @importFrom RClickhouse dbSendQuery
-#' @importFrom dplyr filter pull
 #' 
 #' @export
 #' 
@@ -737,11 +719,11 @@ set_chMDB_access <- function(x, mdb, public){
    )
    ch_insert(con, dbName=mdb, tableName="Public", value=tibble(public=public))
    users <- list_chTKCat_users(x) %>% 
-      filter(!admin) %>% 
-      pull(login)
+      dplyr::filter(!.data$admin) %>% 
+      dplyr::pull("login")
    chMDBusers <- list_chMDB_users(x, mdb)$login
    dbTables <- DBI::dbGetQuery(con, sprintf("SHOW TABLES FROM %s", mdb)) %>% 
-      pull(name)
+      pull("name")
    if(public){
       for(tn in setdiff(dbTables, "___MDBUsers___")){
          RClickhouse::dbSendQuery(
@@ -780,9 +762,7 @@ set_chMDB_access <- function(x, mdb, public){
 #' - user: the user login
 #' - mdb: the name of the modeled database
 #' - admin: if the user is an admin of the MDB
-#'
-#' @importFrom DBI dbGetQuery
-#' @importFrom dplyr pull as_tibble mutate
+#' 
 #' @export
 #'
 list_chMDB_users <- function(x, mdb){
@@ -802,7 +782,7 @@ list_chMDB_users <- function(x, mdb){
          mdb
       )
    ) %>% 
-      dplyr::pull(name)
+      dplyr::pull("name")
    if(length(mdbut)==0){
       stop("The chMDB does not exist or is not initialized yet")
    }
@@ -814,7 +794,7 @@ list_chMDB_users <- function(x, mdb){
       )
    ) %>% 
       dplyr::as_tibble() %>%
-      dplyr::mutate(admin=as.logical(admin)) %>% 
+      dplyr::mutate(admin=as.logical(.data$admin)) %>% 
       return()
 }
 
@@ -826,8 +806,7 @@ list_chMDB_users <- function(x, mdb){
 #' @param mdb name of the modeled database
 #' @param login login of the user to drop
 #' @param admin if the user is an admin of the MDB
-#'
-#' @importFrom RClickhouse dbSendQuery
+#' 
 #' @export
 #'
 add_chMDB_user <- function(x, mdb, login, admin=FALSE){
@@ -866,7 +845,7 @@ add_chMDB_user <- function(x, mdb, login, admin=FALSE){
          )
       )
       dbTables <- DBI::dbGetQuery(con, sprintf("SHOW TABLES FROM %s", mdb)) %>% 
-         pull(name)
+         dplyr::pull("name")
       modelTables <- names(CHMDB_DATA_MODEL)
       for(tn in setdiff(dbTables, modelTables)){
          RClickhouse::dbSendQuery(
@@ -888,9 +867,7 @@ add_chMDB_user <- function(x, mdb, login, admin=FALSE){
 #' @param x a [chTKCat] object
 #' @param mdb name of the modeled database
 #' @param login login of the user to drop
-#'
-#' @importFrom RClickhouse dbSendQuery
-#' @importFrom DBI dbGetQuery
+#' 
 #' @export
 #'
 remove_chMDB_user <- function(x, mdb, login){
@@ -911,8 +888,8 @@ remove_chMDB_user <- function(x, mdb, login){
       )
    )
    mdbAdmin <- list_chTKCat_users(x) %>% 
-      filter(login==!!login) %>% 
-      pull(admin)
+      dplyr::filter(.data$login==!!login) %>% 
+      dplyr::pull("admin")
    if(!mdbAdmin){
       public <- is_chMDB_public(x, mdb)
       RClickhouse::dbSendQuery(
@@ -932,7 +909,7 @@ remove_chMDB_user <- function(x, mdb, login){
          selTables <- DBI::dbGetQuery(
             con, sprintf("SHOW TABLES FROM %s", mdb)
          ) %>% 
-            pull(name)
+            dplyr::pull("name")
       }
       selTables <- setdiff(selTables, "___MDBUsers___")
       for(tn in selTables){
@@ -956,8 +933,6 @@ remove_chMDB_user <- function(x, mdb, login){
 #' 
 #' @param x a [chTKCat] object
 #' 
-#' @importFrom dplyr as_tibble
-#' 
 #' @export
 #' 
 list_chTKCat_collections <- function(x){
@@ -979,11 +954,8 @@ list_chTKCat_collections <- function(x){
 #' - a path to a file
 #' - the name of a local collection (see [list_local_collections()])
 #' - the json text defining the collection
-#' 
-#' @importFrom jsonlite fromJSON
-#' @importFrom jsonvalidate json_validate
-#' @importFrom dplyr tibble filter pull
-#' @importFrom RClickhouse dbSendQuery
+#' @param overwrite a logical indicating if the existing collection should
+#' be replaced.
 #' 
 #' @export
 #' 
@@ -997,12 +969,12 @@ add_chTKCat_collection <- function(x, json, overwrite=FALSE){
       stop("Only chTKCat admin can add collections")
    }
    if(file.exists(json)){
-      raw <- readLines(f) %>% paste(collapse="\n")
+      raw <- readLines(json) %>% paste(collapse="\n")
    }else if(json %in% list_local_collections()$title){
       env <- environment()
       raw <- tkcatEnv$COLLECTIONS %>%
-         dplyr::filter(title==get("json", env)) %>%
-         dplyr::pull(json)
+         dplyr::filter(.data$title==get("json", env)) %>%
+         dplyr::pull("json")
    }else{
       raw <- json
    }
@@ -1051,8 +1023,6 @@ add_chTKCat_collection <- function(x, json, overwrite=FALSE){
 #' @param x a [chTKCat] object
 #' @param title the title of the collection to remove
 #' 
-#' @importFrom RClickhouse dbSendQuery
-#' 
 #' @export
 #' 
 remove_chTKCat_collection <- function(x, title){
@@ -1081,16 +1051,16 @@ remove_chTKCat_collection <- function(x, title){
 #' Get collection members of a [chTKCat] object
 #' 
 #' @param x a [chTKCat] object
-#' @param collection a character vector indicating the name of the collections
+#' @param collections a character vector indicating the name of the collections
 #' to focus on (default: NULL ==> all of them)
-#' 
-#' @return See [collectionMembers.chMDB()]
+#' @param ... not used
 #' 
 #' @export
 #'
 collection_members.chTKCat <- function(
    x,
-   collections=NULL
+   collections=NULL,
+   ...
 ){
    #### TODO ####
    stop("TODO")
@@ -1098,7 +1068,7 @@ collection_members.chTKCat <- function(
    stopifnot(
       is.null(collections) || is.character(collections)
    )
-   toRet <- dbGetQuery(
+   toRet <- DBI::dbGetQuery(
       conn=x$chcon,
       statement=
          sprintf(
@@ -1113,8 +1083,11 @@ collection_members.chTKCat <- function(
             }
          )
    ) %>%
-      as_tibble() %>%
-      select(collection, resource, cid, table, field, static, value, type) %>%
-      mutate(static=as.logical(static))
+      dplyr::as_tibble() %>%
+      dplyr::select(
+         "collection", "resource", "cid",
+         "table", "field", "static", "value", "type"
+      ) %>%
+      dplyr::mutate(static=as.logical(.data$static))
    return(toRet)
 }

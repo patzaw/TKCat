@@ -7,9 +7,9 @@
 drop_chMDB(x, name)
 }
 \arguments{
-\item{name}{the name of the database to remove}
+\item{x}{a \link{chTKCat} object}
 
-\item{tkcon}{a \link{chTKCat} object}
+\item{name}{the name of the database to remove}
 }
 \description{
 Drop a database from a \link{chTKCat}

@@ -1,5 +1,8 @@
 ###############################################################################@
 #' Get DB information
+#' 
+#' @param x an object with embedded database information
+#' @param ... further arguments for the method
 #'
 #' @export
 #'
@@ -9,6 +12,9 @@ db_info <- function(x, ...){
 
 ###############################################################################@
 #' Get collection members
+#' 
+#' @param x an object with embedded collection members
+#' @param ... further arguments for the method
 #'
 #' @export
 #'
@@ -18,10 +24,13 @@ collection_members <- function(x, ...){
 
 ###############################################################################@
 #' Set collection members
+#' 
+#' @param x an object with embedded collection members
+#' @param value the new collection members
 #'
 #' @export
 #'
-'collection_members<-' <- function(x, value, ...){
+'collection_members<-' <- function(x, value){
    UseMethod("collection_members<-", x)
 }
 
@@ -29,6 +38,9 @@ collection_members <- function(x, ...){
 ###############################################################################@
 #' Get object data model
 #'
+#' @param x an object with an embedded data model
+#' @param ... further arguments for the method
+#' 
 #' @export
 #'
 data_model <- function(x, ...){
@@ -38,6 +50,9 @@ data_model <- function(x, ...){
 ###############################################################################@
 #' Get object data tables
 #'
+#' @param x an object with embedded data tables
+#' @param ... further arguments for the method
+#' 
 #' @export
 #'
 data_tables <- function(x, ...){

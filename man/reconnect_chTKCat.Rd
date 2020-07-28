@@ -9,13 +9,14 @@ reconnect_chTKCat(x, ...)
 \arguments{
 \item{x}{a \link{chTKCat} object}
 
-\item{user}{user name. If not provided, it's taken from x}
-
-\item{password}{user password. If not provided, first the function
-tries to connect without any password.If it fails, the function asks the
-user to provide a password.}
-
-\item{ntries}{the number of times the user can enter a wrong password}
+\item{...}{further arguments for \link{ch_reconnect}:
+\itemize{
+\item \strong{user}: user name. If not provided, it's taken from x
+\item \strong{password}: user password. If not provided, first the function
+tries to connect without any password. If it fails, the function asks the
+user to provide a password.
+\item \strong{ntries}: the number of times the user can enter a wrong password
+}}
 }
 \description{
 Reconnect to a \link{chTKCat} instance

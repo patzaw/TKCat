@@ -7,11 +7,11 @@
 create_chMDB(x, name, public = FALSE)
 }
 \arguments{
+\item{x}{a \link{chTKCat} object}
+
 \item{name}{the name of the new database}
 
-\item{public}{if the database data are accessible to any user (default:TRUE)}
-
-\item{tkcon}{a \link{chTKCat} object}
+\item{public}{if the database data are accessible to any user (default:FALSE)}
 }
 \description{
 Create a database in a \link{chTKCat}

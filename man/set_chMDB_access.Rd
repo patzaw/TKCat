@@ -2,7 +2,7 @@
 % Please edit documentation in R/chTKCat.R
 \name{set_chMDB_access}
 \alias{set_chMDB_access}
-\title{Set a chMDB public}
+\title{Set  chMDB access}
 \usage{
 set_chMDB_access(x, mdb, public)
 }
@@ -14,5 +14,5 @@ set_chMDB_access(x, mdb, public)
 \item{public}{if access is public}
 }
 \description{
-Set a chMDB public
+Set  chMDB access
 }

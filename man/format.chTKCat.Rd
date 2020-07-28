@@ -4,10 +4,12 @@
 \alias{format.chTKCat}
 \title{Format a \link{chTKCat} object for printing}
 \usage{
-\method{format}{chTKCat}(x)
+\method{format}{chTKCat}(x, ...)
 }
 \arguments{
 \item{x}{a \link{chTKCat} object}
+
+\item{...}{not used}
 }
 \value{
 A single character
