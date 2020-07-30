@@ -26,7 +26,19 @@ collection_members <- function(x, ...){
 #' Set collection members
 #' 
 #' @param x an object with embedded collection members
-#' @param value the new collection members
+#' @param value the new collection members.
+#' A data.frame with the following columns:
+#' - **collection** (character): The name of the collection
+#' - **cid** (character): Collection identifier
+#' - **resource** (character): The name of the resource
+#' - **mid** (integer): The identifier of the member
+#' - **table** (character): The table recording collection information
+#' - **field** (character): The collection field.
+#' - **static** (logical): TRUE if the field value is common to all elements.
+#' - **value** (character): The name of the table column if static is FALSE
+#' or the field value if static is TRUE.
+#' - **type** (character): the type of the field.
+#' (not necessarily used ==> NA if not)
 #'
 #' @export
 #'

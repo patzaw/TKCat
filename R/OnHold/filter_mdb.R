@@ -32,12 +32,13 @@ filter_mdb <- function(x, dots){
                         )
                   )
             }else{
-               toRet[[ntn]] <- x[[ntn]] %>%
+               tv <- x[[ntn]]
+               toRet[[ntn]] <- tv %>%
                   filter(
                      do.call(
                         paste,
                         c(
-                           (!!x[[ntn]][, fkl$tf[[i]], drop=FALSE]),
+                           (!!tv[, fkl$tf[[i]], drop=FALSE]),
                            list(sep="_")
                         )
                      ) %in%
@@ -59,7 +60,7 @@ filter_mdb <- function(x, dots){
    fk <- get_foreign_keys(dataModel(x)) %>%
       select(from, ff, to, tf)
    for(tn in names(dots)){
-      toRet[[tn]] <- filter(x[[tn]], !!dots[[tn]])
+      toRet[[tn]] <- filter(x[[tn]], eval(!!dots[[tn]])) ### !! EVAL EXPRESSION --> not nice !!!
       toRet <- fkFilter(toRet, tn)
    }
    return(internalMDB(

@@ -71,6 +71,13 @@
         "comment": "The title of the collection"
       },
       {
+        "name": "cid",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Collection identifier"
+      },
+      {
         "name": "table",
         "type": "character",
         "nullable": false,
@@ -78,11 +85,11 @@
         "comment": "The name of the table providing the collection"
       },
       {
-        "name": "cid",
+        "name": "mid",
         "type": "integer",
         "nullable": false,
         "unique": false,
-        "comment": "The identifier of the collection"
+        "comment": "The identifier of the member"
       },
       {
         "name": "field",
@@ -127,17 +134,17 @@
     ],
     "indexes": [
       {
-        "fields": ["cid", "collection", "field", "table"],
+        "fields": ["collection", "field", "mid", "table"],
         "unique": [true]
       }
     ],
     "display": {
-      "x": [-352],
-      "y": [-274],
+      "x": [-350],
+      "y": [-304],
       "color": ["#DFFB86"],
       "comment": ["Tables in MDBs which provide a collection of concepts."]
     },
-    "primaryKey": ["cid", "collection", "field", "table"]
+    "primaryKey": ["collection", "field", "mid", "table"]
   },
   "___Tables___": {
     "tableName": ["___Tables___"],
