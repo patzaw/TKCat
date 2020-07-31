@@ -1,6 +1,100 @@
 ###############################################################################@
 #' Create an MDB (Modeled DataBase) based on files
 #' 
+#' @param dataFiles a named vector of path to data files with
+#' `all(names(dataFiles) %in% names(dataModel))`
+#' @param dataModel a [ReDaMoR::RelDataModel] object
+#' @param dbInfo a list with DB information:
+#' "name", "title", "description", "url",
+#' "version", "maintainer".
+#' @param readParameters a list of parameters for reading the data file.
+#' (e.g. `list(delim='\t', quoted_na=FALSE,)`)
+#' @param collectionMembers the members of collections as provided to the
+#' [collection_members<-.fileMDB] function (default: NULL ==> no member).
+#' @param n_max maximum number of records to read
+#' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
+#' @param verbose if TRUE display the data confrontation report
+#'
+#' @return A [fileMDB] object
+#' 
+#' @export
+#' 
+fileMDB <- function(
+   dataFiles,
+   dbInfo,
+   dataModel,
+   readParameters=list(),
+   collectionMembers=NULL,
+   n_max=10,
+   verbose=FALSE
+){
+   
+   ## Data files ----
+   stopifnot(
+      all(file.exists(dataFiles)),
+      all(names(dataFiles) %in% names(dataModel))
+   )
+   dataFiles <- dataFiles[names(dataModel)]
+   
+   ## DB information ----
+   dbInfo <- .check_dbInfo(dbInfo)
+   
+   ## Data model ----
+   if(!ReDaMoR::is.RelDataModel(dataModel)){
+      stop(
+         "dataModel should be a path to a valid json file ",
+         "or a RelDataModel object"
+      )
+   }
+   
+   ## Read parameters ----
+   readParameters <- readParameters[intersect(
+      setdiff(names(readParameters), "n_max"),
+      names(as.list(args(readr::read_delim)))
+   )]
+   
+   ## Confront data to model ----
+   rnDataModel <- dataModel
+   names(rnDataModel) <- sub(
+      pattern="(\\.[[:alnum:]]+)(\\.gz)?$", replacement="",
+      x=basename(dataFiles)
+   )
+   cr <- do.call(ReDaMoR::confront_data, c(
+      list(
+         rnDataModel,
+         paths=dataFiles,
+         returnData=FALSE,
+         verbose=verbose,
+         n_max=n_max
+      ),
+      readParameters
+   ))
+   assign("confrontationReport", cr[-which(names(cr)=="data")], envir=tkcatEnv)
+   if(!cr$success){
+      stop(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+   }
+   if(verbose){
+      cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+   }
+   
+   ## Object ----
+   toRet <- list(
+      dataFiles=dataFiles,
+      dataModel=dataModel,
+      dbInfo=dbInfo,
+      readParameters=readParameters
+   )
+   class(toRet) <- c("fileMDB", "MDB", class(toRet))
+   
+   ## Collection members ----
+   collection_members(toRet) <- collectionMembers
+   
+   return(toRet)
+}
+
+###############################################################################@
+#' Read a [fileMDB] from a path
+#' 
 #' @param path the path to a folder with data or with the following structure:
 #' - **data**: a folder with the data
 #' - **DESCRIPTION.json**: a file with db information
@@ -10,11 +104,11 @@
 #' "name", "title", "description", "url" (or "reference URL"),
 #' "version", "maintainer". If NULL (default), the DESCRIPTION.json file found
 #' in path.
-#' @param dataModel a [RelDataModel] object or json file.
+#' @param dataModel a [ReDaMoR::RelDataModel] object or json file.
 #' If NULL (default), the model json file found in path/model.
 #' @param collectionMembers the members of collections as provided to the
-#' [collection_members<-.fileMDB] function.
-#' @param verbose if TRUE display the data confrontation report
+#' [collection_members<-.fileMDB] function. If NULL (default), the members
+#' are taken from json files found in path/model/Collections
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
 #' @param ext the file extension to consider (default: "ext"),
@@ -29,12 +123,11 @@
 #' 
 #' @export
 #' 
-fileMDB <- function(
+read_fileMDB <- function(
    path,
    dbInfo=NULL,
    dataModel=NULL,
    collectionMembers=NULL,
-   verbose=FALSE,
    n_max=10,
    ext='txt',
    delim='\t',
@@ -44,7 +137,7 @@ fileMDB <- function(
    stopifnot(file.exists(path))
    fparam <- c(as.list(environment()), list(...))
    
-   ## dbInfo ----
+   ## DB information ----
    if(is.null(dbInfo)){
       dbInfo <- jsonlite::read_json(file.path(path, "DESCRIPTION.json"))
    }else{
@@ -59,18 +152,7 @@ fileMDB <- function(
       
    }
    names(dbInfo) <- sub("^reference URL$", "url", names(dbInfo))
-   mandFields <- c(
-      "name", "title", "description", "url",
-      "version", "maintainer"
-   )
-   for(f in mandFields){
-      if(!is.character(dbInfo[[f]]) || length(dbInfo[[f]])!=1){
-         stop(sprintf(
-            "%s in dbInfo should be a character vector of length 1"
-         ))
-      }
-   }
-   dbInfo <- as.list(dbInfo[mandFields])
+   dbInfo <- .check_dbInfo(dbInfo)
    
    ## Data model ----
    if(is.null(dataModel)){
@@ -99,49 +181,18 @@ fileMDB <- function(
    if(!file.exists(dp)){
       dp <- path
    }
+   dataFiles <- file.path(dp, paste(names(dataModel), ext, sep=".")) %>% 
+      normalizePath()
+   names(dataFiles) <- names(dataModel)
    
-   ## Confront data to model ----
-   cr <- ReDaMoR::confront_data(
-      dataModel,
-      paths=list.files(
-         path=dp,
-         pattern=paste0(".", ext, "$"),
-         full.names=TRUE
-      ),
-      returnData=FALSE,
-      verbose=verbose,
-      n_max=n_max,
-      delim=delim,
-      quoted_na=quoted_na,
-      ...
-   )
-   assign("confrontationReport", cr[-which(names(cr)=="data")], envir=tkcatEnv)
-   if(!cr$success){
-      stop(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
-   }
-   if(verbose){
-      cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
-   }
-   
-   ## Read parameters
+   ## Read parameters ----
    readParameters <- fparam[intersect(
       setdiff(names(fparam), "n_max"),
       names(as.list(args(readr::read_delim)))
    )]
    
-   ## Object ----
-   toRet <- list(
-      dataPath=normalizePath(dp),
-      dataModel=dataModel,
-      dbInfo=dbInfo,
-      readParameters=readParameters
-   )
-   class(toRet) <- c("fileMDB", "MDB", class(toRet))
-   
    ## Collection members ----
-   if(!is.null(collectionMembers)){
-      collection_members(toRet) <- collectionMembers
-   }else{
+   if(is.null(collectionMembers)){
       for(
          cm in list.files(
             path=file.path(path, "model", "Collections"),
@@ -149,16 +200,24 @@ fileMDB <- function(
             full.names=TRUE
          )
       ){
-         collection_members(toRet) <- dplyr::bind_rows(
-            collection_members(toRet),
+         collectionMembers <- dplyr::bind_rows(
+            collectionMembers,
             read_collection_members(cm)
          )
       }
    }
    
-   return(toRet)
+   ## Object ----
+   return(fileMDB(
+      dataFiles=dataFiles,
+      dbInfo=dbInfo,
+      dataModel=dataModel,
+      readParameters=readParameters,
+      collectionMembers=collectionMembers,
+      n_max=n_max,
+      verbose=TRUE
+   ))
 }
-
 
 ###############################################################################@
 #' Check the object is  a [fileMDB] object
@@ -174,36 +233,71 @@ is.fileMDB <- function(x){
 }
 
 ###############################################################################@
-#' Get DB information of a [fileMDB] object
-#' 
+#' @export
+#'
+'names<-.fileMDB' <- function(x, value){
+   colMb <- collection_members(x)
+   ovalues <- names(x)
+   x <- unclass(x)
+   ncolMb <- NULL
+   if(!is.null(colMb)){
+      ncolMb <- NULL
+      for(i in 1:length(ovalues)){
+         toAdd <- colMb %>% dplyr::filter(.data$table==!!ovalues[i])
+         if(nrow(toAdd)>0){
+            toAdd$table <- value[i]
+            ncolMb <- ncolMb %>% dplyr::bind_rows(toAdd)
+         }
+      }
+   }
+   names(x$dataModel) <- names(x$dataFiles) <-value
+   class(x) <- c("fileMDB", class(x))
+   collection_members(x) <- ncolMb
+   return(x)
+}
+
+###############################################################################@
 #' @param x a [fileMDB] object
 #' @param ... not used
 #' 
-#' @return A list with the following elements:
-#' - **name**: a single character
-#' - **title**: a single character
-#' - **description**: a single character
-#' - **url**: a single character
-#' - **version**: a single character
-#' - **maintainer**: a single character vector
-#' - **size**: a numeric vector providing the size of the DB in bytes
+#' @rdname db_info
+#' @method db_info fileMDB
 #' 
 #' @export
 #'
 db_info.fileMDB <- function(x, ...){
    y <- unclass(x)
    toRet <- y$dbInfo
-   toRet$size <- sum(file.size(list.files(path=y$dataPath, full.names=TRUE)))
    return(toRet)
 }
 
 ###############################################################################@
-#' Get the [ReDaMoR::RelDataModel] of a [fileMDB] object
+#' @param x a [fileMDB] object
+#' @param value a list with DB information:
+#' "name", "title", "description", "url",
+#' "version", "maintainer".
 #' 
+#' @rdname db_info-set
+#' @method db_info<- fileMDB
+#' 
+#' @export
+#'
+'db_info<-.fileMDB' <- function(x, value){
+   toRet <- unclass(x)
+   dbInfo <- .check_dbInfo(value)
+   toRet$dbInfo <- dbInfo
+   if(!is.null(toRet$collectionMembers)){
+      toRet$collectionMembers$resource <- dbInfo$name
+   }
+   return(toRet)
+}
+
+###############################################################################@
 #' @param x a [fileMDB] object
 #' @param ... not used
 #' 
-#' @return A [ReDaMoR::RelDataModel] object
+#' @rdname data_model
+#' @method data_model fileMDB
 #' 
 #' @export
 #'
@@ -212,44 +306,30 @@ data_model.fileMDB <- function(x, ...){
 }
 
 ###############################################################################@
-#' Get collection members of an [fileMDB] object
-#' 
 #' @param x a [fileMDB] object
-#' @param collections a character vector indicating the collections
-#' to focus on. If NA (default), all of them are taken.
-#' @param ... not used
+#' @param ... names of the collections
+#' to focus on. By default, all of them are taken.
 #' 
-#' @return A [tibble::tibble] with the following columns:
-#' - **collection** (character): The name of the collection
-#' - **cid** (character): Collection identifier
-#' - **resource** (character): The name of the resource
-#' - **mid** (integer): The identifier of the member
-#' - **table** (character): The table recording collection information
-#' - **field** (character): The collection field.
-#' - **static** (logical): TRUE if the field value is common to all elements.
-#' - **value** (character): The name of the table column if static is FALSE
-#' or the field value if static is TRUE.
-#' - **type** (character): the type of the field.
-#' (not necessarily used ==> NA if not)
+#' @rdname collection_members
+#' @method collection_members fileMDB
 #' 
 #' @export
 #'
 collection_members.fileMDB <- function(
    x,
-   collections=NA,
    ...
 ){
    x <- unclass(x)
    toRet <- x$"collectionMembers"
-   if(!is.na(collections)){
-      toRet <- toRet[which(toRet$collection %in% collections),]
+   toTake <- unlist(list(...))
+   if(length(toTake)>0){
+      stopifnot(is.character(toTake))
+      toRet <- toRet[which(toRet$collection %in% toTake),]
    }
    return(toRet)
 }
 
 ###############################################################################@
-#' Set collection members of a [fileMDB] object
-#' 
 #' @param x a [fileMDB] object
 #' 
 #' @param value A data.frame with the following columns:
@@ -264,6 +344,9 @@ collection_members.fileMDB <- function(
 #' or the field value if static is TRUE.
 #' - **type** (character): the type of the field.
 #' (not necessarily used ==> NA if not)
+#' 
+#' @rdname collection_members-set
+#' @method collection_members<- fileMDB
 #' 
 #' @export
 #'
@@ -325,4 +408,89 @@ collection_members.fileMDB <- function(
    x$"collectionMembers" <- value
    class(x) <- c("fileMDB", "MDB", class(x))
    return(x)
+}
+
+###############################################################################@
+#' @param x a [fileMDB] object
+#' @param ... the name of the tables to get (default: all of them)
+#' 
+#' @rdname data_tables
+#' @method data_tables fileMDB
+#' 
+#' @export
+#'
+data_tables.fileMDB <- function(x, ...){
+   m <- data_model(x)
+   x <- unclass(x)
+   toTake <- unlist(list(...))
+   if(is.numeric(toTake)){
+      toTake <- names(m)[toTake]
+   }
+   if(length(toTake)>0){
+      notInDb <- setdiff(toTake, names(m))
+      if(length(notInDb)>0){
+         stop(
+            "The following tables are not in the InternalDB: ",
+            paste(notInDb, sep=", ")
+         )
+      }
+   }else{
+      toTake <- names(m)
+   }
+   toRet <- lapply(
+      toTake,
+      function(y){
+         cr <- do.call(readr::read_delim, c(
+            list(
+               file=x$dataFiles[y],
+               col_types=col_types(m[[y]])
+            ),
+            x$readParameters
+         ))
+      }
+   )
+   names(toRet) <- toTake
+   return(toRet)
+}
+
+###############################################################################@
+#' @param x a [fileMDB]
+#' @param ... the name of the tables to consider (default: all of them)
+#' 
+#' @rdname count_records
+#' @method count_records fileMDB
+#' 
+#' @export
+#'
+count_records.fileMDB <- function(x, ...){
+   count_lines <- function(f, by=10^5){
+      con <- file(f, "r")
+      on.exit(close(con))
+      d <- c()
+      n <- cn <- length(readLines(con, n=by))
+      while(cn>0){
+         cn <- length(readLines(con, n=by))
+         n <- n+cn
+      }
+      return(n)
+   }
+   m <- data_model(x)
+   x <- unclass(x)
+   toTake <- unlist(list(...))
+   if(is.numeric(toTake)){
+      toTake <- names(m)[toTake]
+   }
+   if(length(toTake)>0){
+      notInDb <- setdiff(toTake, names(m))
+      if(length(notInDb)>0){
+         stop(
+            "The following tables are not in the InternalDB: ",
+            paste(notInDb, sep=", ")
+         )
+      }
+   }else{
+      toTake <- names(m)
+   }
+   lapply(x$dataFiles[toTake], count_lines) %>% 
+      unlist()
 }

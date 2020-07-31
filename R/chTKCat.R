@@ -1048,37 +1048,38 @@ remove_chTKCat_collection <- function(x, title){
 
 
 ###############################################################################@
-#' Get collection members of a [chTKCat] object
-#' 
 #' @param x a [chTKCat] object
-#' @param collections a character vector indicating the name of the collections
-#' to focus on (default: NULL ==> all of them)
-#' @param ... not used
+#' @param ... names of the collections
+#' to focus on. By default, all of them are taken.
+#' 
+#' @rdname collection_members
+#' @method collection_members chTKCat
 #' 
 #' @export
 #'
 collection_members.chTKCat <- function(
    x,
-   collections=NULL,
    ...
 ){
    #### TODO ####
    stop("TODO")
    
+   toTake <- unlist(list(...))
+   
    stopifnot(
-      is.null(collections) || is.character(collections)
+      length(toTake)==0 || is.character(toTake)
    )
    toRet <- DBI::dbGetQuery(
       conn=x$chcon,
       statement=
          sprintf(
             "SELECT * FROM default.CollectionMembers %s",
-            if(is.null(collections)){
+            if(length(toTake)==0){
                ""
             }else{
                sprintf(
                   "WHERE collection IN ('%s')",
-                  paste(collections, collapse="', '")
+                  paste(toTake, collapse="', '")
                )
             }
          )

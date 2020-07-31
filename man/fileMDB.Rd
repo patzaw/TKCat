@@ -5,53 +5,35 @@
 \title{Create an MDB (Modeled DataBase) based on files}
 \usage{
 fileMDB(
-  path,
-  dbInfo = NULL,
-  dataModel = NULL,
+  dataFiles,
+  dbInfo,
+  dataModel,
+  readParameters = list(),
   collectionMembers = NULL,
-  verbose = FALSE,
   n_max = 10,
-  ext = "txt",
-  delim = "\\t",
-  quoted_na = FALSE,
-  ...
+  verbose = FALSE
 )
 }
 \arguments{
-\item{path}{the path to a folder with data or with the following structure:
-\itemize{
-\item \strong{data}: a folder with the data
-\item \strong{DESCRIPTION.json}: a file with db information
-\item \strong{model}: a folder with the data model json file with the same name as the
-one given in the DESCRIPTION.json file
-}}
+\item{dataFiles}{a named vector of path to data files with
+\code{all(names(dataFiles) \%in\% names(dataModel))}}
 
-\item{dbInfo}{a list or a json file with DB information:
-"name", "title", "description", "url" (or "reference URL"),
-"version", "maintainer". If NULL (default), the DESCRIPTION.json file found
-in path.}
+\item{dbInfo}{a list with DB information:
+"name", "title", "description", "url",
+"version", "maintainer".}
 
-\item{dataModel}{a \link{RelDataModel} object or json file.
-If NULL (default), the model json file found in path/model.}
+\item{dataModel}{a \link[ReDaMoR:RelDataModel]{ReDaMoR::RelDataModel} object}
+
+\item{readParameters}{a list of parameters for reading the data file.
+(e.g. \code{list(delim='\\t', quoted_na=FALSE,)})}
 
 \item{collectionMembers}{the members of collections as provided to the
-\link{collection_members<-.fileMDB} function.}
-
-\item{verbose}{if TRUE display the data confrontation report}
+\link{collection_members<-.fileMDB} function (default: NULL ==> no member).}
 
 \item{n_max}{maximum number of records to read
 for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}
 
-\item{ext}{the file extension to consider (default: "ext"),}
-
-\item{delim}{delimiter (default: '\\\\t')}
-
-\item{quoted_na}{Should missing values inside quotes be treated
-as missing values or as strings or strings (the default).
-Be aware that the default value here is different than the one for the
-original \code{\link[readr:read_delim]{readr::read_delim()}} function.}
-
-\item{...}{additional parameters for the \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}} function}
+\item{verbose}{if TRUE display the data confrontation report}
 }
 \value{
 A \link{fileMDB} object
