@@ -8,7 +8,7 @@ Description: Classes and methods to manage a catalog of
    knowledge data.
 Depends:
    R (>= 3.6),
-   ReDaMoR,
+   ReDaMoR (>= 0.4.3),
    magrittr,
    dplyr,
    DBI,

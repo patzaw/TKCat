@@ -10,7 +10,7 @@ is.MDB(x)
 \item{x}{any object}
 }
 \value{
-A single logical: TRUE if x is an MDB object: \link{fileMDB}
+A single logical: TRUE if x is an MDB object.
 }
 \description{
 Check if the object is  an MDB object

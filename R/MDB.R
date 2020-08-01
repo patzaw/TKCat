@@ -3,7 +3,7 @@
 #' 
 #' @param x any object
 #' 
-#' @return A single logical: TRUE if x is an MDB object: [fileMDB]
+#' @return A single logical: TRUE if x is an MDB object.
 #' 
 #' @export
 #'
@@ -85,6 +85,35 @@ format.MDB <- function(x, ...){
 #'
 print.MDB <- function(x, ...){
    cat(format(x, ...), "\n")
+}
+
+###############################################################################@
+#' @export
+#'
+select.MDB <- function(.data, ...){
+   i <- unlist(list(...))
+   .data[i]
+}
+
+###############################################################################@
+#' @export
+#'
+'[<-.MDB' <- function(x, i, value){
+   stop("'[<-' is not supported for .MDB")
+}
+
+###############################################################################@
+#' @export
+#'
+'[[<-.MDB' <- function(x, i, value){
+   stop("'[[<-' is not supported for .MDB")
+}
+
+###############################################################################@
+#' @export
+#'
+'$<-.MDB' <- function(x, i, value){
+   stop("'$<-' is not supported for .MDB")
 }
 
 

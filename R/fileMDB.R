@@ -55,26 +55,28 @@ fileMDB <- function(
    
    ## Confront data to model ----
    rnDataModel <- dataModel
-   names(rnDataModel) <- sub(
-      pattern="(\\.[[:alnum:]]+)(\\.gz)?$", replacement="",
-      x=basename(dataFiles)
-   )
-   cr <- do.call(ReDaMoR::confront_data, c(
-      list(
-         rnDataModel,
-         paths=dataFiles,
-         returnData=FALSE,
-         verbose=verbose,
-         n_max=n_max
-      ),
-      readParameters
-   ))
-   assign("confrontationReport", cr[-which(names(cr)=="data")], envir=tkcatEnv)
-   if(!cr$success){
-      stop(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
-   }
-   if(verbose){
-      cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+   if(length(dataModel)>0){
+      names(rnDataModel) <- sub(
+         pattern="(\\.[[:alnum:]]+)(\\.gz)?$", replacement="",
+         x=basename(dataFiles)
+      )
+      cr <- do.call(ReDaMoR::confront_data, c(
+         list(
+            rnDataModel,
+            paths=dataFiles,
+            returnData=FALSE,
+            verbose=verbose,
+            n_max=n_max
+         ),
+         readParameters
+      ))
+      assign("confrontationReport", cr[-which(names(cr)=="data")], envir=tkcatEnv)
+      if(!cr$success){
+         stop(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+      }
+      if(verbose){
+         cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+      }
    }
    
    ## Object ----
@@ -443,7 +445,7 @@ data_tables.fileMDB <- function(x, ...){
          cr <- do.call(readr::read_delim, c(
             list(
                file=x$dataFiles[y],
-               col_types=col_types(m[[y]])
+               col_types=ReDaMoR::col_types(m[[y]])
             ),
             x$readParameters
          ))
@@ -493,4 +495,66 @@ count_records.fileMDB <- function(x, ...){
    }
    lapply(x$dataFiles[toTake], count_lines) %>% 
       unlist()
+}
+
+###############################################################################@
+#' Get the data files from an object
+#' 
+#' @param x an object with a dataFiles and readParameters slots
+#' 
+#' @return a list with "dataFiles" and "readParameters" for reading the files.
+#' 
+#' @export
+#'
+data_files <- function(x){
+   x <- unclass(x)
+   toTake <- c("dataFiles", "readParameters")
+   stopifnot(all(toTake %in% names(x)))
+   return(x[toTake])
+}
+
+###############################################################################@
+#' @export
+#'
+'[.fileMDB' <- function(x, i){
+   if(missing(i)){
+      return(x)
+   }
+   if(length(i)==0){
+      dbi <- db_info(x)
+      dbi$name <- sprintf("EMPTY %s", dbi$name)
+      return(fileMDB(
+         dataFiles=as.character(),
+         dbInfo=dbi,
+         dataModel=RelDataModel(l=list()),
+         readParameters=data_files(x)$readParameters
+      ))
+   }
+   stopifnot(
+      is.character(i) || is.numeric(i),
+      all(!is.na(i))
+   )
+   if(is.numeric(i)){
+      stopifnot(all(i %in% 1:length(x)))
+   }
+   if(is.character(i)){
+      stopifnot(all(i %in% names(x)))
+   }
+   dbi <- db_info(x)
+   dbi$name <- sprintf("SUBSET of %s", dbi$name)
+   dm <- data_model(x)[i, rmForeignKeys=TRUE]
+   df <- data_files(x)
+   rp <- df$readParameters
+   df <- df$dataFiles[i]
+   cm <- collection_members(x) %>%
+      dplyr::filter(.data$table %in% i) %>%
+      dplyr::mutate(resource=dbi$name)
+   toRet <- fileMDB(
+      dataFiles=df,
+      dbInfo=dbi,
+      dataModel=dm,
+      readParameters=rp,
+      collectionMembers=cm
+   )
+   return(toRet)
 }
