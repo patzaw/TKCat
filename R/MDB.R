@@ -91,8 +91,40 @@ print.MDB <- function(x, ...){
 #' @export
 #'
 select.MDB <- function(.data, ...){
-   i <- unlist(list(...))
+   i <- tidyselect::eval_select(expr(c(...)), .data)
    .data[i]
+}
+
+###############################################################################@
+#' @export
+#'
+'[[.MDB' <- function(x, i){
+   stopifnot(
+      length(i)==1
+   )
+   ## Rstudio hack to avoid DB call when just looking for names
+   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
+   if(length(cc)!=0){
+      invisible(NULL)
+   }else{
+      data_tables(x, i)[[1]]
+   }
+}
+#' @export
+'$.MDB' <- `[[.MDB`
+
+###############################################################################@
+#' @importFrom tidyselect vars_pull
+#' @importFrom rlang enquo
+#' 
+#' @export
+#'
+pull.MDB <- function(.data, var=-1, name=NULL, ...){
+   if(!is.null(name)){
+      warning("name parameter not used by the pull.MDB function")
+   }
+   var <- tidyselect::vars_pull(names(.data), !!rlang::enquo(var))
+   return(.data[[var]])
 }
 
 ###############################################################################@
