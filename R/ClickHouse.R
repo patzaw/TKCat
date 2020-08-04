@@ -8,8 +8,6 @@
 #' user to provide a password.
 #' @param ntries the number of times the user can enter a wrong password
 #' 
-#' @importFrom getPass getPass
-#' 
 #' @export
 #' 
 ch_reconnect <- function(x, user, password, ntries=3){

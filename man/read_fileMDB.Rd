@@ -9,11 +9,7 @@ read_fileMDB(
   dbInfo = NULL,
   dataModel = NULL,
   collectionMembers = NULL,
-  n_max = 10,
-  ext = "txt",
-  delim = "\\t",
-  quoted_na = FALSE,
-  ...
+  n_max = 10
 )
 }
 \arguments{
@@ -28,7 +24,15 @@ one given in the DESCRIPTION.json file
 \item{dbInfo}{a list or a json file with DB information:
 "name", "title", "description", "url" (or "reference URL"),
 "version", "maintainer". If NULL (default), the DESCRIPTION.json file found
-in path.}
+in path. This file should also contains relevant parameters for the
+\code{\link[readr:read_delim]{readr::read_delim()}} function. For example:
+\itemize{
+\item \strong{delim delimiter} (default: '\\\\t')
+\item \strong{quoted_na}: Should missing values inside quotes be treated
+as missing values or as strings or strings (the default).
+Be aware that the default value here is different than the one for the
+original \code{\link[readr:read_delim]{readr::read_delim()}} function.
+}}
 
 \item{dataModel}{a \link[ReDaMoR:RelDataModel]{ReDaMoR::RelDataModel} object or json file.
 If NULL (default), the model json file found in path/model.}
@@ -39,17 +43,6 @@ are taken from json files found in path/model/Collections}
 
 \item{n_max}{maximum number of records to read
 for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}
-
-\item{ext}{the file extension to consider (default: "ext"),}
-
-\item{delim}{delimiter (default: '\\\\t')}
-
-\item{quoted_na}{Should missing values inside quotes be treated
-as missing values or as strings or strings (the default).
-Be aware that the default value here is different than the one for the
-original \code{\link[readr:read_delim]{readr::read_delim()}} function.}
-
-\item{...}{additional parameters for the \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}} function}
 }
 \value{
 A \link{fileMDB} object

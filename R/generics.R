@@ -127,3 +127,18 @@ data_tables <- function(x, ...){
 count_records <- function(x, ...){
    UseMethod("count_records", x)
 }
+
+
+###############################################################################@
+#' Write an MDB object
+#'
+#' @param x an MDB object
+#' @param path the path where the MDB should be written
+#' 
+#' @return A [fileMDB] object.
+#' 
+#' @export
+#'
+write_MDB <- function(x, path, ...){
+   UseMethod("write_MDB", x)
+}

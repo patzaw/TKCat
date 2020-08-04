@@ -10,9 +10,17 @@
 #' @import ReDaMoR
 #' @import DBI
 #' @import RClickhouse
-#' @importFrom rlang .data
-#' @importFrom jsonlite fromJSON read_json
+#' 
+#' @importFrom rlang .data enquo
+#' @importFrom tidyselect eval_select vars_pull eval_rename
+#' 
+#' @importFrom jsonlite fromJSON read_json unbox toJSON
 #' @importFrom jsonvalidate json_validate
+#' 
+#' @importFrom visNetwork visSave
+#' 
 #' @importFrom readr read_delim
+#' @importFrom getPass getPass
+#' @importFrom utils packageName str
 #' 
 NULL

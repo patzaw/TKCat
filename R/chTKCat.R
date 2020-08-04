@@ -274,9 +274,6 @@ reconnect_chTKCat <- function(x, ...){
 #'
 #' @return a [chTKCat]
 #' 
-#' @importFrom getPass getPass
-#' @importFrom utils packageName
-#' 
 #' @export
 #'
 init_chTKCat <- function(

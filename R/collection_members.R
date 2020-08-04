@@ -71,8 +71,6 @@ read_collection_members <- function(txt){
 #' If NULL (default), it is taken from TKCat environment
 #' (see [list_local_collections()].
 #' 
-#' @importFrom jsonlite unbox toJSON
-#' 
 #' @export
 #' 
 write_collection_members <- function(colMembers, path=NA, collection=NULL){

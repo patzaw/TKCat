@@ -35,6 +35,8 @@ fileMDB <- function(
       all(names(dataFiles) %in% names(dataModel))
    )
    dataFiles <- dataFiles[names(dataModel)]
+   dataFiles <- normalizePath(dataFiles)
+   names(dataFiles) <- names(dataModel)
    
    ## DB information ----
    dbInfo <- .check_dbInfo(dbInfo)
@@ -105,7 +107,13 @@ fileMDB <- function(
 #' @param dbInfo a list or a json file with DB information:
 #' "name", "title", "description", "url" (or "reference URL"),
 #' "version", "maintainer". If NULL (default), the DESCRIPTION.json file found
-#' in path.
+#' in path. This file should also contains relevant parameters for the
+#' [readr::read_delim()] function. For example:
+#' - **delim delimiter** (default: '\\\\t')
+#' - **quoted_na**: Should missing values inside quotes be treated
+#' as missing values or as strings or strings (the default).
+#' Be aware that the default value here is different than the one for the
+#' original [readr::read_delim()] function.
 #' @param dataModel a [ReDaMoR::RelDataModel] object or json file.
 #' If NULL (default), the model json file found in path/model.
 #' @param collectionMembers the members of collections as provided to the
@@ -113,13 +121,6 @@ fileMDB <- function(
 #' are taken from json files found in path/model/Collections
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
-#' @param ext the file extension to consider (default: "ext"),
-#' @param delim delimiter (default: '\\\\t')
-#' @param quoted_na Should missing values inside quotes be treated
-#' as missing values or as strings or strings (the default).
-#' Be aware that the default value here is different than the one for the
-#' original [readr::read_delim()] function.
-#' @param ... additional parameters for the [ReDaMoR::confront_data()] function
 #'
 #' @return A [fileMDB] object
 #' 
@@ -130,14 +131,9 @@ read_fileMDB <- function(
    dbInfo=NULL,
    dataModel=NULL,
    collectionMembers=NULL,
-   n_max=10,
-   ext='txt',
-   delim='\t',
-   quoted_na=FALSE,
-   ...
+   n_max=10
 ){
    stopifnot(file.exists(path))
-   fparam <- c(as.list(environment()), list(...))
    
    ## DB information ----
    if(is.null(dbInfo)){
@@ -154,7 +150,23 @@ read_fileMDB <- function(
       
    }
    names(dbInfo) <- sub("^reference URL$", "url", names(dbInfo))
+   allInfo <- dbInfo
    dbInfo <- .check_dbInfo(dbInfo)
+   
+   ## Read parameters ----
+   readParameters <- allInfo[intersect(
+      names(allInfo),
+      names(as.list(args(readr::read_delim)))
+   )]
+   defaultParameters <- list(
+      delim='\t',
+      quoted_na=FALSE
+   )
+   for(p in names(defaultParameters)){
+      if(!p %in% names(readParameters)){
+         readParameters[[p]] <- defaultParameters[[p]]
+      }
+   }
    
    ## Data model ----
    if(is.null(dataModel)){
@@ -183,15 +195,16 @@ read_fileMDB <- function(
    if(!file.exists(dp)){
       dp <- path
    }
-   dataFiles <- file.path(dp, paste(names(dataModel), ext, sep=".")) %>% 
+   ext <- unique(.getExtensions(list.files(dp)))
+   if(length(ext)!=1){
+      stop(
+         "There should be one and only one extension for all the data files.",
+         sprintf("Here the following were found: %s", paste(ext, collapse=", "))
+      )
+   }
+   dataFiles <- file.path(dp, paste0(names(dataModel), ext)) %>% 
       normalizePath()
    names(dataFiles) <- names(dataModel)
-   
-   ## Read parameters ----
-   readParameters <- fparam[intersect(
-      setdiff(names(fparam), "n_max"),
-      names(as.list(args(readr::read_delim)))
-   )]
    
    ## Collection members ----
    if(is.null(collectionMembers)){
@@ -257,6 +270,18 @@ is.fileMDB <- function(x){
    collection_members(x) <- ncolMb
    return(x)
 }
+
+
+###############################################################################@
+#' @export
+#' 
+rename.fileMDB <- function(.data, ...){
+   loc <- tidyselect::eval_rename(expr(c(...)), .data)
+   names <- names(.data)
+   names[loc] <- names(loc)
+   set_names(.data, names)
+}
+
 
 ###############################################################################@
 #' @param x a [fileMDB] object
@@ -387,8 +412,11 @@ collection_members.fileMDB <- function(
    )
    
    for(collection in unique(value$collection)){
-      jval <- dplyr::filter(value, .data$collection==!!collection) %>%
-         write_collection_members()
+      cv <- dplyr::filter(value, .data$collection==!!collection)
+      for(cid in unique(cv$cid)){
+         jval <- dplyr::filter(cv, .data$cid==!!cid) %>%
+            write_collection_members()
+      }
    }
    
    for(mbt in unique(value$table)){
@@ -423,22 +451,11 @@ collection_members.fileMDB <- function(
 #'
 data_tables.fileMDB <- function(x, ...){
    m <- data_model(x)
+   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   if(length(toTake)==0){
+      toTake <- 1:length(x)
+   }
    x <- unclass(x)
-   toTake <- unlist(list(...))
-   if(is.numeric(toTake)){
-      toTake <- names(m)[toTake]
-   }
-   if(length(toTake)>0){
-      notInDb <- setdiff(toTake, names(m))
-      if(length(notInDb)>0){
-         stop(
-            "The following tables are not in the InternalDB: ",
-            paste(notInDb, sep=", ")
-         )
-      }
-   }else{
-      toTake <- names(m)
-   }
    toRet <- lapply(
       toTake,
       function(y){
@@ -477,24 +494,14 @@ count_records.fileMDB <- function(x, ...){
       return(n)
    }
    m <- data_model(x)
+   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   if(length(toTake)==0){
+      toTake <- 1:length(x)
+   }
    x <- unclass(x)
-   toTake <- unlist(list(...))
-   if(is.numeric(toTake)){
-      toTake <- names(m)[toTake]
-   }
-   if(length(toTake)>0){
-      notInDb <- setdiff(toTake, names(m))
-      if(length(notInDb)>0){
-         stop(
-            "The following tables are not in the InternalDB: ",
-            paste(notInDb, sep=", ")
-         )
-      }
-   }else{
-      toTake <- names(m)
-   }
    lapply(x$dataFiles[toTake], count_lines) %>% 
-      unlist()
+      unlist() %>% 
+      `-`(1)
 }
 
 ###############################################################################@
@@ -560,16 +567,146 @@ data_files <- function(x){
 }
 
 ###############################################################################@
+#' @export
 #'
-write_MDB.fileMDB <- function(x,path){}
+'[[.fileMDB' <- function(x, i){
+   stopifnot(
+      length(i)==1
+   )
+   ## Rstudio hack to avoid DB call when just looking for names
+   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
+   if(length(cc)!=0){
+      invisible(NULL)
+   }else{
+      cc <- c(
+         grep('.rs.valueContents', deparse(sys.calls()), value=FALSE),
+         grep('.rs.explorer.inspectObject', deparse(sys.calls()), value=FALSE)
+      )
+      if(length(cc)!=0){
+         invisible(as.character(data_files(x)$dataFiles[i]))
+      }else{
+         data_tables(x, i)[[1]]
+      }
+   }
+}
+#' @export
+'$.fileMDB' <- `[[.fileMDB`
+
 
 ###############################################################################@
+#' @export
 #'
-c.fileMDB <- function(x){}
+c.fileMDB <- function(...){
+   alldb <- list(...)
+   if(length(alldb)==0){
+      stop("At least one fileMDB should be provided as an input")
+   }
+   df <- data_files(alldb[[1]])
+   rp1 <- df$readParameters
+   for(i in 1:length(alldb)){
+      if(!is.fileMDB(alldb[[i]])){
+         stop("All objects should be fileMDB")
+      }
+      rpi <- data_files(alldb[[i]])$readParameters[names(rp1)]
+      if(!identical(rp1, rpi)){
+         stop("readParameters of all fileMDB should be identical")
+      }
+   }
+   di <- db_info(alldb[[1]])
+   dm <- data_model(alldb[[1]])
+   df <- data_files(alldb[[1]])
+   dc <- collection_members(alldb[[1]])
+   if(length(alldb)>1) for(i in 2:length(alldb)){
+      dm <- c(dm, data_model(alldb[[i]]))
+      df$dataFiles <- c(df$dataFiles, data_files(alldb[[i]])$dataFiles)
+      dc <- dplyr::bind_rows(
+         dc,
+         collection_members(alldb[[i]]) %>%
+            dplyr::mutate(resource=di$name)
+      )
+   }
+   fileMDB(
+      dataFiles=df$dataFiles,
+      dbInfo=di,
+      dataModel=dm,
+      readParameters=df$readParameters,
+      collectionMembers=dc
+   )
+}
+
 
 ###############################################################################@
+#' @param x a [fileMDB]
+#' @param path the path where the MDB should be written
+#' @param ... not used
+#' 
+#' @rdname write_MDB
+#' @method write_MDB fileMDB
+#' 
+#' @export
 #'
-rename.fileMDB <- function(x){}
+write_MDB.fileMDB <- function(x, path, ...){
+   stopifnot(is.character(path), length(path)==1, !is.na(path))
+   dbInfo <- db_info(x)
+   dbName <- dbInfo$name
+   
+   ## Initialization ----
+   fullPath <- file.path(path, dbName)
+   if(file.exists(fullPath)){
+      stop(sprintf("%s already exists", fullPath))
+   }
+   dir.create(fullPath, recursive=TRUE)
+   
+   ## Description file ----
+   rp <- data_files(x)$readParameters
+   descFile <- file.path(fullPath, "DESCRIPTION.json")
+   .writeDescription(c(dbInfo, rp), descFile)
+   
+   ## Data model ----
+   dm <- data_model(x)
+   modelPath <- file.path(fullPath, "model")
+   dir.create(modelPath)
+   jModelPath <- file.path(modelPath, paste0(dbName, ".json"))
+   hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
+   write_json_data_model(dm, jModelPath)
+   plot(dm) %>%
+      visNetwork::visSave(hModelPath)
+   
+   ## Collection members ----
+   cm <- collection_members(x)
+   if(nrow(cm)>0){
+      colPath <- file.path(modelPath, "Collections")
+      dir.create(colPath)
+      for(collection in unique(cm$collection)){
+         cv <- dplyr::filter(cm, .data$collection==!!collection)
+         for(cid in unique(cv$cid)){
+            dplyr::filter(cv, .data$cid==!!cid) %>%
+               write_collection_members(path=file.path(
+                  colPath,
+                  paste0(collection, "-", cid, ".json")
+               ))
+         }
+      }
+   }
+   
+   ## Data ----
+   dataPath <- file.path(fullPath, "data")
+   dir.create(dataPath)
+   ofiles <- data_files(x)$dataFiles
+   ext <- .getExtensions(ofiles)
+   dfiles <- file.path(dataPath, paste0(names(ext), ext))
+   names(dfiles) <- names(ofiles)
+   file.copy(ofiles, dfiles)
+   
+   ## Return fileMDB ----
+   return(fileMDB(
+      dataFiles=dfiles,
+      dbInfo=dbInfo,
+      dataModel=dm,
+      readParameters=rp,
+      collectionMembers=cm
+   ))
+}
 
 
 ###############################################################################@
@@ -604,5 +741,18 @@ right_join.fileMDB <- function(x){}
 ###############################################################################@
 #'
 full_join.fileMDB <- function(x){}
+
+
+###############################################################################@
+## Helpers ----
+.getExtensions <- function(files){
+   ext <- regexpr(
+      "(\\.[[:alnum:]]+)(\\.gz)?$", files, ignore.case=TRUE
+   )
+   ext <- substr(
+      files, ext, ext+attr(ext, "match.length")-1
+   )
+   return(ext)
+}
 
 
