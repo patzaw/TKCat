@@ -38,7 +38,7 @@ original \code{\link[readr:read_delim]{readr::read_delim()}} function.
 If NULL (default), the model json file found in path/model.}
 
 \item{collectionMembers}{the members of collections as provided to the
-\link{collection_members<-.fileMDB} function. If NULL (default), the members
+\link{collection_members<-} function. If NULL (default), the members
 are taken from json files found in path/model/Collections}
 
 \item{n_max}{maximum number of records to read

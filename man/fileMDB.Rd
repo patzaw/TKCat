@@ -2,7 +2,7 @@
 % Please edit documentation in R/fileMDB.R
 \name{fileMDB}
 \alias{fileMDB}
-\title{Create an MDB (Modeled DataBase) based on files}
+\title{Create an MDB (Modeled DataBase) based on files: fileMDB}
 \usage{
 fileMDB(
   dataFiles,
@@ -28,7 +28,7 @@ fileMDB(
 (e.g. \code{list(delim='\\t', quoted_na=FALSE,)})}
 
 \item{collectionMembers}{the members of collections as provided to the
-\link{collection_members<-.fileMDB} function (default: NULL ==> no member).}
+\link{collection_members<-} function (default: NULL ==> no member).}
 
 \item{n_max}{maximum number of records to read
 for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}
@@ -39,5 +39,5 @@ for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{Re
 A \link{fileMDB} object
 }
 \description{
-Create an MDB (Modeled DataBase) based on files
+Create an MDB (Modeled DataBase) based on files: fileMDB
 }

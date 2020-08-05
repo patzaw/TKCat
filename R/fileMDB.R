@@ -1,5 +1,5 @@
 ###############################################################################@
-#' Create an MDB (Modeled DataBase) based on files
+#' Create an MDB (Modeled DataBase) based on files: fileMDB
 #' 
 #' @param dataFiles a named vector of path to data files with
 #' `all(names(dataFiles) %in% names(dataModel))`
@@ -10,7 +10,7 @@
 #' @param readParameters a list of parameters for reading the data file.
 #' (e.g. `list(delim='\t', quoted_na=FALSE,)`)
 #' @param collectionMembers the members of collections as provided to the
-#' [collection_members<-.fileMDB] function (default: NULL ==> no member).
+#' [collection_members<-] function (default: NULL ==> no member).
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
 #' @param verbose if TRUE display the data confrontation report
@@ -44,8 +44,7 @@ fileMDB <- function(
    ## Data model ----
    if(!ReDaMoR::is.RelDataModel(dataModel)){
       stop(
-         "dataModel should be a path to a valid json file ",
-         "or a RelDataModel object"
+         "dataModel should be a RelDataModel object"
       )
    }
    
@@ -67,12 +66,12 @@ fileMDB <- function(
             rnDataModel,
             paths=dataFiles,
             returnData=FALSE,
-            verbose=verbose,
+            verbose=FALSE,
             n_max=n_max
          ),
          readParameters
       ))
-      assign("confrontationReport", cr[-which(names(cr)=="data")], envir=tkcatEnv)
+      assign("confrontationReport", cr, envir=tkcatEnv)
       if(!cr$success){
          stop(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
       }
@@ -117,7 +116,7 @@ fileMDB <- function(
 #' @param dataModel a [ReDaMoR::RelDataModel] object or json file.
 #' If NULL (default), the model json file found in path/model.
 #' @param collectionMembers the members of collections as provided to the
-#' [collection_members<-.fileMDB] function. If NULL (default), the members
+#' [collection_members<-] function. If NULL (default), the members
 #' are taken from json files found in path/model/Collections
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
@@ -234,6 +233,7 @@ read_fileMDB <- function(
    ))
 }
 
+
 ###############################################################################@
 #' Check the object is  a [fileMDB] object
 #' 
@@ -246,6 +246,7 @@ read_fileMDB <- function(
 is.fileMDB <- function(x){
    inherits(x, "fileMDB")
 }
+
 
 ###############################################################################@
 #' @export
@@ -298,6 +299,7 @@ db_info.fileMDB <- function(x, ...){
    return(toRet)
 }
 
+
 ###############################################################################@
 #' @param x a [fileMDB] object
 #' @param value a list with DB information:
@@ -316,8 +318,10 @@ db_info.fileMDB <- function(x, ...){
    if(!is.null(toRet$collectionMembers)){
       toRet$collectionMembers$resource <- dbInfo$name
    }
+   class(toRet) <- c("fileMDB", "MDB", class(toRet))
    return(toRet)
 }
+
 
 ###############################################################################@
 #' @param x a [fileMDB] object
@@ -331,6 +335,7 @@ db_info.fileMDB <- function(x, ...){
 data_model.fileMDB <- function(x, ...){
    unclass(x)$dataModel
 }
+
 
 ###############################################################################@
 #' @param x a [fileMDB] object
@@ -355,6 +360,7 @@ collection_members.fileMDB <- function(
    }
    return(toRet)
 }
+
 
 ###############################################################################@
 #' @param x a [fileMDB] object
@@ -440,6 +446,7 @@ collection_members.fileMDB <- function(
    return(x)
 }
 
+
 ###############################################################################@
 #' @param x a [fileMDB] object
 #' @param ... the name of the tables to get (default: all of them)
@@ -454,6 +461,7 @@ data_tables.fileMDB <- function(x, ...){
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
+      names(toTake) <- names(x)
    }
    x <- unclass(x)
    toRet <- lapply(
@@ -468,9 +476,10 @@ data_tables.fileMDB <- function(x, ...){
          ))
       }
    )
-   names(toRet) <- toTake
+   names(toRet) <- names(toTake)
    return(toRet)
 }
+
 
 ###############################################################################@
 #' @param x a [fileMDB]
@@ -504,6 +513,7 @@ count_records.fileMDB <- function(x, ...){
       `-`(1)
 }
 
+
 ###############################################################################@
 #' Get the data files from an object
 #' 
@@ -519,6 +529,7 @@ data_files <- function(x){
    stopifnot(all(toTake %in% names(x)))
    return(x[toTake])
 }
+
 
 ###############################################################################@
 #' @export
@@ -543,6 +554,7 @@ data_files <- function(x){
    )
    if(is.numeric(i)){
       stopifnot(all(i %in% 1:length(x)))
+      i <- names(x)[i]
    }
    if(is.character(i)){
       stopifnot(all(i %in% names(x)))
@@ -566,6 +578,7 @@ data_files <- function(x){
    return(toRet)
 }
 
+
 ###############################################################################@
 #' @export
 #'
@@ -585,7 +598,7 @@ data_files <- function(x){
       if(length(cc)!=0){
          invisible(as.character(data_files(x)$dataFiles[i]))
       }else{
-         data_tables(x, i)[[1]]
+         return(data_tables(x, i)[[1]])
       }
    }
 }
