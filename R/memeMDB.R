@@ -497,7 +497,206 @@ write_MDB.memeMDB <- function(x, path, ...){
 }
 
 
+###############################################################################@
+#' Filter a [memeMDB] object
+#' 
+#' @param x a [memeMDB] object
+#' @param ... each argument should have the name of one of the tables of the
+#' [memeMDB] object and contain a simple logical expression involving
+#' the names of the corresponding table.
+#' 
+#' @return a filtered [memeMDB] object
+#' 
+#' @examples
+#' filter(hpo, HPO_diseases=(db=="DECIPHER" & id=="1"))
+#' 
+#' @export
+#'
+filter.memeMDB <- function(x, ...){
+   
+   .fkFilter <- function(toRet, tn){
+      fkf <- fk %>% filter(from==!!tn)
+      fkt <- fk %>% filter(to==!!tn)
+      fk <<- fk %>% filter(
+         !paste(from, to, sep="--") %in% paste(!!fkf$from, !!fkf$to, sep="--"),
+         !paste(from, to, sep="--") %in% paste(!!fkt$from, !!fkt$to, sep="--")
+      )
+      fkl <- bind_rows(
+         fkf,
+         fkt %>% rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
+      )
+      if(nrow(fkl)>0){
+         for(i in 1:nrow(fkl)){
+            ntn <- fkl$to[i]
+            if(ntn %in% names(toRet)){
+               toRet[[ntn]] <- toRet[[ntn]] %>%
+                  filter(
+                     do.call(
+                        paste,
+                        c(
+                           (!!toRet[[ntn]][, fkl$tf[[i]], drop=FALSE]),
+                           list(sep="_")
+                        )
+                     ) %in%
+                        do.call(
+                           paste,
+                           c(
+                              (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
+                              list(sep="_")
+                           )
+                        )
+                  )
+            }else{
+               toRet[[ntn]] <- x[[ntn]] %>%
+                  filter(
+                     do.call(
+                        paste,
+                        c(
+                           (!!x[[ntn]][, fkl$tf[[i]], drop=FALSE]),
+                           list(sep="_")
+                        )
+                     ) %in%
+                        do.call(
+                           paste,
+                           c(
+                              (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
+                              list(sep="_")
+                           )
+                        )
+                  )
+            }
+            toRet <- .fkFilter(toRet, ntn)
+         }
+      }
+      return(toRet)
+   }
+   
+   ## Identify foreign keys ----
+   fk <- get_foreign_keys(data_model(x)) %>%
+      select(from, ff, to, tf)
+   
+   ## Apply rules and propagates the filtering ----
+   toRet <- list()
+   dots <- enquos(...)
+   for(tn in names(dots)){
+      if(!tn %in% names(x)){
+         stop(sprintf("%s table does not exist", tn))
+      }
+      toRet[[tn]] <- filter(x[[tn]], !!dots[[tn]])
+      toRet <- .fkFilter(toRet, tn)
+   }
+   
+   ## Results ----
+   return(memeMDB(
+      dataTables=toRet,
+      dataModel=data_model(x)[names(toRet)],
+      dbInfo=db_info(x),
+      collectionMembers=collection_members(x) %>% filter(table %in% names(x))
+   ))
+   
+}
 
 
-
+###############################################################################@
+#' Subset a [memeMDB] object according to row position in one table
+#' 
+#' @param x a [memeMDB] object
+#' @param ... a single argument. The name of this argument should be a table
+#' name of x and the value of this argument should be vector of integers
+#' corresponding to row indexes.
+#' @param .preserve not used
+#' 
+#' @return a [memeMDB] object
+#' 
+#' @examples
+#' slice(hpo, HPO_diseases=1:10)
+#' 
+#' @export
+#'
+slice.memeMDB <- function(x, ..., .preserve=FALSE){
+   
+   .fkFilter <- function(toRet, tn){
+      fkf <- fk %>% filter(from==!!tn)
+      fkt <- fk %>% filter(to==!!tn)
+      fk <<- fk %>% filter(
+         !paste(from, to, sep="--") %in% paste(!!fkf$from, !!fkf$to, sep="--"),
+         !paste(from, to, sep="--") %in% paste(!!fkt$from, !!fkt$to, sep="--")
+      )
+      fkl <- bind_rows(
+         fkf,
+         fkt %>% rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
+      )
+      if(nrow(fkl)>0){
+         for(i in 1:nrow(fkl)){
+            ntn <- fkl$to[i]
+            if(ntn %in% names(toRet)){
+               toRet[[ntn]] <- toRet[[ntn]] %>%
+                  filter(
+                     do.call(
+                        paste,
+                        c(
+                           (!!toRet[[ntn]][, fkl$tf[[i]], drop=FALSE]),
+                           list(sep="_")
+                        )
+                     ) %in%
+                        do.call(
+                           paste,
+                           c(
+                              (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
+                              list(sep="_")
+                           )
+                        )
+                  )
+            }else{
+               toRet[[ntn]] <- x[[ntn]] %>%
+                  filter(
+                     do.call(
+                        paste,
+                        c(
+                           (!!x[[ntn]][, fkl$tf[[i]], drop=FALSE]),
+                           list(sep="_")
+                        )
+                     ) %in%
+                        do.call(
+                           paste,
+                           c(
+                              (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
+                              list(sep="_")
+                           )
+                        )
+                  )
+            }
+            toRet <- .fkFilter(toRet, ntn)
+         }
+      }
+      return(toRet)
+   }
+   
+   ## Identify foreign keys ----
+   fk <- get_foreign_keys(data_model(x)) %>%
+      select(from, ff, to, tf)
+   
+   ## Apply rules and propagates the filtering ----
+   toRet <- list()
+   dots <- list(...)
+   if(length(dots)>1){
+      stop("Only one argument should be supplied in '...'")
+   }
+   tn <- names(dots)
+   if(!tn %in% names(x)){
+      stop(sprintf("%s table does not exist", tn))
+   }
+   i <- dots[[tn]]
+   toRet[[tn]] <- slice(x[[tn]], i)
+   toRet <- .fkFilter(toRet, tn)
+   
+   ## Results ----
+   return(memeMDB(
+      dataTables=toRet,
+      dataModel=data_model(x)[names(toRet)],
+      dbInfo=db_info(x),
+      collectionMembers=collection_members(x) %>% filter(table %in% names(x))
+   ))
+   
+}
 
