@@ -17,6 +17,8 @@
 #'
 #' @return A [fileMDB] object
 #' 
+#' @example inst/examples/fileMDB-examples.R
+#' 
 #' @export
 #' 
 fileMDB <- function(
@@ -173,13 +175,13 @@ read_fileMDB <- function(
          file.path(path, "model", sprintf("%s.json", dbInfo[["name"]]))
       )
    }else{
-      if(is.character(dbInfo)){
+      if(is.character(dataModel)){
          stopifnot(
-            length(dbInfo)==1,
-            !is.na(dbInfo),
-            file.exists(dbInfo)
+            length(dataModel)==1,
+            !is.na(dataModel),
+            file.exists(dataModel)
          )
-         dataModel <- ReDaMoR::read_json_data_model(dbInfo)
+         dataModel <- ReDaMoR::read_json_data_model(dataModel)
       }
    }
    if(!ReDaMoR::is.RelDataModel(dataModel)){
@@ -723,12 +725,278 @@ write_MDB.fileMDB <- function(x, path, ...){
 
 
 ###############################################################################@
+#' Filter a [fileMDB] object and return a [memoMDB]
+#' 
+#' @param .data a [fileMDB] object
+#' @param ... each argument should have the name of one of the tables of the
+#' [fileMDB] object and contain a simple logical expression involving
+#' the names of the corresponding table.
+#' @param .preserve not used
+#' 
+#' @return a [memoMDB] object
+#' 
+#' @export
 #'
-filter.fileMDB <- function(x){}
+filter.fileMDB <- function(.data, ..., .preserve=FALSE){
+   
+   .fkFilter <- function(toRet, tn){
+      fkf <- fk %>% dplyr::filter(.data$from==!!tn)
+      fkt <- fk %>% dplyr::filter(.data$to==!!tn)
+      fk <<- fk %>% dplyr::filter(
+         !paste(.data$from, .data$to, sep="--") %in%
+            paste(!!fkf$from, !!fkf$to, sep="--"),
+         !paste(.data$from, .data$to, sep="--") %in%
+            paste(!!fkt$from, !!fkt$to, sep="--")
+      )
+      fkl <- dplyr::bind_rows(
+         fkf,
+         fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
+      )
+      if(nrow(fkl)>0){
+         for(i in 1:nrow(fkl)){
+            ntn <- fkl$to[i]
+            if(ntn %in% names(toRet)){
+               toRet[[ntn]] <- toRet[[ntn]] %>%
+                  dplyr::filter(
+                     do.call(
+                        paste,
+                        c(
+                           (!!toRet[[ntn]][, fkl$tf[[i]], drop=FALSE]),
+                           list(sep="_")
+                        )
+                     ) %in%
+                        do.call(
+                           paste,
+                           c(
+                              (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
+                              list(sep="_")
+                           )
+                        )
+                  )
+            }else{
+               tnv <- do.call(
+                  paste,
+                  c(
+                     toRet[[tn]][, fkl$ff[[i]], drop=FALSE],
+                     list(sep="_")
+                  )
+               )
+               toRet[[ntn]] <- do.call(
+                  readr::read_delim_chunked,
+                  c(
+                     list(file=files[ntn]),
+                     rp,
+                     list(
+                        col_types=ReDaMoR::col_types(dm[[ntn]])
+                     ),
+                     list(
+                        callback=readr::DataFrameCallback$new(function(y, pos){
+                           yv <- do.call(
+                              paste,
+                              c(
+                                 (y[, fkl$tf[[i]], drop=FALSE]),
+                                 list(sep="_")
+                              )
+                           )
+                           dplyr::filter(
+                              y,
+                              !!yv %in% !!tnv
+                           )
+                        }),
+                        chunk_size=10^5
+                     )
+                  )
+               )
+            }
+            toRet <- .fkFilter(toRet, ntn)
+         }
+      }
+      return(toRet)
+   }
+   
+   x <- .data
+   
+   ## Identify foreign keys ----
+   dm <- data_model(x)
+   fk <- ReDaMoR::get_foreign_keys(dm) %>%
+      dplyr::select("from", "ff", "to", "tf")
+   
+   ## Apply rules and propagates the filtering ----
+   toRet <- list()
+   dots <- enquos(...)
+   files <- data_files(x)
+   rp <- files$readParameters
+   files <- files$dataFiles
+   for(tn in names(dots)){
+      if(!tn %in% names(x)){
+         stop(sprintf("%s table does not exist", tn))
+      }
+      toRet[[tn]] <- do.call(
+         readr::read_delim_chunked,
+         c(
+            list(file=files[tn]),
+            rp,
+            list(
+               col_types=ReDaMoR::col_types(dm[[tn]])
+            ),
+            list(
+               callback=readr::DataFrameCallback$new(function(y, pos){
+                  dplyr::filter(y, !!dots[[tn]])
+               }),
+               chunk_size=10^5
+            )
+         )
+      )
+      toRet <- .fkFilter(toRet, tn)
+   }
+   
+   ## Collection members ----
+   cm <- collection_members(x)
+   if(!is.null(cm)){
+      cm <- cm %>% dplyr::filter(.data$table %in% names(x))
+   }
+   
+   ## Results ----
+   return(memoMDB(
+      dataTables=toRet,
+      dataModel=dm[names(toRet)],
+      dbInfo=db_info(x),
+      collectionMembers=cm
+   ))
+   
+}
+
 
 ###############################################################################@
+#' Subset a [fileMDB] object according to row position in one table
+#' and return a [memoMDB]
+#' 
+#' @param .data a [fileMDB] object
+#' @param ... a single argument. The name of this argument should be a table
+#' name of x and the value of this argument should be vector of integers
+#' corresponding to row indexes.
+#' @param .preserve not used
+#' 
+#' @return a [memoMDB] object
+#' 
+#' @export
 #'
-slice.fileMDB <- function(x){}
+slice.fileMDB <- function(.data, ..., .preserve=FALSE){
+   
+   .fkFilter <- function(toRet, tn){
+      fkf <- fk %>% dplyr::filter(.data$from==!!tn)
+      fkt <- fk %>% dplyr::filter(.data$to==!!tn)
+      fk <<- fk %>% dplyr::filter(
+         !paste(.data$from, .data$to, sep="--") %in%
+            paste(!!fkf$from, !!fkf$to, sep="--"),
+         !paste(.data$from, .data$to, sep="--") %in%
+            paste(!!fkt$from, !!fkt$to, sep="--")
+      )
+      fkl <- dplyr::bind_rows(
+         fkf,
+         fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
+      )
+      if(nrow(fkl)>0){
+         for(i in 1:nrow(fkl)){
+            ntn <- fkl$to[i]
+            if(ntn %in% names(toRet)){
+               toRet[[ntn]] <- toRet[[ntn]] %>%
+                  dplyr::filter(
+                     do.call(
+                        paste,
+                        c(
+                           (!!toRet[[ntn]][, fkl$tf[[i]], drop=FALSE]),
+                           list(sep="_")
+                        )
+                     ) %in%
+                        do.call(
+                           paste,
+                           c(
+                              (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
+                              list(sep="_")
+                           )
+                        )
+                  )
+            }else{
+               tnv <- do.call(
+                  paste,
+                  c(
+                     toRet[[tn]][, fkl$ff[[i]], drop=FALSE],
+                     list(sep="_")
+                  )
+               )
+               toRet[[ntn]] <- do.call(
+                  readr::read_delim_chunked,
+                  c(
+                     list(file=files[ntn]),
+                     rp,
+                     list(
+                        col_types=ReDaMoR::col_types(dm[[ntn]])
+                     ),
+                     list(
+                        callback=readr::DataFrameCallback$new(function(y, pos){
+                           yv <- do.call(
+                              paste,
+                              c(
+                                 (y[, fkl$tf[[i]], drop=FALSE]),
+                                 list(sep="_")
+                              )
+                           )
+                           dplyr::filter(
+                              y,
+                              !!yv %in% !!tnv
+                           )
+                        }),
+                        chunk_size=10^5
+                     )
+                  )
+               )
+            }
+            toRet <- .fkFilter(toRet, ntn)
+         }
+      }
+      return(toRet)
+   }
+   
+   x <- .data
+   
+   ## Identify foreign keys ----
+   dm <- data_model(x)
+   fk <- ReDaMoR::get_foreign_keys(dm) %>%
+      dplyr::select("from", "ff", "to", "tf")
+   
+   ## Apply rules and propagates the filtering ----
+   toRet <- list()
+   dots <- list(...)
+   files <- data_files(x)
+   rp <- files$readParameters
+   files <- files$dataFiles
+   if(length(dots)>1){
+      stop("Only one argument should be supplied in '...'")
+   }
+   tn <- names(dots)
+   if(!tn %in% names(x)){
+      stop(sprintf("%s table does not exist", tn))
+   }
+   i <- dots[[tn]]
+   toRet[[tn]] <- dplyr::slice(x[[tn]], i)
+   toRet <- .fkFilter(toRet, tn)
+   
+   ## Collection members ----
+   cm <- collection_members(x)
+   if(!is.null(cm)){
+      cm <- cm %>% dplyr::filter(.data$table %in% names(x))
+   }
+   
+   ## Results ----
+   return(memoMDB(
+      dataTables=toRet,
+      dataModel=dm[names(toRet)],
+      dbInfo=db_info(x),
+      collectionMembers=cm
+   ))
+   
+}
 
 
 ###############################################################################@

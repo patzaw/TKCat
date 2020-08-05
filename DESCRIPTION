@@ -27,7 +27,8 @@ Imports:
    markdown
 Suggests:
    knitr,
-   rmarkdown
+   rmarkdown,
+   stringr
 License: GPL-3
 Encoding: UTF-8
 VignetteBuilder: knitr

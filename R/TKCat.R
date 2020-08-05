@@ -19,7 +19,7 @@
 #' 
 #' @importFrom visNetwork visSave
 #' 
-#' @importFrom readr read_delim write_tsv
+#' @importFrom readr read_delim write_tsv read_delim_chunked DataFrameCallback
 #' @importFrom getPass getPass
 #' @importFrom utils packageName str
 #' 
