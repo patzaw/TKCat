@@ -128,6 +128,114 @@ pull.MDB <- function(.data, var=-1, name=NULL, ...){
    return(.data[[var]])
 }
 
+###############################################################################@
+#' Compare two MDB objects
+#' 
+#' @param former an MDB object
+#' @param new an MDB object
+#' 
+#' @return A tibble with 4 columns:
+#' - **Information**: Compared information
+#' - **Former**: value for the former object
+#' - **New**: value for the new object
+#' - **Identical**: a logical indicating if the 2 values are identical
+#'
+#' @export
+#'
+compare_MDB <- function(former, new){
+   
+   stopifnot(is.MDB(former), is.MDB(new))
+   
+   ## DB information ----
+   fdbi <- db_info(former)
+   ndbi <- db_info(new)
+   dbif <- union(names(fdbi), names(ndbi))
+   toRet <- dplyr::tibble(
+      "Information"=dbif,
+      "Former"=unlist(fdbi)[dbif],
+      "New"=unlist(ndbi)[dbif]
+   ) %>% mutate(
+      "Identical"=.data$Former==.data$New
+   )
+   
+   ## Data model ----
+   toRet <- dplyr::bind_rows(
+      toRet,
+      dplyr::tibble(
+         "Information"=c("Model", "Model display"),
+         "Former"=c(sprintf("%s tables", length(former)), ""),
+         "New"=c(sprintf("%s tables", length(new)), ""),
+         "Identical"=c(
+            ReDaMoR::identical_RelDataModel(
+               data_model(former), data_model(new), includeDisplay=FALSE
+            ),
+            ReDaMoR::identical_RelDataModel(
+               data_model(former), data_model(new), includeDisplay=TRUE
+            )
+         )
+      )
+   )
+   
+   ## Records ----
+   fnr <- count_records(former)
+   fnr <- fnr[sort(names(fnr))]
+   nnr <- count_records(new)
+   nnr <- nnr[sort(names(nnr))]
+   if(
+      length(fnr)==length(nnr) && length(fnr) > 0 &&
+      all(names(fnr)==names(nnr))
+   ){
+      toRet <- dplyr::bind_rows(
+         toRet,
+         dplyr::tibble(
+            "Information"=c(sprintf("Table %s", names(fnr)), "Total"),
+            "Former"=format(c(fnr, sum(fnr)), big.mark=",", trim=FALSE),
+            "New"=format(c(nnr, sum(nnr)), big.mark=",", trim=FALSE)
+         ) %>% mutate(
+            "Identical"=c(fnr, sum(fnr))==c(nnr, sum(nnr))
+         )
+      )
+   }
+   
+   ## Collection members ----
+   ccm <- collection_members(former)
+   if(!is.null(ccm)){
+      ccm <- ccm %>% dplyr::arrange_all()
+      ccoll <- ccm %>%
+         dplyr::distinct(
+            .data$resource, .data$collection, .data$table, .data$mid
+         ) %>%
+         nrow
+   }else{
+      ccoll <- 0
+   }
+   ncm <- collection_members(new)
+   if(!is.null(ncm)){
+      ncm <- ncm %>% dplyr::arrange_all()
+      ncoll <- ncm %>%
+         dplyr::distinct(
+            .data$resource, .data$collection, .data$table, .data$mid
+         ) %>%
+         nrow
+   }else{
+      ncoll <- 0
+   }
+   toRet <- dplyr::bind_rows(
+      toRet,
+      dplyr::tibble(
+         "Information"="Collections",
+         "Former"=format(ccoll, big.mark=",", trim=FALSE),
+         "New"=format(ncoll, big.mark=",", trim=FALSE),
+         "Identical"=(
+            ccoll==ncoll && (
+               ccoll==0 || identical(ccm, ncm)
+            )
+         )
+      )
+   )
+   
+   return(toRet)
+}
 
 ###############################################################################@
 #' @export
