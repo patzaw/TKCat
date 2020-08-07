@@ -514,70 +514,11 @@ write_MDB.memoMDB <- function(x, path, ...){
 #'
 filter.memoMDB <- function(.data, ..., .preserve=FALSE){
    
-   .fkFilter <- function(toRet, tn){
-      fkf <- fk %>% dplyr::filter(.data$from==!!tn)
-      fkt <- fk %>% dplyr::filter(.data$to==!!tn)
-      fk <<- fk %>% dplyr::filter(
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkf$from, !!fkf$to, sep="--"),
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkt$from, !!fkt$to, sep="--")
-      )
-      fkl <- dplyr::bind_rows(
-         fkf,
-         fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
-      )
-      if(nrow(fkl)>0){
-         for(i in 1:nrow(fkl)){
-            ntn <- fkl$to[i]
-            if(ntn %in% names(toRet)){
-               toRet[[ntn]] <- toRet[[ntn]] %>%
-                  dplyr::filter(
-                     do.call(
-                        paste,
-                        c(
-                           (!!toRet[[ntn]][, fkl$tf[[i]], drop=FALSE]),
-                           list(sep="_")
-                        )
-                     ) %in%
-                        do.call(
-                           paste,
-                           c(
-                              (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
-                              list(sep="_")
-                           )
-                        )
-                  )
-            }else{
-               toRet[[ntn]] <- x[[ntn]] %>%
-                  dplyr::filter(
-                     do.call(
-                        paste,
-                        c(
-                           (!!x[[ntn]][, fkl$tf[[i]], drop=FALSE]),
-                           list(sep="_")
-                        )
-                     ) %in%
-                        do.call(
-                           paste,
-                           c(
-                              (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
-                              list(sep="_")
-                           )
-                        )
-                  )
-            }
-            toRet <- .fkFilter(toRet, ntn)
-         }
-      }
-      return(toRet)
-   }
-   
    x <- .data
    
    ## Identify foreign keys ----
-   fk <- ReDaMoR::get_foreign_keys(data_model(x)) %>%
-      dplyr::select("from", "ff", "to", "tf")
+   dm <- data_model(x)
+   fk <- ReDaMoR::get_foreign_keys(dm)
    
    ## Apply rules and propagates the filtering ----
    toRet <- list()
@@ -587,19 +528,21 @@ filter.memoMDB <- function(.data, ..., .preserve=FALSE){
          stop(sprintf("%s table does not exist", tn))
       }
       toRet[[tn]] <- dplyr::filter(x[[tn]], !!dots[[tn]])
-      toRet <- .fkFilter(toRet, tn)
    }
+   toRet <- .memo_filtByConta(toRet, data_tables(x), fk)
+   dm <- dm[names(toRet), rmForeignKeys=TRUE]
+   toRet <- .norm_data(toRet,  dm)
    
    ## Collection members ----
    cm <- collection_members(x)
    if(!is.null(cm)){
-      cm <- cm %>% dplyr::filter(.data$table %in% names(x))
+      cm <- cm %>% dplyr::filter(.data$table %in% names(toRet))
    }
    
    ## Results ----
    return(memoMDB(
       dataTables=toRet,
-      dataModel=data_model(x)[names(toRet)],
+      dataModel=dm,
       dbInfo=db_info(x),
       collectionMembers=cm
    ))
@@ -622,70 +565,11 @@ filter.memoMDB <- function(.data, ..., .preserve=FALSE){
 #'
 slice.memoMDB <- function(.data, ..., .preserve=FALSE){
    
-   .fkFilter <- function(toRet, tn){
-      fkf <- fk %>% dplyr::filter(.data$from==!!tn)
-      fkt <- fk %>% dplyr::filter(.data$to==!!tn)
-      fk <<- fk %>% dplyr::filter(
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkf$from, !!fkf$to, sep="--"),
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkt$from, !!fkt$to, sep="--")
-      )
-      fkl <- dplyr::bind_rows(
-         fkf,
-         fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
-      )
-      if(nrow(fkl)>0){
-         for(i in 1:nrow(fkl)){
-            ntn <- fkl$to[i]
-            if(ntn %in% names(toRet)){
-               toRet[[ntn]] <- toRet[[ntn]] %>%
-                  dplyr::filter(
-                     do.call(
-                        paste,
-                        c(
-                           (!!toRet[[ntn]][, fkl$tf[[i]], drop=FALSE]),
-                           list(sep="_")
-                        )
-                     ) %in%
-                        do.call(
-                           paste,
-                           c(
-                              (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
-                              list(sep="_")
-                           )
-                        )
-                  )
-            }else{
-               toRet[[ntn]] <- x[[ntn]] %>%
-                  dplyr::filter(
-                     do.call(
-                        paste,
-                        c(
-                           (!!x[[ntn]][, fkl$tf[[i]], drop=FALSE]),
-                           list(sep="_")
-                        )
-                     ) %in%
-                        do.call(
-                           paste,
-                           c(
-                              (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
-                              list(sep="_")
-                           )
-                        )
-                  )
-            }
-            toRet <- .fkFilter(toRet, ntn)
-         }
-      }
-      return(toRet)
-   }
-   
    x <- .data
    
    ## Identify foreign keys ----
-   fk <- ReDaMoR::get_foreign_keys(data_model(x)) %>%
-      dplyr::select("from", "ff", "to", "tf")
+   dm <- data_model(x)
+   fk <- ReDaMoR::get_foreign_keys(dm)
    
    ## Apply rules and propagates the filtering ----
    toRet <- list()
@@ -699,21 +583,165 @@ slice.memoMDB <- function(.data, ..., .preserve=FALSE){
    }
    i <- dots[[tn]]
    toRet[[tn]] <- dplyr::slice(x[[tn]], i)
-   toRet <- .fkFilter(toRet, tn)
+   toRet <- .memo_filtByConta(toRet, data_tables(x), fk)
+   dm <- dm[names(toRet), rmForeignKeys=TRUE]
+   toRet <- .norm_data(toRet,  dm)
    
    ## Collection members ----
    cm <- collection_members(x)
    if(!is.null(cm)){
-      cm <- cm %>% dplyr::filter(.data$table %in% names(x))
+      cm <- cm %>% dplyr::filter(.data$table %in% names(toRet))
    }
    
    ## Results ----
    return(memoMDB(
       dataTables=toRet,
-      dataModel=data_model(x)[names(toRet)],
+      dataModel=dm,
       dbInfo=db_info(x),
       collectionMembers=cm
    ))
    
 }
 
+## Helpers ----
+.memo_filtByConta <- function(d, all, fk){
+   nfk <- fk
+   .contaminate <- function(tn){
+      
+      ## Backward ----
+      fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin>0)
+      fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin>0)
+      nfk <<- nfk %>% dplyr::filter(
+         !paste(.data$from, .data$to, sep="--") %in%
+            paste(!!fkf$from, !!fkf$to, sep="--"),
+         !paste(.data$from, .data$to, sep="--") %in%
+            paste(!!fkt$from, !!fkt$to, sep="--")
+      )
+      fkl <- dplyr::bind_rows(
+         fkf,
+         fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
+      ) %>% 
+         distinct()
+      if(nrow(fkl)>0){
+         for(i in 1:nrow(fkl)){
+            ntn <- fkl$to[i]
+            if(ntn %in% names(d)){
+               nv <- d[[ntn]]
+            }else{
+               nv <- all[[ntn]]
+            }
+            d[[ntn]] <<- nv %>% dplyr::filter(
+               do.call(
+                  paste,
+                  c(
+                     (!!nv[, fkl$tf[[i]], drop=FALSE]),
+                     list(sep="_")
+                  )
+               ) %in%
+                  do.call(
+                     paste,
+                     c(
+                        (!!d[[tn]][, fkl$ff[[i]], drop=FALSE]),
+                        list(sep="_")
+                     )
+                  )
+            )
+         }
+      }
+      
+      ## Forward ----
+      fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin==0)
+      fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin==0)
+      nfk <<- nfk %>% dplyr::filter(
+         !paste(.data$from, .data$to, sep="--") %in%
+            paste(!!fkf$from, !!fkf$to, sep="--"),
+         !paste(.data$from, .data$to, sep="--") %in%
+            paste(!!fkt$from, !!fkt$to, sep="--")
+      )
+      fkl <- dplyr::bind_rows(
+         fkf,
+         fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
+      ) %>% 
+         distinct()
+      if(nrow(fkl)>0){
+         for(i in 1:nrow(fkl)){
+            ntn <- fkl$to[i]
+            toAdd <- all[[ntn]] %>% dplyr::filter(
+               do.call(
+                  paste,
+                  c(
+                     (!!all[[ntn]][, fkl$tf[[i]], drop=FALSE]),
+                     list(sep="_")
+                  )
+               ) %in%
+                  do.call(
+                     paste,
+                     c(
+                        (!!d[[tn]][, fkl$ff[[i]], drop=FALSE]),
+                        list(sep="_")
+                     )
+                  )
+            )
+            d[[ntn]] <<- dplyr::bind_rows(
+               d[[ntn]],
+               toAdd
+            ) %>%
+               dplyr::distinct()
+         }
+      }
+   }
+   for(tn in names(d)){
+      .contaminate(tn)
+   }
+   if(nrow(fk) > nrow(nfk)){
+      d <- .memo_filtByConta(d, all, nfk)
+   }
+   return(d)
+}
+
+
+.norm_data <- function(dataTables, dataModel){
+   fk <- ReDaMoR::get_foreign_keys(dataModel) %>%
+      filter(
+         .data$from %in% names(dataTables) | .data$to %in% names(dataTables)
+      )
+   toRet <- dataTables
+   .norm_table <- function(tn){
+      fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin>0)
+      fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin>0)
+      fkl <- dplyr::bind_rows(
+         fkf,
+         fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
+      )
+      if(nrow(fkl)>0){
+         for(i in 1:nrow(fkl)){
+            ntn <- fkl$to[i]
+            nv <- toRet[[ntn]] %>%
+               dplyr::filter(
+                  do.call(
+                     paste,
+                     c(
+                        (!!toRet[[ntn]][, fkl$tf[[i]], drop=FALSE]),
+                        list(sep="_")
+                     )
+                  ) %in%
+                     do.call(
+                        paste,
+                        c(
+                           (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
+                           list(sep="_")
+                        )
+                     )
+               )
+            if(nrow(nv) < nrow(toRet[[ntn]])){
+               toRet[[ntn]] <<- nv
+               .norm_table(ntn)
+            }
+         }
+      }
+   }
+   for(tn in names(toRet)){
+      .norm_table(tn)
+   }
+   return(toRet)
+}
