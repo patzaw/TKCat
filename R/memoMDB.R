@@ -360,9 +360,12 @@ count_records.memoMDB <- function(x, ...){
    dbi$name <- sprintf("SUBSET of %s", dbi$name)
    dm <- data_model(x)[i, rmForeignKeys=TRUE]
    dt <- data_tables(x)[i]
-   cm <- collection_members(x) %>%
-      dplyr::filter(.data$table %in% i) %>%
-      dplyr::mutate(resource=dbi$name)
+   cm <- collection_members(x)
+   if(!is.null(cm)){
+      cm <- cm %>%
+         dplyr::filter(.data$table %in% !!i) %>%
+         dplyr::mutate(resource=!!dbi$name)
+   }
    toRet <- memoMDB(
       dataTables=dt,
       dataModel=dm,

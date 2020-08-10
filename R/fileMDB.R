@@ -573,9 +573,12 @@ data_files <- function(x){
    df <- data_files(x)
    rp <- df$readParameters
    df <- df$dataFiles[i]
-   cm <- collection_members(x) %>%
-      dplyr::filter(.data$table %in% i) %>%
-      dplyr::mutate(resource=dbi$name)
+   cm <- collection_members(x)
+   if(!is.null(cm)){
+      cm <- cm %>%
+         dplyr::filter(.data$table %in% !!i) %>%
+         dplyr::mutate(resource=!!dbi$name)
+   }
    toRet <- fileMDB(
       dataFiles=df,
       dbInfo=dbi,

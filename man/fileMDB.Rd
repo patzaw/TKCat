@@ -72,6 +72,10 @@ message(
 )
 count_records(hpof)
 
+select(hpof, HPO_hp:HPO_diseases)
+toTake <- "HPO_altId"
+select(hpof, toTake)
+
 hpoSlice <- slice(hpof, HPO_diseases=1:10)
 count_records(hpoSlice)
 
@@ -83,5 +87,11 @@ if(requireNamespace("stringr", quietly = TRUE)){
       )
    )
    count_records(epilHP)
+   label <- "Rolandic epilepsy"
+   cn <- sym("label")
+   reHP <- filter(
+      hpof,
+      HPO_diseases=!!cn==!!label
+   )
 }
 }
