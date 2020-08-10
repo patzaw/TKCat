@@ -57,7 +57,6 @@ format.MDB <- function(x, ...){
          "%s %s (version %s%s): %s",
          "   - %s tables",
          "",
-         "Collections: ",
          "%s",
          "",
          "%s (%s)",
@@ -69,23 +68,30 @@ format.MDB <- function(x, ...){
       ifelse(is.na(maintainer) || maintainer=="", "", paste(",", maintainer)),
       db_info(x)$title,
       length(x),
-      paste(
-         unlist(lapply(
-            unique(cm$collection),
-            function(y){
-               return(sprintf(
-                  "   - %s %s member%s",
-                  length(unique(cm$table[which(cm$collection==y)])),
-                  y,
-                  ifelse(
-                     length(unique(cm$table[which(cm$collection==y)]))>1,
-                     "s", ""
-                  )
-               ))
-            }
-         )),
-         collapse="\n"
-      ),
+      if(nrow(cm)>0){
+         sprintf(
+            "Collection members: \n%s",
+            paste(
+               unlist(lapply(
+                  unique(cm$collection),
+                  function(y){
+                     return(sprintf(
+                        "   - %s %s member%s",
+                        length(unique(cm$table[which(cm$collection==y)])),
+                        y,
+                        ifelse(
+                           length(unique(cm$table[which(cm$collection==y)]))>1,
+                           "s", ""
+                        )
+                     ))
+                  }
+               )),
+               collapse="\n"
+            )
+         )
+      }else{
+         "No collection member"
+      },
       db_info(x)$description,
       db_info(x)$url
    ))
