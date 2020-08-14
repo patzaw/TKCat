@@ -30,7 +30,7 @@ count_records(hpof)
 
 select(hpof, HPO_hp:HPO_diseases)
 toTake <- "HPO_altId"
-select(hpof, toTake)
+select(hpof, all_of(toTake))
 
 hpoSlice <- slice(hpof, HPO_diseases=1:10)
 count_records(hpoSlice)

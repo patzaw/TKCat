@@ -47,6 +47,21 @@ length.MDB <- function(x){
 
 
 ###############################################################################@
+#' Get the number of fields in each table of an MDB object
+#' 
+#' @param x an MDB object
+#' @param use.names return the names of the tables
+#' 
+#' @return A vector of integers
+#' 
+#' @export
+#'
+lengths.MDB <- function(x, use.names=TRUE){
+   lengths(data_model(x), use.names=use.names)
+}
+
+
+###############################################################################@
 #' @export
 #'
 format.MDB <- function(x, ...){
@@ -68,7 +83,7 @@ format.MDB <- function(x, ...){
       ifelse(is.na(maintainer) || maintainer=="", "", paste(",", maintainer)),
       db_info(x)$title,
       length(x),
-      if(nrow(cm)>0){
+      if(!is.null(cm) && nrow(cm)>0){
          sprintf(
             "Collection members: \n%s",
             paste(
