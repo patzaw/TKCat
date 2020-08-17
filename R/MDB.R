@@ -66,23 +66,49 @@ lengths.MDB <- function(x, use.names=TRUE){
 #'
 format.MDB <- function(x, ...){
    cm <- collection_members(x)
+   dbi <- db_info(x)
    maintainer <- db_info(x)$maintainer
    return(sprintf(
       paste(
-         "%s %s (version %s%s): %s",
-         "   - %s tables",
+         "%s %s%s%s",
+         "   - %s tables with %s fields",
          "",
          "%s",
          "",
-         "%s (%s)",
+         "%s",
+         "%s",
          sep="\n"
       ),
       class(x)[1],
       db_info(x)$name,
-      db_info(x)$version,
-      ifelse(is.na(maintainer) || maintainer=="", "", paste(",", maintainer)),
-      db_info(x)$title,
+      ifelse(
+         (is.na(dbi$version) || dbi$version=="") &&
+         (is.na(dbi$maintainer) || dbi$maintainer==""),
+         "",
+         sprintf(
+            " (%s%s%s)",
+            ifelse(
+               is.na(dbi$version) || dbi$version=="", "",
+               sprintf('version %s', dbi$version)
+            ),
+            ifelse(
+               !is.na(dbi$version) && dbi$version!="" &&
+               !is.na(dbi$maintainer) && dbi$maintainer!="",
+               ', ', ''
+            ),
+            ifelse(
+               is.na(dbi$maintainer) || dbi$maintainer=="", "",
+               dbi$maintainer
+            )
+         )
+      ),
+      ifelse(
+         is.na(dbi$title) || dbi$title=="",
+         '',
+         sprintf(': %s', dbi$title)
+      ),
       length(x),
+      sum(lengths(x)),
       if(!is.null(cm) && nrow(cm)>0){
          sprintf(
             "Collection members: \n%s",
@@ -107,8 +133,16 @@ format.MDB <- function(x, ...){
       }else{
          "No collection member"
       },
-      db_info(x)$description,
-      db_info(x)$url
+      ifelse(
+         is.na(dbi$description) || dbi$description=="",
+         '',
+         dbi$description
+      ),
+      ifelse(
+         is.na(dbi$url) || dbi$url=="",
+         '',
+         sprintf('(%s)', dbi$url)
+      )
    ))
 }
 
@@ -284,8 +318,7 @@ compare_MDB <- function(former, new){
 ## Helpers ----
 .check_dbInfo <- function(dbInfo){
    mandFields <- c(
-      "name", "title", "description", "url",
-      "version", "maintainer"
+      "name"
    )
    for(f in mandFields){
       if(
@@ -297,7 +330,22 @@ compare_MDB <- function(former, new){
          ))
       }
    }
-   dbInfo <- as.list(dbInfo[mandFields])
+   optfields <- c(
+      "title", "description", "url",
+      "version", "maintainer"
+   )
+   for(f in optfields){
+      fv <- dbInfo[[f]]
+      if(length(fv)==0){
+         dbInfo[[f]] <- as.character(NA)
+      }else{
+         if(length(fv)>1 || !is.atomic(fv)){
+            stop(sprintf("Invalid value for %s", f))
+         }
+         dbInfo[[f]] <- as.character(fv)
+      }
+   }
+   dbInfo <- as.list(dbInfo[c(mandFields, optfields)])
    return(dbInfo)
 }
 

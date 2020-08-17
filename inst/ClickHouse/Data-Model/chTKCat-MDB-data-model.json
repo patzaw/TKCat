@@ -12,35 +12,35 @@
       {
         "name": "title",
         "type": "character",
-        "nullable": false,
+        "nullable": true,
         "unique": false,
         "comment": "A longer title for the resource"
       },
       {
         "name": "description",
         "type": "character",
-        "nullable": false,
+        "nullable": true,
         "unique": false,
         "comment": "Description of the resource"
       },
       {
         "name": "url",
         "type": "character",
-        "nullable": false,
+        "nullable": true,
         "unique": false,
         "comment": "URL for more information about the original resource"
       },
       {
         "name": "version",
         "type": "character",
-        "nullable": false,
+        "nullable": true,
         "unique": false,
         "comment": "Version of resource data model. The version of the data should be included in the database itself."
       },
       {
         "name": "maintainer",
         "type": "character",
-        "nullable": false,
+        "nullable": true,
         "unique": false,
         "comment": "Maintainer of the resource"
       }

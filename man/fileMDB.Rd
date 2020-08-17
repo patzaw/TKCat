@@ -19,7 +19,7 @@ fileMDB(
 \code{all(names(dataFiles) \%in\% names(dataModel))}}
 
 \item{dbInfo}{a list with DB information:
-"name", "title", "description", "url",
+\strong{"name"} (only mandatory field), "title", "description", "url",
 "version", "maintainer".}
 
 \item{dataModel}{a \link[ReDaMoR:RelDataModel]{ReDaMoR::RelDataModel} object}
@@ -49,26 +49,13 @@ hpof <- read_fileMDB(
    dataModel=system.file("examples/HPO-model.json", package="ReDaMoR"),
    dbInfo=list(
       "name"="HPO",
-      "title"="Data extracted from the HPO database", 
+      "title"="Data extracted from the HPO database",
       "description"=paste(
-         "The Human Phenotype Ontology (HPO) aims to provide a standardized", 
-         "vocabulary of phenotypic abnormalities encountered in human disease.",
-         "Each term in the HPO describes a phenotypic abnormality,",
-         "such as atrial septal defect. The HPO is currently being developed",
-         "using the medical literature, Orphanet, DECIPHER, and OMIM.",
-         "HPO currently contains approximately 11,000 terms (still growing)",
-         "and over 115,000 annotations to hereditary diseases.",
-         "The HPO also provides a large set of HPO annotations to approximately",
-         "4000 common diseases."
+         "This is a very small subset of the HPO!",
+         "Visit the reference URL for more information"
       ),
-      "url"="http://human-phenotype-ontology.github.io/",
-      "version"="0.9",
-      "maintainer"="Patrice Godard <patrice.godard@ucb.com>"
+      "url"="http://human-phenotype-ontology.github.io/"
    )
-)
-message(
-   "This is a very small subset of the HPO! Visit ",
-   db_info(hpof)$url
 )
 count_records(hpof)
 

@@ -4,7 +4,7 @@
 #' @param dataTables a list of tibbles
 #' @param dataModel a [ReDaMoR::RelDataModel] object
 #' @param dbInfo a list with DB information:
-#' "name", "title", "description", "url",
+#' **"name"** (only mandatory field), "title", "description", "url",
 #' "version", "maintainer".
 #' @param collectionMembers the members of collections as provided to the
 #' [collection_members<-] function (default: NULL ==> no member).

@@ -22,7 +22,8 @@ one given in the DESCRIPTION.json file
 }}
 
 \item{dbInfo}{a list or a json file with DB information:
-"name", "title", "description", "url" (or "reference URL"),
+\strong{"name"} (only mandatory field), "title", "description",
+"url" (or "reference URL"),
 "version", "maintainer". If NULL (default), the DESCRIPTION.json file found
 in path. This file should also contains relevant parameters for the
 \code{\link[readr:read_delim]{readr::read_delim()}} function. For example:

@@ -5,7 +5,7 @@
 #' `all(names(dataFiles) %in% names(dataModel))`
 #' @param dataModel a [ReDaMoR::RelDataModel] object
 #' @param dbInfo a list with DB information:
-#' "name", "title", "description", "url",
+#' **"name"** (only mandatory field), "title", "description", "url",
 #' "version", "maintainer".
 #' @param readParameters a list of parameters for reading the data file.
 #' (e.g. `list(delim='\t', quoted_na=FALSE,)`)
@@ -106,7 +106,8 @@ fileMDB <- function(
 #' - **model**: a folder with the data model json file with the same name as the
 #' one given in the DESCRIPTION.json file
 #' @param dbInfo a list or a json file with DB information:
-#' "name", "title", "description", "url" (or "reference URL"),
+#' **"name"** (only mandatory field), "title", "description",
+#' "url" (or "reference URL"),
 #' "version", "maintainer". If NULL (default), the DESCRIPTION.json file found
 #' in path. This file should also contains relevant parameters for the
 #' [readr::read_delim()] function. For example:
