@@ -549,7 +549,6 @@ data_files <- function(x){
    }
    if(length(i)==0){
       dbi <- db_info(x)
-      dbi$name <- sprintf("EMPTY %s", dbi$name)
       return(fileMDB(
          dataFiles=as.character(),
          dbInfo=dbi,
@@ -569,7 +568,6 @@ data_files <- function(x){
       stopifnot(all(i %in% names(x)))
    }
    dbi <- db_info(x)
-   dbi$name <- sprintf("SUBSET of %s", dbi$name)
    dm <- data_model(x)[i, rmForeignKeys=TRUE]
    df <- data_files(x)
    rp <- df$readParameters

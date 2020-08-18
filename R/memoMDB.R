@@ -126,7 +126,7 @@ rename.memoMDB <- function(.data, ...){
    loc <- tidyselect::eval_rename(expr(c(...)), .data)
    names <- names(.data)
    names[loc] <- names(loc)
-   set_names(.data, names)
+   magrittr::set_names(.data, names)
 }
 
 
@@ -338,7 +338,6 @@ count_records.memoMDB <- function(x, ...){
    }
    if(length(i)==0){
       dbi <- db_info(x)
-      dbi$name <- sprintf("EMPTY %s", dbi$name)
       return(memoMDB(
          dataTables=list(),
          dataModel=RelDataModel(l=list()),
@@ -357,7 +356,6 @@ count_records.memoMDB <- function(x, ...){
       stopifnot(all(i %in% names(x)))
    }
    dbi <- db_info(x)
-   dbi$name <- sprintf("SUBSET of %s", dbi$name)
    dm <- data_model(x)[i, rmForeignKeys=TRUE]
    dt <- data_tables(x)[i]
    cm <- collection_members(x)
