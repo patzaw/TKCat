@@ -517,11 +517,7 @@ filter.memoMDB <- function(.data, ..., .preserve=FALSE){
    
    x <- .data
    
-   ## Identify foreign keys ----
-   dm <- data_model(x)
-   fk <- ReDaMoR::get_foreign_keys(dm)
-   
-   ## Apply rules and propagates the filtering ----
+   ## Apply rules ----
    toRet <- list()
    dots <- enquos(...)
    for(tn in names(dots)){
@@ -530,23 +526,9 @@ filter.memoMDB <- function(.data, ..., .preserve=FALSE){
       }
       toRet[[tn]] <- dplyr::filter(x[[tn]], !!dots[[tn]])
    }
-   toRet <- .memo_filtByConta(toRet, data_tables(x), fk)
-   dm <- dm[names(toRet), rmForeignKeys=TRUE]
-   toRet <- .norm_data(toRet,  dm)
    
-   ## Collection members ----
-   cm <- collection_members(x)
-   if(!is.null(cm)){
-      cm <- cm %>% dplyr::filter(.data$table %in% names(toRet))
-   }
-   
-   ## Results ----
-   return(memoMDB(
-      dataTables=toRet,
-      dataModel=dm,
-      dbInfo=db_info(x),
-      collectionMembers=cm
-   ))
+   ## Filter with tables
+   return(filter_with_tables(x, toRet, checkTables=FALSE))
    
 }
 
@@ -568,11 +550,7 @@ slice.memoMDB <- function(.data, ..., .preserve=FALSE){
    
    x <- .data
    
-   ## Identify foreign keys ----
-   dm <- data_model(x)
-   fk <- ReDaMoR::get_foreign_keys(dm)
-   
-   ## Apply rules and propagates the filtering ----
+   ## Apply rules ----
    toRet <- list()
    dots <- list(...)
    if(length(dots)>1){
@@ -584,19 +562,57 @@ slice.memoMDB <- function(.data, ..., .preserve=FALSE){
    }
    i <- dots[[tn]]
    toRet[[tn]] <- dplyr::slice(x[[tn]], i)
-   toRet <- .memo_filtByConta(toRet, data_tables(x), fk)
-   dm <- dm[names(toRet), rmForeignKeys=TRUE]
-   toRet <- .norm_data(toRet,  dm)
+   
+   ## Filter with tables
+   return(filter_with_tables(x, toRet, checkTables=FALSE))
+   
+}
+
+
+###############################################################################@
+#' Filter [memoMDB] object according to provided tables
+#' 
+#' @param x a [memoMDB] object
+#' @param tables a named list of tibbles to filter with. The names should
+#' correspond to the table names in x and the tibbles should fit the
+#' data model.
+#' @param checkTables if TRUE, the tables are confronted to their model
+#' in the data model of x.
+#' 
+#' @return a [memoMDB] object
+#' 
+#' @export
+#'
+filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
+   
+   ## Check the tables ----
+   if(checkTables){
+      for(tn in names(tables)){
+         cr <- ReDaMoR::confront_table_data(data_model(x)[[tn]], tables[[tn]])
+         if(!cr$sucess){
+            stop(sprintf("The %s table does not fit the data model"), tn)
+         }
+      }
+   }
+   
+   ## Identify foreign keys ----
+   dm <- data_model(x)
+   fk <- ReDaMoR::get_foreign_keys(dm)
+   
+   ## Filter by contamination ----
+   tables <- .memo_filtByConta(tables, data_tables(x), fk)
+   dm <- dm[names(tables), rmForeignKeys=TRUE]
+   tables <- .norm_data(tables,  dm)
    
    ## Collection members ----
    cm <- collection_members(x)
    if(!is.null(cm)){
-      cm <- cm %>% dplyr::filter(.data$table %in% names(toRet))
+      cm <- cm %>% dplyr::filter(.data$table %in% names(tables))
    }
    
    ## Results ----
    return(memoMDB(
-      dataTables=toRet,
+      dataTables=tables,
       dataModel=dm,
       dbInfo=db_info(x),
       collectionMembers=cm

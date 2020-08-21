@@ -23,6 +23,6 @@ data model of all the MDBs plus the relational tables}
 A metaMDB object
 }
 \description{
-A metaMDB object is an MDB gathering several other MDBs glued
+A metaMDB object is an MDB gathering several other MDBs glued by
 relational tables.
 }

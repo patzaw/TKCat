@@ -130,6 +130,26 @@ count_records <- function(x, ...){
 
 
 ###############################################################################@
+#' Filter an MDB object according to provided tables
+#' 
+#' @param x an MDB object
+#' @param tables a named list of tibbles to filter with. The names should
+#' correspond to the table names in x and the tibbles should fit the
+#' data model.
+#' @param checkTables if TRUE, the tables are confronted to their model
+#' in the data model of x.
+#' 
+#' @return a [memoMDB] object
+#' 
+#' @export
+#'
+filter_with_tables <- function(x, tables, checkTables=TRUE){
+   UseMethod("filter_with_tables", x)
+}
+
+
+
+###############################################################################@
 #' Write an MDB object
 #'
 #' @param x an MDB object

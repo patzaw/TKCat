@@ -1,10 +1,9 @@
 ###############################################################################@
-###############################################################################@
 # @example inst/examples/metaMDB-examples.R
 #
 #' Create a metaMDB object
 #' 
-#' A metaMDB object is an MDB gathering several other MDBs glued
+#' A metaMDB object is an MDB gathering several other MDBs glued by
 #' relational tables.
 #'
 #' @param MDBs a list of MDB objects
@@ -363,4 +362,172 @@ count_records.metaMDB <- function(x, ...){
 #'
 c.metaMDB <- function(...){
    stop("c() not availble for metaMDB objects. Use join_mdb() instead.")
+}
+
+
+###############################################################################@
+#' Filter [metaMDB] object according to provided tables
+#' 
+#' @param x a [metaMDB] object
+#' @param tables a named list of tibbles to filter with. The names should
+#' correspond to the table names in x and the tibbles should fit the
+#' data model.
+#' @param checkTables if TRUE, the tables are confronted to their model
+#' in the data model of x.
+#' 
+#' @return a [metaMDB] object
+#' 
+#' @export
+#'
+filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
+   
+   ## Check the tables ----
+   if(checkTables){
+      for(tn in names(tables)){
+         cr <- ReDaMoR::confront_table_data(data_model(x)[[tn]], tables[[tn]])
+         if(!cr$sucess){
+            stop(sprintf("The %s table does not fit the data model"), tn)
+         }
+      }
+   }
+   
+   ## Useful information ----
+   oriRT <- unclass(x)$relationalTables
+   rtNames <- names(oriRT)
+   
+   ## Filter the MDBs ----
+   fmdbs <- lapply(
+      MDBs(x),
+      function(y){
+         mdbt <- intersect(names(tables), names(y))
+         if(length(mdbt)>0){
+            toRet <- filter_with_tables(y, tables[mdbt], checkTables=FALSE)
+         }else{
+            toRet <- NULL
+         }
+         return(toRet)
+      }
+   )
+   fmdbs <- fmdbs[which(unlist(lapply(fmdbs, is.MDB)))]
+   
+   ## Get relevant relational tables ----
+   dm <- data_model(x)
+   fk <- ReDaMoR::get_foreign_keys(dm)
+   toTake <- fk %>%
+      dplyr::filter(
+         from %in% rtNames
+      ) %>%
+      dplyr::pull(to) %>% 
+      c(
+         fk %>%
+            dplyr::filter(
+               to %in% rtNames
+            ) %>%
+            dplyr::pull(from)
+      ) %>% 
+      intersect(unlist(lapply(fmdbs, names))) %>% 
+      union(intersect(names(tables), rtNames))
+   
+   ## No relational table to filter on ----
+   if(length(toTake)==0){
+      return(metaMDB(
+         MDBs=fmdbs,
+         relationalTables=list(),
+         dataModel=do.call(c, lapply(fmdbs, data_model)),
+         dbInfo=db_info(x)
+      ))
+   }
+   
+   ## Filter relational tables ----
+   frdb <- c(
+      oriRT,
+      data_tables(x, intersect(names(x), toTake))
+   )
+   frdb <- memoMDB(
+      dataTables=frdb,
+      dataModel=data_model(x)[names(frdb), rmForeignKeys=TRUE],
+      dbInfo=list(name="reltables"),
+      checks=c()
+   )
+   frdb <- filter_with_tables(
+      x=frdb,
+      tables=c(
+         tables[intersect(toTake, rtNames)],
+         do.call(c, lapply(
+            fmdbs, function(y) data_tables(y, intersect(names(y), toTake))
+         ))
+      )
+   )
+   
+   ## Propagate filter -----
+   tables <- data_tables(
+      frdb,
+      intersect(names(frdb), unlist(lapply(MDBs(x), names)))
+   )
+   tables <- c(
+      tables,
+      do.call(c, lapply(fmdbs, function(y){
+         data_tables(y, setdiff(names(y), names(tables)))
+      }))
+   )
+   fmdbs <- lapply(
+      MDBs(x),
+      function(y){
+         mdbt <- intersect(names(tables), names(y))
+         if(length(mdbt)>0){
+            toRet <- filter_with_tables(y, tables[mdbt], checkTables=FALSE)
+         }else{
+            toRet <- NULL
+         }
+         return(toRet)
+      }
+   )
+   fmdbs <- fmdbs[which(unlist(lapply(fmdbs, is.MDB)))]
+   
+   ## Final filter of relational tables ----
+   toTake <- fk %>%
+      dplyr::filter(
+         from %in% rtNames
+      ) %>%
+      dplyr::pull(to) %>% 
+      c(
+         fk %>%
+            dplyr::filter(
+               to %in% rtNames
+            ) %>%
+            dplyr::pull(from)
+      ) %>% 
+      intersect(unlist(lapply(fmdbs, names)))
+   frdb <- c(
+      oriRT,
+      data_tables(x, intersect(names(x), toTake))
+   )
+   frdb <- memoMDB(
+      dataTables=frdb,
+      dataModel=data_model(x)[names(frdb), rmForeignKeys=TRUE],
+      dbInfo=list(name="reltables"),
+      checks=c()
+   )
+   frdb <- filter_with_tables(
+      x=frdb,
+      tables=do.call(c, lapply(
+         fmdbs, function(y) data_tables(y, intersect(names(y), toTake))
+      ))
+   )
+   
+   ## Final object ----
+   toRet <- metaMDB(
+      MDBs=fmdbs,
+      relationalTables=data_tables(
+         frdb,
+         setdiff(names(frdb), unlist(lapply(MDBs(x), names)))
+      ),
+      dataModel=do.call(
+         c,
+         data_model(x)[union(unlist(lapply(fmdbs, names)), names(frdb))]
+      ),
+      dbInfo=db_info(x)
+   )
+   return(toRet)
+   
 }
