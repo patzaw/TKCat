@@ -7,8 +7,13 @@ assign(
    ),
    envir=tkcatEnv
 )
+assign(
+   x="MAPPERS",
+   value=list(),
+   envir=tkcatEnv
+)
 
-## Importing built-in collections when loading the library ----
+## Importing built-in collections and mappers when loading the library ----
 .onLoad <- function(libname, pkgname){
    assign(
       x="COL_SCHEMA",
@@ -28,5 +33,21 @@ assign(
    )
    for(f in files){
       import_local_collection(f)
+   }
+   files <- list.files(
+      path=system.file(
+         "Collections", "Built-in",
+         package=pkgname
+      ),
+      pattern="[-]mapper[.]R$", ignore.case=FALSE,
+      full.names=TRUE
+   )
+   for(f in files){
+      fun <- source(f)$value
+      stopifnot(is.function(fun))
+      import_collection_mapper(
+         collection=sub("[-]mapper[.][R]$", "", basename(f)),
+         fun=fun
+      )
    }
 }

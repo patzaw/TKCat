@@ -1013,9 +1013,11 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
       }
    }
    for(tn in names(d)){
-      .contaminate(tn)
+      if(!is.null(fk)){
+         .contaminate(tn)
+      }
    }
-   if(nrow(fk) > nrow(nfk)){
+   if(!is.null(fk) && nrow(fk) > nrow(nfk)){
       d <- .file_filtByConta(d, fdb, nfk)
    }
    return(d)

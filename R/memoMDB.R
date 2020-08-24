@@ -708,9 +708,11 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       }
    }
    for(tn in names(d)){
-      .contaminate(tn)
+      if(!is.null(fk)){
+         .contaminate(tn)
+      }
    }
-   if(nrow(fk) > nrow(nfk)){
+   if(!is.null(fk) && nrow(fk) > nrow(nfk)){
       d <- .memo_filtByConta(d, all, nfk)
    }
    return(d)
@@ -718,11 +720,15 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
 
 
 .norm_data <- function(dataTables, dataModel){
-   fk <- ReDaMoR::get_foreign_keys(dataModel) %>%
+   toRet <- dataTables
+   fk <- ReDaMoR::get_foreign_keys(dataModel)
+   if(is.null(fk)){
+      return(toRet)
+   }
+   fk <- fk %>%
       filter(
          .data$from %in% names(dataTables) | .data$to %in% names(dataTables)
       )
-   toRet <- dataTables
    .norm_table <- function(tn){
       fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin>0)
       fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin>0)

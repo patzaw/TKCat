@@ -14,12 +14,15 @@ data_model(x, ...)
 
 \method{data_model}{memoMDB}(x, ...)
 
-\method{data_model}{metaMDB}(x, ...)
+\method{data_model}{metaMDB}(x, rtOnly = FALSE, ...)
 }
 \arguments{
 \item{x}{a \link{metaMDB} object}
 
 \item{...}{not used}
+
+\item{rtOnly}{if TRUE, the function only returns the relationTables and
+the foreign tables (default: FALSE)}
 }
 \value{
 A \link[ReDaMoR:RelDataModel]{ReDaMoR::RelDataModel} object
