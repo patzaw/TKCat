@@ -163,3 +163,8 @@ write_MDB <- function(x, path, ...){
    UseMethod("write_MDB", x)
 }
 
+
+## Helpers ----
+.filter_table <- function(x){
+   UseMethod(".filter_table", x)
+}

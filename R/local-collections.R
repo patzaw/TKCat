@@ -79,7 +79,7 @@ get_local_collection <- function(title){
 import_collection_mapper <- function(collection, fun){
    stopifnot(
       is.function(fun),
-      c("x", "y") %in% names(formals(fun)),
+      c("x", "y", "...") %in% names(formals(fun)),
       collection %in% list_local_collections()$title
    )
    toAdd <- list(fun)

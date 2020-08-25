@@ -210,15 +210,15 @@ data_model.metaMDB <- function(x, rtOnly=FALSE, ...){
       fk <- ReDaMoR::get_foreign_keys(toRet)
       toTake <- fk %>%
          dplyr::filter(
-            from %in% rt
+            .data$from %in% rt
          ) %>%
-         dplyr::pull(to) %>% 
+         dplyr::pull("to") %>% 
          c(
             fk %>%
                dplyr::filter(
-                  to %in% rt
+                  .data$to %in% rt
                ) %>%
-               dplyr::pull(from)
+               dplyr::pull("from")
          ) %>% 
          c(rt) %>% 
          unique()
@@ -437,15 +437,15 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
    fk <- ReDaMoR::get_foreign_keys(dm)
    toTake <- fk %>%
       dplyr::filter(
-         from %in% rtNames
+         .data$from %in% rtNames
       ) %>%
-      dplyr::pull(to) %>% 
+      dplyr::pull("to") %>% 
       c(
          fk %>%
             dplyr::filter(
-               to %in% rtNames
+               .data$to %in% rtNames
             ) %>%
-            dplyr::pull(from)
+            dplyr::pull("from")
       ) %>% 
       intersect(unlist(lapply(fmdbs, names))) %>% 
       union(intersect(names(tables), rtNames))
@@ -509,15 +509,15 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
    ## Final filter of relational tables ----
    toTake <- fk %>%
       dplyr::filter(
-         from %in% rtNames
+         .data$from %in% rtNames
       ) %>%
-      dplyr::pull(to) %>% 
+      dplyr::pull("to") %>% 
       c(
          fk %>%
             dplyr::filter(
-               to %in% rtNames
+               .data$to %in% rtNames
             ) %>%
-            dplyr::pull(from)
+            dplyr::pull("from")
       ) %>% 
       intersect(unlist(lapply(fmdbs, names)))
    frdb <- c(
@@ -580,257 +580,3 @@ get_shared_collections <- function(x, y){
    ))
 }
 
-##############################################################################@
-#' Join 2 MDBs
-#' 
-#' @param x an MDB
-#' @param y an MDB
-#' @param by a tibble as returned by the [get_shared_collections()] function
-#' which indicates which collection members should be joined through
-#' a relational table. If the collection is `NA`, the relational table is built
-#' by merging identical columns in table.x and table.y. If the collection
-#' is provided, the relational table is build using
-#' the [map_collection_members()] function.
-#' @param dbInfo a list with DB information:
-#' **"name"** (only mandatory field), "title", "description", "url",
-#' "version", "maintainer".
-#' @param dmAutoLayout if TRUE (default) the layout of the joined data model
-#' is automatically adjusted.
-#' @param ... further parameters for the [map_collection_members()] function.
-#' 
-#' @return a [metaMDB] object
-#' 
-#' @export
-#' 
-full_join_MDBs <- function(
-   x, y,
-   by=get_shared_collections(x, y),
-   dbInfo=list(name=paste(db_info(x)$name, db_info(y)$name, sep="_")),
-   dmAutoLayout=TRUE,
-   ...
-){
-   
-   ## Checks ----
-   stopifnot(
-      is.MDB(x), is.MDB(y),
-      is.data.frame(by),
-      nrow(by)>0,
-      all(
-         c("collection", "mid.x", "table.x", "mid.y", "table.y") %in% 
-         colnames(by)
-      )
-   )
-   by <- dplyr::distinct(by)
-   ic <- dplyr::setdiff(by, get_shared_collections(x, y))
-   if(nrow(ic)>0){
-      if(any(!is.na(ic$collection))){
-         print(ic)
-         stop("Cannot join using the provided collection members")
-      }
-      mt <- setdiff(c(ic$table.x, ic$table.y), c(names(x), names(y)))
-      if(length(mt)>0){
-         stop(
-            "The following tables do not exist: ",
-            paste(mt, collapse=", ")
-         )
-      }
-   }
-   dbInfo <- .check_dbInfo(dbInfo)
-   
-   ## Building the relational tables ----
-   by <- by %>% 
-      dplyr::mutate(
-         rt=ifelse(
-               !is.na(.data$collection),
-               paste(
-                  .data$collection,
-                  .data$mid.x, .data$table.x,
-                  .data$mid.y, .data$table.y,
-                  sep="_"
-               ),
-               paste(
-                  .data$table.x,
-                  .data$table.y,
-                  sep="_"
-               )
-         )
-      )
-   xcm <- collection_members(x)
-   ycm <- collection_members(y)
-   relationalTables <- list()
-   dm <- c(data_model(x), data_model(y))
-   fdm <- unclass(dm)
-   for(i in 1:nrow(by)){
-      byi <- by[i,]
-      
-      ## 
-      if(is.na(byi$collection)){
-         tmx <- dm[[byi$table.x]]$fields
-         tmy <- dm[[byi$table.y]]$fields
-         tmxy <- dplyr::intersect(
-            dplyr::select(tmx, "name", "type"),
-            dplyr::select(tmy, "name", "type")
-         )
-         if(nrow(tmxy)==0){
-            stop(
-               "There is no common field with the same type in",
-               sprintf(
-                  " the provided tables: %s and %s",
-                  byi$table.x, byi$table.y
-               )
-            )
-         }
-         tmxy$nullable <- tmx$nullable[match(tmxy$name, tmx$name)] |
-            tmy$nullable[match(tmxy$name, tmy$name)]
-         tmxy$unique <- tmx$unique[match(tmxy$name, tmx$name)] &
-            tmy$unique[match(tmxy$name, tmy$name)]
-         tmxy$comment <- as.character(NA)
-         
-         relationalTables[[byi$rt]] <- dplyr::bind_rows(
-            x[[byi$table.x]][,tmxy$name],
-            y[[byi$table.y]][,tmxy$name],
-         ) %>% 
-            dplyr::distinct()
-         
-         tm <- ReDaMoR::RelTableModel(list(
-            tableName=byi$rt,
-            fields=tmxy,
-            primaryKey=NULL,
-            foreignKeys=list(
-               list(
-                  refTable=byi$table.x,
-                  key=dplyr::tibble(
-                     from=tmxy$name,
-                     to=tmxy$name
-                  ),
-                  cardinality=c(fmin=0L, fmax=-1L, tmin=0L, tmax=-1L)
-               ),
-               list(
-                  refTable=byi$table.y,
-                  key=dplyr::tibble(
-                     from=tmxy$name,
-                     to=tmxy$name
-                  ),
-                  cardinality=c(fmin=0L, fmax=-1L, tmin=0L, tmax=-1L)
-               )
-            ),
-            indexes=NULL,
-            "display"=list(
-               x=as.numeric(NA), y=as.numeric(NA),
-               color=as.character(NA),
-               comment=as.character(NA)
-            )
-         ))
-         
-      }
-      
-      else{
-      
-         xcmi <- xcm %>% 
-            dplyr::filter(
-               .data$collection==byi$collection,
-               .data$mid==byi$mid.x,
-               .data$table==byi$table.x
-            ) %>% 
-            dplyr::select("field", "static", "value", "type")
-         ycmi <- ycm %>% 
-            dplyr::filter(
-               .data$collection==byi$collection,
-               .data$mid==byi$mid.y,
-               .data$table==byi$table.y
-            ) %>% 
-            dplyr::select("field", "static", "value", "type")
-         
-         dxcmi <- xcmi %>% 
-            dplyr::filter(!.data$static) %>% 
-            dplyr::select("name"="value") %>%
-            dplyr::left_join(dm[[byi$table.x]]$fields, by="name") %>% 
-            dplyr::rename("to"="name") %>% 
-            dplyr::mutate(
-               name=paste(.data$to, byi$table.x, sep="_"),
-               nullable=TRUE, unique=FALSE,
-               refTable=byi$table.x
-            )
-         dycmi <- ycmi %>% 
-            dplyr::filter(!.data$static) %>% 
-            dplyr::select("name"="value") %>%
-            dplyr::left_join(dm[[byi$table.y]]$fields, by="name") %>% 
-            dplyr::rename("to"="name") %>% 
-            dplyr::mutate(
-               name=paste(.data$to, byi$table.y, sep="_"),
-               nullable=TRUE, unique=FALSE,
-               refTable=byi$table.y
-            )
-         tm <- ReDaMoR::RelTableModel(list(
-            tableName=byi$rt,
-            fields=dplyr::bind_rows(
-               select(dxcmi, "name", "type", "nullable", "unique", "comment"),
-               select(dycmi, "name", "type", "nullable", "unique", "comment")
-            ),
-            primaryKey=NULL,
-            foreignKeys=list(
-               list(
-                  refTable=byi$table.x,
-                  key=dplyr::tibble(
-                     from=dxcmi$name,
-                     to=dxcmi$to
-                  ),
-                  cardinality=c(fmin=0L, fmax=-1L, tmin=0L, tmax=-1L)
-               ),
-               list(
-                  refTable=byi$table.y,
-                  key=dplyr::tibble(
-                     from=dycmi$name,
-                     to=dycmi$to
-                  ),
-                  cardinality=c(fmin=0L, fmax=-1L, tmin=0L, tmax=-1L)
-               )
-            ),
-            indexes=NULL,
-            "display"=list(
-               x=as.numeric(NA), y=as.numeric(NA),
-               color=as.character(NA),
-               comment=as.character(NA)
-            )
-         ))
-         
-         ## The relational table
-         nrt <- map_collection_members(
-            x=x[[byi$table.x]],
-            y=y[[byi$table.y]],
-            collection=byi$collection,
-            xm=xcmi,
-            ym=ycmi,
-            suffix=paste0("_", c(byi$table.x, byi$table.y)),
-            ...
-         )
-         for(cn in colnames(nrt)){
-            nrt[,cn] <- as_type(
-               dplyr::pull(nrt, !!cn),
-               tm$fields$type[which(tm$fields$name==cn)]
-            )
-         }
-         relationalTables[[byi$rt]] <- nrt
-      
-      }
-      
-      fdm[[byi$rt]] <- tm
-   }
-   dm <- ReDaMoR::RelDataModel(fdm)
-   
-   
-   ## Final object ----
-   if(dmAutoLayout){
-      dm <- ReDaMoR::auto_layout(dm)
-   }
-   
-   # return(dm)
-   return(metaMDB(
-      MDBs=list(x, y) %>%
-         magrittr::set_names(c(db_info(x)$name, db_info(y)$name)),
-      relationalTables=relationalTables,
-      dataModel=dm,
-      dbInfo=dbInfo
-   ))
-   
-}

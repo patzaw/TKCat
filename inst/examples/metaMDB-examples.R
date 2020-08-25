@@ -9,7 +9,7 @@ rt <- get_shared_collections(cvf, pmf)
 rt[which(rt$collection=="BE"), "table.y"] <- "PubMed_geneByMedgen"
 rt[which(rt$collection=="BE"), "collection"] <- NA
 
-cvpm <- full_join_MDBs(cvf, pmf, by=rt)
+cvpm <- merge(cvf, pmf, by=rt)
 
 scv <- cvf %>% 
    select(
@@ -26,7 +26,7 @@ spm <- pmf %>%
       PubMed_medgenNames=stringr::str_detect(name, "Epilepsy"),
       PubMed_geneByPubmed=entrez %in% c(6505, 9900)
    )
-scvpm <- full_join_MDBs(scv, spm)
+scvpm <- merge(scv, spm)
 
 
 hpcv <- metaMDB(
