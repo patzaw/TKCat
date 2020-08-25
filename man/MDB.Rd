@@ -4,6 +4,7 @@
 \alias{MDB}
 \alias{names.MDB}
 \alias{length.MDB}
+\alias{lengths.MDB}
 \alias{as.list.MDB}
 \alias{select.MDB}
 \alias{pull.MDB}
@@ -13,6 +14,8 @@
 \method{names}{MDB}(x)
 
 \method{length}{MDB}(x)
+
+\method{lengths}{MDB}(x, use.names = TRUE)
 
 \method{as.list}{MDB}(x, ...)
 
@@ -33,6 +36,8 @@
 }
 \arguments{
 \item{x}{an MDB object}
+
+\item{use.names}{return the names of the tables}
 
 \item{...}{additional parameters}
 
@@ -69,6 +74,8 @@ automatically using the \code{\link[=get_collection_mapper]{get_collection_mappe
 \code{names()} returns the table names.
 
 \code{length()} returns the number of tables in x.
+
+\code{lengths()} returns the number of fields for each table in x.
 
 \code{as.list.MDB()} returns a simple list of tibbles with all the
 data from the tables in x.

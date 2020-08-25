@@ -628,12 +628,9 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       ## Backward ----
       fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin>0)
       fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin>0)
-      nfk <<- nfk %>% dplyr::filter(
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkf$from, !!fkf$to, sep="--"),
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkt$from, !!fkt$to, sep="--")
-      )
+      nfk <<- nfk %>%
+         dplyr::anti_join(select(fkf, "from", "to"), by=c("from", "to")) %>% 
+         dplyr::anti_join(select(fkt, "from", "to"), by=c("from", "to"))
       fkl <- dplyr::bind_rows(
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
@@ -647,21 +644,11 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
             }else{
                nv <- all[[ntn]]
             }
-            d[[ntn]] <<- nv %>% dplyr::filter(
-               do.call(
-                  paste,
-                  c(
-                     (!!nv[, fkl$tf[[i]], drop=FALSE]),
-                     list(sep="_")
-                  )
-               ) %in%
-                  do.call(
-                     paste,
-                     c(
-                        (!!d[[tn]][, fkl$ff[[i]], drop=FALSE]),
-                        list(sep="_")
-                     )
-                  )
+            d[[ntn]] <<- dplyr::semi_join(
+               nv, d[[tn]],
+               by=magrittr::set_names(
+                  fkl$ff[[i]], fkl$tf[[i]]
+               )
             )
          }
       }
@@ -669,12 +656,9 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       ## Forward ----
       fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin==0)
       fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin==0)
-      nfk <<- nfk %>% dplyr::filter(
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkf$from, !!fkf$to, sep="--"),
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkt$from, !!fkt$to, sep="--")
-      )
+      nfk <<- nfk %>%
+         dplyr::anti_join(select(fkf, "from", "to"), by=c("from", "to")) %>% 
+         dplyr::anti_join(select(fkt, "from", "to"), by=c("from", "to"))
       fkl <- dplyr::bind_rows(
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
@@ -683,22 +667,13 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
-            toAdd <- all[[ntn]] %>% dplyr::filter(
-               do.call(
-                  paste,
-                  c(
-                     (!!all[[ntn]][, fkl$tf[[i]], drop=FALSE]),
-                     list(sep="_")
-                  )
-               ) %in%
-                  do.call(
-                     paste,
-                     c(
-                        (!!d[[tn]][, fkl$ff[[i]], drop=FALSE]),
-                        list(sep="_")
-                     )
-                  )
+            toAdd <- dplyr::semi_join(
+               all[[ntn]], d[[tn]],
+               by=magrittr::set_names(
+                  fkl$ff[[i]], fkl$tf[[i]]
+               )
             )
+            
             d[[ntn]] <<- dplyr::bind_rows(
                d[[ntn]],
                toAdd
@@ -739,23 +714,12 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
-            nv <- toRet[[ntn]] %>%
-               dplyr::filter(
-                  do.call(
-                     paste,
-                     c(
-                        (!!toRet[[ntn]][, fkl$tf[[i]], drop=FALSE]),
-                        list(sep="_")
-                     )
-                  ) %in%
-                     do.call(
-                        paste,
-                        c(
-                           (!!toRet[[tn]][, fkl$ff[[i]], drop=FALSE]),
-                           list(sep="_")
-                        )
-                     )
+            nv <- dplyr::semi_join(
+               toRet[[ntn]], toRet[[tn]],
+               by=magrittr::set_names(
+                  fkl$ff[[i]], fkl$tf[[i]]
                )
+            )
             if(nrow(nv) < nrow(toRet[[ntn]])){
                toRet[[ntn]] <<- nv
                .norm_table(ntn)

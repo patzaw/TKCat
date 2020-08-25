@@ -884,12 +884,9 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
       ## Backward ----
       fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin>0)
       fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin>0)
-      nfk <<- nfk %>% dplyr::filter(
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkf$from, !!fkf$to, sep="--"),
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkt$from, !!fkt$to, sep="--")
-      )
+      nfk <<- nfk %>%
+         dplyr::anti_join(select(fkf, "from", "to"), by=c("from", "to")) %>% 
+         dplyr::anti_join(select(fkt, "from", "to"), by=c("from", "to"))
       fkl <- dplyr::bind_rows(
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
@@ -899,30 +896,13 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
             if(ntn %in% names(d)){
-               nv <- d[[ntn]] %>% dplyr::filter(
-                  do.call(
-                     paste,
-                     c(
-                        (!!d[[ntn]][, fkl$tf[[i]], drop=FALSE]),
-                        list(sep="_")
-                     )
-                  ) %in%
-                     do.call(
-                        paste,
-                        c(
-                           (!!d[[tn]][, fkl$ff[[i]], drop=FALSE]),
-                           list(sep="_")
-                        )
-                     )
-               )
-            }else{
-               tnv <- do.call(
-                  paste,
-                  c(
-                     d[[tn]][, fkl$ff[[i]], drop=FALSE],
-                     list(sep="_")
+               nv <- dplyr::semi_join(
+                  d[[ntn]], d[[tn]],
+                  by=magrittr::set_names(
+                     fkl$ff[[i]], fkl$tf[[i]]
                   )
                )
+            }else{
                nv <- do.call(
                   readr::read_delim_chunked,
                   c(
@@ -933,16 +913,11 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
                      ),
                      list(
                         callback=readr::DataFrameCallback$new(function(y, pos){
-                           yv <- do.call(
-                              paste,
-                              c(
-                                 (y[, fkl$tf[[i]], drop=FALSE]),
-                                 list(sep="_")
+                           dplyr::semi_join(
+                              y, d[[tn]],
+                              by=magrittr::set_names(
+                                 fkl$ff[[i]], fkl$tf[[i]]
                               )
-                           )
-                           dplyr::filter(
-                              y,
-                              !!yv %in% !!tnv
                            )
                         }),
                         chunk_size=10^5
@@ -957,12 +932,9 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
       ## Forward ----
       fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin==0)
       fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin==0)
-      nfk <<- nfk %>% dplyr::filter(
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkf$from, !!fkf$to, sep="--"),
-         !paste(.data$from, .data$to, sep="--") %in%
-            paste(!!fkt$from, !!fkt$to, sep="--")
-      )
+      nfk <<- nfk %>%
+         dplyr::anti_join(select(fkf, "from", "to"), by=c("from", "to")) %>% 
+         dplyr::anti_join(select(fkt, "from", "to"), by=c("from", "to"))
       fkl <- dplyr::bind_rows(
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
@@ -971,13 +943,6 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
-            tnv <- do.call(
-               paste,
-               c(
-                  d[[tn]][, fkl$ff[[i]], drop=FALSE],
-                  list(sep="_")
-               )
-            )
             toAdd <- do.call(
                readr::read_delim_chunked,
                c(
@@ -988,16 +953,11 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
                   ),
                   list(
                      callback=readr::DataFrameCallback$new(function(y, pos){
-                        yv <- do.call(
-                           paste,
-                           c(
-                              (y[, fkl$tf[[i]], drop=FALSE]),
-                              list(sep="_")
+                        dplyr::semi_join(
+                           y, d[[tn]],
+                           by=magrittr::set_names(
+                              fkl$ff[[i]], fkl$tf[[i]]
                            )
-                        )
-                        dplyr::filter(
-                           y,
-                           !!yv %in% !!tnv
                         )
                      }),
                      chunk_size=10^5

@@ -60,6 +60,8 @@ length.MDB <- function(x){
 #' 
 #' @return `lengths()` returns the number of fields for each table in x.
 #' 
+#' @rdname MDB
+#' 
 #' @export
 #'
 lengths.MDB <- function(x, use.names=TRUE){
