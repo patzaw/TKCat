@@ -2,12 +2,27 @@
 % Please edit documentation in R/metaMDB.R
 \name{metaMDB}
 \alias{metaMDB}
-\title{Create a metaMDB object}
+\alias{names<-.metaMDB}
+\alias{rename.metaMDB}
+\alias{[.metaMDB}
+\alias{[[.metaMDB}
+\alias{$.metaMDB}
+\title{A metaMDB object}
 \usage{
 metaMDB(MDBs, relationalTables, dataModel, dbInfo)
+
+\method{names}{metaMDB}(x) <- value
+
+\method{rename}{metaMDB}(.data, ...)
+
+\method{[}{metaMDB}(x, i)
+
+\method{[[}{metaMDB}(x, i)
+
+\method{$}{metaMDB}(x, i)
 }
 \arguments{
-\item{MDBs}{a list of MDB objects}
+\item{MDBs}{a list of \link{MDB} objects}
 
 \item{relationalTables}{a list of tibbles corresponding to the relational
 tables between the different MDBs}
@@ -18,11 +33,30 @@ data model of all the MDBs plus the relational tables}
 \item{dbInfo}{a list with DB information:
 \strong{"name"} (only mandatory field), "title", "description", "url",
 "version", "maintainer".}
+
+\item{x}{a \link{metaMDB} object}
+
+\item{value}{new table names}
+
+\item{.data}{a memoMDB}
+
+\item{...}{Use new_name = old_name to rename selected tables}
+
+\item{i}{the index or the name of the tables to take}
 }
 \value{
 A metaMDB object
 }
 \description{
-A metaMDB object is an MDB gathering several other MDBs glued by
+A metaMDB object is an \link{MDB} gathering several other MDBs glued by
 relational tables.
+}
+\seealso{
+\itemize{
+\item MDB methods:
+\link{db_info}, \link{data_model}, \link{data_tables}, \link{collection_members},
+\link{count_records}, \link{filter_with_tables}, \link{write_MDB}
+\item Additional general documentation is related to \link{MDB}.
+\item \link{filter.metaMDB}, \link{slice.metaMDB}
+}
 }

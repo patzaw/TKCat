@@ -4,18 +4,27 @@
 \name{collection_members.chTKCat}
 \alias{collection_members.chTKCat}
 \alias{collection_members.fileMDB}
+\alias{collection_members<-.fileMDB}
 \alias{collection_members}
+\alias{collection_members<-}
 \alias{collection_members.memoMDB}
+\alias{collection_members<-.memoMDB}
 \alias{collection_members.metaMDB}
-\title{Get collection members}
+\title{Collection members}
 \usage{
 \method{collection_members}{chTKCat}(x, ...)
 
 \method{collection_members}{fileMDB}(x, ...)
 
+\method{collection_members}{fileMDB}(x) <- value
+
 collection_members(x, ...)
 
+collection_members(x) <- value
+
 \method{collection_members}{memoMDB}(x, ...)
+
+\method{collection_members}{memoMDB}(x) <- value
 
 \method{collection_members}{metaMDB}(x, ...)
 }
@@ -24,6 +33,21 @@ collection_members(x, ...)
 
 \item{...}{names of the collections
 to focus on. By default, all of them are taken.}
+
+\item{value}{A data.frame with the following columns:
+\itemize{
+\item \strong{collection} (character): The name of the collection
+\item \strong{cid} (character): Collection identifier
+\item \strong{resource} (character): The name of the resource
+\item \strong{mid} (integer): The identifier of the member
+\item \strong{table} (character): The table recording collection information
+\item \strong{field} (character): The collection field.
+\item \strong{static} (logical): TRUE if the field value is common to all elements.
+\item \strong{value} (character): The name of the table column if static is FALSE
+or the field value if static is TRUE.
+\item \strong{type} (character): the type of the field.
+(not necessarily used ==> NA if not)
+}}
 }
 \value{
 A \link[tibble:tibble]{tibble::tibble} with the following columns:
@@ -42,5 +66,7 @@ or the field value if static is TRUE.
 }
 }
 \description{
-Get collection members
+Collection members
+
+Collection members
 }

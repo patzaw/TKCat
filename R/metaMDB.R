@@ -1,12 +1,12 @@
 ###############################################################################@
 # @example inst/examples/metaMDB-examples.R
 #
-#' Create a metaMDB object
+#' A metaMDB object
 #' 
-#' A metaMDB object is an MDB gathering several other MDBs glued by
+#' A metaMDB object is an [MDB] gathering several other MDBs glued by
 #' relational tables.
 #'
-#' @param MDBs a list of MDB objects
+#' @param MDBs a list of [MDB] objects
 #' @param relationalTables a list of tibbles corresponding to the relational
 #' tables between the different MDBs
 #' @param dataModel a [ReDaMoR::RelDataModel] object gathering all the
@@ -17,6 +17,12 @@
 #'
 #' @return A metaMDB object
 #' 
+#' @seealso
+#' - MDB methods:
+#' [db_info], [data_model], [data_tables], [collection_members],
+#' [count_records], [filter_with_tables], [write_MDB]
+#' - Additional general documentation is related to [MDB].
+#' - [filter.metaMDB], [slice.metaMDB]
 #'
 #' @export
 #'
@@ -122,6 +128,12 @@ MDBs <- function(x){
 
 
 ###############################################################################@
+#' 
+#' @param x a [metaMDB] object
+#' @param value new table names
+#' 
+#' @rdname metaMDB
+#' 
 #' @export
 #'
 'names<-.metaMDB' <- function(x, value){
@@ -147,6 +159,12 @@ MDBs <- function(x){
 
 
 ###############################################################################@
+#'
+#' @param .data a memoMDB
+#' @param ... Use new_name = old_name to rename selected tables
+#' 
+#' @rdname metaMDB
+#' 
 #' @export
 #' 
 rename.metaMDB <- function(.data, ...){
@@ -178,7 +196,7 @@ db_info.metaMDB <- function(x, ...){
 #' "name", "title", "description", "url",
 #' "version", "maintainer".
 #' 
-#' @rdname db_info-set
+#' @rdname db_info
 #' @method db_info<- metaMDB
 #' 
 #' @export
@@ -302,6 +320,12 @@ count_records.metaMDB <- function(x, ...){
 
 
 ###############################################################################@
+#' 
+#' @param x a [metaMDB] object
+#' @param i index or names of the tables to take
+#' 
+#' @rdname metaMDB
+#' 
 #' @export
 #'
 '[.metaMDB' <- function(x, i){
@@ -353,6 +377,12 @@ count_records.metaMDB <- function(x, ...){
 
 
 ###############################################################################@
+#' 
+#' @param x a [metaMDB] object
+#' @param i the index or the name of the tables to take
+#' 
+#' @rdname metaMDB
+#' 
 #' @export
 #'
 '[[.metaMDB' <- function(x, i){
@@ -375,6 +405,8 @@ count_records.metaMDB <- function(x, ...){
       }
    }
 }
+#' @rdname metaMDB
+#' 
 #' @export
 '$.metaMDB' <- `[[.metaMDB`
 
@@ -385,6 +417,100 @@ count_records.metaMDB <- function(x, ...){
 c.metaMDB <- function(...){
    stop("c() not availble for metaMDB objects. Use join_mdb() instead.")
 }
+
+
+###############################################################################@
+#' Filter a [metaMDB] object
+#' 
+#' @param .data a [metaMDB] object
+#' @param ... each argument should have the name of one of the tables of the
+#' [metaMDB] object and contain a simple logical expression involving
+#' the names of the corresponding table.
+#' @param .preserve not used
+#' 
+#' @return a filtered [memoMDB] object
+#' 
+#' @export
+#'
+filter.metaMDB <- function(.data, ..., .preserve=FALSE){
+   
+   x <- .data
+   
+   ## Useful information ----
+   oriRT <- unclass(x)$relationalTables
+   rtNames <- names(oriRT)
+   
+   ## Filter each MDB ----
+   dots <- enquos(...)
+   fdt <- lapply(
+      MDBs(x),
+      function(y){
+         mdbt <- intersect(names(dots), names(y))
+         if(length(mdbt)>0){
+            sdots <- dots[mdbt]
+            toRet <- dplyr::filter(y, !!!sdots) %>% data_tables()
+         }else{
+            toRet <- NULL
+         }
+         return(toRet)
+      }
+   )
+   names(fdt) <- NULL
+   fdt <- do.call(c, fdt)
+   mdbt <- intersect(names(dots), rtNames)
+   if(length(mdbt)>0){
+      toAdd <- memoMDB(
+         dataTables=oriRT,
+         dataModel=data_model(x)[rtNames, rmForeignKeys=TRUE],
+         dbInfo=list(name="reltables"),
+         checks=c()
+      ) %>%
+         dplyr::filter(dots[mdbt]) %>% 
+         data_tables()
+      fdt <- c(fdt, toAdd)
+   }
+   
+   ## Filter with tables
+   return(filter_with_tables(x, fdt, checkTables=FALSE))
+   
+}
+
+
+###############################################################################@
+#' Subset a [metaMDB] object according to row position in one table
+#' 
+#' @param .data a [metaMDB] object
+#' @param ... a single argument. The name of this argument should be a table
+#' name of x and the value of this argument should be vector of integers
+#' corresponding to row indexes.
+#' @param .preserve not used
+#' 
+#' @return a [memoMDB] object
+#' 
+#' @export
+#'
+slice.metaMDB <- function(.data, ..., .preserve=FALSE){
+   
+   x <- .data
+   
+   ## Apply rules ----
+   toRet <- list()
+   dots <- list(...)
+   if(length(dots)>1){
+      stop("Only one argument should be supplied in '...'")
+   }
+   tn <- names(dots)
+   if(!tn %in% names(x)){
+      stop(sprintf("%s table does not exist", tn))
+   }
+   i <- dots[[tn]]
+   toRet[[tn]] <- dplyr::slice(x[[tn]], i)
+   
+   ## Filter with tables
+   return(filter_with_tables(x, toRet, checkTables=FALSE))
+   
+}
+
 
 
 ###############################################################################@
@@ -399,6 +525,9 @@ c.metaMDB <- function(...){
 #' 
 #' @return a [metaMDB] object
 #' 
+#' @rdname filter_with_tables
+#' @method filter_with_tables metaMDB
+#' 
 #' @export
 #'
 filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
@@ -407,7 +536,7 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
    if(checkTables){
       for(tn in names(tables)){
          cr <- ReDaMoR::confront_table_data(data_model(x)[[tn]], tables[[tn]])
-         if(!cr$sucess){
+         if(!cr$success){
             stop(sprintf("The %s table does not fit the data model"), tn)
          }
       }
@@ -449,38 +578,29 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
       ) %>% 
       intersect(unlist(lapply(fmdbs, names))) %>% 
       union(intersect(names(tables), rtNames))
-   
+
    ## No relational table to filter on ----
    if(length(toTake)==0){
       return(metaMDB(
          MDBs=fmdbs,
          relationalTables=list(),
-         dataModel=do.call(c, lapply(fmdbs, data_model)),
+         dataModel=do.call(c, set_names(lapply(fmdbs, data_model), NULL)),
          dbInfo=db_info(x)
       ))
    }
    
    ## Filter relational tables ----
-   frdb <- c(
-      oriRT,
-      data_tables(x, intersect(names(x), toTake))
-   )
-   frdb <- memoMDB(
-      dataTables=frdb,
-      dataModel=data_model(x)[names(frdb), rmForeignKeys=TRUE],
-      dbInfo=list(name="reltables"),
-      checks=c()
-   )
+   frdb <- as_memoMDB(x[names(data_model(x, rtOnly=TRUE))])
    frdb <- filter_with_tables(
       x=frdb,
       tables=c(
          tables[intersect(toTake, rtNames)],
-         do.call(c, lapply(
+         do.call(c, set_names(lapply(
             fmdbs, function(y) data_tables(y, intersect(names(y), toTake))
-         ))
+         ), NULL))
       )
    )
-   
+
    ## Propagate filter -----
    tables <- data_tables(
       frdb,
@@ -488,9 +608,9 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
    )
    tables <- c(
       tables,
-      do.call(c, lapply(fmdbs, function(y){
+      do.call(c, set_names(lapply(fmdbs, function(y){
          data_tables(y, setdiff(names(y), names(tables)))
-      }))
+      }), NULL))
    )
    fmdbs <- lapply(
       MDBs(x),
@@ -507,36 +627,27 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
    fmdbs <- fmdbs[which(unlist(lapply(fmdbs, is.MDB)))]
    
    ## Final filter of relational tables ----
-   toTake <- fk %>%
-      dplyr::filter(
-         .data$from %in% rtNames
-      ) %>%
-      dplyr::pull("to") %>% 
-      c(
-         fk %>%
-            dplyr::filter(
-               .data$to %in% rtNames
-            ) %>%
-            dplyr::pull("from")
-      ) %>% 
-      intersect(unlist(lapply(fmdbs, names)))
-   frdb <- c(
-      oriRT,
-      data_tables(x, intersect(names(x), toTake))
-   )
-   frdb <- memoMDB(
-      dataTables=frdb,
-      dataModel=data_model(x)[names(frdb), rmForeignKeys=TRUE],
-      dbInfo=list(name="reltables"),
-      checks=c()
-   )
-   frdb <- filter_with_tables(
-      x=frdb,
-      tables=do.call(c, lapply(
-         fmdbs, function(y) data_tables(y, intersect(names(y), toTake))
-      ))
-   )
-   
+   # toTake <- fk %>%
+   #    dplyr::filter(
+   #       .data$from %in% rtNames
+   #    ) %>%
+   #    dplyr::pull("to") %>% 
+   #    c(
+   #       fk %>%
+   #          dplyr::filter(
+   #             .data$to %in% rtNames
+   #          ) %>%
+   #          dplyr::pull("from")
+   #    ) %>% 
+   #    intersect(unlist(lapply(fmdbs, names)))
+   # frdb <- as_memoMDB(x[names(data_model(x, rtOnly=TRUE))])
+   # frdb <- filter_with_tables(
+   #    x=frdb,
+   #    tables=do.call(c, set_names(lapply(
+   #       fmdbs, function(y) data_tables(y, intersect(names(y), toTake))
+   #    ), NULL))
+   # )
+
    ## Final object ----
    toRet <- metaMDB(
       MDBs=fmdbs,
@@ -544,10 +655,10 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
          frdb,
          setdiff(names(frdb), unlist(lapply(MDBs(x), names)))
       ),
-      dataModel=do.call(
-         c,
-         data_model(x)[union(unlist(lapply(fmdbs, names)), names(frdb))]
-      ),
+      dataModel=data_model(x)[
+         union(unlist(lapply(fmdbs, names)), names(frdb)),
+         rmForeignKeys=TRUE
+      ],
       dbInfo=db_info(x)
    )
    return(toRet)

@@ -2,7 +2,13 @@
 % Please edit documentation in R/fileMDB.R
 \name{fileMDB}
 \alias{fileMDB}
-\title{Create an MDB (Modeled DataBase) based on files: fileMDB}
+\alias{names<-.fileMDB}
+\alias{rename.fileMDB}
+\alias{[.fileMDB}
+\alias{[[.fileMDB}
+\alias{$.fileMDB}
+\alias{c.fileMDB}
+\title{An \link{MDB} (Modeled DataBase) based on files: fileMDB}
 \usage{
 fileMDB(
   dataFiles,
@@ -13,6 +19,18 @@ fileMDB(
   n_max = 10,
   verbose = FALSE
 )
+
+\method{names}{fileMDB}(x) <- value
+
+\method{rename}{fileMDB}(.data, ...)
+
+\method{[}{fileMDB}(x, i)
+
+\method{[[}{fileMDB}(x, i)
+
+\method{$}{fileMDB}(x, i)
+
+\method{c}{fileMDB}(...)
 }
 \arguments{
 \item{dataFiles}{a named vector of path to data files with
@@ -34,12 +52,22 @@ fileMDB(
 for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}
 
 \item{verbose}{if TRUE display the data confrontation report}
+
+\item{x}{a \link{fileMDB} object}
+
+\item{value}{new table names}
+
+\item{.data}{a fileMDB}
+
+\item{...}{\link{fileMDB} objects}
+
+\item{i}{the index or the name of the tables to take}
 }
 \value{
 A \link{fileMDB} object
 }
 \description{
-Create an MDB (Modeled DataBase) based on files: fileMDB
+An \link{MDB} (Modeled DataBase) based on files: fileMDB
 }
 \examples{
 library(devTKCat)
@@ -80,5 +108,14 @@ if(requireNamespace("stringr", quietly = TRUE)){
       hpof,
       HPO_diseases=!!cn==!!label
    )
+}
+}
+\seealso{
+\itemize{
+\item MDB methods:
+\link{db_info}, \link{data_model}, \link{data_tables}, \link{collection_members},
+\link{count_records}, \link{filter_with_tables}, \link{write_MDB}
+\item Additional general documentation is related to \link{MDB}.
+\item \link{filter.fileMDB}, \link{slice.fileMDB}
 }
 }

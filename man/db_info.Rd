@@ -3,23 +3,39 @@
 %   R/metaMDB.R
 \name{db_info.fileMDB}
 \alias{db_info.fileMDB}
+\alias{db_info<-.fileMDB}
 \alias{db_info}
+\alias{db_info<-}
 \alias{db_info.memoMDB}
+\alias{db_info<-.memoMDB}
 \alias{db_info.metaMDB}
-\title{Get DB information}
+\alias{db_info<-.metaMDB}
+\title{DB information}
 \usage{
 \method{db_info}{fileMDB}(x, ...)
 
+\method{db_info}{fileMDB}(x) <- value
+
 db_info(x, ...)
+
+db_info(x) <- value
 
 \method{db_info}{memoMDB}(x, ...)
 
+\method{db_info}{memoMDB}(x) <- value
+
 \method{db_info}{metaMDB}(x, ...)
+
+\method{db_info}{metaMDB}(x) <- value
 }
 \arguments{
 \item{x}{a \link{metaMDB} object}
 
 \item{...}{not used}
+
+\item{value}{a list with DB information:
+"name", "title", "description", "url",
+"version", "maintainer".}
 }
 \value{
 A list with the following elements:
@@ -34,5 +50,7 @@ A list with the following elements:
 }
 }
 \description{
-Get DB information
+DB information
+
+DB information
 }

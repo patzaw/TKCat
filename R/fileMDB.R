@@ -1,5 +1,5 @@
 ###############################################################################@
-#' Create an MDB (Modeled DataBase) based on files: fileMDB
+#' An [MDB] (Modeled DataBase) based on files: fileMDB
 #' 
 #' @param dataFiles a named vector of path to data files with
 #' `all(names(dataFiles) %in% names(dataModel))`
@@ -16,6 +16,13 @@
 #' @param verbose if TRUE display the data confrontation report
 #'
 #' @return A [fileMDB] object
+#' 
+#' @seealso
+#' - MDB methods:
+#' [db_info], [data_model], [data_tables], [collection_members],
+#' [count_records], [filter_with_tables], [write_MDB]
+#' - Additional general documentation is related to [MDB].
+#' - [filter.fileMDB], [slice.fileMDB]
 #' 
 #' @example inst/examples/fileMDB-examples.R
 #' 
@@ -258,6 +265,12 @@ is.fileMDB <- function(x){
 
 
 ###############################################################################@
+#' 
+#' @param x a [fileMDB] object
+#' @param value new table names
+#' 
+#' @rdname fileMDB
+#' 
 #' @export
 #'
 'names<-.fileMDB' <- function(x, value){
@@ -283,6 +296,12 @@ is.fileMDB <- function(x){
 
 
 ###############################################################################@
+#'
+#' @param .data a fileMDB
+#' @param ... Use new_name = old_name to rename selected tables
+#'  
+#' @rdname fileMDB
+#' 
 #' @export
 #' 
 rename.fileMDB <- function(.data, ...){
@@ -315,7 +334,7 @@ db_info.fileMDB <- function(x, ...){
 #' "name", "title", "description", "url",
 #' "version", "maintainer".
 #' 
-#' @rdname db_info-set
+#' @rdname db_info
 #' @method db_info<- fileMDB
 #' 
 #' @export
@@ -387,7 +406,7 @@ collection_members.fileMDB <- function(
 #' - **type** (character): the type of the field.
 #' (not necessarily used ==> NA if not)
 #' 
-#' @rdname collection_members-set
+#' @rdname collection_members
 #' @method collection_members<- fileMDB
 #' 
 #' @export
@@ -541,6 +560,12 @@ data_files <- function(x){
 
 
 ###############################################################################@
+#' 
+#' @param x a [fileMDB] object
+#' @param i index or names of the tables to take
+#'
+#' @rdname fileMDB
+#' 
 #' @export
 #'
 '[.fileMDB' <- function(x, i){
@@ -590,7 +615,13 @@ data_files <- function(x){
 
 
 ###############################################################################@
+#' 
+#' @param x a [fileMDB] object
+#' @param i the index or the name of the tables to take
+#' 
 #' @export
+#'
+#' @rdname fileMDB
 #'
 '[[.fileMDB' <- function(x, i){
    stopifnot(
@@ -612,11 +643,17 @@ data_files <- function(x){
       }
    }
 }
+#' @rdname fileMDB
 #' @export
 '$.fileMDB' <- `[[.fileMDB`
 
 
 ###############################################################################@
+#'
+#' @param ... [fileMDB] objects
+#'
+#' @rdname fileMDB
+#' 
 #' @export
 #'
 c.fileMDB <- function(...){
@@ -832,6 +869,9 @@ slice.fileMDB <- function(.data, ..., .preserve=FALSE){
 #' 
 #' @return a [memoMDB] object
 #' 
+#' @rdname filter_with_tables
+#' @method filter_with_tables fileMDB
+#' 
 #' @export
 #'
 filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
@@ -840,7 +880,7 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
    if(checkTables){
       for(tn in names(tables)){
          cr <- ReDaMoR::confront_table_data(data_model(x)[[tn]], tables[[tn]])
-         if(!cr$sucess){
+         if(!cr$success){
             stop(sprintf("The %s table does not fit the data model"), tn)
          }
       }

@@ -1,5 +1,5 @@
 ###############################################################################@
-#' Get DB information
+#' DB information
 #' 
 #' @param x an object with embedded database information
 #' 
@@ -19,7 +19,7 @@ db_info <- function(x, ...){
 }
 
 ###############################################################################@
-#' Set DB information
+#' DB information
 #' 
 #' @param x an object with embedded database information
 #' 
@@ -31,6 +31,8 @@ db_info <- function(x, ...){
 #' - **version**: a single character
 #' - **maintainer**: a single character vector
 #' - **size**: a numeric vector providing the size of the DB in bytes
+#' 
+#' @rdname db_info
 #'
 #' @export
 #'
@@ -54,7 +56,7 @@ data_model <- function(x, ...){
 
 
 ###############################################################################@
-#' Get collection members
+#' Collection members
 #' 
 #' @param x an object with embedded collection members
 #' 
@@ -78,7 +80,7 @@ collection_members <- function(x, ...){
 }
 
 ###############################################################################@
-#' Set collection members
+#' Collection members
 #' 
 #' @param x an object with embedded collection members
 #' @param value the new collection members.
@@ -94,6 +96,8 @@ collection_members <- function(x, ...){
 #' or the field value if static is TRUE.
 #' - **type** (character): the type of the field.
 #' (not necessarily used ==> NA if not)
+#' 
+#' @rdname collection_members
 #'
 #' @export
 #'

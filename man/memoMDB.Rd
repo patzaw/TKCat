@@ -2,7 +2,13 @@
 % Please edit documentation in R/memoMDB.R
 \name{memoMDB}
 \alias{memoMDB}
-\title{Create an MDB (Modeled DataBase) in memory: memoMDB}
+\alias{names<-.memoMDB}
+\alias{rename.memoMDB}
+\alias{[.memoMDB}
+\alias{[[.memoMDB}
+\alias{$.memoMDB}
+\alias{c.memoMDB}
+\title{An \link{MDB} (Modeled DataBase) in memory: memoMDB}
 \usage{
 memoMDB(
   dataTables,
@@ -12,6 +18,18 @@ memoMDB(
   checks = c("unique", "not nullable", "foreign keys"),
   verbose = FALSE
 )
+
+\method{names}{memoMDB}(x) <- value
+
+\method{rename}{memoMDB}(.data, ...)
+
+\method{[}{memoMDB}(x, i)
+
+\method{[[}{memoMDB}(x, i)
+
+\method{$}{memoMDB}(x, i)
+
+\method{c}{memoMDB}(...)
 }
 \arguments{
 \item{dataTables}{a list of tibbles}
@@ -30,12 +48,22 @@ done (all of them c("unique", "not nullable", "foreign keys"))}
 
 \item{verbose}{if TRUE display the data confrontation report
 (default: FALSE)}
+
+\item{x}{a \link{memoMDB} object}
+
+\item{value}{new table names}
+
+\item{.data}{a memoMDB}
+
+\item{...}{\link{memoMDB} objects}
+
+\item{i}{the index or the name of the tables to take}
 }
 \value{
 A memoMDB object
 }
 \description{
-Create an MDB (Modeled DataBase) in memory: memoMDB
+An \link{MDB} (Modeled DataBase) in memory: memoMDB
 }
 \examples{
 library(devTKCat)
@@ -67,5 +95,14 @@ if(requireNamespace("stringr", quietly = TRUE)){
       )
    )
    count_records(epilHP)
+}
+}
+\seealso{
+\itemize{
+\item MDB methods:
+\link{db_info}, \link{data_model}, \link{data_tables}, \link{collection_members},
+\link{count_records}, \link{filter_with_tables}, \link{write_MDB}
+\item Additional general documentation is related to \link{MDB}.
+\item \link{filter.memoMDB}, \link{slice.memoMDB}
 }
 }

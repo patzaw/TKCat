@@ -2,7 +2,16 @@
 #' MDB
 #' 
 #' The class "MDB" provides general functions for handling
-#' modeled databases
+#' modeled databases. 
+#' The MDB classes implemented in the TKCat package
+#' are: [fileMDB], [memoMDB], chMDB and [metaMDB].
+#' These classes provide additional functions.
+#' 
+#' @seealso MDB methods:
+#' [db_info], [data_model], [data_tables], [collection_members],
+#' [count_records], [filter_with_tables], [write_MDB]
+#' Additional documentation is provided for each specific class:
+#' [fileMDB], [memoMDB], chMDB and [metaMDB].
 #' 
 #' @name MDB
 #' 
@@ -294,10 +303,10 @@ compare_MDB <- function(former, new){
    ## Collection members ----
    ccm <- collection_members(former)
    if(!is.null(ccm)){
-      ccm <- ccm %>% dplyr::arrange_all()
+      ccm <- ccm %>% dplyr::select(-"resource") %>% dplyr::arrange_all()
       ccoll <- ccm %>%
          dplyr::distinct(
-            .data$resource, .data$collection, .data$table, .data$mid
+            .data$collection, .data$table, .data$mid
          ) %>%
          nrow
    }else{
@@ -305,10 +314,10 @@ compare_MDB <- function(former, new){
    }
    ncm <- collection_members(new)
    if(!is.null(ncm)){
-      ncm <- ncm %>% dplyr::arrange_all()
+      ncm <- ncm %>% dplyr::select(-"resource") %>% dplyr::arrange_all()
       ncoll <- ncm %>%
          dplyr::distinct(
-            .data$resource, .data$collection, .data$table, .data$mid
+            .data$collection, .data$table, .data$mid
          ) %>%
          nrow
    }else{

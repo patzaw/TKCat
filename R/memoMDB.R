@@ -1,5 +1,5 @@
 ###############################################################################@
-#' Create an MDB (Modeled DataBase) in memory: memoMDB
+#' An [MDB] (Modeled DataBase) in memory: memoMDB
 #'
 #' @param dataTables a list of tibbles
 #' @param dataModel a [ReDaMoR::RelDataModel] object
@@ -14,6 +14,13 @@
 #' (default: FALSE)
 #'
 #' @return A memoMDB object
+#' 
+#' @seealso
+#' - MDB methods:
+#' [db_info], [data_model], [data_tables], [collection_members],
+#' [count_records], [filter_with_tables], [write_MDB]
+#' - Additional general documentation is related to [MDB].
+#' - [filter.memoMDB], [slice.memoMDB]
 #' 
 #' @example inst/examples/memoMDB-examples.R
 #'
@@ -84,17 +91,27 @@ is.memoMDB <- function(x){
 #'
 as_memoMDB <- function(x, ...){
    stopifnot(is.MDB(x))
+   cm <- collection_members(x)
+   if(!is.null(cm)){
+      cm$resource <- db_info(x)$name
+   }
    return(memoMDB(
       dataTables=data_tables(x),
       dataModel=data_model(x),
       dbInfo=db_info(x),
-      collectionMembers=collection_members(x),
+      collectionMembers=cm,
       ...
    ))
 }
 
 
 ###############################################################################@
+#' 
+#' @param x a [memoMDB] object
+#' @param value new table names
+#' 
+#' @rdname memoMDB
+#' 
 #' @export
 #'
 'names<-.memoMDB' <- function(x, value){
@@ -120,6 +137,11 @@ as_memoMDB <- function(x, ...){
 
 
 ###############################################################################@
+#'
+#' @param .data a memoMDB
+#' @param ... Use new_name = old_name to rename selected tables
+#' 
+#' @rdname memoMDB
 #' @export
 #' 
 rename.memoMDB <- function(.data, ...){
@@ -151,7 +173,7 @@ db_info.memoMDB <- function(x, ...){
 #' "name", "title", "description", "url",
 #' "version", "maintainer".
 #' 
-#' @rdname db_info-set
+#' @rdname db_info
 #' @method db_info<- memoMDB
 #' 
 #' @export
@@ -223,7 +245,7 @@ collection_members.memoMDB <- function(
 #' - **type** (character): the type of the field.
 #' (not necessarily used ==> NA if not)
 #' 
-#' @rdname collection_members-set
+#' @rdname collection_members
 #' @method collection_members<- memoMDB
 #' 
 #' @export
@@ -330,6 +352,12 @@ count_records.memoMDB <- function(x, ...){
 
 
 ###############################################################################@
+#' 
+#' @param x a [memoMDB] object
+#' @param i index or names of the tables to take
+#' 
+#' @rdname memoMDB
+#' 
 #' @export
 #'
 '[.memoMDB' <- function(x, i){
@@ -375,6 +403,12 @@ count_records.memoMDB <- function(x, ...){
 
 
 ###############################################################################@
+#' 
+#' @param x a [memoMDB] object
+#' @param i the index or the name of the tables to take
+#' 
+#' @rdname memoMDB
+#' 
 #' @export
 #'
 '[[.memoMDB' <- function(x, i){
@@ -383,11 +417,18 @@ count_records.memoMDB <- function(x, ...){
    )
    return(data_tables(x, i)[[1]])
 }
+#' @rdname memoMDB
+#' 
 #' @export
 '$.memoMDB' <- `[[.memoMDB`
 
 
 ###############################################################################@
+#'
+#' @param ... [memoMDB] objects
+#' 
+#' @rdname memoMDB
+#' 
 #' @export
 #'
 c.memoMDB <- function(...){
@@ -581,6 +622,9 @@ slice.memoMDB <- function(.data, ..., .preserve=FALSE){
 #' 
 #' @return a [memoMDB] object
 #' 
+#' @rdname filter_with_tables
+#' @method filter_with_tables memoMDB
+#' 
 #' @export
 #'
 filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
@@ -589,7 +633,7 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
    if(checkTables){
       for(tn in names(tables)){
          cr <- ReDaMoR::confront_table_data(data_model(x)[[tn]], tables[[tn]])
-         if(!cr$sucess){
+         if(!cr$success){
             stop(sprintf("The %s table does not fit the data model"), tn)
          }
       }
