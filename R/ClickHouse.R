@@ -199,19 +199,6 @@ ch_insert <- function(
    on.exit(RClickhouse::dbSendQuery(con, "USE default"))
    
    if(nrow(value)>0){
-      # classes <- unlist(lapply(value, function(v){
-      #    class(v)[[1]]
-      # }))
-      # for (c in names(classes[classes=="character"])) {
-      #    # value[[c]] <- .Internal(setEncoding(value[[c]], "UTF-8"))
-      #    Encoding(value[[c]]) <- "UTF-8"
-      # }
-      # for (c in names(classes[classes=="factor"])) {
-      #    # levels(value[[c]]) <- .Internal(setEncoding(
-      #    #    levels(value[[c]]), "UTF-8"
-      #    # ))
-      #    Encoding(levels(value[[c]])) <- "UTF-8"
-      # }
       s <- by*(0:(nrow(value)%/%by))
       e <- c(s[-1], nrow(value))
       s <- s+1
@@ -219,11 +206,10 @@ ch_insert <- function(
       e <- e[which(!duplicated(e))]
       for(i in 1:length(s)){
          em <- try(
-            # RClickhouse:::insert(con@ptr, qname, value[s[i]:e[i],,drop=FALSE]),
             DBI::dbWriteTable(
                con,
                tableName, #qname,
-               value[s[i]:e[i],,drop=FALSE],
+               dplyr::select(value, s[i]:e[i]),
                append=TRUE
             ),
             silent=TRUE
