@@ -20,7 +20,7 @@
 #' @seealso
 #' - MDB methods:
 #' [db_info], [data_model], [data_tables], [collection_members],
-#' [count_records], [filter_with_tables], [write_MDB]
+#' [count_records], [filter_with_tables], [as_fileMDB]
 #' - Additional general documentation is related to [MDB].
 #' - [filter.fileMDB], [slice.fileMDB]
 #' 
@@ -296,11 +296,10 @@ is.fileMDB <- function(x){
 
 
 ###############################################################################@
+#' Rename tables of a [fileMDB] object
 #'
-#' @param .data a fileMDB
+#' @param .data a [fileMDB] object
 #' @param ... Use new_name = old_name to rename selected tables
-#'  
-#' @rdname fileMDB
 #' 
 #' @export
 #' 
@@ -313,8 +312,6 @@ rename.fileMDB <- function(.data, ...){
 
 
 ###############################################################################@
-#' @param x a [fileMDB] object
-#' @param ... not used
 #' 
 #' @rdname db_info
 #' @method db_info fileMDB
@@ -329,10 +326,6 @@ db_info.fileMDB <- function(x, ...){
 
 
 ###############################################################################@
-#' @param x a [fileMDB] object
-#' @param value a list with DB information:
-#' "name", "title", "description", "url",
-#' "version", "maintainer".
 #' 
 #' @rdname db_info
 #' @method db_info<- fileMDB
@@ -352,8 +345,6 @@ db_info.fileMDB <- function(x, ...){
 
 
 ###############################################################################@
-#' @param x a [fileMDB] object
-#' @param ... not used
 #' 
 #' @rdname data_model
 #' @method data_model fileMDB
@@ -366,9 +357,6 @@ data_model.fileMDB <- function(x, ...){
 
 
 ###############################################################################@
-#' @param x a [fileMDB] object
-#' @param ... names of the collections
-#' to focus on. By default, all of them are taken.
 #' 
 #' @rdname collection_members
 #' @method collection_members fileMDB
@@ -391,21 +379,7 @@ collection_members.fileMDB <- function(
 
 
 ###############################################################################@
-#' @param x a [fileMDB] object
-#' 
-#' @param value A data.frame with the following columns:
-#' - **collection** (character): The name of the collection
-#' - **cid** (character): Collection identifier
-#' - **resource** (character): The name of the resource
-#' - **mid** (integer): The identifier of the member
-#' - **table** (character): The table recording collection information
-#' - **field** (character): The collection field.
-#' - **static** (logical): TRUE if the field value is common to all elements.
-#' - **value** (character): The name of the table column if static is FALSE
-#' or the field value if static is TRUE.
-#' - **type** (character): the type of the field.
-#' (not necessarily used ==> NA if not)
-#' 
+#'
 #' @rdname collection_members
 #' @method collection_members<- fileMDB
 #' 
@@ -476,8 +450,6 @@ collection_members.fileMDB <- function(
 
 
 ###############################################################################@
-#' @param x a [fileMDB] object
-#' @param ... the name of the tables to get (default: all of them)
 #' 
 #' @rdname data_tables
 #' @method data_tables fileMDB
@@ -510,8 +482,6 @@ data_tables.fileMDB <- function(x, ...){
 
 
 ###############################################################################@
-#' @param x a [fileMDB]
-#' @param ... the name of the tables to consider (default: all of them)
 #' 
 #' @rdname count_records
 #' @method count_records fileMDB
@@ -696,16 +666,13 @@ c.fileMDB <- function(...){
 
 
 ###############################################################################@
-#' @param x a [fileMDB]
-#' @param path the path where the MDB should be written
-#' @param ... not used
 #' 
-#' @rdname write_MDB
-#' @method write_MDB fileMDB
+#' @rdname as_fileMDB
+#' @method as_fileMDB fileMDB
 #' 
 #' @export
 #'
-write_MDB.fileMDB <- function(x, path, ...){
+as_fileMDB.fileMDB <- function(x, path, ...){
    stopifnot(is.character(path), length(path)==1, !is.na(path))
    dbInfo <- db_info(x)
    dbName <- dbInfo$name
@@ -734,7 +701,7 @@ write_MDB.fileMDB <- function(x, path, ...){
    
    ## Collection members ----
    cm <- collection_members(x)
-   if(nrow(cm)>0){
+   if(!is.null(cm) && nrow(cm)>0){
       colPath <- file.path(modelPath, "Collections")
       dir.create(colPath)
       for(collection in unique(cm$collection)){
@@ -858,16 +825,6 @@ slice.fileMDB <- function(.data, ..., .preserve=FALSE){
 
 
 ###############################################################################@
-#' Filter [fileMDB] object according to provided tables
-#' 
-#' @param x a [fileMDB] object
-#' @param tables a named list of tibbles to filter with. The names should
-#' correspond to the table names in x and the tibbles should fit the
-#' data model.
-#' @param checkTables if TRUE, the tables are confronted to their model
-#' in the data model of x.
-#' 
-#' @return a [memoMDB] object
 #' 
 #' @rdname filter_with_tables
 #' @method filter_with_tables fileMDB

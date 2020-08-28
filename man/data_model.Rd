@@ -14,15 +14,18 @@ data_model(x, ...)
 
 \method{data_model}{memoMDB}(x, ...)
 
-\method{data_model}{metaMDB}(x, rtOnly = FALSE, ...)
+\method{data_model}{metaMDB}(x, rtOnly = FALSE, recursive = FALSE, ...)
 }
 \arguments{
-\item{x}{a \link{metaMDB} object}
+\item{x}{an object with an embedded data model}
 
-\item{...}{not used}
+\item{...}{method specific parameters}
 
-\item{rtOnly}{if TRUE, the function only returns the relationTables and
-the foreign tables (default: FALSE)}
+\item{rtOnly}{if TRUE, the function only returns the relational tables
+and the corresponding foreign tables (default: FALSE)}
+
+\item{recursive}{if TRUE and rtOnly, the function returns also the
+relational tables from embedded metaMDBs.}
 }
 \value{
 A \link[ReDaMoR:RelDataModel]{ReDaMoR::RelDataModel} object

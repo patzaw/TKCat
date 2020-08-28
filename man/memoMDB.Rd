@@ -3,7 +3,6 @@
 \name{memoMDB}
 \alias{memoMDB}
 \alias{names<-.memoMDB}
-\alias{rename.memoMDB}
 \alias{[.memoMDB}
 \alias{[[.memoMDB}
 \alias{$.memoMDB}
@@ -20,8 +19,6 @@ memoMDB(
 )
 
 \method{names}{memoMDB}(x) <- value
-
-\method{rename}{memoMDB}(.data, ...)
 
 \method{[}{memoMDB}(x, i)
 
@@ -53,11 +50,9 @@ done (all of them c("unique", "not nullable", "foreign keys"))}
 
 \item{value}{new table names}
 
-\item{.data}{a memoMDB}
+\item{i}{the index or the name of the tables to take}
 
 \item{...}{\link{memoMDB} objects}
-
-\item{i}{the index or the name of the tables to take}
 }
 \value{
 A memoMDB object
@@ -101,7 +96,7 @@ if(requireNamespace("stringr", quietly = TRUE)){
 \itemize{
 \item MDB methods:
 \link{db_info}, \link{data_model}, \link{data_tables}, \link{collection_members},
-\link{count_records}, \link{filter_with_tables}, \link{write_MDB}
+\link{count_records}, \link{filter_with_tables}, \link{as_fileMDB}
 \item Additional general documentation is related to \link{MDB}.
 \item \link{filter.memoMDB}, \link{slice.memoMDB}
 }

@@ -6,7 +6,7 @@
 \alias{filter_with_tables}
 \alias{filter_with_tables.memoMDB}
 \alias{filter_with_tables.metaMDB}
-\title{Filter \link{fileMDB} object according to provided tables}
+\title{Filter an \link{MDB} object according to provided tables}
 \usage{
 \method{filter_with_tables}{fileMDB}(x, tables, checkTables = TRUE)
 
@@ -17,7 +17,7 @@ filter_with_tables(x, tables, checkTables = TRUE)
 \method{filter_with_tables}{metaMDB}(x, tables, checkTables = TRUE)
 }
 \arguments{
-\item{x}{a \link{metaMDB} object}
+\item{x}{an \link{MDB} object}
 
 \item{tables}{a named list of tibbles to filter with. The names should
 correspond to the table names in x and the tibbles should fit the
@@ -28,19 +28,7 @@ in the data model of x.}
 }
 \value{
 a \link{memoMDB} object
-
-a \link{memoMDB} object
-
-a \link{memoMDB} object
-
-a \link{metaMDB} object
 }
 \description{
-Filter \link{fileMDB} object according to provided tables
-
-Filter an MDB object according to provided tables
-
-Filter \link{memoMDB} object according to provided tables
-
-Filter \link{metaMDB} object according to provided tables
+Filter an \link{MDB} object according to provided tables
 }

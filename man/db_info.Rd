@@ -29,13 +29,20 @@ db_info(x) <- value
 \method{db_info}{metaMDB}(x) <- value
 }
 \arguments{
-\item{x}{a \link{metaMDB} object}
+\item{x}{an object with embedded database information}
 
-\item{...}{not used}
+\item{...}{method specific parameters}
 
-\item{value}{a list with DB information:
-"name", "title", "description", "url",
-"version", "maintainer".}
+\item{value}{list with the following elements:
+\itemize{
+\item \strong{name}: a single character
+\item \strong{title}: a single character
+\item \strong{description}: a single character
+\item \strong{url}: a single character
+\item \strong{version}: a single character
+\item \strong{maintainer}: a single character vector
+\item \strong{size}: a numeric vector providing the size of the DB in bytes
+}}
 }
 \value{
 A list with the following elements:

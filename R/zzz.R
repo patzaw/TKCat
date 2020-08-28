@@ -43,7 +43,7 @@ assign(
       full.names=TRUE
    )
    for(f in files){
-      fun <- source(f)$value
+      fun <- source(f, local=TRUE)$value
       stopifnot(is.function(fun))
       import_collection_mapper(
          collection=sub("[-]mapper[.][R]$", "", basename(f)),

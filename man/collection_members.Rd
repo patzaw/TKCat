@@ -29,12 +29,13 @@ collection_members(x) <- value
 \method{collection_members}{metaMDB}(x, ...)
 }
 \arguments{
-\item{x}{a \link{metaMDB} object}
+\item{x}{an object with embedded collection members}
 
 \item{...}{names of the collections
 to focus on. By default, all of them are taken.}
 
-\item{value}{A data.frame with the following columns:
+\item{value}{the new collection members.
+A data.frame with the following columns:
 \itemize{
 \item \strong{collection} (character): The name of the collection
 \item \strong{cid} (character): Collection identifier

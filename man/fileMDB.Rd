@@ -3,7 +3,6 @@
 \name{fileMDB}
 \alias{fileMDB}
 \alias{names<-.fileMDB}
-\alias{rename.fileMDB}
 \alias{[.fileMDB}
 \alias{[[.fileMDB}
 \alias{$.fileMDB}
@@ -21,8 +20,6 @@ fileMDB(
 )
 
 \method{names}{fileMDB}(x) <- value
-
-\method{rename}{fileMDB}(.data, ...)
 
 \method{[}{fileMDB}(x, i)
 
@@ -57,11 +54,9 @@ for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{Re
 
 \item{value}{new table names}
 
-\item{.data}{a fileMDB}
+\item{i}{the index or the name of the tables to take}
 
 \item{...}{\link{fileMDB} objects}
-
-\item{i}{the index or the name of the tables to take}
 }
 \value{
 A \link{fileMDB} object
@@ -114,7 +109,7 @@ if(requireNamespace("stringr", quietly = TRUE)){
 \itemize{
 \item MDB methods:
 \link{db_info}, \link{data_model}, \link{data_tables}, \link{collection_members},
-\link{count_records}, \link{filter_with_tables}, \link{write_MDB}
+\link{count_records}, \link{filter_with_tables}, \link{as_fileMDB}
 \item Additional general documentation is related to \link{MDB}.
 \item \link{filter.fileMDB}, \link{slice.fileMDB}
 }

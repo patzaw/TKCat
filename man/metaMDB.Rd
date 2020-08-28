@@ -38,7 +38,7 @@ data model of all the MDBs plus the relational tables}
 
 \item{value}{new table names}
 
-\item{.data}{a memoMDB}
+\item{.data}{a \link{metaMDB} object}
 
 \item{...}{Use new_name = old_name to rename selected tables}
 
@@ -55,7 +55,7 @@ relational tables.
 \itemize{
 \item MDB methods:
 \link{db_info}, \link{data_model}, \link{data_tables}, \link{collection_members},
-\link{count_records}, \link{filter_with_tables}, \link{write_MDB}
+\link{count_records}, \link{filter_with_tables}, \link{as_fileMDB}
 \item Additional general documentation is related to \link{MDB}.
 \item \link{filter.metaMDB}, \link{slice.metaMDB}
 }

@@ -96,7 +96,7 @@ These classes provide additional functions.
 \seealso{
 MDB methods:
 \link{db_info}, \link{data_model}, \link{data_tables}, \link{collection_members},
-\link{count_records}, \link{filter_with_tables}, \link{write_MDB}
+\link{count_records}, \link{filter_with_tables}, \link{as_fileMDB}
 Additional documentation is provided for each specific class:
 \link{fileMDB}, \link{memoMDB}, chMDB and \link{metaMDB}.
 }

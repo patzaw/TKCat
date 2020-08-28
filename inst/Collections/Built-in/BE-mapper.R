@@ -1,4 +1,4 @@
-fun <- function(
+function(
    x, y,
    orthologs=FALSE,
    restricted=FALSE,

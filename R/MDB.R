@@ -9,7 +9,7 @@
 #' 
 #' @seealso MDB methods:
 #' [db_info], [data_model], [data_tables], [collection_members],
-#' [count_records], [filter_with_tables], [write_MDB]
+#' [count_records], [filter_with_tables], [as_fileMDB]
 #' Additional documentation is provided for each specific class:
 #' [fileMDB], [memoMDB], chMDB and [metaMDB].
 #' 

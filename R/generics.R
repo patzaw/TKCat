@@ -2,6 +2,7 @@
 #' DB information
 #' 
 #' @param x an object with embedded database information
+#' @param ... method specific parameters
 #' 
 #' @return A list with the following elements:
 #' - **name**: a single character
@@ -45,6 +46,7 @@ db_info <- function(x, ...){
 #' Get object data model
 #'
 #' @param x an object with an embedded data model
+#' @param ... method specific parameters
 #' 
 #' @return A [ReDaMoR::RelDataModel] object
 #' 
@@ -59,6 +61,8 @@ data_model <- function(x, ...){
 #' Collection members
 #' 
 #' @param x an object with embedded collection members
+#' @param ... names of the collections
+#' to focus on. By default, all of them are taken.
 #' 
 #' @return A [tibble::tibble] with the following columns:
 #' - **collection** (character): The name of the collection
@@ -109,6 +113,7 @@ collection_members <- function(x, ...){
 #' Get object data tables
 #'
 #' @param x an object with embedded data tables
+#' @param ... the name of the tables to get (default: all of them)
 #' 
 #' @return A list of [dplyr::tibble]
 #' 
@@ -123,6 +128,7 @@ data_tables <- function(x, ...){
 #' Count the number of records
 #'
 #' @param x an object with embedded data tables
+#' @param ... the name of the tables to consider (default: all of them)
 #' 
 #' @return A named vector with the number of records per table.
 #' 
@@ -134,9 +140,9 @@ count_records <- function(x, ...){
 
 
 ###############################################################################@
-#' Filter an MDB object according to provided tables
+#' Filter an [MDB] object according to provided tables
 #' 
-#' @param x an MDB object
+#' @param x an [MDB] object
 #' @param tables a named list of tibbles to filter with. The names should
 #' correspond to the table names in x and the tibbles should fit the
 #' data model.
@@ -158,13 +164,14 @@ filter_with_tables <- function(x, tables, checkTables=TRUE){
 #'
 #' @param x an MDB object
 #' @param path the path where the MDB should be written
+#' @param ... method specific parameters
 #' 
 #' @return A [fileMDB] object.
 #' 
 #' @export
 #'
-write_MDB <- function(x, path, ...){
-   UseMethod("write_MDB", x)
+as_fileMDB <- function(x, path, ...){
+   UseMethod("as_fileMDB", x)
 }
 
 

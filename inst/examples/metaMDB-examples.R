@@ -10,6 +10,8 @@ rt[which(rt$collection=="BE"), "table.y"] <- "PubMed_geneByMedgen"
 rt[which(rt$collection=="BE"), "collection"] <- NA
 
 cvpm <- merge(cvf, pmf, by=rt)
+rt2 <- get_shared_collections(cvpm, hpof)
+cvpmhp <- merge(cvpm, hpof, by=rt2[4,])
 
 scv <- cvf %>% 
    select(
@@ -27,15 +29,8 @@ spm <- pmf %>%
       PubMed_geneByPubmed=entrez %in% c(6505, 9900)
    )
 scvpm <- merge(scv, spm)
-
-
-hpcv <- metaMDB(
-   MDBs=list(HPO=hpof, ClinVar=cvf),
-   relationalTables=list(),
-   dataModel=c(data_model(hpof), data_model(cvf)),
-   dbInfo=list(name="HPO+MB")
-)
-data_model(hpcv) %>% auto_layout(force=TRUE) %>% plot()
-
-shpcv <- hpcv[c("HPO_hp", "HPO_synonyms")]
-shpcv <- hpcv[c("HPO_hp", "ClinVar_entrezNames")]
+shp <- hpof %>% 
+   filter(HPO_diseases=stringr::str_detect(label, "Epilepsy"))
+rt <- get_shared_collections(scvpm, shp)
+scvpmhp <- merge(scvpm, shp, by=rt[4,])
+plot(data_model(scvpmhp, rtOnly=TRUE, recursive=TRUE))

@@ -20,7 +20,7 @@
 #' @seealso
 #' - MDB methods:
 #' [db_info], [data_model], [data_tables], [collection_members],
-#' [count_records], [filter_with_tables], [write_MDB]
+#' [count_records], [filter_with_tables], [as_fileMDB]
 #' - Additional general documentation is related to [MDB].
 #' - [filter.metaMDB], [slice.metaMDB]
 #'
@@ -128,6 +128,36 @@ MDBs <- function(x){
 
 
 ###############################################################################@
+#' Get a list of relational tables
+#' 
+#' @param x a [metaMDB] object
+#' @param recursive if TRUE, function returns also the
+#' relational tables from embedded metaMDBs.
+#' 
+#' @return A list of relational tables (tibbles)
+#' 
+#' @export
+#'
+relational_tables <- function(x, recursive=FALSE){
+   stopifnot(is.metaMDB(x))
+   toRet <- unclass(x)$relationalTables
+   if(recursive){
+      toRet <- c(toRet, do.call(c, set_names(lapply(
+         MDBs(x),
+         function(y){
+            if(is.metaMDB(y)){
+               return(relational_tables(y, recursive=TRUE))
+            }else{
+               return(NULL)
+            }
+         }
+      ), NULL)))
+   }
+   return(toRet)
+}
+
+
+###############################################################################@
 #' 
 #' @param x a [metaMDB] object
 #' @param value new table names
@@ -159,8 +189,9 @@ MDBs <- function(x){
 
 
 ###############################################################################@
+#' Rename tables of a [metaMDB] object
 #'
-#' @param .data a memoMDB
+#' @param .data a [metaMDB] object
 #' @param ... Use new_name = old_name to rename selected tables
 #' 
 #' @rdname metaMDB
@@ -176,8 +207,6 @@ rename.metaMDB <- function(.data, ...){
 
 
 ###############################################################################@
-#' @param x a [metaMDB] object
-#' @param ... not used
 #' 
 #' @rdname db_info
 #' @method db_info metaMDB
@@ -191,10 +220,6 @@ db_info.metaMDB <- function(x, ...){
 }
 
 ###############################################################################@
-#' @param x a [metaMDB] object
-#' @param value a list with DB information:
-#' "name", "title", "description", "url",
-#' "version", "maintainer".
 #' 
 #' @rdname db_info
 #' @method db_info<- metaMDB
@@ -211,20 +236,21 @@ db_info.metaMDB <- function(x, ...){
 
 
 ###############################################################################@
-#' @param x a [metaMDB] object
-#' @param rtOnly if TRUE, the function only returns the relationTables and
-#' the foreign tables (default: FALSE)
-#' @param ... not used
+#' 
+#' @param rtOnly if TRUE, the function only returns the relational tables
+#' and the corresponding foreign tables (default: FALSE)
+#' @param recursive if TRUE and rtOnly, the function returns also the
+#' relational tables from embedded metaMDBs.
 #' 
 #' @rdname data_model
 #' @method data_model metaMDB
 #' 
 #' @export
 #'
-data_model.metaMDB <- function(x, rtOnly=FALSE, ...){
+data_model.metaMDB <- function(x, rtOnly=FALSE, recursive=FALSE, ...){
    toRet <- unclass(x)$dataModel
    if(rtOnly){
-      rt <- names(unclass(x)$relationalTables)
+      rt <- names(relational_tables(x, recursive=recursive))
       fk <- ReDaMoR::get_foreign_keys(toRet)
       toTake <- fk %>%
          dplyr::filter(
@@ -247,9 +273,6 @@ data_model.metaMDB <- function(x, rtOnly=FALSE, ...){
 
 
 ###############################################################################@
-#' @param x a [metaMDB] object
-#' @param ... names of the collections
-#' to focus on. By default, all of them are taken.
 #' 
 #' @rdname collection_members
 #' @method collection_members metaMDB
@@ -272,8 +295,6 @@ collection_members.metaMDB <- function(
 
 
 ###############################################################################@
-#' @param x a [metaMDB] object
-#' @param ... the name of the tables to get (default: all of them)
 #' 
 #' @rdname data_tables
 #' @method data_tables metaMDB
@@ -306,8 +327,6 @@ data_tables.metaMDB <- function(x, ...){
 
 
 ###############################################################################@
-#' @param x a [metaMDB]
-#' @param ... the name of the tables to consider (default: all of them)
 #' 
 #' @rdname count_records
 #' @method count_records metaMDB
@@ -363,8 +382,8 @@ count_records.metaMDB <- function(x, ...){
          fmdbs[[mdb]] <- mdbs[[mdb]][lToTake]
       }
    }
-   lToTake <- intersect(i, names(unclass(x)$relationalTables))
-   frt <- unclass(x)$relationalTables[lToTake]
+   lToTake <- intersect(i, names(relational_tables(x)))
+   frt <- relational_tables(x)[lToTake]
    
    toRet <- metaMDB(
       MDBs=fmdbs,
@@ -420,6 +439,101 @@ c.metaMDB <- function(...){
 
 
 ###############################################################################@
+#' 
+#' @rdname as_fileMDB
+#' @method as_fileMDB metaMDB
+#' 
+#' @export
+#'
+as_fileMDB.metaMDB <- function(x, path, ...){
+   stopifnot(is.character(path), length(path)==1, !is.na(path))
+   dbInfo <- db_info(x)
+   dbName <- dbInfo$name
+   
+   ## Initialization ----
+   fullPath <- file.path(path, dbName)
+   if(file.exists(fullPath)){
+      stop(sprintf("%s already exists", fullPath))
+   }
+   dir.create(fullPath, recursive=TRUE)
+   
+   ## Description file ----
+   rp <- list(
+      delim='\t',
+      quoted_na=FALSE
+   )
+   descFile <- file.path(fullPath, "DESCRIPTION.json")
+   .writeDescription(c(dbInfo, rp), descFile)
+   
+   ## Data model ----
+   dm <- data_model(x)
+   modelPath <- file.path(fullPath, "model")
+   dir.create(modelPath)
+   jModelPath <- file.path(modelPath, paste0(dbName, ".json"))
+   hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
+   write_json_data_model(dm, jModelPath)
+   plot(dm) %>%
+      visNetwork::visSave(hModelPath)
+   
+   ## Collection members ----
+   cm <- collection_members(x)
+   if(!is.null(cm) && nrow(cm)>0){
+      cm$resource <- dbName
+      colPath <- file.path(modelPath, "Collections")
+      dir.create(colPath)
+      for(collection in unique(cm$collection)){
+         cv <- dplyr::filter(cm, .data$collection==!!collection)
+         for(cid in unique(cv$cid)){
+            dplyr::filter(cv, .data$cid==!!cid) %>%
+               write_collection_members(path=file.path(
+                  colPath,
+                  paste0(collection, "-", cid, ".json")
+               ))
+         }
+      }
+   }
+   
+   ## Data ----
+   dataPath <- file.path(fullPath, "data")
+   dir.create(dataPath)
+   
+   adfiles <- c()
+   for(mdb in MDBs(x)){
+      if(is.fileMDB(mdb)){
+         lrp <- data_files(mdb)$readParameters
+         if(!identical(lrp[sort(names(lrp))], rp[sort(names(rp))])){
+            mdb <- as_memoMDB(mdb)
+         }
+      }
+      tmp <- as_fileMDB(mdb, path=dataPath)
+      ofiles <- data_files(tmp)$dataFiles
+      dfiles <- file.path(dataPath, basename(ofiles)) %>%
+         magrittr::set_names(names(ofiles))
+      file.rename(ofiles, dfiles)
+      unlink(file.path(dataPath, db_info(tmp)$name), recursive=TRUE)
+      adfiles <- c(adfiles, dfiles)
+   }
+   frdb <- as_memoMDB(x[names(relational_tables(x))])
+   tmp <- as_fileMDB(frdb, path=dataPath)
+   ofiles <- data_files(tmp)$dataFiles
+   dfiles <- file.path(dataPath, basename(ofiles)) %>%
+      magrittr::set_names(names(ofiles))
+   file.rename(ofiles, dfiles)
+   unlink(file.path(dataPath, db_info(tmp)$name), recursive=TRUE)
+   adfiles <- c(adfiles, dfiles)
+   
+   ## Return fileMDB ----
+   return(fileMDB(
+      dataFiles=adfiles,
+      dbInfo=dbInfo,
+      dataModel=dm,
+      readParameters=rp,
+      collectionMembers=cm
+   ))
+}
+
+
+###############################################################################@
 #' Filter a [metaMDB] object
 #' 
 #' @param .data a [metaMDB] object
@@ -437,7 +551,7 @@ filter.metaMDB <- function(.data, ..., .preserve=FALSE){
    x <- .data
    
    ## Useful information ----
-   oriRT <- unclass(x)$relationalTables
+   oriRT <- relational_tables(x)
    rtNames <- names(oriRT)
    
    ## Filter each MDB ----
@@ -514,16 +628,6 @@ slice.metaMDB <- function(.data, ..., .preserve=FALSE){
 
 
 ###############################################################################@
-#' Filter [metaMDB] object according to provided tables
-#' 
-#' @param x a [metaMDB] object
-#' @param tables a named list of tibbles to filter with. The names should
-#' correspond to the table names in x and the tibbles should fit the
-#' data model.
-#' @param checkTables if TRUE, the tables are confronted to their model
-#' in the data model of x.
-#' 
-#' @return a [metaMDB] object
 #' 
 #' @rdname filter_with_tables
 #' @method filter_with_tables metaMDB
@@ -543,7 +647,7 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
    }
    
    ## Useful information ----
-   oriRT <- unclass(x)$relationalTables
+   oriRT <- relational_tables(x)
    rtNames <- names(oriRT)
    
    ## Filter the MDBs ----

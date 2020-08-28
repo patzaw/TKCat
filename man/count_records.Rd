@@ -17,7 +17,7 @@ count_records(x, ...)
 \method{count_records}{metaMDB}(x, ...)
 }
 \arguments{
-\item{x}{a \link{metaMDB}}
+\item{x}{an object with embedded data tables}
 
 \item{...}{the name of the tables to consider (default: all of them)}
 }
