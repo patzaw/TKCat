@@ -17,7 +17,7 @@
 #'
 #' @return a chTKCat object
 #'
-#' @seealso [check_chTKCat()], [disconnect_chTKCat()]
+#' @seealso [check_chTKCat()], [db_disconnect()], [db_reconnect()]
 #' 
 #' @export
 #'
@@ -138,6 +138,26 @@ check_chTKCat <- function(x, verbose=FALSE){
          stop(sprintf('Incoherent "%s" information', i))
       }
    }
+   
+   ## Check collection consistency ----
+   rcols <- list_chTKCat_collections(x, withJson=TRUE)
+   for(col in rcols$title){
+      lcol <- get_local_collection(title=col) %>% 
+         jsonlite::fromJSON(simplifyVector=FALSE)
+      rcol <- rcols %>%
+         dplyr::filter(.data$title==!!col) %>%
+         dplyr::pull("json") %>% 
+         jsonlite::fromJSON(simplifyVector=FALSE)
+      if(!identical(lcol, rcol)){
+         warning(
+            sprintf(
+               "Remote %s collection is different from the local version.",
+               col
+            ),
+            " Be careful when manipulating members of this collection."
+         )
+      }
+   }
    return(toRet)
 }
 
@@ -197,36 +217,28 @@ print.chTKCat <- function(x, ...){
 
 
 ###############################################################################@
-#' Disconnect from a [chTKCat] instance
-#'
-#' @param x a [chTKCat] object
+#' 
+#' @rdname db_disconnect
+#' @method db_disconnect chTKCat
 #' 
 #' @export
 #'
-disconnect_chTKCat <- function(x){
-   stopifnot(inherits(x, "chTKCat"))
-   RClickhouse::dbDisconnect(x[["chcon"]])
+db_disconnect.chTKCat <- function(x){
+   RClickhouse::db_disconnect(x[["chcon"]])
    invisible()
 }
 
 ###############################################################################@
-#' Reconnect to a [chTKCat] instance
-#'
-#' @param x a [chTKCat] object
-#' @param ... further arguments for [ch_reconnect]:
-#' - **user**: user name. If not provided, it's taken from x
-#' - **password**: user password. If not provided, first the function
-#' tries to connect without any password. If it fails, the function asks the
-#' user to provide a password.
-#' - **ntries**: the number of times the user can enter a wrong password
+#' 
+#' @rdname db_reconnect
+#' @method db_reconnect chTKCat
 #' 
 #' @export
 #'
-reconnect_chTKCat <- function(x, ...){
-   stopifnot(inherits(x, "chTKCat"))
+db_reconnect.chTKCat <- function(x, user, password, ntries=3){
    xn <- deparse(substitute(x))
    con <- x$chcon
-   ch_reconnect(con, ...)
+   db_reconnect(con, user=user, password=password, ntries=ntries)
    nv <- x
    nv$chcon <- con
    nv <- check_chTKCat(nv)
@@ -318,6 +330,9 @@ init_chTKCat <- function(
       )
    }
    
+   ## Enabling introspection functions (for GRANT access) ----
+   RClickhouse::dbSendQuery(con, "SET allow_introspection_functions=1")
+   
    ## Create default tables ----
    mergeTrees_from_RelDataModel(
       con, "default",
@@ -340,7 +355,7 @@ init_chTKCat <- function(
    create_chTKCat_user(
       x, login=login, password=password, contact=contact, admin=TRUE
    )
-   disconnect_chTKCat(x)
+   db_disconnect(x)
    file.copy(userfile, file.path(path, "conf", "users.xml"), overwrite=TRUE)
    Sys.sleep(3)
    x <- chTKCat(
@@ -566,7 +581,7 @@ list_chMDBs <- function(x, withInfo=TRUE){
             con,
             sprintf("SHOW TABLES FROM `%s`", dbName)
          )
-         if("___MDB___" %in% dbTables){
+         if("___MDB___" %in% dbTables$name){
             toRet <- bind_rows(
                toRet,
                DBI::dbGetQuery(
@@ -595,7 +610,7 @@ create_chMDB <- function(x, name, public=FALSE){
       is.character(name), length(name)==1, !is.na(name)
    )
    if(!x$admin){
-      stop("Only chTKCat admin can add users")
+      stop("Only chTKCat admin can create an MDB in ClickHouse")
    }
    if(name %in% list_chMDBs(x, withInfo=FALSE)){
       stop("The database exists already")
@@ -617,7 +632,7 @@ create_chMDB <- function(x, name, public=FALSE){
       )
    }
    set_chMDB_access(x, name, public=public)
-   add_chMDB_user(x, x$chcon@user, name, admin=TRUE)
+   add_chMDB_user(x, name, x$chcon@user, admin=TRUE)
    invisible()
 }
 
@@ -639,7 +654,7 @@ drop_chMDB <- function(x, name){
       stop("The database does not exist")
    }
    if(!x$admin){
-      stop("Only chTKCat admin can add users")
+      stop("Only chTKCat admin can drop an MDB from ClickHouse")
    }
    con <- x$chcon
    RClickhouse::dbSendQuery(con, sprintf("DROP DATABASE %s", name))
@@ -653,6 +668,48 @@ drop_chMDB <- function(x, name){
          paste(CH_DB_STATEMENTS, collapse=", "), name, paste(ul, collapse=", ")
       )
    )
+   invisible()
+}
+
+
+###############################################################################@
+#' Empty a chMDB in a [chTKCat]
+#' 
+#' @param x a [chTKCat] object
+#' @param name the name of the database to empty
+#' 
+#' @export
+#' 
+empty_chMDB <- function(x, name){
+   stopifnot(
+      is.chTKCat(x),
+      is.character(name), length(name)==1, !is.na(name)
+   )
+   if(!name %in% list_chMDBs(x, withInfo=FALSE)){
+      stop("The database does not exist")
+   }
+   con <- x$chcon
+   toDrop <- setdiff(
+      list_tables(con, name)$name,
+      names(devTKCat:::CHMDB_DATA_MODEL)
+   )
+   for(tn in toDrop){
+      RClickhouse::dbSendQuery(
+         x$chcon,
+         sprintf("DROP TABLE `%s`.`%s`", name, tn)
+      )
+   }
+   toEmpty <- setdiff(
+      names(devTKCat:::CHMDB_DATA_MODEL),
+      c("___MDBUsers___", "___Public___")
+   )
+   for(tn in toEmpty){
+      RClickhouse::dbSendQuery(
+         x$chcon,
+         sprintf("ALTER TABLE `%s`.`%s` DELETE WHERE 1", name, tn)
+      )
+   }
+   Sys.sleep(5)
    invisible()
 }
 
@@ -676,7 +733,7 @@ is_chMDB_public <- function(x, mdb){
    con <- x$chcon
    toRet <- DBI::dbGetQuery(
       con, 
-      sprintf("SELECT public from `%s`.Public", mdb)
+      sprintf("SELECT public from `%s`.___Public___", mdb)
    ) %>%
       dplyr::pull("public") %>% 
       as.logical()
@@ -709,12 +766,12 @@ set_chMDB_access <- function(x, mdb, public){
    RClickhouse::dbSendQuery(
       con, 
       sprintf(
-         "ALTER TABLE `%s`.Public DELETE WHERE 1",
+         "ALTER TABLE `%s`.___Public___ DELETE WHERE 1",
          mdb,
          as.integer(public)
       )
    )
-   ch_insert(con, dbName=mdb, tableName="Public", value=tibble(public=public))
+   ch_insert(con, dbName=mdb, tableName="___Public___", value=tibble(public=public))
    users <- list_chTKCat_users(x) %>% 
       dplyr::filter(!.data$admin) %>% 
       dplyr::pull("login")
@@ -929,17 +986,47 @@ remove_chMDB_user <- function(x, mdb, login){
 #' List collections available in a [chTKCat]
 #' 
 #' @param x a [chTKCat] object
+#' @param withJson if TRUE, returns the json strings of the collection
+#' (default: FALSE)
 #' 
 #' @export
 #' 
-list_chTKCat_collections <- function(x){
+list_chTKCat_collections <- function(x, withJson=FALSE){
    stopifnot(is.chTKCat(x))
    dbGetQuery(
       conn=x$chcon,
-      statement="SELECT title, description FROM default.Collections"
+      statement=sprintf(
+         "SELECT title, description %s FROM default.Collections",
+         ifelse(withJson, ", json", "")
+      )
    ) %>%
       as_tibble() %>% 
       return()
+}
+
+
+###############################################################################@
+#' Get a collection from a [chTKCat]
+#' 
+#' @param x a [chTKCat] object
+#' @param title the title of the collection to get
+#' 
+#' @export
+#' 
+get_chTKCat_collection <- function(x, title){
+   stopifnot(
+      is.chTKCat(x), is.character(title), length(title)==1, !is.na(title)
+   )
+   if(!title %in% list_chTKCat_collections(x)$title){
+      stop("This collection is not available")
+   }
+   dbGetQuery(
+      conn=x$chcon,
+      statement=sprintf(
+         "SELECT json FROM default.Collections WHERE title='%s'",
+         title
+      )
+   )$json
 }
 
 
@@ -968,10 +1055,7 @@ add_chTKCat_collection <- function(x, json, overwrite=FALSE){
    if(file.exists(json)){
       raw <- readLines(json) %>% paste(collapse="\n")
    }else if(json %in% list_local_collections()$title){
-      env <- environment()
-      raw <- tkcatEnv$COLLECTIONS %>%
-         dplyr::filter(.data$title==get("json", env)) %>%
-         dplyr::pull("json")
+      raw <- get_local_collection(json)
    }else{
       raw <- json
    }
@@ -979,37 +1063,50 @@ add_chTKCat_collection <- function(x, json, overwrite=FALSE){
       stop("Not a valid collection")
    }
    def <- jsonlite::fromJSON(raw)
-   ctitle <- def$properties$collection$enum 
-   if(
-      ctitle %in% list_chTKCat_collections(x)$title &&
-      !overwrite
-   ){
-      stop(
-         sprintf(
-            'A "%s" has already been imported.',
+   ctitle <- def$properties$collection$enum
+   writeCol <- TRUE
+   if(ctitle %in% list_chTKCat_collections(x)$title){
+      lcol <- raw %>% 
+         jsonlite::fromJSON(simplifyVector=FALSE)
+      rcol <- get_chTKCat_collection(x, ctitle) %>% 
+         jsonlite::fromJSON(simplifyVector=FALSE)
+      if(identical(lcol, rcol)){
+         writeCol <- FALSE
+      }else{
+         if(!overwrite){
+            stop(
+               sprintf(
+                  "Remote %s collection is different from the local version.",
+                  ctitle
+               ),
+               " Use the overwrite parameter of",
+               " the add_chTKCat_collection function to update it in chTKCat"
+            )
+         }else{
+            writeCol <- TRUE
+         }
+      }
+   }
+   if(writeCol){
+      RClickhouse::dbSendQuery(
+         conn=x$chcon,
+         statement=sprintf(
+            "ALTER TABLE default.Collections DELETE WHERE title='%s'",
             ctitle
-         ),
-         " Set overwrite to TRUE if you want to replace it."
+         )
+      )
+      toWrite<- dplyr::tibble(
+         title=ctitle,
+         description=def$description,
+         json=raw
+      )
+      ch_insert(
+         con=x$chcon,
+         dbName="default",
+         tableName="Collections",
+         value=toWrite
       )
    }
-   RClickhouse::dbSendQuery(
-      conn=x$chcon,
-      statement=sprintf(
-         "ALTER TABLE default.Collections DELETE WHERE title='%s'",
-         ctitle
-      )
-   )
-   toWrite<- dplyr::tibble(
-      title=ctitle,
-      description=def$description,
-      json=raw
-   )
-   ch_insert(
-      con=x$chcon,
-      dbName="default",
-      tableName="Collections",
-      value=toWrite
-   )
    invisible()
 }
 

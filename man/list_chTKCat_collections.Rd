@@ -4,10 +4,13 @@
 \alias{list_chTKCat_collections}
 \title{List collections available in a \link{chTKCat}}
 \usage{
-list_chTKCat_collections(x)
+list_chTKCat_collections(x, withJson = FALSE)
 }
 \arguments{
 \item{x}{a \link{chTKCat} object}
+
+\item{withJson}{if TRUE, returns the json strings of the collection
+(default: FALSE)}
 }
 \description{
 List collections available in a \link{chTKCat}

@@ -573,8 +573,8 @@
     },
     "primaryKey": ["login"]
   },
-  "Public": {
-    "tableName": ["Public"],
+  "___Public___": {
+    "tableName": ["___Public___"],
     "fields": [
       {
         "name": "public",

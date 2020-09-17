@@ -2,7 +2,7 @@
 % Please edit documentation in R/memoMDB.R
 \name{is.memoMDB}
 \alias{is.memoMDB}
-\title{Check the object is  a \link{memoMDB} object}
+\title{Check if the object is  a \link{memoMDB} object}
 \usage{
 is.memoMDB(x)
 }
@@ -13,5 +13,5 @@ is.memoMDB(x)
 A single logical: TRUE if x is an \link{memoMDB} object
 }
 \description{
-Check the object is  a \link{memoMDB} object
+Check if the object is  a \link{memoMDB} object
 }

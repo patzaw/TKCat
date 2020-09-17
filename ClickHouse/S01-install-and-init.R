@@ -8,7 +8,7 @@ TKCAT_NAT_PORT <- 9201 # mv back to 9101 when tests are finished
 TKCAT_HTTP_PORT <- 9211 # mv back to 9111 when tests are finished
 
 SRC_DIR <- here::here("ClickHouse", "ClickHouse-Files")
-CH_VERSION <- "20.4.5.36"
+CH_VERSION <- "20.8.2.3"
 
 CONTAINER <- "ucb_tbn_tkcat"
 INSTANCE_NAME <- "UCB - TBN"

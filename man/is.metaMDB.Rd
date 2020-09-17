@@ -2,7 +2,7 @@
 % Please edit documentation in R/metaMDB.R
 \name{is.metaMDB}
 \alias{is.metaMDB}
-\title{Check the object is  a \link{metaMDB} object}
+\title{Check if the object is  a \link{metaMDB} object}
 \usage{
 is.metaMDB(x)
 }
@@ -13,5 +13,5 @@ is.metaMDB(x)
 A single logical: TRUE if x is an \link{metaMDB} object
 }
 \description{
-Check the object is  a \link{metaMDB} object
+Check if the object is  a \link{metaMDB} object
 }

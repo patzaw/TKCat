@@ -19,7 +19,7 @@ NULL
 
 
 ###############################################################################@
-#' Check if the object is  an MDB object
+#' Check if the object is an [MDB] object
 #' 
 #' @param x any object
 #' 

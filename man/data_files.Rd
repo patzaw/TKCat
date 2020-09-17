@@ -2,16 +2,16 @@
 % Please edit documentation in R/fileMDB.R
 \name{data_files}
 \alias{data_files}
-\title{Get the data files from an object}
+\title{Get the data files from a \link{fileMDB} object}
 \usage{
 data_files(x)
 }
 \arguments{
-\item{x}{an object with a dataFiles and readParameters slots}
+\item{x}{a \link{fileMDB} object}
 }
 \value{
 a list with "dataFiles" and "readParameters" for reading the files.
 }
 \description{
-Get the data files from an object
+Get the data files from a \link{fileMDB} object
 }

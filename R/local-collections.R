@@ -42,10 +42,17 @@ import_local_collection <- function(path, overwrite=FALSE){
 ###############################################################################@
 #' List local collections of concepts
 #' 
+#' @param withJson if TRUE, returns the json strings of the collection
+#' (default: FALSE)
+#' 
 #' @export
 #'
-list_local_collections <- function(){
-   tkcatEnv$COLLECTIONS %>% dplyr::select("title", "description")
+list_local_collections <- function(withJson=FALSE){
+   toRet <- tkcatEnv$COLLECTIONS
+   if(!withJson){
+      dplyr::select(toRet, "title", "description")
+   }
+   return(toRet)
 }
 
 

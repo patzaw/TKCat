@@ -158,7 +158,6 @@ filter_with_tables <- function(x, tables, checkTables=TRUE){
 }
 
 
-
 ###############################################################################@
 #' Write an MDB object
 #'
@@ -175,7 +174,50 @@ as_fileMDB <- function(x, path, ...){
 }
 
 
-## Helpers ----
-.filter_table <- function(x){
-   UseMethod(".filter_table", x)
+###############################################################################@
+#' Push an MDB object in a ClickHouse database
+#'
+#' @param x an MDB object
+#' @param tkcon a [chTKCat] object
+#' @param overwrite a logical indicating if existing data should be overwritten
+#' (default: FALSE)
+#' @param ... method specific parameters
+#' 
+#' @return A [chMDB] object.
+#' 
+#' @export
+#'
+as_chMDB <- function(x, tkcon, overwrite=FALSE, ...){
+   UseMethod("as_chMDB", x)
 }
+
+
+###############################################################################@
+#' Disconnect an object from a database
+#'
+#' @param x an object with a database connection
+#' 
+#' @export
+#'
+db_disconnect <- function(x){
+   UseMethod("db_disconnect", x)
+}
+
+
+###############################################################################@
+#' Reconnect an object to a database
+#' 
+#' @param x an object with a database connection
+#' @param user user name. If not provided, it's taken from x
+#' @param password user password. If not provided, first the function
+#' tries to connect without any password.If it fails, the function asks the
+#' user to provide a password.
+#' @param ntries the number of times the user can enter a wrong password
+#' (default: 3)
+#' 
+#' @export
+#' 
+db_reconnect <- function(x, user, password, ntries=3){
+   UseMethod("db_reconnect", x)
+}
+

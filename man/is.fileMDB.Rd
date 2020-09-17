@@ -2,7 +2,7 @@
 % Please edit documentation in R/fileMDB.R
 \name{is.fileMDB}
 \alias{is.fileMDB}
-\title{Check the object is  a \link{fileMDB} object}
+\title{Check if the object is  a \link{fileMDB} object}
 \usage{
 is.fileMDB(x)
 }
@@ -13,5 +13,5 @@ is.fileMDB(x)
 A single logical: TRUE if x is an \link{fileMDB} object
 }
 \description{
-Check the object is  a \link{fileMDB} object
+Check if the object is  a \link{fileMDB} object
 }

@@ -33,5 +33,5 @@ a chTKCat object
 Connect to a ClickHouse TKCat instance
 }
 \seealso{
-\code{\link[=check_chTKCat]{check_chTKCat()}}, \code{\link[=disconnect_chTKCat]{disconnect_chTKCat()}}
+\code{\link[=check_chTKCat]{check_chTKCat()}}, \code{\link[=db_disconnect]{db_disconnect()}}, \code{\link[=db_reconnect]{db_reconnect()}}
 }

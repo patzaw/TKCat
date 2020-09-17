@@ -1,16 +1,18 @@
 ###############################################################################@
-#' Reconnect to a ClickHouse database
-#' 
-#' @param x a ClickhouseConnection object
-#' @param user user name. If not provided, it's taken from x
-#' @param password user password. If not provided, first the function
-#' tries to connect without any password.If it fails, the function asks the
-#' user to provide a password.
-#' @param ntries the number of times the user can enter a wrong password
-#' 
+#'
 #' @export
-#' 
-ch_reconnect <- function(x, user, password, ntries=3){
+#'
+db_disconnect.ClickhouseConnection <- function(x){
+   RClickhouse::dbDisconnect(x)
+   invisible()
+}
+
+
+###############################################################################@
+#'
+#' @export
+#'
+db_reconnect.ClickhouseConnection <- function(x, user, password, ntries=3){
    xn <- deparse(substitute(x))
    if(missing(user)){
       user <- x@user
@@ -25,7 +27,9 @@ ch_reconnect <- function(x, user, password, ntries=3){
       ), silent=TRUE)
       n <- 0
       while(inherits(nv, "try-error") & n < ntries){
-         password <- getPass::getPass(msg=paste(user, "password"))
+         password <- getPass::getPass(
+            msg=paste0(user, " password on ", x@host, ":", x@port)
+         )
          if(is.null(password)){
             stop("Canceled by the user")
          }
@@ -51,22 +55,40 @@ ch_reconnect <- function(x, user, password, ntries=3){
    assign(xn, nv, envir=parent.frame(n=1))
 }
 
+
 ###############################################################################@
-#' List tables from a ClickHouse database
+#' List tables in a clickhouse database
 #' 
 #' @param con the clickhouse connection
-#' @param dbName the name of the database from which the tables should be listed
+#' @param dbNames the name of databases to focus on (default NULL ==> all)
 #' 
-#' @return A character vector with table names
+#' @return A tibble with the following columns:
+#' - **database**: the name of the database
+#' - **name**: the name of the table
+#' - **total_rows**: the number of rows in the table
+#' - **total_bytes**: the size of the table
 #' 
 #' @export
 #' 
-ch_list_tables <- function(con, dbName=NA){
-   if(is.na(dbName)){
-      return(DBI::dbGetQuery(con, "SHOW TABLES")$name)
-   }else{
-      return(DBI::dbGetQuery(con, sprintf("SHOW TABLES FROM %s", dbName))$name)
+list_tables <- function(
+   con, dbNames=NULL
+){
+   stopifnot(
+      inherits(con, "ClickhouseConnection"),
+      length(dbNames)==0 || is.character(dbNames) & all(!is.na(dbNames))
+   )
+   query <- paste(
+      "SELECT database, name, total_rows, total_bytes",
+      "FROM system.tables"
+   )
+   if(length(dbNames)>0){
+      query <- paste(
+         query,
+         sprintf("WHERE database IN ('%s')", paste(dbNames, collapse="', '"))
+      )
    }
+   toRet <- dplyr::as_tibble(DBI::dbGetQuery(con, query))
+   return(toRet)
 }
 
 
@@ -187,7 +209,7 @@ ch_insert <- function(
       is.character(dbName), length(dbName)==1,
       is.character(tableName), length(tableName)==1,
       is.data.frame(value),
-      tableName %in% ch_list_tables(con, dbName)
+      tableName %in% list_tables(con, dbName)$name
    )
    
    qname <- DBI::SQL(paste(
@@ -199,6 +221,15 @@ ch_insert <- function(
    on.exit(RClickhouse::dbSendQuery(con, "USE default"))
    
    if(nrow(value)>0){
+      fo <- DBI::dbGetQuery(con, sprintf("SELECT * FROM %s LIMIT 1", qname)) %>% 
+         colnames
+      if(!all(colnames(value) %in% fo)){
+         stop(
+            "Some fields in value are not available in the table: ",
+            paste(setdiff(colnames(value), fo), collapse=", ")
+         )
+      }
+      value <- dplyr::select(value, dplyr::all_of(fo))
       s <- by*(0:(nrow(value)%/%by))
       e <- c(s[-1], nrow(value))
       s <- s+1
@@ -209,7 +240,7 @@ ch_insert <- function(
             DBI::dbWriteTable(
                con,
                tableName, #qname,
-               dplyr::select(value, s[i]:e[i]),
+               dplyr::slice(value, s[i]:e[i]),
                append=TRUE
             ),
             silent=TRUE
@@ -266,7 +297,7 @@ mergeTree_from_RelTableModel <- function(
    names(rtypes) <- tm$fields$name
    value <- dplyr::tibble()
    for(i in 1:nrow(tm$fields)){
-      toAdd <- character()
+      toAdd <- integer()
       class(toAdd) <- tm$fields$type[i]
       value[,tm$fields$name[i]] <- toAdd
    }
@@ -282,6 +313,7 @@ mergeTree_from_RelTableModel <- function(
       sortKey=tm$primaryKey
    )
 }
+
 
 ###############################################################################@
 ## ClickHouse statements for DB access ----

@@ -4,7 +4,11 @@
 \alias{list_local_collections}
 \title{List local collections of concepts}
 \usage{
-list_local_collections()
+list_local_collections(withJson = FALSE)
+}
+\arguments{
+\item{withJson}{if TRUE, returns the json strings of the collection
+(default: FALSE)}
 }
 \description{
 List local collections of concepts

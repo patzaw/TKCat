@@ -59,7 +59,7 @@ for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{Re
 \item{...}{\link{fileMDB} objects}
 }
 \value{
-A \link{fileMDB} object
+A fileMDB object
 }
 \description{
 An \link{MDB} (Modeled DataBase) based on files: fileMDB

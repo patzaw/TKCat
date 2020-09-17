@@ -3,10 +3,10 @@
 #' 
 #' @param dataFiles a named vector of path to data files with
 #' `all(names(dataFiles) %in% names(dataModel))`
-#' @param dataModel a [ReDaMoR::RelDataModel] object
 #' @param dbInfo a list with DB information:
 #' **"name"** (only mandatory field), "title", "description", "url",
 #' "version", "maintainer".
+#' @param dataModel a [ReDaMoR::RelDataModel] object
 #' @param readParameters a list of parameters for reading the data file.
 #' (e.g. `list(delim='\t', quoted_na=FALSE,)`)
 #' @param collectionMembers the members of collections as provided to the
@@ -15,7 +15,7 @@
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
 #' @param verbose if TRUE display the data confrontation report
 #'
-#' @return A [fileMDB] object
+#' @return A fileMDB object
 #' 
 #' @seealso
 #' - MDB methods:
@@ -251,7 +251,7 @@ read_fileMDB <- function(
 
 
 ###############################################################################@
-#' Check the object is  a [fileMDB] object
+#' Check if the object is  a [fileMDB] object
 #' 
 #' @param x any object
 #' 
@@ -319,9 +319,7 @@ rename.fileMDB <- function(.data, ...){
 #' @export
 #'
 db_info.fileMDB <- function(x, ...){
-   y <- unclass(x)
-   toRet <- y$dbInfo
-   return(toRet)
+   return(unclass(x)$dbInfo)
 }
 
 
@@ -415,7 +413,7 @@ collection_members.fileMDB <- function(
       all(value$resource==db_info(x)$name),
       all(value$collection %in% list_local_collections()$title),
       sum(duplicated(
-         value %>% dplyr::select("collection", "table", "field")
+         dplyr::select(value, "collection", "mid", "table", "field")
       ))==0
    )
    
@@ -467,7 +465,7 @@ data_tables.fileMDB <- function(x, ...){
    toRet <- lapply(
       toTake,
       function(y){
-         cr <- do.call(readr::read_delim, c(
+         do.call(readr::read_delim, c(
             list(
                file=x$dataFiles[y],
                col_types=ReDaMoR::col_types(m[[y]])
@@ -500,10 +498,10 @@ count_records.fileMDB <- function(x, ...){
       }
       return(n)
    }
-   m <- data_model(x)
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
+      names(toTake) <- names(x)
    }
    x <- unclass(x)
    lapply(x$dataFiles[toTake], count_lines) %>% 
@@ -513,15 +511,16 @@ count_records.fileMDB <- function(x, ...){
 
 
 ###############################################################################@
-#' Get the data files from an object
+#' Get the data files from a [fileMDB] object
 #' 
-#' @param x an object with a dataFiles and readParameters slots
+#' @param x a [fileMDB] object
 #' 
 #' @return a list with "dataFiles" and "readParameters" for reading the files.
 #' 
 #' @export
 #'
 data_files <- function(x){
+   stopifnot(is.fileMDB(x))
    x <- unclass(x)
    toTake <- c("dataFiles", "readParameters")
    stopifnot(all(toTake %in% names(x)))

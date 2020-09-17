@@ -2,6 +2,10 @@
 <!----------------------------------------------------------------------------->
 ## Version 0.5.0
 
+### R
+
+- Complete refactoring of code to make it more generic and flexible
+
 ### DESCRIPTION.json file
 
 - `readr::read_delim()` parameters are now provided within this file and

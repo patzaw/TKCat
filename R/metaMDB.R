@@ -99,7 +99,7 @@ metaMDB <- function(
 
 
 ###############################################################################@
-#' Check the object is  a [metaMDB] object
+#' Check if the object is  a [metaMDB] object
 #' 
 #' @param x any object
 #' 
@@ -302,7 +302,6 @@ collection_members.metaMDB <- function(
 #' @export
 #'
 data_tables.metaMDB <- function(x, ...){
-   m <- data_model(x)
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
@@ -334,7 +333,26 @@ data_tables.metaMDB <- function(x, ...){
 #' @export
 #'
 count_records.metaMDB <- function(x, ...){
-   lapply(data_tables(x, ...), nrow) %>% unlist()
+   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   if(length(toTake)==0){
+      toTake <- 1:length(x)
+      names(toTake) <- names(x)
+   }
+   toTake <- names(toTake)
+   x <- unclass(x)
+   toRet <- c()
+   for(mdb in names(x$MDBs)){
+      lToTake <- intersect(toTake, names(x$MDBs[[mdb]]))
+      if(length(lToTake)>0){
+         toRet <- c(toRet, count_records(x$MDBs[[mdb]], dplyr::all_of(lToTake)))
+      }
+   }
+   lToTake <- intersect(toTake, names(x$relationalTables))
+   if(length(lToTake)>0){
+      toRet <- c(toRet, unlist(lapply(x$relationalTables[lToTake], nrow)))
+   }
+   toRet <- toRet[toTake]
+   return(toRet)
 }
 
 

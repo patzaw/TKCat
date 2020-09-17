@@ -2,7 +2,7 @@
 % Please edit documentation in R/MDB.R
 \name{is.MDB}
 \alias{is.MDB}
-\title{Check if the object is  an MDB object}
+\title{Check if the object is an \link{MDB} object}
 \usage{
 is.MDB(x)
 }
@@ -13,5 +13,5 @@ is.MDB(x)
 A single logical: TRUE if x is an MDB object.
 }
 \description{
-Check if the object is  an MDB object
+Check if the object is an \link{MDB} object
 }
