@@ -10,10 +10,10 @@
 #' database (default: localhost)
 #' @param port an integer specifying the port on which the 
 #' database is listening (default: 9101)
-#' @param http an integer specifying the HTTP port of the 
-#' ClickHouse database (default: 9111). Used for documentation only.
 #' @param user user name
 #' @param password user password
+#' @param http an integer specifying the HTTP port of the 
+#' ClickHouse database (default: NULL). Used for documentation only.
 #'
 #' @return a chTKCat object
 #'
@@ -24,9 +24,9 @@
 chTKCat <- function(
    host="localhost",
    port=9101L,
-   http=9111L,
    user="default",
-   password
+   password,
+   http=NULL
 ){
    if(missing(password)){
       password <- getPass::getPass(

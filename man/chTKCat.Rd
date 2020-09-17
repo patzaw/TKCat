@@ -7,9 +7,9 @@
 chTKCat(
   host = "localhost",
   port = 9101L,
-  http = 9111L,
   user = "default",
-  password
+  password,
+  http = NULL
 )
 }
 \arguments{
@@ -19,12 +19,12 @@ database (default: localhost)}
 \item{port}{an integer specifying the port on which the
 database is listening (default: 9101)}
 
-\item{http}{an integer specifying the HTTP port of the
-ClickHouse database (default: 9111). Used for documentation only.}
-
 \item{user}{user name}
 
 \item{password}{user password}
+
+\item{http}{an integer specifying the HTTP port of the
+ClickHouse database (default: NULL). Used for documentation only.}
 }
 \value{
 a chTKCat object

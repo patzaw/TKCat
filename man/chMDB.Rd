@@ -3,6 +3,9 @@
 \name{chMDB}
 \alias{chMDB}
 \alias{names<-.chMDB}
+\alias{[.chMDB}
+\alias{[[.chMDB}
+\alias{c.chMDB}
 \title{An \link{MDB} (Modeled DataBase) relying on ClickHouse: chMDB}
 \usage{
 chMDB(
@@ -16,6 +19,12 @@ chMDB(
 )
 
 \method{names}{chMDB}(x) <- value
+
+\method{[}{chMDB}(x, i)
+
+\method{[[}{chMDB}(x, i)
+
+\method{c}{chMDB}(...)
 }
 \arguments{
 \item{tkcon}{a \link{chTKCat} object}
@@ -40,6 +49,10 @@ for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{Re
 \item{x}{a \link{chMDB} object}
 
 \item{value}{new table names}
+
+\item{i}{the index or the name of the tables to take}
+
+\item{...}{\link{chMDB} objects}
 }
 \value{
 A chMDB object

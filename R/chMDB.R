@@ -56,19 +56,21 @@ chMDB <- function(
       all(names(dbTables) %in% names(dataModel)),
       all(names(dataModel) %in% names(dbTables))
    )
-   dbTables_t <- strsplit(dbTables, split="[.]") %>% 
-      lapply(function(x) gsub("`", "", x)) %>% 
-      do.call(rbind, .) %>% 
-      magrittr::set_colnames(c("database", "name")) %>% 
-      dplyr::as_tibble()
-   chTables <- list_tables(tkcon$chcon, dbNames=unique(dbTables_t$database))
-   missTab <- dplyr::anti_join(dbTables_t, chTables, by=c("database", "name"))
-   if(nrow(missTab)>0){
-      stop(
-         "The following tables are not in the clickhouse database: ",
-         sprintf("`%s`.`%s`", missTab$database, missTab$name) %>% 
-            paste(collapse=", ")
-      )
+   if(length(dbTables)>0){
+      dbTables_t <- strsplit(dbTables, split="[.]") %>% 
+         lapply(function(x) gsub("`", "", x)) %>% 
+         do.call(rbind, .) %>% 
+         magrittr::set_colnames(c("database", "name")) %>% 
+         dplyr::as_tibble()
+      chTables <- list_tables(tkcon$chcon, dbNames=unique(dbTables_t$database))
+      missTab <- dplyr::anti_join(dbTables_t, chTables, by=c("database", "name"))
+      if(nrow(missTab)>0){
+         stop(
+            "The following tables are not in the clickhouse database: ",
+            sprintf("`%s`.`%s`", missTab$database, missTab$name) %>% 
+               paste(collapse=", ")
+         )
+      }
    }
    
    ## Confront data to model ----
@@ -234,7 +236,7 @@ get_chMDB <- function(tkcon, dbName, n_max=10){
       dataModel=dataModel,
       collectionMembers=collectionMembers,
       n_max=n_max,
-      verbose=TRUE
+      verbose=FALSE
    ))
 }
 
@@ -450,17 +452,28 @@ data_tables.chMDB <- function(x, ...){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
    }
-   toTake <- x$dbTables[toTake]
    dbt <- db_tables(x)
+   toTake <- dbt$dbTables[toTake]
    toRet <- lapply(
-      toTake,
-      function(y){
-         DBI::dbGetQuery(
+      names(toTake),
+      function(tn){
+         toRet <- DBI::dbGetQuery(
             dbt$tkcon$chcon,
-            sprintf("SELECT * from %s", y)
-         )
+            sprintf("SELECT * from %s", toTake[tn])
+         ) %>% 
+            dplyr::as_tibble()
+         attr(toRet, "data.type") <- NULL
+         for (cn in colnames(toRet)) {
+            toRet[, cn] <- as_type(
+               dplyr::pull(toRet, !!cn),
+               dplyr::filter(m[[tn]]$fields, .data$name==!!cn) %>%
+                  dplyr::pull("type")
+            )
+         }
+         return(toRet)
       }
    )
+   names(toRet) <- names(toTake)
    return(toRet)
 }
 
@@ -516,36 +529,143 @@ db_tables <- function(x){
 }
 
 
+###############################################################################@
+#' 
+#' @param x a [chMDB] object
+#' @param i index or names of the tables to take
+#'
+#' @rdname chMDB
+#' 
+#' @export
+#'
+'[.chMDB' <- function(x, i){
+   if(missing(i)){
+      return(x)
+   }
+   if(length(i)==0){
+      dbi <- db_info(x)
+      return(chMDB(
+         tkcon=db_tables(x)$tkcon,
+         dbTables=as.character(),
+         dbInfo=dbi,
+         dataModel=RelDataModel(l=list())
+      ))
+   }
+   stopifnot(
+      is.character(i) || is.numeric(i),
+      all(!is.na(i))
+   )
+   if(is.numeric(i)){
+      stopifnot(all(i %in% 1:length(x)))
+      i <- names(x)[i]
+   }
+   if(is.character(i)){
+      stopifnot(all(i %in% names(x)))
+   }
+   dbi <- db_info(x)
+   dm <- data_model(x)[i, rmForeignKeys=TRUE]
+   dbt <- db_tables(x)
+   tkcon <- dbt$tkcon
+   dbt <- dbt$dbTables[i]
+   cm <- collection_members(x)
+   if(!is.null(cm)){
+      cm <- cm %>%
+         dplyr::filter(.data$table %in% !!i) %>%
+         dplyr::mutate(resource=!!dbi$name)
+   }
+   toRet <- chMDB(
+      tkcon=tkcon,
+      dbTables=dbt,
+      dbInfo=dbi,
+      dataModel=dm,
+      collectionMembers=cm
+   )
+   return(toRet)
+}
 
 
+###############################################################################@
+#' 
+#' @param x a [chMDB] object
+#' @param i the index or the name of the tables to take
+#' 
+#' @export
+#'
+#' @rdname chMDB
+#'
+'[[.chMDB' <- function(x, i){
+   stopifnot(
+      length(i)==1
+   )
+   ## Rstudio hack to avoid DB call when just looking for names
+   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
+   if(length(cc)!=0){
+      invisible(NULL)
+   }else{
+      cc <- c(
+         grep('.rs.valueContents', deparse(sys.calls()), value=FALSE),
+         grep('.rs.explorer.inspectObject', deparse(sys.calls()), value=FALSE)
+      )
+      if(length(cc)!=0){
+         invisible(as.character(data_files(x)$dataFiles[i]))
+      }else{
+         return(data_tables(x, i)[[1]])
+      }
+   }
+}
+#' @rdname fileMDB
+#' @export
+'$.chMDB' <- `[[.chMDB`
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+###############################################################################@
+#'
+#' @param ... [chMDB] objects
+#'
+#' @rdname chMDB
+#' 
+#' @export
+#'
+c.chMDB <- function(...){
+   alldb <- list(...)
+   if(length(alldb)==0){
+      stop("At least one chMDB should be provided as an input")
+   }
+   dbt <- db_tables(alldb[[1]])
+   tkcon <- dbt$tkcon
+   for(i in 1:length(alldb)){
+      if(!is.chMDB(alldb[[i]])){
+         stop("All objects should be chMDB")
+      }
+      tkconi <- db_tables(alldb[[i]])$tkcon
+      if(!all(c(
+         tkconi$chcon@host==tkcon$chcon@host,
+         tkconi$chcon@port==tkcon$chcon@port
+      ))){
+         stop(
+            "chMDB are not from the same chTKCat instance.",
+            " Check hosts and ports."
+         )
+      }
+   }
+   dbt <- dbt$dbTables
+   di <- db_info(alldb[[1]])
+   dm <- data_model(alldb[[1]])
+   dc <- collection_members(alldb[[1]])
+   if(length(alldb)>1) for(i in 2:length(alldb)){
+      dm <- c(dm, data_model(alldb[[i]]))
+      dbt <- c(dbt, db_tables(alldb[[i]])$dbTables)
+      dc <- dplyr::bind_rows(
+         dc,
+         collection_members(alldb[[i]]) %>%
+            dplyr::mutate(resource=di$name)
+      )
+   }
+   chMDB(
+      tkcon=tkcon,
+      dbTables=dbt,
+      dbInfo=di,
+      dataModel=dm,
+      collectionMembers=dc
+   )
+}
