@@ -296,7 +296,11 @@ collection_members.memoMDB <- function(
 #' 
 #' @export
 #'
-data_tables.memoMDB <- function(x, ...){
+data_tables.memoMDB <- function(x, ..., skip=0, n_max=Inf){
+   stopifnot(
+      is.numeric(skip), length(skip)==1, skip>=0, is.finite(skip),
+      is.numeric(n_max), length(n_max)==1, n_max>0
+   )
    m <- data_model(x)
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
@@ -304,7 +308,17 @@ data_tables.memoMDB <- function(x, ...){
       names(toTake) <- names(x)
    }
    x <- unclass(x)
-   toRet <- x$dataTables[toTake]
+   toRet <- lapply(
+      x$dataTables[toTake],
+      function(d){
+         if(skip >= nrow(d)){
+            return(d[c(),])
+         }
+         n <- skip+1
+         m <- min(nrow(d), n_max+skip)
+         return(d[n:m,])
+      }
+   )
    names(toRet) <- names(toTake)
    return(toRet)
 }

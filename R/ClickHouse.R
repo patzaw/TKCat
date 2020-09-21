@@ -310,10 +310,48 @@ mergeTree_from_RelTableModel <- function(
       nullable=tm$fields %>%
          dplyr::filter(.data$nullable) %>%
          pull("name"),
-      sortKey=tm$primaryKey
+      sortKey=.get_tm_sortKey(tm)
    )
 }
 
+
+###############################################################################@
+## Helpers ----
+
+.get_tm_sortKey <- function(
+   tm, # a [ReDaMoR::RelTableModel] object
+   quoted=FALSE # if TRUE, returns a single character value ClickHouse compatible
+               # if FALSE, returns a vector of character
+){
+   # By default: sort by primary key
+   if(length(tm$primaryKey)>0){
+      toRet <- tm$primaryKey
+      
+   }else{
+      it <- index_table(tm)
+      if(!is.null(it) && nrow(it)>0){
+         uit <- dplyr::filter(it, .data$uniqueIndex)
+         
+         # If no primary key, sort by the first unique index
+         if(nrow(uit)>0){
+            toRet <- dplyr::filter(uit, .data$index==min(uit$index)) %>% 
+               pull(field)
+         }else{
+            
+            # If no unique index, sort by index and the remaining columns
+            toRet <- unique(c(it$field, tm$fields$name))
+         }
+      }else{
+         
+         # If no index, sort by all columns
+         toRet <- tm$fields$name
+      }
+   }
+   if(quoted){
+      toRet <- paste(sprintf("`%s`", toRet), collapse=", ")
+   }
+   return(toRet)
+}
 
 ###############################################################################@
 ## ClickHouse statements for DB access ----

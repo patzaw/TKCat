@@ -445,7 +445,14 @@ collection_members.chMDB <- function(
 #' 
 #' @export
 #'
-data_tables.chMDB <- function(x, ...){
+data_tables.chMDB <- function(x, ..., skip=0, n_max=Inf){
+   stopifnot(
+      is.numeric(skip), length(skip)==1, skip>=0, is.finite(skip),
+      is.numeric(n_max), length(n_max)==1, n_max>0
+   )
+   if(is.infinite(n_max)){
+      n_max <- max(count_records(x, ...))
+   }
    m <- data_model(x)
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
@@ -459,7 +466,12 @@ data_tables.chMDB <- function(x, ...){
       function(tn){
          toRet <- DBI::dbGetQuery(
             dbt$tkcon$chcon,
-            sprintf("SELECT * from %s", toTake[tn])
+            sprintf(
+               "SELECT * from %s ORDER BY %s LIMIT %s, %s",
+               toTake[tn],
+               .get_tm_sortKey(m[[tn]]),
+               skip, n_max
+            )
          ) %>% 
             dplyr::as_tibble()
          attr(toRet, "data.type") <- NULL
@@ -668,4 +680,91 @@ c.chMDB <- function(...){
       dataModel=dm,
       collectionMembers=dc
    )
+}
+
+
+###############################################################################@
+#' 
+#' @param by the size of the batch: number of records to write
+#' together (default: 10^5)
+#' 
+#' @rdname as_fileMDB
+#' @method as_fileMDB chMDB
+#' 
+#' @export
+#'
+as_fileMDB.chMDB <- function(x, path, by=10^5, ...){
+   stopifnot(is.character(path), length(path)==1, !is.na(path))
+   dbInfo <- db_info(x)
+   dbName <- dbInfo$name
+   
+   ## Initialization ----
+   fullPath <- file.path(path, dbName)
+   if(file.exists(fullPath)){
+      stop(sprintf("%s already exists", fullPath))
+   }
+   dir.create(fullPath, recursive=TRUE)
+   
+   ## Description file ----
+   rp <- list(
+      delim='\t',
+      quoted_na=FALSE
+   )
+   descFile <- file.path(fullPath, "DESCRIPTION.json")
+   .writeDescription(c(dbInfo, rp), descFile)
+   
+   ## Data model ----
+   dm <- data_model(x)
+   modelPath <- file.path(fullPath, "model")
+   dir.create(modelPath)
+   jModelPath <- file.path(modelPath, paste0(dbName, ".json"))
+   hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
+   write_json_data_model(dm, jModelPath)
+   plot(dm) %>%
+      visNetwork::visSave(hModelPath)
+   
+   ## Collection members ----
+   cm <- collection_members(x)
+   if(!is.null(cm) && nrow(cm)>0){
+      colPath <- file.path(modelPath, "Collections")
+      dir.create(colPath)
+      for(collection in unique(cm$collection)){
+         cv <- dplyr::filter(cm, .data$collection==!!collection)
+         for(cid in unique(cv$cid)){
+            dplyr::filter(cv, .data$cid==!!cid) %>%
+               write_collection_members(path=file.path(
+                  colPath,
+                  paste0(collection, "-", cid, ".json")
+               ))
+         }
+      }
+   }
+   
+   ## Data ----
+   dataPath <- file.path(fullPath, "data")
+   dir.create(dataPath)
+   ext <- ".txt.gz"
+   dfiles <- file.path(dataPath, paste0(names(x), ext))
+   names(dfiles) <- names(x)
+   for(tn in names(x)){
+      toWrite <- data_tables(x, tn, skip=0, n_max=by)[[1]]
+      r <- nrow(toWrite)
+      while(nrow(toWrite)>0){
+         readr::write_tsv(
+            toWrite, path=dfiles[tn],
+            append=file.exists(dfiles[tn])
+         )
+         toWrite <- data_tables(x, tn, skip=r, n_max=by)[[1]]
+         r <- r+nrow(toWrite)
+      }
+   }
+   
+   ## Return fileMDB ----
+   return(fileMDB(
+      dataFiles=dfiles,
+      dbInfo=dbInfo,
+      dataModel=dm,
+      readParameters=rp,
+      collectionMembers=cm
+   ))
 }

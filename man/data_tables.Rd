@@ -9,13 +9,13 @@
 \alias{data_tables.metaMDB}
 \title{Get object data tables}
 \usage{
-\method{data_tables}{chMDB}(x, ...)
+\method{data_tables}{chMDB}(x, ..., skip = 0, n_max = Inf)
 
-\method{data_tables}{fileMDB}(x, ...)
+\method{data_tables}{fileMDB}(x, ..., skip = 0, n_max = Inf)
 
-data_tables(x, ...)
+data_tables(x, ..., skip = 0, n_max = Inf)
 
-\method{data_tables}{memoMDB}(x, ...)
+\method{data_tables}{memoMDB}(x, ..., skip = 0, n_max = Inf)
 
 \method{data_tables}{metaMDB}(x, ...)
 }
@@ -23,6 +23,10 @@ data_tables(x, ...)
 \item{x}{an object with embedded data tables}
 
 \item{...}{the name of the tables to get (default: all of them)}
+
+\item{skip}{the number of rows to skip (default: 0)}
+
+\item{n_max}{maximum number of rows to return (default: Inf)}
 }
 \value{
 A list of \link[dplyr:reexports]{dplyr::tibble}

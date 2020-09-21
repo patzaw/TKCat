@@ -454,7 +454,11 @@ collection_members.fileMDB <- function(
 #' 
 #' @export
 #'
-data_tables.fileMDB <- function(x, ...){
+data_tables.fileMDB <- function(x, ..., skip=0, n_max=Inf){
+   stopifnot(
+      is.numeric(skip), length(skip)==1, skip>=0, is.finite(skip),
+      is.numeric(n_max), length(n_max)==1, n_max>0
+   )
    m <- data_model(x)
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
@@ -465,13 +469,24 @@ data_tables.fileMDB <- function(x, ...){
    toRet <- lapply(
       toTake,
       function(y){
-         do.call(readr::read_delim, c(
+         ht <- do.call(readr::read_delim, c(
             list(
                file=x$dataFiles[y],
-               col_types=ReDaMoR::col_types(m[[y]])
+               col_types=ReDaMoR::col_types(m[[y]]),
+               skip=0, n_max=0
             ),
             x$readParameters
          ))
+         return(do.call(readr::read_delim, c(
+            list(
+               file=x$dataFiles[y],
+               col_names=colnames(ht),
+               col_types=ReDaMoR::col_types(m[[y]]),
+               skip=skip+1,
+               n_max=n_max
+            ),
+            x$readParameters
+         )))
       }
    )
    names(toRet) <- names(toTake)

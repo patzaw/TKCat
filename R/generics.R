@@ -114,12 +114,14 @@ collection_members <- function(x, ...){
 #'
 #' @param x an object with embedded data tables
 #' @param ... the name of the tables to get (default: all of them)
+#' @param skip the number of rows to skip (default: 0)
+#' @param n_max maximum number of rows to return (default: Inf)
 #' 
 #' @return A list of [dplyr::tibble]
 #' 
 #' @export
 #'
-data_tables <- function(x, ...){
+data_tables <- function(x, ..., skip=0, n_max=Inf){
    UseMethod("data_tables", x)
 }
 
