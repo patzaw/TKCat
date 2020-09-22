@@ -4,10 +4,10 @@
 \alias{import_local_collection}
 \title{Import a  the definition of a collection of concepts in the local environment}
 \usage{
-import_local_collection(path, overwrite = FALSE)
+import_local_collection(txt, overwrite = FALSE)
 }
 \arguments{
-\item{path}{the JSON file to import}
+\item{txt}{a JSON string or file}
 
 \item{overwrite}{a single logical. If TRUE the collection is overwritten
 if it already exists (default: FALSE)}

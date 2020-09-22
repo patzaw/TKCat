@@ -217,7 +217,7 @@ ch_insert <- function(
       RClickhouse::dbQuoteIdentifier(con, tableName),
       sep="."
    ))
-   RClickhouse::dbSendQuery(con, sprintf("USE %s", dbName))
+   RClickhouse::dbSendQuery(con, sprintf("USE `%s`", dbName))
    on.exit(RClickhouse::dbSendQuery(con, "USE default"))
    
    if(nrow(value)>0){
@@ -335,7 +335,7 @@ mergeTree_from_RelTableModel <- function(
          # If no primary key, sort by the first unique index
          if(nrow(uit)>0){
             toRet <- dplyr::filter(uit, .data$index==min(uit$index)) %>% 
-               pull(field)
+               pull("field")
          }else{
             
             # If no unique index, sort by index and the remaining columns

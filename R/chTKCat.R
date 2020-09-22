@@ -141,21 +141,29 @@ check_chTKCat <- function(x, verbose=FALSE){
    
    ## Check collection consistency ----
    rcols <- list_chTKCat_collections(x, withJson=TRUE)
+   lcols <- list_local_collections(withJson=TRUE)
    for(col in rcols$title){
-      lcol <- get_local_collection(title=col) %>% 
-         jsonlite::fromJSON(simplifyVector=FALSE)
-      rcol <- rcols %>%
-         dplyr::filter(.data$title==!!col) %>%
-         dplyr::pull("json") %>% 
-         jsonlite::fromJSON(simplifyVector=FALSE)
-      if(!identical(lcol, rcol)){
-         warning(
-            sprintf(
-               "Remote %s collection is different from the local version.",
-               col
-            ),
-            " Be careful when manipulating members of this collection."
-         )
+      if(col %in% lcols$title){
+         lcol <- get_local_collection(title=col) %>% 
+            jsonlite::fromJSON(simplifyVector=FALSE)
+         rcol <- rcols %>%
+            dplyr::filter(.data$title==!!col) %>%
+            dplyr::pull("json") %>% 
+            jsonlite::fromJSON(simplifyVector=FALSE)
+         if(!identical(lcol, rcol)){
+            warning(
+               sprintf(
+                  "Remote %s collection is different from the local version.",
+                  col
+               ),
+               " Be careful when manipulating members of this collection."
+            )
+         }
+      }else{
+         rcol <- rcols %>%
+            dplyr::filter(.data$title==!!col) %>%
+            dplyr::pull("json")
+         import_local_collection(rcol)
       }
    }
    return(toRet)
@@ -224,7 +232,7 @@ print.chTKCat <- function(x, ...){
 #' @export
 #'
 db_disconnect.chTKCat <- function(x){
-   RClickhouse::db_disconnect(x[["chcon"]])
+   RClickhouse::dbDisconnect(x[["chcon"]])
    invisible()
 }
 
@@ -657,7 +665,7 @@ drop_chMDB <- function(x, name){
       stop("Only chTKCat admin can drop an MDB from ClickHouse")
    }
    con <- x$chcon
-   RClickhouse::dbSendQuery(con, sprintf("DROP DATABASE %s", name))
+   RClickhouse::dbSendQuery(con, sprintf("DROP DATABASE `%s`", name))
    ul <- list_chTKCat_users(x) %>% 
       dplyr::filter(!.data$admin) %>% 
       dplyr::pull("login")
@@ -691,7 +699,7 @@ empty_chMDB <- function(x, name){
    con <- x$chcon
    toDrop <- setdiff(
       list_tables(con, name)$name,
-      names(devTKCat:::CHMDB_DATA_MODEL)
+      names(CHMDB_DATA_MODEL)
    )
    for(tn in toDrop){
       RClickhouse::dbSendQuery(
@@ -700,7 +708,7 @@ empty_chMDB <- function(x, name){
       )
    }
    toEmpty <- setdiff(
-      names(devTKCat:::CHMDB_DATA_MODEL),
+      names(CHMDB_DATA_MODEL),
       c("___MDBUsers___", "___Public___")
    )
    for(tn in toEmpty){
@@ -776,7 +784,7 @@ set_chMDB_access <- function(x, mdb, public){
       dplyr::filter(!.data$admin) %>% 
       dplyr::pull("login")
    chMDBusers <- list_chMDB_users(x, mdb)$login
-   dbTables <- DBI::dbGetQuery(con, sprintf("SHOW TABLES FROM %s", mdb)) %>% 
+   dbTables <- DBI::dbGetQuery(con, sprintf("SHOW TABLES FROM `%s`", mdb)) %>% 
       pull("name")
    if(public){
       for(tn in setdiff(dbTables, "___MDBUsers___")){
@@ -898,7 +906,9 @@ add_chMDB_user <- function(x, mdb, login, admin=FALSE){
             mdb, login
          )
       )
-      dbTables <- DBI::dbGetQuery(con, sprintf("SHOW TABLES FROM %s", mdb)) %>% 
+      dbTables <- DBI::dbGetQuery(
+         con, sprintf("SHOW TABLES FROM `%s`", mdb)
+      ) %>% 
          dplyr::pull("name")
       modelTables <- names(CHMDB_DATA_MODEL)
       for(tn in setdiff(dbTables, modelTables)){
@@ -961,7 +971,7 @@ remove_chMDB_user <- function(x, mdb, login){
       selTables <- names(CHMDB_DATA_MODEL)
       if(public){
          selTables <- DBI::dbGetQuery(
-            con, sprintf("SHOW TABLES FROM %s", mdb)
+            con, sprintf("SHOW TABLES FROM `%s`", mdb)
          ) %>% 
             dplyr::pull("name")
       }

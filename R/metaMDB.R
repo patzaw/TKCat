@@ -438,7 +438,7 @@ count_records.metaMDB <- function(x, ...){
       if(length(cc)!=0){
          invisible(as.character(data_files(x)$dataFiles[i]))
       }else{
-         return(data_tables(x, i)[[1]])
+         return(data_tables(x, dplyr::all_of(i))[[1]])
       }
    }
 }
@@ -463,7 +463,11 @@ c.metaMDB <- function(...){
 #' 
 #' @export
 #'
-as_fileMDB.metaMDB <- function(x, path, ...){
+as_fileMDB.metaMDB <- function(
+   x, path,
+   readParameters=DEFAULT_READ_PARAMS,
+   ...
+){
    stopifnot(is.character(path), length(path)==1, !is.na(path))
    dbInfo <- db_info(x)
    dbName <- dbInfo$name
@@ -476,10 +480,7 @@ as_fileMDB.metaMDB <- function(x, path, ...){
    dir.create(fullPath, recursive=TRUE)
    
    ## Description file ----
-   rp <- list(
-      delim='\t',
-      quoted_na=FALSE
-   )
+   rp <- .check_read_params(readParameters)
    descFile <- file.path(fullPath, "DESCRIPTION.json")
    .writeDescription(c(dbInfo, rp), descFile)
    
@@ -517,13 +518,7 @@ as_fileMDB.metaMDB <- function(x, path, ...){
    
    adfiles <- c()
    for(mdb in MDBs(x)){
-      if(is.fileMDB(mdb)){
-         lrp <- data_files(mdb)$readParameters
-         if(!identical(lrp[sort(names(lrp))], rp[sort(names(rp))])){
-            mdb <- as_memoMDB(mdb)
-         }
-      }
-      tmp <- as_fileMDB(mdb, path=dataPath)
+      tmp <- as_fileMDB(mdb, path=dataPath, readParameters=rp)
       ofiles <- data_files(tmp)$dataFiles
       dfiles <- file.path(dataPath, basename(ofiles)) %>%
          magrittr::set_names(names(ofiles))
@@ -718,7 +713,10 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
       tables=c(
          tables[intersect(toTake, rtNames)],
          do.call(c, set_names(lapply(
-            fmdbs, function(y) data_tables(y, intersect(names(y), toTake))
+            fmdbs,
+            function(y){
+               data_tables(y, dplyr::all_of(intersect(names(y), toTake)))
+            }
          ), NULL))
       )
    )
@@ -726,12 +724,12 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
    ## Propagate filter -----
    tables <- data_tables(
       frdb,
-      intersect(names(frdb), unlist(lapply(MDBs(x), names)))
+      dplyr::all_of(intersect(names(frdb), unlist(lapply(MDBs(x), names))))
    )
    tables <- c(
       tables,
       do.call(c, set_names(lapply(fmdbs, function(y){
-         data_tables(y, setdiff(names(y), names(tables)))
+         data_tables(y, dplyr::all_of(setdiff(names(y), names(tables))))
       }), NULL))
    )
    fmdbs <- lapply(
@@ -775,7 +773,7 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
       MDBs=fmdbs,
       relationalTables=data_tables(
          frdb,
-         setdiff(names(frdb), unlist(lapply(MDBs(x), names)))
+         dplyr::all_of(setdiff(names(frdb), unlist(lapply(MDBs(x), names))))
       ),
       dataModel=data_model(x)[
          union(unlist(lapply(fmdbs, names)), names(frdb)),
@@ -811,5 +809,15 @@ get_shared_collections <- function(x, y){
       dplyr::distinct(ycm, .data$collection, .data$table, .data$mid),
       by="collection"
    ))
+}
+
+
+###############################################################################@
+## Helpers ----
+.write_chTables.metaMDB <- function(x, con, dbName){
+   for(mdb in MDBs(x)){
+      .write_chTables(mdb, con, dbName)
+   }
+   .write_chTables(as_memoMDB(x[names(relational_tables(x))]), con, dbName)
 }
 

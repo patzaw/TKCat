@@ -9,20 +9,29 @@
 \alias{as_fileMDB.metaMDB}
 \title{Write an MDB object}
 \usage{
-\method{as_fileMDB}{chMDB}(x, path, by = 10^5, ...)
+\method{as_fileMDB}{chMDB}(x, path, readParameters = DEFAULT_READ_PARAMS, by = 10^5, ...)
 
-\method{as_fileMDB}{fileMDB}(x, path, ...)
+\method{as_fileMDB}{fileMDB}(x, path, readParameters = DEFAULT_READ_PARAMS, ...)
 
-as_fileMDB(x, path, ...)
+as_fileMDB(x, path, readParameters = DEFAULT_READ_PARAMS, ...)
 
-\method{as_fileMDB}{memoMDB}(x, path, ...)
+\method{as_fileMDB}{memoMDB}(x, path, readParameters = DEFAULT_READ_PARAMS, ...)
 
-\method{as_fileMDB}{metaMDB}(x, path, ...)
+\method{as_fileMDB}{metaMDB}(x, path, readParameters = DEFAULT_READ_PARAMS, ...)
 }
 \arguments{
 \item{x}{an MDB object}
 
 \item{path}{the path where the MDB should be written}
+
+\item{readParameters}{a list with 2 elements:
+\itemize{
+\item \strong{delim}: a single character used to separate fields within a record
+(default: '\\t')
+\item \strong{quoted_na}: a single logical indicating if missing values inside quotes
+should bbe treated as missing values or strings
+(FALSE: the default \strong{different} from \link[readr:read_delim]{readr::read_delim})
+}}
 
 \item{by}{the size of the batch: number of records to write
 together (default: 10^5)}

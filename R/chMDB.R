@@ -58,8 +58,7 @@ chMDB <- function(
    )
    if(length(dbTables)>0){
       dbTables_t <- strsplit(dbTables, split="[.]") %>% 
-         lapply(function(x) gsub("`", "", x)) %>% 
-         do.call(rbind, .) %>% 
+         do.call(rbind, lapply(function(x) gsub("`", "", x))) %>%
          magrittr::set_colnames(c("database", "name")) %>% 
          dplyr::as_tibble()
       chTables <- list_tables(tkcon$chcon, dbNames=unique(dbTables_t$database))
@@ -89,8 +88,8 @@ chMDB <- function(
             toRet[,cn] <- ReDaMoR::as_type(
                dplyr::pull(toRet, !!cn),
                dataModel[[tn]]$fields %>%
-                  dplyr::filter(name==!!cn) %>%
-                  dplyr::pull(type)
+                  dplyr::filter(.data$name==!!cn) %>%
+                  dplyr::pull("type")
             )
          }
          return(toRet)
@@ -224,9 +223,12 @@ get_chMDB <- function(tkcon, dbName, n_max=10){
       as_tibble() %>%
       mutate(
          resource=dbName,
-         static=as.logical(static)
+         static=as.logical(.data$static)
       ) %>% 
-      select(collection, cid, resource, mid, table, field, static, value, type)
+      select(
+         "collection", "cid", "resource", "mid", "table", "field",
+         "static", "value", "type"
+      )
    attr(collectionMembers, "data.type") <- NULL
    
    return(chMDB(
@@ -252,6 +254,131 @@ get_chMDB <- function(tkcon, dbName, n_max=10){
 #'
 is.chMDB <- function(x){
    inherits(x, "chMDB")
+}
+
+
+###############################################################################@
+#' Push an [MDB] object in a ClickHouse database
+#'
+#' @param x an [MDB] object
+#' @param tkcon a [chTKCat] object
+#' @param overwrite a logical indicating if existing data should be overwritten
+#' (default: FALSE)
+#' 
+#' @return A [chMDB] object.
+#' 
+#' @export
+#'
+as_chMDB <- function(x, tkcon, overwrite=FALSE){
+   stopifnot(is.MDB(x))
+   stopifnot(is.chTKCat(tkcon))
+   con <- tkcon$chcon
+   dbInfo <- db_info(x)
+   dbName <- dbInfo$name
+   dataModel <- data_model(x)
+   collectionMembers <- collection_members(x)
+   
+   ## Check existence and availability ----
+   if(!dbName %in% list_chMDBs(tkcon, withInfo=FALSE)){
+      stop(
+         sprintf("%s does not exist in the chTKCat.", dbName),
+         "Create it or contact the administrator of the chTKCat."
+      )
+   }
+   if(
+      dbName %in% list_chMDBs(tkcon, withInfo=TRUE)$name
+   ){
+      if(!overwrite){
+         stop(
+            sprintf("%s is already used and filled.", dbName),
+            " Set overwrite to TRUE if you want to replace the content."
+         )
+      }else{
+         empty_chMDB(tkcon, dbName)
+      }
+   }
+   
+   ## Add relevant collections ----
+   if(!is.null(collectionMembers) && nrow(collectionMembers)>0){
+      toAdd <- unique(collectionMembers$collection)
+      for(col in toAdd){
+         add_chTKCat_collection(tkcon, col)
+      }
+   }
+   
+   ## Write DB information ----
+   ch_insert(
+      con=con, dbName=dbName, tableName="___MDB___", value=as_tibble(dbInfo)
+   )
+   
+   ## Write data model ----
+   er <- try({
+      dbm <- ReDaMoR::toDBM(dataModel)
+      ch_insert(
+         con=con,
+         dbName=dbName,
+         tableName="___Tables___",
+         value=dbm$tables
+      )
+      ch_insert(
+         con=con,
+         dbName=dbName,
+         tableName="___Fields___",
+         value=dbm$fields
+      )
+      ch_insert(
+         con=con,
+         dbName=dbName,
+         tableName="___PrimaryKeys___",
+         value=dbm$primaryKeys
+      )
+      ch_insert(
+         con=con,
+         dbName=dbName,
+         tableName="___ForeignKeys___",
+         value=dbm$foreignKeys
+      )
+      ch_insert(
+         con=con,
+         dbName=dbName,
+         tableName="___Indexes___",
+         value=dbm$indexes
+      )
+   }, silent=FALSE)
+   if(inherits(er, "try-error")){
+      empty_chMDB(tkcon, dbName)
+      stop(as.character(er))
+   }
+   
+   ## Write collection members ----
+   er <- try({
+      ch_insert(
+         con=con, dbName=dbName, tableName="___CollectionMembers___",
+         value=dplyr::select(
+            collectionMembers,
+            dplyr::all_of(
+               CHMDB_DATA_MODEL$"___CollectionMembers___"$fields$name
+            )
+         )
+      )
+   }, silent=FALSE)
+   if(inherits(er, "try-error")){
+      empty_chMDB(tkcon, dbName)
+      stop(as.character(er))
+   }
+   
+   ## Write data ----
+   er <- try({
+      mergeTrees_from_RelDataModel(con=con, dbName=dbName, dbm=dataModel)
+      .write_chTables(x, con, dbName)
+   }, silent=FALSE)
+   if(inherits(er, "try-error")){
+      empty_chMDB(tkcon, dbName)
+      stop(as.character(er))
+   }
+   
+   ## Return the chMDB object ----
+   return(get_chMDB(tkcon=tkcon, dbName=dbName))
 }
 
 
@@ -469,7 +596,7 @@ data_tables.chMDB <- function(x, ..., skip=0, n_max=Inf){
             sprintf(
                "SELECT * from %s ORDER BY %s LIMIT %s, %s",
                toTake[tn],
-               .get_tm_sortKey(m[[tn]]),
+               .get_tm_sortKey(m[[tn]], quoted=TRUE),
                skip, n_max
             )
          ) %>% 
@@ -506,8 +633,7 @@ count_records.chMDB <- function(x, ...){
    dbt <- db_tables(x)
    dbt$dbTables <- dbt$dbTables[toTake]
    dbTables_t <- strsplit(dbt$dbTables, split="[.]") %>% 
-      lapply(function(x) gsub("`", "", x)) %>% 
-      do.call(rbind, .) %>% 
+      do.call(rbind, lapply(function(x) gsub("`", "", x))) %>% 
       magrittr::set_colnames(c("database", "name")) %>% 
       dplyr::as_tibble()
    chTables <- list_tables(
@@ -621,7 +747,7 @@ db_tables <- function(x){
       if(length(cc)!=0){
          invisible(as.character(data_files(x)$dataFiles[i]))
       }else{
-         return(data_tables(x, i)[[1]])
+         return(data_tables(x, dplyr::all_of(i))[[1]])
       }
    }
 }
@@ -693,7 +819,12 @@ c.chMDB <- function(...){
 #' 
 #' @export
 #'
-as_fileMDB.chMDB <- function(x, path, by=10^5, ...){
+as_fileMDB.chMDB <- function(
+   x, path,
+   readParameters=DEFAULT_READ_PARAMS,
+   by=10^5,
+   ...
+){
    stopifnot(is.character(path), length(path)==1, !is.na(path))
    dbInfo <- db_info(x)
    dbName <- dbInfo$name
@@ -706,10 +837,7 @@ as_fileMDB.chMDB <- function(x, path, by=10^5, ...){
    dir.create(fullPath, recursive=TRUE)
    
    ## Description file ----
-   rp <- list(
-      delim='\t',
-      quoted_na=FALSE
-   )
+   rp <- .check_read_params(readParameters)
    descFile <- file.path(fullPath, "DESCRIPTION.json")
    .writeDescription(c(dbInfo, rp), descFile)
    
@@ -747,14 +875,15 @@ as_fileMDB.chMDB <- function(x, path, by=10^5, ...){
    dfiles <- file.path(dataPath, paste0(names(x), ext))
    names(dfiles) <- names(x)
    for(tn in names(x)){
-      toWrite <- data_tables(x, tn, skip=0, n_max=by)[[1]]
+      toWrite <- data_tables(x, dplyr::all_of(tn), skip=0, n_max=by)[[1]]
       r <- nrow(toWrite)
       while(nrow(toWrite)>0){
-         readr::write_tsv(
+         readr::write_delim(
             toWrite, path=dfiles[tn],
+            delim=rp$delim,
             append=file.exists(dfiles[tn])
          )
-         toWrite <- data_tables(x, tn, skip=r, n_max=by)[[1]]
+         toWrite <- data_tables(x, dplyr::all_of(tn), skip=r, n_max=by)[[1]]
          r <- r+nrow(toWrite)
       }
    }
@@ -767,4 +896,69 @@ as_fileMDB.chMDB <- function(x, path, by=10^5, ...){
       readParameters=rp,
       collectionMembers=cm
    ))
+}
+
+
+###############################################################################@
+#' Filter a [chMDB] object and return a [memoMDB]
+#' 
+#' @param .data a [chMDB] object
+#' @param ... each argument should have the name of one of the tables of the
+#' [chMDB] object and contain a simple logical expression involving
+#' the names of the corresponding table.
+#' @param .preserve not used
+#' 
+#' @return a [memoMDB] object
+#' 
+#' @export
+#'
+filter.chMDB <- function(.data, ..., .preserve=FALSE){
+}
+
+
+###############################################################################@
+#' Subset a [chMDB] object according to row position in one table
+#' and return a [memoMDB]
+#' 
+#' @param .data a [chMDB] object
+#' @param ... a single argument. The name of this argument should be a table
+#' name of x and the value of this argument should be vector of integers
+#' corresponding to row indexes.
+#' @param .preserve not used
+#' 
+#' @return a [memoMDB] object
+#' 
+#' @export
+#'
+slice.chMDB <- function(.data, ..., .preserve=FALSE){
+}
+
+
+###############################################################################@
+#' 
+#' @rdname filter_with_tables
+#' @method filter_with_tables chMDB
+#' 
+#' @export
+#'
+filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
+}
+
+
+###############################################################################@
+## Helpers ----
+.write_chTables.chMDB <- function(x, con, dbName, by=10^5){
+   dm <- data_model(x)
+   df <- data_files(x)
+   rp <- df$readParameters
+   df <- df$dataFiles
+   for(tn in names(x)){
+      toWrite <- data_tables(x, dplyr::all_of(tn), skip=0, n_max=by)[[1]]
+      r <- nrow(toWrite)
+      while(nrow(toWrite)>0){
+         ch_insert(con=con, dbName=dbName, tableName=tn, value=toWrite)
+         toWrite <- data_tables(x, dplyr::all_of(tn), skip=r, n_max=by)[[1]]
+         r <- r+nrow(toWrite)
+      }
+   }
 }

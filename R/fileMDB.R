@@ -32,7 +32,7 @@ fileMDB <- function(
    dataFiles,
    dbInfo,
    dataModel,
-   readParameters=list(),
+   readParameters=DEFAULT_READ_PARAMS,
    collectionMembers=NULL,
    n_max=10,
    verbose=FALSE
@@ -58,10 +58,7 @@ fileMDB <- function(
    }
    
    ## Read parameters ----
-   readParameters <- readParameters[intersect(
-      setdiff(names(readParameters), "n_max"),
-      names(as.list(args(readr::read_delim)))
-   )]
+   readParameters <- .check_read_params(readParameters)
    
    ## Confront data to model ----
    rnDataModel <- dataModel
@@ -163,19 +160,7 @@ read_fileMDB <- function(
    dbInfo <- .check_dbInfo(dbInfo)
    
    ## Read parameters ----
-   readParameters <- allInfo[intersect(
-      names(allInfo),
-      names(as.list(args(readr::read_delim)))
-   )]
-   defaultParameters <- list(
-      delim='\t',
-      quoted_na=FALSE
-   )
-   for(p in names(defaultParameters)){
-      if(!p %in% names(readParameters)){
-         readParameters[[p]] <- defaultParameters[[p]]
-      }
-   }
+   readParameters <- .check_read_params(allInfo)
    
    ## Data model ----
    if(is.null(dataModel)){
@@ -623,7 +608,7 @@ data_files <- function(x){
       if(length(cc)!=0){
          invisible(as.character(data_files(x)$dataFiles[i]))
       }else{
-         return(data_tables(x, i)[[1]])
+         return(data_tables(x, dplyr::all_of(i))[[1]])
       }
    }
 }
@@ -686,7 +671,11 @@ c.fileMDB <- function(...){
 #' 
 #' @export
 #'
-as_fileMDB.fileMDB <- function(x, path, ...){
+as_fileMDB.fileMDB <- function(
+   x, path,
+   readParameters=DEFAULT_READ_PARAMS,
+   ...
+){
    stopifnot(is.character(path), length(path)==1, !is.na(path))
    dbInfo <- db_info(x)
    dbName <- dbInfo$name
@@ -699,9 +688,21 @@ as_fileMDB.fileMDB <- function(x, path, ...){
    dir.create(fullPath, recursive=TRUE)
    
    ## Description file ----
-   rp <- data_files(x)$readParameters
+   readParameters <- .check_read_params(readParameters)
    descFile <- file.path(fullPath, "DESCRIPTION.json")
-   .writeDescription(c(dbInfo, rp), descFile)
+   .writeDescription(c(dbInfo, readParameters), descFile)
+   rp <- data_files(x)$readParameters
+   if(
+      !identical(sort(names(rp)), sort(names(readParameters))) ||
+      !all(unlist(lapply(
+         names(readParameters), 
+         function(rpn) readParameters[[rpn]]!=rp[[rpn]]
+      )))
+   ){
+      rewrite=TRUE
+   }else{
+      rewrite=FALSE
+   }
    
    ## Data model ----
    dm <- data_model(x)
@@ -736,14 +737,38 @@ as_fileMDB.fileMDB <- function(x, path, ...){
    ofiles <- data_files(x)$dataFiles
    dfiles <- file.path(dataPath, basename(ofiles)) %>%
       magrittr::set_names(names(ofiles))
-   file.copy(ofiles, dfiles)
+   if(rewrite){
+      for(tn in names(x)){
+         do.call(
+            readr::read_delim_chunked,
+            c(
+               list(file=ofiles[tn]),
+               rp,
+               list(
+                  col_types=ReDaMoR::col_types(dm[[tn]])
+               ),
+               list(
+                  callback=readr::DataFrameCallback$new(function(y, pos){
+                     readr::write_delim(
+                        y, path=dfiles[tn], delim=readParameters$delim,
+                        append=file.exists(dfiles[tn])
+                     )
+                  }),
+                  chunk_size=10^5
+               )
+            )
+         )
+      }
+   }else{
+      file.copy(ofiles, dfiles)
+   }
    
    ## Return fileMDB ----
    return(fileMDB(
       dataFiles=dfiles,
       dbInfo=dbInfo,
       dataModel=dm,
-      readParameters=rp,
+      readParameters=readParameters,
       collectionMembers=cm
    ))
 }
@@ -882,8 +907,64 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
    
 }
 
+###############################################################################@
+## READ PARAMETERS -----
+DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
 
+.check_read_params <- function(readParameters){
+   readParameters <- readParameters[intersect(
+      names(readParameters), names(DEFAULT_READ_PARAMS)
+   )]
+   if("delim" %in% names(readParameters)){
+      stopifnot(
+         length(readParameters$delim)==1,
+         is.character(readParameters$delim),
+         !is.na(readParameters$delim)
+      )
+   }
+   if("quoted_na" %in% names(readParameters)){
+      stopifnot(
+         length(readParameters$quoted_na)==1,
+         is.logical(readParameters$quoted_na),
+         !is.na(readParameters$quoted_na)
+      )
+   }
+   return(c(
+      readParameters,
+      DEFAULT_READ_PARAMS[setdiff(
+         names(DEFAULT_READ_PARAMS), names(readParameters)
+      )]
+   )[names(DEFAULT_READ_PARAMS)])
+}
+
+
+###############################################################################@
 ## Helpers ----
+.write_chTables.fileMDB <- function(x, con, dbName, by=10^5){
+   dm <- data_model(x)
+   df <- data_files(x)
+   rp <- df$readParameters
+   df <- df$dataFiles
+   for(tn in names(x)){
+      do.call(
+         readr::read_delim_chunked,
+         c(
+            list(file=df[tn]),
+            rp,
+            list(
+               col_types=ReDaMoR::col_types(dm[[tn]])
+            ),
+            list(
+               callback=readr::DataFrameCallback$new(function(y, pos){
+                  ch_insert(con=con, dbName=dbName, tableName=tn, value=y)
+               }),
+               chunk_size=by
+            )
+         )
+      )
+   }
+}
+
 .file_filtByConta <- function(d, fdb, fk){
    nfk <- fk
    files <- data_files(fdb)

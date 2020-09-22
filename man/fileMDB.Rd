@@ -16,7 +16,7 @@ fileMDB(
   dataFiles,
   dbInfo,
   dataModel,
-  readParameters = list(),
+  readParameters = DEFAULT_READ_PARAMS,
   collectionMembers = NULL,
   n_max = 10,
   verbose = FALSE

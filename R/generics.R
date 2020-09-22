@@ -165,32 +165,24 @@ filter_with_tables <- function(x, tables, checkTables=TRUE){
 #'
 #' @param x an MDB object
 #' @param path the path where the MDB should be written
+#' @param readParameters a list with 2 elements:
+#' - **delim**: a single character used to separate fields within a record
+#' (default: '\\t')
+#' - **quoted_na**: a single logical indicating if missing values inside quotes
+#' should bbe treated as missing values or strings
+#' (FALSE: the default **different** from [readr::read_delim])
 #' @param ... method specific parameters
 #' 
 #' @return A [fileMDB] object.
 #' 
 #' @export
 #'
-as_fileMDB <- function(x, path, ...){
+as_fileMDB <- function(
+   x, path,
+   readParameters=DEFAULT_READ_PARAMS,
+   ...
+){
    UseMethod("as_fileMDB", x)
-}
-
-
-###############################################################################@
-#' Push an MDB object in a ClickHouse database
-#'
-#' @param x an MDB object
-#' @param tkcon a [chTKCat] object
-#' @param overwrite a logical indicating if existing data should be overwritten
-#' (default: FALSE)
-#' @param ... method specific parameters
-#' 
-#' @return A [chMDB] object.
-#' 
-#' @export
-#'
-as_chMDB <- function(x, tkcon, overwrite=FALSE, ...){
-   UseMethod("as_chMDB", x)
 }
 
 
@@ -223,3 +215,9 @@ db_reconnect <- function(x, user, password, ntries=3){
    UseMethod("db_reconnect", x)
 }
 
+
+###############################################################################@
+## Helpers ----
+.write_chTables <- function(x, con, dbName, ...){
+   UseMethod(".write_chTables", x)
+}

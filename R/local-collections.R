@@ -1,14 +1,20 @@
 ###############################################################################@
 #' Import a  the definition of a collection of concepts in the local environment
 #' 
-#' @param path the JSON file to import
+#' @param txt a JSON string or file
 #' @param overwrite a single logical. If TRUE the collection is overwritten
 #' if it already exists (default: FALSE)
 #' 
 #' @export
 #' 
-import_local_collection <- function(path, overwrite=FALSE){
-   raw <- readLines(path) %>% paste(collapse="\n")
+import_local_collection <- function(txt, overwrite=FALSE){
+   
+   if(file.exists(txt)){
+      raw <- readLines(txt) %>% paste(collapse="\n")
+   }else{
+      raw <- txt
+   }
+   
    if(!jsonvalidate::json_validate(raw, tkcatEnv$COL_SCHEMA, verbose=TRUE)){
       stop("Not a valid collection")
    }

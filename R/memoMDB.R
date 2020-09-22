@@ -400,7 +400,7 @@ count_records.memoMDB <- function(x, ...){
    stopifnot(
       length(i)==1
    )
-   return(data_tables(x, i)[[1]])
+   return(data_tables(x, dplyr::all_of(i))[[1]])
 }
 #' @rdname memoMDB
 #' 
@@ -455,7 +455,11 @@ c.memoMDB <- function(...){
 #' 
 #' @export
 #'
-as_fileMDB.memoMDB <- function(x, path, ...){
+as_fileMDB.memoMDB <- function(
+   x, path,
+   readParameters=DEFAULT_READ_PARAMS,
+   ...
+){
    stopifnot(is.character(path), length(path)==1, !is.na(path))
    dbInfo <- db_info(x)
    dbName <- dbInfo$name
@@ -468,10 +472,7 @@ as_fileMDB.memoMDB <- function(x, path, ...){
    dir.create(fullPath, recursive=TRUE)
    
    ## Description file ----
-   rp <- list(
-      delim='\t',
-      quoted_na=FALSE
-   )
+   rp <- .check_read_params(readParameters)
    descFile <- file.path(fullPath, "DESCRIPTION.json")
    .writeDescription(c(dbInfo, rp), descFile)
    
@@ -509,7 +510,7 @@ as_fileMDB.memoMDB <- function(x, path, ...){
    dfiles <- file.path(dataPath, paste0(names(x), ext))
    names(dfiles) <- names(x)
    for(tn in names(x)){
-      readr::write_tsv(x[[tn]], path=dfiles[tn])
+      readr::write_delim(x=x[[tn]], path=dfiles[tn], delim=rp$delim)
    }
    
    ## Return fileMDB ----
@@ -520,127 +521,6 @@ as_fileMDB.memoMDB <- function(x, path, ...){
       readParameters=rp,
       collectionMembers=cm
    ))
-}
-
-
-###############################################################################@
-#' 
-#' @rdname as_chMDB
-#' @method as_chMDB memoMDB
-#' 
-#' @export
-#'
-as_chMDB.memoMDB <- function(x, tkcon, overwrite=FALSE, ...){
-   stopifnot(is.chTKCat(tkcon))
-   con <- tkcon$chcon
-   dbInfo <- db_info(x)
-   dbName <- dbInfo$name
-   dataModel <- data_model(x)
-   collectionMembers <- collection_members(x)
-   
-   ## Check existence and availability ----
-   if(!dbName %in% list_chMDBs(tkcon, withInfo=FALSE)){
-      stop(
-         sprintf("%s does not exist in the chTKCat.", dbName),
-         "Create it or contact the administrator of the chTKCat."
-      )
-   }
-   if(
-      dbName %in% list_chMDBs(tkcon, withInfo=TRUE)$name
-   ){
-      if(!overwrite){
-         stop(
-            sprintf("%s is already used and filled.", dbName),
-            " Set overwrite to TRUE if you want to replace the content."
-         )
-      }else{
-         empty_chMDB(tkcon, dbName)
-      }
-   }
-   
-   ## Add relevant collections ----
-   if(!is.null(collectionMembers) && nrow(collectionMembers)>0){
-      toAdd <- unique(collectionMembers$collection)
-      for(col in toAdd){
-         add_chTKCat_collection(tkcon, col)
-      }
-   }
-   
-   ## Write DB information ----
-   ch_insert(
-      con=con, dbName=dbName, tableName="___MDB___", value=as_tibble(dbInfo)
-   )
-   
-   ## Write data model ----
-   er <- try({
-      dbm <- ReDaMoR::toDBM(dataModel)
-      ch_insert(
-         con=con,
-         dbName=dbName,
-         tableName="___Tables___",
-         value=dbm$tables
-      )
-      ch_insert(
-         con=con,
-         dbName=dbName,
-         tableName="___Fields___",
-         value=dbm$fields
-      )
-      ch_insert(
-         con=con,
-         dbName=dbName,
-         tableName="___PrimaryKeys___",
-         value=dbm$primaryKeys
-      )
-      ch_insert(
-         con=con,
-         dbName=dbName,
-         tableName="___ForeignKeys___",
-         value=dbm$foreignKeys
-      )
-      ch_insert(
-         con=con,
-         dbName=dbName,
-         tableName="___Indexes___",
-         value=dbm$indexes
-      )
-   }, silent=FALSE)
-   if(inherits(er, "try-error")){
-      empty_chMDB(tkcon, dbName)
-      stop(as.character(er))
-   }
-   
-   ## Write collection members ----
-   er <- try({
-      ch_insert(
-         con=con, dbName=dbName, tableName="___CollectionMembers___",
-         value=dplyr::select(
-            collectionMembers,
-            dplyr::all_of(
-               CHMDB_DATA_MODEL$"___CollectionMembers___"$fields$name
-            )
-         )
-      )
-   }, silent=FALSE)
-   if(inherits(er, "try-error")){
-      empty_chMDB(tkcon, dbName)
-      stop(as.character(er))
-   }
-   
-   ## Write data ----
-   er <- try({
-      mergeTrees_from_RelDataModel(con=con, dbName=dbName, dbm=dataModel)
-      for(tn in names(x)){
-         ch_insert(con=con, dbName=dbName, tableName=tn, value=x[[tn]])
-      }
-   }, silent=FALSE)
-   if(inherits(er, "try-error")){
-      empty_chMDB(tkcon, dbName)
-      stop(as.character(er))
-   }
-   
-   ## Return the chMDB object ----
-   return(get_chMDB(tkcon=tkcon, dbName=dbName))
 }
 
 
@@ -758,6 +638,12 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
 }
 
 ## Helpers ----
+.write_chTables.memoMDB <- function(x, con, dbName){
+   for(tn in names(x)){
+      ch_insert(con=con, dbName=dbName, tableName=tn, value=x[[tn]])
+   }
+}
+
 .memo_filtByConta <- function(d, all, fk){
    nfk <- fk
    .contaminate <- function(tn){
