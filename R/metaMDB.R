@@ -620,7 +620,7 @@ slice.metaMDB <- function(.data, ..., .preserve=FALSE){
    
    x <- .data
    
-   ## Apply rules ----
+   ## Apply rules
    toRet <- list()
    dots <- list(...)
    if(length(dots)>1){

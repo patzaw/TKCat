@@ -87,7 +87,11 @@ list_tables <- function(
          sprintf("WHERE database IN ('%s')", paste(dbNames, collapse="', '"))
       )
    }
-   toRet <- dplyr::as_tibble(DBI::dbGetQuery(con, query))
+   toRet <- dplyr::as_tibble(DBI::dbGetQuery(con, query)) %>% 
+      mutate(
+         total_rows=as.numeric(.data$total_rows),
+         total_bytes=as.numeric(.data$total_bytes)
+      )
    return(toRet)
 }
 

@@ -5,7 +5,7 @@
 \title{Subset a \link{chMDB} object according to row position in one table
 and return a \link{memoMDB}}
 \usage{
-\method{slice}{chMDB}(.data, ..., .preserve = FALSE)
+\method{slice}{chMDB}(.data, ..., by = 10^5, .preserve = FALSE)
 }
 \arguments{
 \item{.data}{a \link{chMDB} object}
@@ -13,6 +13,9 @@ and return a \link{memoMDB}}
 \item{...}{a single argument. The name of this argument should be a table
 name of x and the value of this argument should be vector of integers
 corresponding to row indexes.}
+
+\item{by}{the size of the batch: number of records to slice
+together (default: 10^5)}
 
 \item{.preserve}{not used}
 }

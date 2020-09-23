@@ -462,7 +462,7 @@ data_tables.fileMDB <- function(x, ..., skip=0, n_max=Inf){
             ),
             x$readParameters
          ))
-         return(do.call(readr::read_delim, c(
+         toRet <- do.call(readr::read_delim, c(
             list(
                file=x$dataFiles[y],
                col_names=colnames(ht),
@@ -471,7 +471,9 @@ data_tables.fileMDB <- function(x, ..., skip=0, n_max=Inf){
                n_max=n_max
             ),
             x$readParameters
-         )))
+         ))
+         attr(toRet, "spec") <- NULL
+         return(toRet)
       }
    )
    names(toRet) <- names(toTake)
@@ -792,7 +794,7 @@ filter.fileMDB <- function(.data, ..., .preserve=FALSE){
    x <- .data
    dm <- data_model(x)
    
-   ## Apply rules ----
+   ## Apply rules
    toRet <- list()
    dots <- enquos(...)
    files <- data_files(x)
@@ -844,7 +846,7 @@ slice.fileMDB <- function(.data, ..., .preserve=FALSE){
    
    x <- .data
    
-   ## Apply rules ----
+   ## Apply rules
    toRet <- list()
    dots <- list(...)
    if(length(dots)>1){
@@ -855,7 +857,29 @@ slice.fileMDB <- function(.data, ..., .preserve=FALSE){
       stop(sprintf("%s table does not exist", tn))
    }
    i <- dots[[tn]]
-   toRet[[tn]] <- dplyr::slice(x[[tn]], i)
+   
+   dm <- data_model(x)
+   files <- data_files(x)
+   rp <- files$readParameters
+   files <- files$dataFiles
+   toRet[[tn]] <- do.call(
+      readr::read_delim_chunked,
+      c(
+         list(file=files[tn]),
+         rp,
+         list(
+            col_types=ReDaMoR::col_types(dm[[tn]])
+         ),
+         list(
+            callback=readr::DataFrameCallback$new(function(y, pos){
+               j <- i-pos+1
+               j <- j[j>0]
+               dplyr::slice(y, j)
+            }),
+            chunk_size=10^5
+         )
+      )
+   )
    
    ## Filter with tables
    return(filter_with_tables(x, toRet, checkTables=FALSE))

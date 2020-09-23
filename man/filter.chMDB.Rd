@@ -4,7 +4,7 @@
 \alias{filter.chMDB}
 \title{Filter a \link{chMDB} object and return a \link{memoMDB}}
 \usage{
-\method{filter}{chMDB}(.data, ..., .preserve = FALSE)
+\method{filter}{chMDB}(.data, ..., by = 10^5, .preserve = FALSE)
 }
 \arguments{
 \item{.data}{a \link{chMDB} object}
@@ -12,6 +12,9 @@
 \item{...}{each argument should have the name of one of the tables of the
 \link{chMDB} object and contain a simple logical expression involving
 the names of the corresponding table.}
+
+\item{by}{the size of the batch: number of records to filter
+together (default: 10^5)}
 
 \item{.preserve}{not used}
 }

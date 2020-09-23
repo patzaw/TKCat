@@ -57,8 +57,10 @@ chMDB <- function(
       all(names(dataModel) %in% names(dbTables))
    )
    if(length(dbTables)>0){
-      dbTables_t <- strsplit(dbTables, split="[.]") %>% 
-         do.call(rbind, lapply(function(x) gsub("`", "", x))) %>%
+      dbTables_t <- do.call(rbind, lapply(
+         strsplit(dbTables, split="[.]"),
+         function(x) gsub("`", "", x)
+      )) %>%
          magrittr::set_colnames(c("database", "name")) %>% 
          dplyr::as_tibble()
       chTables <- list_tables(tkcon$chcon, dbNames=unique(dbTables_t$database))
@@ -632,8 +634,10 @@ count_records.chMDB <- function(x, ...){
    }
    dbt <- db_tables(x)
    dbt$dbTables <- dbt$dbTables[toTake]
-   dbTables_t <- strsplit(dbt$dbTables, split="[.]") %>% 
-      do.call(rbind, lapply(function(x) gsub("`", "", x))) %>% 
+   dbTables_t <- do.call(rbind, lapply(
+      strsplit(dbt$dbTables, split="[.]"),
+      function(x) gsub("`", "", x)
+   )) %>% 
       magrittr::set_colnames(c("database", "name")) %>% 
       dplyr::as_tibble()
    chTables <- list_tables(
@@ -906,13 +910,39 @@ as_fileMDB.chMDB <- function(
 #' @param ... each argument should have the name of one of the tables of the
 #' [chMDB] object and contain a simple logical expression involving
 #' the names of the corresponding table.
+#' @param by the size of the batch: number of records to filter
+#' together (default: 10^5)
 #' @param .preserve not used
 #' 
 #' @return a [memoMDB] object
 #' 
 #' @export
 #'
-filter.chMDB <- function(.data, ..., .preserve=FALSE){
+filter.chMDB <- function(.data, ..., by=10^5, .preserve=FALSE){
+   
+   x <- .data
+   dm <- data_model(x)
+   
+   ## Apply rules
+   toRet <- list()
+   dots <- enquos(...)
+   for(tn in names(dots)){
+      if(!tn %in% names(x)){
+         stop(sprintf("%s table does not exist", tn))
+      }
+      ft <- c()
+      toAdd <- data_tables(x, dplyr::all_of(tn), skip=0, n_max=by)[[1]]
+      r <- nrow(toAdd)
+      while(nrow(toAdd)>0){
+         ft <- dplyr::bind_rows(ft, dplyr::filter(toAdd, !!dots[[tn]]))
+         toAdd <- data_tables(x, dplyr::all_of(tn), skip=r, n_max=by)[[1]]
+         r <- r + nrow(toAdd)
+      }
+      toRet[[tn]] <- ft
+   }
+   
+   ## Filter with tables
+   return(filter_with_tables(x, toRet, checkTables=FALSE))
 }
 
 
@@ -924,13 +954,61 @@ filter.chMDB <- function(.data, ..., .preserve=FALSE){
 #' @param ... a single argument. The name of this argument should be a table
 #' name of x and the value of this argument should be vector of integers
 #' corresponding to row indexes.
+#' @param by the size of the batch: number of records to slice
+#' together (default: 10^5)
 #' @param .preserve not used
 #' 
 #' @return a [memoMDB] object
 #' 
 #' @export
 #'
-slice.chMDB <- function(.data, ..., .preserve=FALSE){
+slice.chMDB <- function(.data, ..., by=10^5, .preserve=FALSE){
+   
+   x <- .data
+   
+   ## Apply rules
+   toRet <- list()
+   dots <- list(...)
+   if(length(dots)>1){
+      stop("Only one argument should be supplied in '...'")
+   }
+   tn <- names(dots)
+   if(!tn %in% names(x)){
+      stop(sprintf("%s table does not exist", tn))
+   }
+   i <- dots[[tn]]
+   
+   ft <- data_tables(x, dplyr::all_of(tn), skip=0, n_max=1)[[1]] %>% 
+      slice(2)
+   s <- 0
+   j <- i-s
+   j <- j[j>0 & j <=by]
+   if(length(j)>0){
+      ft <- dplyr::bind_rows(
+         ft,
+         data_tables(x, dplyr::all_of(tn), skip=s, n_max=by)[[1]] %>% 
+            dplyr::slice(j)
+      )
+   }
+   r <- s+by
+   while(r <= count_records(x, all_of(tn))){
+      s <- r
+      j <- i-s
+      j <- j[j>0 & j <=by]
+      if(length(j)>0){
+         ft <- dplyr::bind_rows(
+            ft,
+            data_tables(x, dplyr::all_of(tn), skip=s, n_max=by)[[1]] %>% 
+               dplyr::slice(j)
+         )
+      }
+      r <- s+by
+   }
+   toRet[[tn]] <- ft
+   
+   ## Filter with tables
+   return(filter_with_tables(x, toRet, checkTables=FALSE))
+   
 }
 
 
@@ -942,6 +1020,40 @@ slice.chMDB <- function(.data, ..., .preserve=FALSE){
 #' @export
 #'
 filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
+   
+   ## Check the tables ----
+   if(checkTables){
+      for(tn in names(tables)){
+         cr <- ReDaMoR::confront_table_data(data_model(x)[[tn]], tables[[tn]])
+         if(!cr$success){
+            stop(sprintf("The %s table does not fit the data model"), tn)
+         }
+      }
+   }
+   
+   ## Identify foreign keys ----
+   dm <- data_model(x)
+   fk <- ReDaMoR::get_foreign_keys(dm)
+   
+   ## Filter by contamination ----
+   tables <- .ch_filtByConta(tables, x, fk)
+   dm <- dm[names(tables), rmForeignKeys=TRUE]
+   tables <- .norm_data(tables,  dm)
+   
+   ## Collection members ----
+   cm <- collection_members(x)
+   if(!is.null(cm)){
+      cm <- cm %>% dplyr::filter(.data$table %in% names(tables))
+   }
+   
+   ## Results ----
+   return(memoMDB(
+      dataTables=tables,
+      dataModel=dm,
+      dbInfo=db_info(x),
+      collectionMembers=cm
+   ))
+   
 }
 
 
@@ -962,3 +1074,105 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
       }
    }
 }
+
+.ch_filtByConta <- function(d, fdb, fk, by=10^5){
+   nfk <- fk
+   dm <- data_model(fdb)
+   .contaminate <- function(tn){
+      
+      ## Backward ----
+      fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin>0)
+      fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin>0)
+      nfk <<- nfk %>%
+         dplyr::anti_join(select(fkf, "from", "to"), by=c("from", "to")) %>% 
+         dplyr::anti_join(select(fkt, "from", "to"), by=c("from", "to"))
+      fkl <- dplyr::bind_rows(
+         fkf,
+         fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
+      ) %>% 
+         distinct()
+      if(nrow(fkl)>0){
+         for(i in 1:nrow(fkl)){
+            ntn <- fkl$to[i]
+            if(ntn %in% names(d)){
+               nv <- dplyr::semi_join(
+                  d[[ntn]], d[[tn]],
+                  by=magrittr::set_names(
+                     fkl$ff[[i]], fkl$tf[[i]]
+                  )
+               )
+            }else{
+               nv <- c()
+               toAdd <- data_tables(
+                  fdb, dplyr::all_of(ntn), skip=0, n_max=by
+               )[[1]]
+               r <- nrow(toAdd)
+               while(nrow(toAdd)>0){
+                  toAdd <- dplyr::semi_join(
+                     toAdd, d[[tn]],
+                     by=magrittr::set_names(
+                        fkl$ff[[i]], fkl$tf[[i]]
+                     )
+                  )
+                  nv <- dplyr::bind_rows(nv, toAdd)
+                  toAdd <- data_tables(
+                     fdb, dplyr::all_of(ntn), skip=r, n_max=by
+                  )[[1]]
+                  r <- r + nrow(toAdd)
+               }
+            }
+            d[[ntn]] <<- nv
+         }
+      }
+      
+      ## Forward ----
+      fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin==0)
+      fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin==0)
+      nfk <<- nfk %>%
+         dplyr::anti_join(select(fkf, "from", "to"), by=c("from", "to")) %>% 
+         dplyr::anti_join(select(fkt, "from", "to"), by=c("from", "to"))
+      fkl <- dplyr::bind_rows(
+         fkf,
+         fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
+      ) %>% 
+         distinct()
+      if(nrow(fkl)>0){
+         for(i in 1:nrow(fkl)){
+            ntn <- fkl$to[i]
+            vta <- c()
+            toAdd <- data_tables(
+               fdb, dplyr::all_of(ntn), skip=0, n_max=by
+            )[[1]]
+            r <- nrow(toAdd)
+            while(nrow(toAdd)>0){
+               toAdd <- dplyr::semi_join(
+                  toAdd, d[[tn]],
+                  by=magrittr::set_names(
+                     fkl$ff[[i]], fkl$tf[[i]]
+                  )
+               )
+               vta <- dplyr::bind_rows(vta, toAdd)
+               toAdd <- data_tables(
+                  fdb, dplyr::all_of(ntn), skip=r, n_max=by
+               )[[1]]
+               r <- r + nrow(toAdd)
+            }
+            d[[ntn]] <<- dplyr::bind_rows(
+               d[[ntn]],
+               vta
+            ) %>%
+               dplyr::distinct()
+         }
+      }
+   }
+   for(tn in names(d)){
+      if(!is.null(fk)){
+         .contaminate(tn)
+      }
+   }
+   if(!is.null(fk) && nrow(fk) > nrow(nfk)){
+      d <- .ch_filtByConta(d, fdb, nfk)
+   }
+   return(d)
+}
+

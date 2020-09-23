@@ -541,7 +541,7 @@ filter.memoMDB <- function(.data, ..., .preserve=FALSE){
    
    x <- .data
    
-   ## Apply rules ----
+   ## Apply rules
    toRet <- list()
    dots <- enquos(...)
    for(tn in names(dots)){
@@ -574,7 +574,7 @@ slice.memoMDB <- function(.data, ..., .preserve=FALSE){
    
    x <- .data
    
-   ## Apply rules ----
+   ## Apply rules
    toRet <- list()
    dots <- list(...)
    if(length(dots)>1){
