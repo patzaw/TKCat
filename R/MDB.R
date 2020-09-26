@@ -384,7 +384,7 @@ compare_MDB <- function(former, new){
 #' automatically using the [get_collection_mapper()] function.
 #' @param ... additional parameters
 #' 
-#' @return `merge()` returns a [metaMDB] object gathering x and y along
+#' @return A [metaMDB] object gathering x and y along
 #' with relational tables between them created using collection members
 #' and mapping functions automatically chosen or provided by
 #' the `funs` parameter. `...` can be used to send parameters to the mapper
@@ -624,7 +624,6 @@ merge.MDB <- function(
       dm <- ReDaMoR::auto_layout(dm)
    }
    
-   # return(dm)
    return(metaMDB(
       MDBs=list(x, y) %>%
          magrittr::set_names(c(db_info(x)$name, db_info(y)$name)),
@@ -633,6 +632,262 @@ merge.MDB <- function(
       dbInfo=dbInfo
    ))
    
+}
+
+
+##############################################################################@
+#' Join connected tables 
+#' 
+#' @param x an MDB object
+#' @param ... at least 2 names of tables to join
+#' @param type the type of join among:
+#' - `"left"`: includes all rows of the first provided table
+#' - `"right"`: includes all rows of the last provided table
+#' - `"inner"`: includes all rows in all provided tables
+#' - `"full"`: includes all rows in at least one provide table
+#' @param jtName the name of the joint. IF NA (default), the name
+#' is then the name is the first provided table name.
+#' 
+#' @return A [metaMDB] corresponding to x with the
+#' joined tables replaced by the joint.
+#' If less than 2 table names are provided, the function returns
+#' the original x MDB.
+#' 
+#' @export
+#' 
+join_mdb_tables <- function(
+   x,
+   ...,
+   type=c("left", "right", "inner", "full"),
+   jtName=NA
+){
+   stopifnot(
+      is.MDB(x)
+   )
+   ttj <- as.character(c(...)) # tables to join
+   if(any(duplicated(ttj))){
+      dupttj <- unique(ttj[which(duplicated(ttj))])
+      warning(sprintf(
+         "Table%s '%s' %s going to be joined several times",
+         ifelse(length(dupttj)>1, "s", ""),
+         paste(dupttj, collapse="', '"),
+         ifelse(length(dupttj)>1, "are", "is")
+      ))
+   }
+   if(!all(ttj %in% names(x))){
+      stop("Tables not found: ", setdiff(ttj, names(x)))
+   }
+   type <- match.arg(type)
+   jfun <-
+      if(type=="left"){ dplyr::left_join
+      }else if(type=="right"){ dplyr::right_join
+      }else if(type=="inner"){ dplyr::inner_join
+      }else if(type=="full"){ dplyr::full_join
+      }
+
+   ## Simple case ----
+   if(length(ttj)<2){
+      return(x)
+   }
+   
+   ## Join table name ----
+   if(is.na(jtName)){
+      jtName <- ttj[1]
+   }
+   if(jtName %in% setdiff(names(x), ttj)){
+      stop("Wrong jtName: this name will still be used after the join.")
+   }
+   techname <- paste0("T", sample.int(10^6, 1), "T")
+   while(techname %in% names(x)){
+      techname <- paste0("T", sample.int(10^6, 1), "T")
+   }
+   
+   ## Join the 2 first tables ----
+   
+   ## _+ Subset tables ----
+   toJoin <- ttj[1:2]
+   ttj <- ttj[-(1:2)]
+   rx <- x[union(setdiff(names(x), toJoin), ttj)]
+   
+   ## _+ Check foreign keys ----
+   dm <- data_model(x)
+   fk <- ReDaMoR::get_foreign_keys(dm)
+   fkt <- dplyr::bind_rows(
+      dplyr::filter(
+         fk,
+         .data$from==!!toJoin[1] & .data$to==!!toJoin[2]
+      ),
+      dplyr::filter(
+         fk,
+         .data$from==!!toJoin[2] & .data$to==!!toJoin[1]
+      ) %>%
+         dplyr::rename(
+            "to"="from", "tf"="ff", "from"="to", "ff"="tf",
+            "tmin"="fmin", "tmax"="fmax", "fmin"="tmin", "fmax"="tmax"
+         )
+   )
+   if(nrow(fkt)==0){
+      stop(sprintf("There is no relationship with %s", toJoin[2]))
+   }
+   
+   ## _+ Set suffix for ambiguous fields ----
+   if(nrow(fkt)==1){
+      fkt$suffix <- ""
+   }else{
+      ff <- unlist(lapply(fkt$ff, function(x) paste(sort(x), collapse="_")))
+      if(!any(duplicated(ff))){
+         fkt$suffix <- ff
+      }else{
+         tf <- unlist(lapply(fkt$tf, function(x) paste(sort(x), collapse="_")))
+         if(!any(duplicated(tf))){
+            fkt$suffix <- tf
+         }else{
+            fftf <- paste(ff, tf, sep="__")
+            if(!any(duplicated(fftf))){
+               fkt$suffix <- fftf
+            }else{
+               fkt$suffix <- paste(fftf, 1:length(fftf), sep="__")
+            }
+         }
+      }
+   }
+   
+   ## _+ Initiate the new data model ----
+   jt <- x[[toJoin[1]]]
+   jdm <- data_model(rx)
+   toAdd <- dm[toJoin[1], rmForeignKeys=TRUE][[1]]
+   toAdd$tableName <- techname
+   toAdd$fields <- toAdd$fields %>% 
+      dplyr::mutate(
+         nullable=TRUE,
+         unique=FALSE
+      )
+   toAdd$primaryKey <- character()
+   toAdd$indexes <- list()
+   toAdd <- list(toAdd) %>% magrittr::set_names(techname)
+   toAdd <- ReDaMoR::RelDataModel(toAdd)
+   jdm <- c(jdm, toAdd)
+   fkToAdd <- dplyr::bind_rows(
+      dplyr::filter(
+         fk,
+         .data$from==!!toJoin[1] & .data$to %in% names(rx)
+      ) %>% 
+         dplyr::mutate(from=techname, fmin=0L, fmax=-1L),
+      dplyr::filter(
+         fk,
+         .data$from %in% names(rx) & .data$to==!!toJoin[1]
+      ) %>% 
+         dplyr::mutate(to=techname, tmin=0L, tmax=-1L)
+   )
+   if(nrow(fkToAdd)>0) for(j in 1:nrow(fkToAdd)){
+      fkj <- dplyr::slice(fkToAdd, j)
+      jdm <- ReDaMoR::add_foreign_key(
+         jdm,
+         fromTable=dplyr::pull(fkj, "from"),
+         fromFields=dplyr::pull(fkj, "ff")[[1]],
+         toTable=dplyr::pull(fkj, "to"),
+         toFields=dplyr::pull(fkj, "tf")[[1]],
+         fmin=dplyr::pull(fkj, "fmin"),
+         fmax=dplyr::pull(fkj, "fmax"),
+         tmin=dplyr::pull(fkj, "tmin"),
+         tmax=dplyr::pull(fkj, "tmax")
+      )
+   }
+   
+   ## _+ Join the tables ----
+   t2 <- x[[toJoin[2]]]
+   for(i in 1:nrow(fkt)){
+      t2i <- t2
+      cn <- setdiff(colnames(t2i), fkt$tf[[i]])
+      if(fkt$suffix[[i]]==""){
+         nn <- cn
+      }else{
+         nn <- paste(cn, fkt$suffix[[i]], sep=".")
+      }
+      if(any(nn %in% colnames(jt))){
+         nn <- paste(toJoin[2], nn, sep=".")
+      }
+      cn <- c(cn, fkt$tf[[i]])
+      nn <- c(nn, fkt$ff[[i]])
+      rnv <- cn %>% magrittr::set_names(nn)
+      t2i <- dplyr::rename(t2i, dplyr::all_of(rnv))
+      jt <- jfun(jt, t2i, by=fkt$ff[[i]])
+      
+      rnv <- nn %>% magrittr::set_names(cn)
+      toAdd <- dm[[toJoin[2]]]$fields %>% 
+         dplyr::mutate(
+            name=as.character(rnv[.data$name]),
+            nullable=TRUE,
+            unique=FALSE
+         ) %>% 
+         dplyr::filter(!.data$name %in% !!jdm[[techname]]$fields$name)
+      for(j in 1:nrow(toAdd)){
+         toAddj <- dplyr::slice(toAdd, j)
+         jdm <- ReDaMoR::add_field(
+            jdm,
+            tableName=techname,
+            name=dplyr::pull(toAddj, "name"),
+            type=dplyr::pull(toAddj, "type"),
+            nullable=dplyr::pull(toAddj, "nullable"),
+            unique=dplyr::pull(toAddj, "unique"),
+            comment=dplyr::pull(toAddj, "comment")
+         )
+      }
+      
+      fkToAdd <- dplyr::bind_rows(
+         dplyr::filter(
+            fk,
+            .data$from==!!toJoin[2] & .data$to %in% names(rx)
+         ) %>% 
+            dplyr::mutate(
+               from=techname, fmin=0L, fmax=-1L,
+               ff=lapply(.data$ff, function(f) as.character(rnv[f]))
+            ),
+         dplyr::filter(
+            fk,
+            .data$from %in% names(rx) & .data$to==!!toJoin[2]
+         ) %>% 
+            dplyr::mutate(
+               to=techname, tmin=0L, tmax=-1L,
+               tf=lapply(.data$tf, function(f) as.character(rnv[f]))
+            )
+      )
+      if(nrow(fkToAdd)>0) for(j in 1:nrow(fkToAdd)){
+         fkj <- dplyr::slice(fkToAdd, j)
+         jdm <- ReDaMoR::add_foreign_key(
+            jdm,
+            fromTable=dplyr::pull(fkj, "from"),
+            fromFields=dplyr::pull(fkj, "ff")[[1]],
+            toTable=dplyr::pull(fkj, "to"),
+            toFields=dplyr::pull(fkj, "tf")[[1]],
+            fmin=dplyr::pull(fkj, "fmin"),
+            fmax=dplyr::pull(fkj, "fmax"),
+            tmin=dplyr::pull(fkj, "tmin"),
+            tmax=dplyr::pull(fkj, "tmax")
+         )
+      }
+   }
+   
+   ## metaMDB object ----
+   MDBs <- list(rx) %>% magrittr::set_names(db_info(rx)$name)
+   rt <- list(jt) %>% magrittr::set_names(techname)
+   toRet <- metaMDB(
+      MDBs=MDBs,
+      relationalTables=rt,
+      dataModel=jdm,
+      dbInfo=db_info(x)
+   )
+   
+   ## Recursion ----
+   ttj <- c(techname, ttj)
+   toRet <- join_mdb_tables(
+      x=toRet,
+      ttj,
+      type=type,
+      jtName=techname
+   ) %>% 
+      rename(dplyr::all_of(magrittr::set_names(techname,jtName)))
+   return(toRet)
 }
 
 

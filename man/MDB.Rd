@@ -80,7 +80,7 @@ automatically using the \code{\link[=get_collection_mapper]{get_collection_mappe
 \code{as.list.MDB()} returns a simple list of tibbles with all the
 data from the tables in x.
 
-\code{merge()} returns a \link{metaMDB} object gathering x and y along
+A \link{metaMDB} object gathering x and y along
 with relational tables between them created using collection members
 and mapping functions automatically chosen or provided by
 the \code{funs} parameter. \code{...} can be used to send parameters to the mapper

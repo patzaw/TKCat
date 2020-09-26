@@ -52,7 +52,7 @@ memoMDB <- function(
    
    ## Object ----
    toRet <- list(
-      dataTables=dataTables,
+      dataTables=dataTables[names(dataModel)],
       dataModel=dataModel,
       dbInfo=dbInfo
    )

@@ -62,7 +62,7 @@ metaMDB <- function(
       if(
          !ReDaMoR::identical_RelDataModel(
             data_model(MDBs[[mdb]]),
-            dataModel[names(MDBs[[mdb]])],
+            dataModel[names(MDBs[[mdb]]), rmForeignKeys=TRUE],
             includeDisplay=FALSE
          )
       ){
@@ -168,22 +168,23 @@ relational_tables <- function(x, recursive=FALSE){
 #'
 'names<-.metaMDB' <- function(x, value){
    stopifnot(
-      length(value)!=length(x),
-      sum(duplicated(value)>0)
+      length(value)==length(x),
+      sum(duplicated(value))==0
    )
    x <- unclass(x)
-   toupdate <- value
+   orinames <- names(x$dataModel)
+   nnames <- value
+   names(nnames) <- orinames
+   names(x$dataModel) <- value
    for(mdb in names(x$MDBs)){
-      nt <- length(x$MDBs[[mdb]])
-      if(nt>0){
-         names(x$MDBs[[mdb]]) <- toupdate[1:nt]
-         toupdate <- toupdate[-c(1:nt)]
-      }
+      names(x$MDBs[[mdb]]) <- as.character(nnames[names(x$MDBs[[mdb]])])
    }
    if(length(x$relationalTables)>0){
-      names(x$relationalTables) <- toupdate
+      names(x$relationalTables) <- as.character(
+         nnames[names(x$relationalTables)]
+      )
    }
-   class(x) <- c("metaMDB", class(x))
+   class(x) <- c("metaMDB", "MDB", class(x))
    return(x)
 }
 
