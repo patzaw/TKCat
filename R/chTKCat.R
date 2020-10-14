@@ -988,7 +988,7 @@ remove_chMDB_user <- function(x, mdb, login){
 
 
 ###############################################################################@
-#### COLLECTIONS (TODO) ####
+#### COLLECTIONS ####
 ###############################################################################@
 
 
@@ -1165,34 +1165,39 @@ collection_members.chTKCat <- function(
    x,
    ...
 ){
-   #### TODO ####
-   stop("TODO")
    
-   toTake <- unlist(list(...))
+   con <- x$chcon
+   dbNames <- DBI::dbGetQuery(con, "SELECT * FROM system.databases") %>% 
+      dplyr::pull("name") %>% 
+      setdiff(CH_RESERVED_DB)
    
-   stopifnot(
-      length(toTake)==0 || is.character(toTake)
-   )
-   toRet <- DBI::dbGetQuery(
-      conn=x$chcon,
-      statement=
-         sprintf(
-            "SELECT * FROM default.CollectionMembers %s",
-            if(length(toTake)==0){
-               ""
-            }else{
+   check_chTKCat(x, verbose=TRUE)
+   toRet <- c()
+   for(dbName in dbNames){
+      dbTables <- DBI::dbGetQuery(
+         con,
+         sprintf("SHOW TABLES FROM `%s`", dbName)
+      )
+      if("___CollectionMembers___" %in% dbTables$name){
+         toRet <- bind_rows(
+            toRet,
+            DBI::dbGetQuery(
+               con,
                sprintf(
-                  "WHERE collection IN ('%s')",
-                  paste(toTake, collapse="', '")
+                  paste(
+                     "SELECT DISTINCT collection, table",
+                     "FROM `%s`.___CollectionMembers___"
+                  ),
+                  dbName
                )
-            }
+            ) %>%
+               dplyr::as_tibble() %>%
+               dplyr::mutate(resource=dbName) %>% 
+               dplyr::select("resource", "collection", "table") %>% 
+               dplyr::distinct()
          )
-   ) %>%
-      dplyr::as_tibble() %>%
-      dplyr::select(
-         "collection", "resource", "cid",
-         "table", "field", "static", "value", "type"
-      ) %>%
-      dplyr::mutate(static=as.logical(.data$static))
+      }
+   }
    return(toRet)
+   
 }

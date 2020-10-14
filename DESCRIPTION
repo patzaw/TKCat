@@ -19,6 +19,7 @@ Imports:
    visNetwork,
    getPass,
    shiny,
+   shinydashboard,
    DT,
    readr,
    jsonlite,
