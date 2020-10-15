@@ -1,5 +1,43 @@
 library(devTKCat)
 
+.highlightText <- function(text, value){
+   value <- sub('^"', '', sub('"$', '', value))
+   value <- gsub("[[:punct:]]", ".?", value)
+   return(unlist(lapply(
+      text,
+      function(x){
+         if(is.na(x)){
+            return(x)
+         }
+         p <- gregexpr(value, x, ignore.case=TRUE)[[1]]
+         if(p[1]>0){
+            toRet <- c(substr(x, 0, p[1]-1))
+            for(i in 1:length(p)){
+               toRet <- c(
+                  toRet,
+                  '<mark style="background-color:yellow;font-weight:bold;">',
+                  substr(x, p[i], p[i]+attr(p, "match.length")[i]-1),
+                  '</mark>',
+                  substr(
+                     x,
+                     p[i]+attr(p, "match.length")[i],
+                     min(
+                        p[i+1]-1,
+                        nchar(x)+1,
+                        na.rm=TRUE
+                     )
+                  )
+               )
+            }
+            toRet <- paste(toRet, collapse="")
+         }else{
+            toRet <- x
+         }
+         return(toRet)
+      }
+   )))
+}
+
 ###############################################################################@
 buildUi <- function(){
    
@@ -159,12 +197,16 @@ buildUi <- function(){
                   tabName="search",
                   shiny::fluidRow(
                      shiny::column(
-                        12,
+                        10,
                         shiny::textInput(
                            inputId="searchInput",
                            label="Search resource, table and field information",
                            placeholder="search value"
                         )
+                     ),
+                     shiny::column(
+                        2,
+                        shiny::uiOutput("searchMessages")
                      )
                   ),
                   shiny::uiOutput("searchResults")
@@ -198,7 +240,7 @@ buildServer <- function(
       ########################@
       ## TKCat instance ----
       instance <- shiny::reactiveValues(
-         tkcon=defaultConnection,
+         tkcon=db_reconnect(defaultConnection, user="default"),
          valid=DBI::dbIsValid(defaultConnection$chcon)
       )
       shiny::observe({
@@ -249,7 +291,7 @@ buildServer <- function(
          shiny::req(mdbs$list)
          toShow <- mdbs$list %>%
             dplyr::select(name, title) %>%
-            dplyr::rename("Database"="name", "Title"="title")
+            dplyr::rename("Resource"="name", "Title"="title")
          cm <- mdbs$collections %>%
             dplyr::select("collection", "resource") %>%
             dplyr::distinct() %>%
@@ -257,7 +299,7 @@ buildServer <- function(
             dplyr::mutate(collection=c(.data$collection)) %>%
             dplyr::ungroup() %>%
             dplyr::rename("Collections"="collection")
-         toShow <- dplyr::left_join(toShow, cm, by=c("Database"="resource"))
+         toShow <- dplyr::left_join(toShow, cm, by=c("Resource"="resource"))
          mdbs$validInput <- TRUE
          DT::datatable(
             toShow,
@@ -266,7 +308,7 @@ buildServer <- function(
             selection = list(
                mode="single",
                selected=which(
-                  toShow$Database==shiny::isolate(selStatus$resource)
+                  toShow$Resource==shiny::isolate(selStatus$resource)
                )
             ),
             extensions='Scroller',
@@ -280,6 +322,13 @@ buildServer <- function(
                dom=c("ti")
             )
          )
+      })
+      mdbListProxy <- DT::dataTableProxy("mdbList")
+      observe({
+         mdbListProxy %>%
+            DT::selectRows(
+               which(isolate(mdbs$list$name) %in% selStatus$resource)
+            )
       })
       
       shiny::observe({
@@ -297,7 +346,14 @@ buildServer <- function(
       observe({
          n <- selStatus$resource
          req(n)
-         selStatus$mdb <- try(get_chMDB(instance$tkcon, n), silent=TRUE)
+         mdb <- try(get_chMDB(instance$tkcon, n), silent=TRUE)
+         selStatus$mdb <- mdb
+         if(
+            inherits(mdb, "try-error") ||
+            !all(isolate(selStatus$tables) %in% names(mdb))
+         ){
+            selStatus$tables <- NULL
+         }
       })
       observe({
          mdb <- selStatus$mdb
@@ -315,12 +371,12 @@ buildServer <- function(
          mdb <- selStatus$mdb
          shiny::req(!is.null(mdb))
          if(inherits(mdb, "try-error")){
+            n <- isolate(selStatus$resource)
             shiny::tagList(
-               shiny::tags$strong(
-                  paste(
-                     "You don't have access to this resource",
-                     '(You can sign in with different credentials)'
-                  ),
+               shiny::tags$p(
+                  "You don't have access to",
+                  shiny::strong(n),
+                  '(You can sign in with different credentials)',
                   style="color:red;"
                )
             )
@@ -446,11 +502,19 @@ buildServer <- function(
       shiny::observe({
          shiny::req(dbdm$validInput)
          n <- input$dataModel_selected
-         if(length(n)==0 || n==""){
+         mdb <- isolate(selStatus$mdb)
+         shiny::req(mdb)
+         if(length(n)==0 || n=="" || !all(n %in% names(mdb))){
             selStatus$tables <- NULL
          }else{
             selStatus$tables <- n
          }
+      })
+      
+      observe({
+         selTables <- selStatus$tables
+         visNetworkProxy("dataModel") %>%
+            visSelectNodes(selTables)
       })
       
       ########################@
@@ -580,32 +644,65 @@ buildServer <- function(
       ########################@
       ## Search ----
       output$searchResults <- shiny::renderUI({
-         shiny::fluidRow(
-            shiny::column(
-               4,
-               shiny::uiOutput("searchResources")
+         shiny::tagList(
+            shiny::fluidRow(
+               shiny::column(
+                  12,
+                  shiny::uiOutput("searchResources")
+               )
             ),
-            shiny::column(
-               4,
-               shiny::uiOutput("searchTables")
+            shiny::fluidRow(
+               shiny::column(
+                  12,
+                  shiny::uiOutput("searchTables")
+               )
             ),
-            shiny::column(
-               4,
-               shiny::uiOutput("searchFields")
+            shiny::fluidRow(
+               shiny::column(
+                  12,
+                  shiny::uiOutput("searchFields")
+               )
             )
          )
       })
-      output$searchResources <- shiny::renderUI({
-         shiny::tagList(
-            shiny::h3("Resources"),
-            DT::DTOutput("searchResRes")
-         )
-      })
-      output$searchResRes <- DT::renderDT({
-         mdbs <- mdbs$list
-         req(mdbs)
+      output$searchMessages <- shiny::renderUI({
          st <- input$searchInput
-         req(st)
+         shiny::req(st)
+         req(c(
+            input$searchResRes_rows_selected,
+            input$searchTabRes_rows_selected,
+            input$searchFieldRes_rows_selected
+         ))
+         mdb <- selStatus$mdb
+         shiny::req(!is.null(mdb))
+         if(inherits(mdb, "try-error")){
+            n <- isolate(selStatus$resource)
+            shiny::tagList(
+               shiny::tags$p(
+                  "You don't have access to",
+                  shiny::strong(n),
+                  '(You can sign in with different credentials)',
+                  style="color:red;"
+               )
+            )
+         }else{
+            NULL
+         }
+      })
+      ##
+      searchRes <- shiny::reactiveValues(
+         resources=NULL,
+         tables=NULL,
+         fields=NULL
+      )
+      ## _+ resources ----
+      shiny::observe({
+         mdbs <- mdbs$list
+         shiny::req(mdbs)
+         st <- input$searchInput
+         shiny::req(st)
+         mdbs <- mdbs %>% 
+            dplyr::select("name", "title", "description", "maintainer")
          toTake <- unlist(apply(
             mdbs, 2,
             function(x){
@@ -613,31 +710,245 @@ buildServer <- function(
             }
          ))
          toTake <- unique(c(0, toTake))
-         mdbs %>% 
-            dplyr::slice(toTake) %>% 
-            DT::datatable()
+         toRet <- mdbs %>% dplyr::slice(toTake)
+         if(nrow(toRet)>0){
+            searchRes$resources <- toRet
+         }else{
+            searchRes$resources <- NULL
+         }
+      })
+      output$searchResources <- shiny::renderUI({
+         st <- input$searchInput
+         req(st)
+         shiny::tagList(
+            shiny::h3("Resources"),
+            DT::DTOutput("searchResRes")
+         )
+      })
+      output$searchResRes <- DT::renderDT({
+         st <- input$searchInput
+         req(st)
+         toRet <- searchRes$resources
+         req(toRet)
+         if(nrow(toRet)>0){
+            toRet %>% 
+               dplyr::mutate(
+                  name=.highlightText(.data$name, st),
+                  title=.highlightText(.data$title, st),
+                  description=.highlightText(.data$description, st),
+                  maintainer=.highlightText(.data$maintainer, st)
+               ) %>% 
+               DT::datatable(
+                  rownames=FALSE,
+                  escape=FALSE,
+                  selection="single",
+                  options=list(
+                     pageLength=5,
+                     dom="tip"
+                  )
+               )
+         }else{
+            NULL
+         }
+      })
+      observe({
+         sel <- input$searchResRes_rows_selected
+         req(sel)
+         rt <- isolate(searchRes$resources)
+         req(rt)
+         selStatus$resource <- rt %>% slice(sel) %>% pull("name")
+      })
+      ## _+ tables ----
+      shiny::observe({
+         mdbs <- mdbs$list
+         shiny::req(mdbs)
+         st <- input$searchInput
+         shiny::req(st)
+         selQueries <- paste(
+            sprintf(
+               "SELECT '%s' as resource, name, comment,",
+               mdbs$name
+            ),
+            sprintf(
+               "positionCaseInsensitive(name, '%s')>0 as s1,",
+               st
+            ),
+            if(nchar(st)>4){
+               sprintf(
+                  "ngramSearchCaseInsensitive(name, '%s') as s2,",
+                  st
+               )
+            }else{
+               "0 as s2,"
+            },
+            sprintf(
+               "if(isNull(comment), 0, positionCaseInsensitive(comment, '%s')>0) as s3,",
+               st
+            ),
+            if(nchar(st)>4){
+               sprintf(
+                  "if(isNull(comment), 0, ngramSearchCaseInsensitive(comment, '%s')) as s4,",
+                  st
+               )
+            }else{
+               "0 as s4,"
+            },
+            "greatest(s4, greatest(s3, greatest(s2, s1))) as ms",
+            sprintf("FROM `%s`.`___Tables___`", mdbs$name),
+            "WHERE ms > 0"
+         )
+         query <- paste(selQueries, collapse=" UNION ALL ")
+         toRet <- DBI::dbGetQuery(instance$tkcon$chcon, query)
+         if(nrow(toRet)>0){
+            searchRes$tables <- toRet %>% 
+               dplyr::as_tibble() %>%
+               dplyr::arrange(desc(ms)) %>%
+               dplyr::select("resource", "name", "comment")
+         }else{
+            searchRes$tables <- NULL
+         }
       })
       output$searchTables <- shiny::renderUI({
+         st <- input$searchInput
+         req(st)
          shiny::tagList(
             shiny::h3("Tables"),
             DT::DTOutput("searchTabRes")
          )
       })
       output$searchTabRes <- DT::renderDT({
+         st <- input$searchInput
+         req(st)
+         toRet <- searchRes$tables
+         req(toRet)
+         if(nrow(toRet)>0){
+            toRet %>%
+               dplyr::mutate(
+                  # resource=.highlightText(.data$resource, st),
+                  name=.highlightText(.data$name, st),
+                  comment=.highlightText(.data$comment, st)
+               ) %>%
+               DT::datatable(
+                  rownames=FALSE,
+                  escape=FALSE,
+                  selection="single",
+                  filter="top",
+                  options=list(
+                     pageLength=5,
+                     dom="tip"
+                  )
+               )
+         }else{
+            NULL
+         }
+      })
+      observe({
+         sel <- input$searchTabRes_rows_selected
+         req(sel)
+         rt <- isolate(searchRes$tables)
+         req(rt)
+         selStatus$resource <- rt %>% slice(sel) %>% pull("resource")
+         selStatus$tables <- rt %>% slice(sel) %>% pull("name")
+      })
+      ## _+ fields ----
+      shiny::observe({
          mdbs <- mdbs$list
-         req(mdbs)
-         NULL
+         shiny::req(mdbs)
+         st <- input$searchInput
+         shiny::req(st)
+         selQueries <- paste(
+            sprintf(
+               "SELECT '%s' as resource, table, name, type, nullable, unique, comment,",
+               mdbs$name
+            ),
+            sprintf(
+               "positionCaseInsensitive(name, '%s')>0 as s1,",
+               st
+            ),
+            if(nchar(st)>4){
+               sprintf(
+                  "ngramSearchCaseInsensitive(name, '%s') as s2,",
+                  st
+               )
+            }else{
+               "0 as s2,"
+            },
+            sprintf(
+               "if(isNull(comment), 0, positionCaseInsensitive(comment, '%s')>0) as s3,",
+               st
+            ),
+            if(nchar(st)>4){
+               sprintf(
+                  "if(isNull(comment), 0, ngramSearchCaseInsensitive(comment, '%s')) as s4,",
+                  st
+               )
+            }else{
+               "0 as s4,"
+            },
+            "greatest(s4, greatest(s3, greatest(s2, s1))) as ms",
+            sprintf("FROM `%s`.`___Fields___`", mdbs$name),
+            "WHERE ms > 0"
+         )
+         query <- paste(selQueries, collapse=" UNION ALL ")
+         toRet <- DBI::dbGetQuery(instance$tkcon$chcon, query)
+         if(nrow(toRet)>0){
+            searchRes$fields <- toRet %>% 
+               dplyr::as_tibble() %>%
+               dplyr::arrange(desc(ms)) %>%
+               dplyr::select(
+                  "resource", "table", "name", "comment",
+                  "type", "nullable", "unique"
+               ) %>%
+               dplyr::mutate(
+                  nullable=as.logical(.data$nullable),
+                  unique=as.logical(.data$unique)
+               )
+         }else{
+            searchRes$fields <- NULL
+         }
       })
       output$searchFields <- shiny::renderUI({
+         st <- input$searchInput
+         req(st)
          shiny::tagList(
             shiny::h3("Fields"),
             DT::DTOutput("searchFieldRes")
          )
       })
       output$searchFieldRes <- DT::renderDT({
-         mdbs <- mdbs$list
-         req(mdbs)
-         NULL
+         st <- input$searchInput
+         req(st)
+         toRet <- searchRes$fields
+         req(toRet)
+         if(nrow(toRet)>0){
+            toRet %>%
+               dplyr::mutate(
+                  # resource=.highlightText(.data$resource, st),
+                  # table=.highlightText(.data$resource, st),
+                  name=.highlightText(.data$name, st),
+                  comment=.highlightText(.data$comment, st)
+               ) %>%
+               DT::datatable(
+                  rownames=FALSE,
+                  escape=FALSE,
+                  selection="single",
+                  filter="top",
+                  options=list(
+                     pageLength=5,
+                     dom="tip"
+                  )
+               )
+         }else{
+            NULL
+         }
+      })
+      observe({
+         sel <- input$searchFieldRes_rows_selected
+         req(sel)
+         rt <- isolate(searchRes$fields)
+         req(rt)
+         selStatus$resource <- rt %>% slice(sel) %>% pull("resource")
+         selStatus$tables <- rt %>% slice(sel) %>% pull("table")
       })
       
       ########################@
@@ -711,7 +1022,7 @@ buildServer <- function(
                      "or if you want to sign up:"
                   ),
                   shiny::HTML(markdown::renderMarkdown(
-                     text=k$contact
+                     text=shiny::isolate(instance$tkcon$contact)
                   ))
                ))
             ),
@@ -739,6 +1050,7 @@ buildServer <- function(
             okConnect(TRUE)
             shiny::removeModal()
          }else{
+            instance$tkcon <- db_reconnect(instance$tkcon, user="default")
             okConnect(FALSE)
          }
       })
