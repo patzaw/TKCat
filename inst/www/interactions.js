@@ -17,3 +17,8 @@ $(document).keyup(function(event) {
     $("#connect").click();
   }
 });
+
+// Manage skin colors
+Shiny.addCustomMessageHandler('change_skin', function(skin) {
+  document.body.className = skin;
+});

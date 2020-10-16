@@ -160,20 +160,20 @@ db_reconnect.chMDB <- function(x, user, password, ntries=3){
 
 
 ###############################################################################@
-#' Get a [chMDB] from a [chTKCat] 
-#' 
-#' @param tkcon a [chTKCat] object
-#' @param dbName the name of the database
+#'
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
 #' 
-#' @export
+#' @rdname get_MDB
+#' @method get_MDB chTKCat
 #' 
-get_chMDB <- function(tkcon, dbName, n_max=10){
+#' @export
+#'
+get_MDB.chTKCat <- function(x, dbName, n_max=10, ...){
    stopifnot(
-      is.chTKCat(tkcon)
+      is.chTKCat(x)
    )
-   dbl <- list_chMDBs(tkcon)
+   dbl <- list_MDBs(x)
    if(!is.data.frame(dbl) || !dbName %in% dbl$name){
       stop(sprintf("%s does not exist in the provided chTKCat", dbName))
    }
@@ -181,21 +181,21 @@ get_chMDB <- function(tkcon, dbName, n_max=10){
    ## Data model ----
    dbm <- list(
       tables=DBI::dbGetQuery(
-         tkcon$chcon, sprintf("SELECT * FROM `%s`.`___Tables___`", dbName)
+         x$chcon, sprintf("SELECT * FROM `%s`.`___Tables___`", dbName)
       ),
       fields=DBI::dbGetQuery(
-         tkcon$chcon, sprintf("SELECT * FROM `%s`.`___Fields___`", dbName)
+         x$chcon, sprintf("SELECT * FROM `%s`.`___Fields___`", dbName)
       ),
       primaryKeys=DBI::dbGetQuery(
-         tkcon$chcon,
+         x$chcon,
          sprintf("SELECT * FROM `%s`.`___PrimaryKeys___`", dbName)
       ),
       foreignKeys=DBI::dbGetQuery(
-         tkcon$chcon,
+         x$chcon,
          sprintf("SELECT * FROM `%s`.`___ForeignKeys___`", dbName)
       ),
       indexes=DBI::dbGetQuery(
-         tkcon$chcon, sprintf("SELECT * FROM `%s`.`___Indexes___`", dbName)
+         x$chcon, sprintf("SELECT * FROM `%s`.`___Indexes___`", dbName)
       )
    )
    dbm$fields$nullable <- as.logical(dbm$fields$nullable)
@@ -205,7 +205,7 @@ get_chMDB <- function(tkcon, dbName, n_max=10){
    
    ## DB information ----
    dbInfo <- as.list(DBI::dbGetQuery(
-      tkcon$chcon, sprintf("SELECT * FROM `%s`.`___MDB___`", dbName)
+      x$chcon, sprintf("SELECT * FROM `%s`.`___MDB___`", dbName)
    ))
    
    ## DB tables ----
@@ -216,7 +216,7 @@ get_chMDB <- function(tkcon, dbName, n_max=10){
    
    ## Collection members ----
    collectionMembers <- DBI::dbGetQuery(
-      conn=tkcon$chcon,
+      conn=x$chcon,
       statement=sprintf(
          "SELECT * FROM `%s`.`___CollectionMembers___`",
          dbName
@@ -234,7 +234,7 @@ get_chMDB <- function(tkcon, dbName, n_max=10){
    attr(collectionMembers, "data.type") <- NULL
    
    return(chMDB(
-      tkcon=tkcon,
+      tkcon=x,
       dbTables=dbTables,
       dbInfo=dbInfo,
       dataModel=dataModel,
@@ -281,14 +281,14 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE){
    collectionMembers <- collection_members(x)
    
    ## Check existence and availability ----
-   if(!dbName %in% list_chMDBs(tkcon, withInfo=FALSE)){
+   if(!dbName %in% list_MDBs(tkcon, withInfo=FALSE)){
       stop(
          sprintf("%s does not exist in the chTKCat.", dbName),
          "Create it or contact the administrator of the chTKCat."
       )
    }
    if(
-      dbName %in% list_chMDBs(tkcon, withInfo=TRUE)$name
+      dbName %in% list_MDBs(tkcon, withInfo=TRUE)$name
    ){
       if(!overwrite){
          stop(
@@ -380,7 +380,7 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE){
    }
    
    ## Return the chMDB object ----
-   return(get_chMDB(tkcon=tkcon, dbName=dbName))
+   return(get_MDB(x=tkcon, dbName=dbName))
 }
 
 

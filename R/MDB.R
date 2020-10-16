@@ -344,21 +344,21 @@ compare_MDB <- function(former, new){
 #' @export
 #'
 '[<-.MDB' <- function(x, i, value){
-   stop("'[<-' is not supported for .MDB")
+   stop("'[<-' is not supported for MDB")
 }
 
 ###############################################################################@
 #' @export
 #'
 '[[<-.MDB' <- function(x, i, value){
-   stop("'[[<-' is not supported for .MDB")
+   stop("'[[<-' is not supported for MDB")
 }
 
 ###############################################################################@
 #' @export
 #'
 '$<-.MDB' <- function(x, i, value){
-   stop("'$<-' is not supported for .MDB")
+   stop("'$<-' is not supported for MDB")
 }
 
 ##############################################################################@

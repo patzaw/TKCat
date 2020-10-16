@@ -187,6 +187,35 @@ as_fileMDB <- function(
 
 
 ###############################################################################@
+#' List available [MDB]
+#' 
+#' @param x a [TKCat] related object (e.g. [chTKCat])
+#' @param withInfo if TRUE (default), the function returns a table with
+#' [db_info]. If FALSE, it returns only [MDB] names.
+#' 
+#' @export
+#' 
+list_MDBs <- function(x, withInfo=TRUE){
+   UseMethod("list_MDBs", x)
+}
+
+###############################################################################@
+#' Get an [MDB] object from a [TKCat] related object
+#' 
+#' @param x a [TKCat] related object (e.g. [chTKCat])
+#' @param dbName the name of the database
+#' @param ... method specific parameters
+#' 
+#' @return An [MDB] object
+#' 
+#' @export
+#' 
+get_MDB <- function(x, dbName, ...){
+   UseMethod("get_MDB", x)
+}
+
+
+###############################################################################@
 #' Disconnect an object from a database
 #'
 #' @param x an object with a database connection
@@ -217,7 +246,26 @@ db_reconnect <- function(x, user, password, ntries=3){
 
 
 ###############################################################################@
+#' Explore available [MDB] in a shiny web interface
+#' 
+#' @param x a [TKCat] related object (e.g. [chTKCat])
+#' @param ... method specific parameters
+#' 
+#' @export
+#' 
+explore_MDBs <- function(x, ...){
+   UseMethod("explore_MDBs", x)
+}
+
+
+###############################################################################@
 ## Helpers ----
 .write_chTables <- function(x, con, dbName, ...){
    UseMethod(".write_chTables", x)
+}
+.build_etkc_ui <- function(x, ...){
+   UseMethod(".build_etkc_ui", x)
+}
+.build_etkc_server <- function(x, ...){
+   UseMethod(".build_etkc_server", x)
 }
