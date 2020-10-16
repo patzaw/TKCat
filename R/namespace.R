@@ -15,7 +15,7 @@
 #' 
 #' @importFrom readr read_delim write_tsv read_delim_chunked DataFrameCallback
 #' @importFrom getPass getPass
-#' @importFrom utils packageName str
+#' @importFrom utils packageName zip object.size str
 #' 
 #' @importFrom markdown renderMarkdown
 #' 

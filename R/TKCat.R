@@ -25,6 +25,8 @@ TKCat <- function(..., list=NULL){
    }
    names(toRet) <- dbnames
    class(toRet) <- c("TKCat", class(toRet))
+   attr(toRet, "tables") <- .get_tkcat_tables(toRet)
+   attr(toRet, "fields") <- .get_tkcat_fields(toRet)
    return(toRet)
 }
 
@@ -112,14 +114,20 @@ print.TKCat <- function(x, ...){
       !any(duplicated(value)),
       length(value)==length(x)
    )
+   dmt <- attr(x, "tables")
+   dmf <- attr(x, "fields")
    x <- unclass(x)
    for(i in 1:length(x)){
       dbi <- db_info(x[[i]])
+      dmt[which(dmt$resource==dbi$name), "resource"] <- value[i]
+      dmf[which(dmf$resource==dbi$name), "resource"] <- value[i]
       dbi$name <- value[i]
       db_info(x[[i]]) <- dbi
    }
    names(x) <- value
    class(x) <- c("TKCat", class(x))
+   attr(x, "tables") <- dmt
+   attr(x, "fields") <- dmf
    return(x)
 }
 
@@ -148,8 +156,12 @@ rename.TKCat <- function(.data, ...){
 #' @export
 #'
 '[.TKCat' <- function(x, i){
+   dmt <- attr(x, "tables")
+   dmf <- attr(x, "fields")
    x <- unclass(x)[i]
    class(x) <- c("TKCat", class(x))
+   attr(x, "tables") <- dmt %>% dplyr::filter(.data$resource %in% names(x))
+   attr(x, "fields") <- dmf %>% dplyr::filter(.data$resource %in% names(x))
    return(x)
 }
 
@@ -195,8 +207,18 @@ c.TKCat <- function(...){
    if(any(duplicated(allnames))){
       stop("Same names cannot be used in the different TKCat objects")
    }
+   dmt <- do.call(dplyr::bind_rows, lapply(
+      alltkcat,
+      attr, which="tables"
+   ))
+   dmf <- do.call(dplyr::bind_rows, lapply(
+      alltkcat,
+      attr, which="fields"
+   ))
    toRet <- do.call(c, lapply(alltkcat, unclass))
    class(toRet) <- c("TKCat", class(toRet))
+   attr(toRet, "tables") <- dmt
+   attr(toRet, "fields") <- dmf
    return(toRet)
 }
 
@@ -217,6 +239,43 @@ list_MDBs.TKCat <- function(x, withInfo=TRUE){
       function(y) dplyr::as_tibble(db_info(y))
    )))
 }
+
+
+###############################################################################@
+#' 
+#' @rdname search_MDB_tables
+#' @method search_MDB_tables TKCat
+#' 
+#' @export
+#'
+search_MDB_tables.TKCat <- function(x, searchTerm){
+   dmt <- attr(x, "tables")
+   toTake <- unique(c(
+      grep(searchTerm, dmt$name, ignore.case=TRUE),
+      grep(searchTerm, dmt$comment, ignore.case=TRUE)
+   ))
+   toRet <- dmt %>% slice(c(0, toTake))
+   return(toRet)
+}
+
+
+###############################################################################@
+#' 
+#' @rdname search_MDB_fields
+#' @method search_MDB_fields TKCat
+#' 
+#' @export
+#'
+search_MDB_fields.TKCat <- function(x, searchTerm){
+   dmf <- attr(x, "fields")
+   toTake <- unique(c(
+      grep(searchTerm, dmf$name, ignore.case=TRUE),
+      grep(searchTerm, dmf$comment, ignore.case=TRUE)
+   ))
+   toRet <- dmf %>% slice(c(0, toTake))
+   return(toRet)
+}
+
 
 
 ###############################################################################@
@@ -250,4 +309,106 @@ collection_members.TKCat <- function(
             dplyr::distinct()
       }
    )))
+}
+
+
+###############################################################################@
+#### SHINY EXPLORER ####
+###############################################################################@
+
+
+###############################################################################@
+#'
+#' @param subSetSize the maximum number of records to show
+#' 
+#' @rdname explore_MDBs
+#' @method explore_MDBs TKCat
+#' 
+#' @export
+#'
+explore_MDBs.TKCat <- function(
+   x,
+   subSetSize=100,
+   ...
+){
+   shiny::shinyApp(
+      ui=.build_etkc_ui(x=x),
+      server=.build_etkc_server(
+         x=x,
+         subSetSize=subSetSize
+      ),
+      enableBookmarking="url"
+   )
+}
+
+###############################################################################@
+.build_etkc_ui.TKCat <- function(x, ...){
+   
+   .etkc_add_resources()
+   
+   function(req){
+      shinydashboard::dashboardPage(
+         title="chTKCat",
+         skin="green",
+         
+         ########################@
+         ## Dashboard header ----
+         ## Uses output$instance and output$status
+         header=.etkc_sd_header(),
+         
+         ########################@
+         ## Sidebar ----
+         ## Uses uiOutput("currentUser") and uiOutput("signin")
+         sidebar=.etkc_sd_sidebar(sysInterface=FALSE),
+         
+         ########################@
+         ## Body ----
+         body=.etkc_sd_body(sysInterface=FALSE)
+      )
+   }
+   
+}
+
+
+###############################################################################@
+.build_etkc_server.TKCat <- function(
+   x,
+   subSetSize=100
+){
+   .build_etkc_server_default(
+      x=x, subSetSize=subSetSize
+   )
+}
+
+
+###############################################################################@
+## Helpers ----
+.get_tkcat_tables <- function(x){
+   dmt <- c()
+   for(n in names(x)){
+      dm <- data_model(get_MDB(x, n))
+      dmt <- dplyr::bind_rows(
+         dmt,
+         ReDaMoR::toDBM(dm)$tables %>% 
+            dplyr::mutate(resource=n) %>% 
+            dplyr::select("resource", "name", "comment")
+      )
+   }
+   return(dmt)
+}
+.get_tkcat_fields <- function(x){
+   dmf <- c()
+   for(n in names(x)){
+      dm <- data_model(get_MDB(x, n))
+      dmf <- dplyr::bind_rows(
+         dmf,
+         ReDaMoR::toDBM(dm)$fields %>% 
+            dplyr::mutate(resource=n) %>% 
+            dplyr::select(
+               "resource", "table", "name",
+               "type", "nullable", "unique", "comment"
+            )
+      )
+   }
+   return(dmf)
 }

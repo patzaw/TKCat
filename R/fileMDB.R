@@ -531,6 +531,23 @@ data_files <- function(x){
 
 
 ###############################################################################@
+#' Get the size of data files from a [fileMDB] object
+#' 
+#' @param x a [fileMDB] object
+#' 
+#' @return a numeric vector with size in bytes.
+#' 
+#' @export
+#'
+data_file_size <- function(x){
+   df <- data_files(x)$dataFiles
+   toRet <- file.size(df)
+   names(toRet) <- names(df)
+   return(toRet)
+}
+
+
+###############################################################################@
 #' 
 #' @param x a [fileMDB] object
 #' @param i index or names of the tables to take

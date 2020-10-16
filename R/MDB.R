@@ -193,7 +193,7 @@ as.list.MDB <- function(x, ...){
 #' @export
 #'
 str.MDB <- function(object, ...){
-   str(unclass(object))
+   utils::str(unclass(object))
 }
 
 

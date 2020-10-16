@@ -216,6 +216,46 @@ get_MDB <- function(x, dbName, ...){
 
 
 ###############################################################################@
+#' Search tables in a [TKCat] related object
+#' 
+#' @param x a [TKCat] related object (e.g. [chTKCat])
+#' @param searchTerm a single character with the term to search
+#' 
+#' @return An [MDB] object
+#' 
+#' @export
+#' 
+search_MDB_tables <- function(x, searchTerm){
+   stopifnot(
+      is.character(searchTerm),
+      length(searchTerm)==1,
+      !is.na(searchTerm)
+   )
+   UseMethod("search_MDB_tables", x)
+}
+
+
+###############################################################################@
+#' Search fields in a [TKCat] related object
+#' 
+#' @param x a [TKCat] related object (e.g. [chTKCat])
+#' @param searchTerm a single character with the term to search
+#' 
+#' @return An [MDB] object
+#' 
+#' @export
+#' 
+search_MDB_fields <- function(x, searchTerm){
+   stopifnot(
+      is.character(searchTerm),
+      length(searchTerm)==1,
+      !is.na(searchTerm)
+   )
+   UseMethod("search_MDB_fields", x)
+}
+
+
+###############################################################################@
 #' Disconnect an object from a database
 #'
 #' @param x an object with a database connection
