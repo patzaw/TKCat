@@ -85,7 +85,7 @@ chMDB <- function(
       function(tn){
          dbt <- dbTables[tn]
          query <- sprintf(query, dbt)
-         toRet <- dplyr::as_tibble(DBI::dbGetQuery(tkcon$chcon, query))
+         toRet <- get_query(tkcon, query)
          for(cn in colnames(toRet)){
             toRet[,cn] <- ReDaMoR::as_type(
                dplyr::pull(toRet, !!cn),
@@ -160,6 +160,23 @@ db_reconnect.chMDB <- function(x, user, password, ntries=3){
 
 
 ###############################################################################@
+#' 
+#' @rdname get_query
+#' @method get_query chMDB
+#' 
+#' @export
+#'
+get_query.chMDB <- function(x, query, ...){
+   con <- unclass(x)$tkcon$chcon
+   n <- unclass(x)$dbInfo$name
+   RClickhouse::dbSendQuery(con, sprintf("USE `%s`", n))
+   on.exit(RClickhouse::dbSendQuery(con, "USE default"))
+   DBI::dbGetQuery(con, query, ...) %>%
+      as_tibble()
+}
+
+
+###############################################################################@
 #'
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
@@ -180,22 +197,22 @@ get_MDB.chTKCat <- function(x, dbName, n_max=10, ...){
    
    ## Data model ----
    dbm <- list(
-      tables=DBI::dbGetQuery(
-         x$chcon, sprintf("SELECT * FROM `%s`.`___Tables___`", dbName)
+      tables=get_query(
+         x, sprintf("SELECT * FROM `%s`.`___Tables___`", dbName)
       ),
-      fields=DBI::dbGetQuery(
-         x$chcon, sprintf("SELECT * FROM `%s`.`___Fields___`", dbName)
+      fields=get_query(
+         x, sprintf("SELECT * FROM `%s`.`___Fields___`", dbName)
       ),
-      primaryKeys=DBI::dbGetQuery(
-         x$chcon,
+      primaryKeys=get_query(
+         x,
          sprintf("SELECT * FROM `%s`.`___PrimaryKeys___`", dbName)
       ),
-      foreignKeys=DBI::dbGetQuery(
-         x$chcon,
+      foreignKeys=get_query(
+         x,
          sprintf("SELECT * FROM `%s`.`___ForeignKeys___`", dbName)
       ),
-      indexes=DBI::dbGetQuery(
-         x$chcon, sprintf("SELECT * FROM `%s`.`___Indexes___`", dbName)
+      indexes=get_query(
+         x, sprintf("SELECT * FROM `%s`.`___Indexes___`", dbName)
       )
    )
    dbm$fields$nullable <- as.logical(dbm$fields$nullable)
@@ -204,8 +221,8 @@ get_MDB.chTKCat <- function(x, dbName, n_max=10, ...){
    dataModel <- ReDaMoR::fromDBM(dbm)
    
    ## DB information ----
-   dbInfo <- as.list(DBI::dbGetQuery(
-      x$chcon, sprintf("SELECT * FROM `%s`.`___MDB___`", dbName)
+   dbInfo <- as.list(get_query(
+      x, sprintf("SELECT * FROM `%s`.`___MDB___`", dbName)
    ))
    
    ## DB tables ----
@@ -215,19 +232,18 @@ get_MDB.chTKCat <- function(x, dbName, n_max=10, ...){
    names(dbTables) <- names(dataModel)
    
    ## Collection members ----
-   collectionMembers <- DBI::dbGetQuery(
-      conn=x$chcon,
+   collectionMembers <- get_query(
+      x,
       statement=sprintf(
          "SELECT * FROM `%s`.`___CollectionMembers___`",
          dbName
       )
    ) %>%
-      as_tibble() %>%
-      mutate(
+      dplyr::mutate(
          resource=dbName,
          static=as.logical(.data$static)
       ) %>% 
-      select(
+      dplyr::select(
          "collection", "cid", "resource", "mid", "table", "field",
          "static", "value", "type"
       )
@@ -593,16 +609,15 @@ data_tables.chMDB <- function(x, ..., skip=0, n_max=Inf){
    toRet <- lapply(
       names(toTake),
       function(tn){
-         toRet <- DBI::dbGetQuery(
-            dbt$tkcon$chcon,
+         toRet <- get_query(
+            x,
             sprintf(
                "SELECT * from %s ORDER BY %s LIMIT %s, %s",
                toTake[tn],
                .get_tm_sortKey(m[[tn]], quoted=TRUE),
                skip, n_max
             )
-         ) %>% 
-            dplyr::as_tibble()
+         )
          attr(toRet, "data.type") <- NULL
          for (cn in colnames(toRet)) {
             toRet[, cn] <- as_type(

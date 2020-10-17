@@ -286,6 +286,22 @@ db_reconnect <- function(x, user, password, ntries=3){
 
 
 ###############################################################################@
+#' Get SQL query
+#' 
+#' @param x an object with a database connection
+#' @param query the SQL query
+#' @param ... method specific parameters
+#' 
+#' @return A tibble with query results
+#' 
+#' @export
+#' 
+get_query <- function(x, query, ...){
+   UseMethod("get_query", x)
+}
+
+
+###############################################################################@
 #' Explore available [MDB] in a shiny web interface
 #' 
 #' @param x a [TKCat] related object (e.g. [chTKCat])

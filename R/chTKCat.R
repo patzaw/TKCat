@@ -256,6 +256,19 @@ db_reconnect.chTKCat <- function(x, user, password, ntries=3){
 
 
 ###############################################################################@
+#' 
+#' @rdname get_query
+#' @method get_query chTKCat
+#' 
+#' @export
+#'
+get_query.chTKCat <- function(x, query, ...){
+   DBI::dbGetQuery(x$chcon, query, ...) %>%
+      as_tibble()
+}
+
+
+###############################################################################@
 #### DATABASE MANAGEMENT ####
 ###############################################################################@
 
@@ -644,8 +657,7 @@ search_MDB_tables.chTKCat <- function(x, searchTerm){
       "WHERE ms > 0"
    )
    query <- paste(selQueries, collapse=" UNION ALL ")
-   toRet <- DBI::dbGetQuery(x$chcon, query) %>%
-      dplyr::as_tibble() %>% 
+   toRet <- get_query(x, query) %>% 
       dplyr::arrange(desc(.data$ms)) %>%
       dplyr::select("resource", "name", "comment")
    return(toRet)
@@ -695,8 +707,7 @@ search_MDB_fields.chTKCat <- function(x, searchTerm){
       "WHERE ms > 0"
    )
    query <- paste(selQueries, collapse=" UNION ALL ")
-   toRet <- DBI::dbGetQuery(x$chcon, query) %>%
-      dplyr::as_tibble() %>%
+   toRet <- get_query(x, query) %>%
       dplyr::arrange(desc(.data$ms)) %>%
       dplyr::select(
          "resource", "table", "name", "comment",

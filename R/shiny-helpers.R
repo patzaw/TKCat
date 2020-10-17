@@ -307,7 +307,9 @@
             dplyr::select("collection", "resource") %>%
             dplyr::distinct() %>%
             dplyr::group_by(.data$resource) %>% 
-            dplyr::summarize(collection=list(.data$collection)) %>%
+            dplyr::summarize(
+               collection=paste(.data$collection, collapse=", ")
+            ) %>%
             dplyr::ungroup() %>%
             dplyr::rename("Collections"="collection")
          toShow <- dplyr::left_join(toShow, cm, by=c("Resource"="resource"))
@@ -330,6 +332,7 @@
                columnDefs=list(
                   list(width='60%', targets=1)
                ),
+               order=list(list(0, 'asc')),
                dom=c("ti")
             )
          )
