@@ -841,6 +841,7 @@ join_mdb_tables <- function(
          ) %>% 
             dplyr::mutate(
                from=techname, fmin=0L, fmax=-1L,
+               tmin=0L, tmax=-1L,
                ff=lapply(.data$ff, function(f) as.character(rnv[f]))
             ),
          dplyr::filter(
@@ -849,6 +850,7 @@ join_mdb_tables <- function(
          ) %>% 
             dplyr::mutate(
                to=techname, tmin=0L, tmax=-1L,
+               fmin=0L, fmax=-1L,
                tf=lapply(.data$tf, function(f) as.character(rnv[f]))
             )
       )
