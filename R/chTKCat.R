@@ -904,15 +904,21 @@ set_chMDB_access <- function(x, mdb, public){
    dbTables <- DBI::dbGetQuery(con, sprintf("SHOW TABLES FROM `%s`", mdb)) %>% 
       pull("name")
    if(public){
-      for(tn in setdiff(dbTables, "___MDBUsers___")){
-         RClickhouse::dbSendQuery(
-            con,
-            sprintf(
-               "GRANT SELECT ON `%s`.`%s` TO %s",
-               mdb, tn, paste(users, collapse=", ")
-            )
+      RClickhouse::dbSendQuery(
+         con,
+         sprintf(
+            "GRANT SELECT ON `%s`.* TO %s",
+            mdb, paste(users, collapse=", ")
          )
-      }
+      )
+      ul <- setdiff(users, chMDBusers)
+      RClickhouse::dbSendQuery(
+         con,
+         sprintf(
+            "REVOKE SELECT ON `%s`.`%s` FROM %s",
+            mdb, "___MDBUsers___", paste(ul, collapse=", ")
+         )
+      )
    }else{
       ul <- setdiff(users, chMDBusers)
       if(length(ul)>0){
