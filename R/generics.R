@@ -171,6 +171,8 @@ filter_with_tables <- function(x, tables, checkTables=TRUE){
 #' - **quoted_na**: a single logical indicating if missing values inside quotes
 #' should bbe treated as missing values or strings
 #' (FALSE: the default **different** from [readr::read_delim])
+#' @param htmlModel a logical. If TRUE (default) the model is also plotted in
+#' an html file.
 #' @param ... method specific parameters
 #' 
 #' @return A [fileMDB] object.
@@ -180,6 +182,7 @@ filter_with_tables <- function(x, tables, checkTables=TRUE){
 as_fileMDB <- function(
    x, path,
    readParameters=DEFAULT_READ_PARAMS,
+   htmlModel=TRUE,
    ...
 ){
    UseMethod("as_fileMDB", x)

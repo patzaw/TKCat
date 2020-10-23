@@ -1,5 +1,5 @@
 ---
-title: "chTKCat data models"
+title: "chTKCat user guide"
 author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
 output:
@@ -10,47 +10,40 @@ output:
      toc: yes
      toc_float: yes
 vignette: >
-   %\VignetteIndexEntry{chTKCat data models}
+   %\VignetteIndexEntry{chTKCat user guide}
    %\VignetteEncoding{UTF-8}
    %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
 ---
 
-
 ```{r setup, message=FALSE, echo=FALSE, include=FALSE, cache=FALSE}
 library(knitr)
 opts_chunk$set(
    include=TRUE,
-   echo=FALSE,
-   message=FALSE,
-   warning=FALSE,
+   echo=TRUE,
+   message=TRUE,
+   warning=TRUE,
    cache=FALSE,
    cache.lazy=FALSE
 )
 library(devTKCat)
 ```
 
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
-# Data model of the default database
-
-The default database stores information about chTKCat instance, users
-and user access.
-
-```{r}
-plot(devTKCat:::DEFAULT_DATA_MODEL)
+```{r child = 'supp/urls.Rmd'}
 ```
 
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
-# Data model of modeled databases
+# Introduction
 
-Modeled databases (MDB) are stored in dedicated database in chTKCat.
-Their data model is provided in dedicated tables described below.
-
-```{r}
-plot(devTKCat:::CHMDB_DATA_MODEL)
+```{r child = 'supp/genIntro.Rmd'}
 ```
 
+This vignette describes how TKCat can be used with
+a [ClickHouse][clickhouse] database.
+Users should also refer
+to the [general TKCat user guide][uguide].
+Finally, a [specific vignette][opman] describes
+how to create and administrate a TKCat ClickHouse instance.

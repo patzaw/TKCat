@@ -1025,7 +1025,7 @@ add_chMDB_user <- function(x, mdb, login, admin=FALSE){
       RClickhouse::dbSendQuery(
          con,
          sprintf(
-            "GRANT CREATE TABLE, ALTER, INSERT ON `%s`.* TO %s",
+            "GRANT CREATE TABLE, DROP TABLE, ALTER, INSERT ON `%s`.* TO %s",
             mdb, login
          )
       )
@@ -1344,6 +1344,14 @@ explore_MDBs.chTKCat <- function(
    host=x$chcon@host,
    ...
 ){
+   on.exit({
+      if(interactive()){
+         warning(
+            "Disconnected from clickhouse database.",
+            "Use the db_reconnect(x) function to reconnect x."
+         )
+      }
+   })
    shiny::shinyApp(
       ui=.build_etkc_ui(x=x),
       server=.build_etkc_server(
@@ -1372,7 +1380,14 @@ explore_MDBs.chTKCat <- function(
          ########################@
          ## Sidebar ----
          ## Uses uiOutput("currentUser") and uiOutput("signin")
-         sidebar=.etkc_sd_sidebar(sysInterface=TRUE),
+         sidebar=.etkc_sd_sidebar(
+            sysInterface=TRUE,
+            manList=c(
+               "chTKCat user guide"="doc/chTKCat-User-guide.html",
+               "General TKCat user guide"="doc/TKCat-User-guide.html",
+               "chTKCat operations manual"="doc/chTKCat-Operations-manual.html"
+            )
+         ),
          
          ########################@
          ## Body ----

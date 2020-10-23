@@ -1,0 +1,194 @@
+---
+title: "TKCat User guide"
+author: "Patrice Godard"
+date:  "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+   html_document:
+     number_sections: yes
+     self_contained: yes
+     theme: cerulean
+     toc: yes
+     toc_float: yes
+vignette: >
+   %\VignetteIndexEntry{TKCat user guide}
+   %\VignetteEncoding{UTF-8}
+   %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{css, echo=FALSE}
+code{
+  white-space: pre !important;
+  overflow-x: scroll !important;
+  word-break: keep-all !important;
+  word-wrap: initial !important;
+}
+```
+
+```{r setup, message=FALSE, echo=FALSE, include=FALSE, cache=FALSE}
+library(knitr)
+opts_chunk$set(
+   include=TRUE,
+   echo=TRUE,
+   message=TRUE,
+   warning=TRUE,
+   cache=FALSE,
+   cache.lazy=FALSE
+)
+library(devTKCat)
+```
+
+```{r child = 'supp/urls.Rmd'}
+```
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Introduction
+
+```{r child = 'supp/genIntro.Rmd'}
+```
+
+This vignette focuses on a local usage of TKCat in R console.
+Two other vignettes describe more specifically how TKCat can be used with
+a [ClickHouse][clickhouse] database from
+a [user][chuguide] or an [operational][opman] perspectives.
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Modeled databases and embeded information
+
+A modeled database (MDB) in TKCat gathers the following information:
+
+- General database information including a mandatory *name* and optionally
+the following fields: *title*, *description*, *url*, *version* and *maintainer*.
+- A data model created using the [ReDaMoR][redamor] package.
+- A list of tables corresponding to reference concepts shared by different
+MDBs. The way these concepts are identified is defined in specific documents
+called collections.
+- The data themselves organized according to the data model.
+
+<!------------->
+## Reading examples
+
+### HPO
+
+A subset of the [Human Phenotype Ontology (HPO)][hpo]
+is provided within the [ReDaMoR][redamor] package.
+The HPO aims to provide a standardized vocabulary of phenotypic
+abnormalities encountered in human diseases.[!!REF!!].
+A MDB object based on files (see [MDB implementations](#MDB-implementations))
+can be read as shown below.
+As explained above, the data provided by the `path` parameter are
+documented with a model (`dataModel` parameter) and general
+information (`dbInfo` parameter).
+
+```{r}
+file_hpo <- read_fileMDB(
+   path=system.file("examples/HPO-subset", package="ReDaMoR"),
+   dataModel=system.file("examples/HPO-model.json", package="ReDaMoR"),
+   dbInfo=list(
+      "name"="HPO",
+      "title"="Data extracted from the HPO database",
+      "description"=paste(
+         "This is a very small subset of the HPO!",
+         "Visit the reference URL for more information."
+      ),
+      "url"="http://human-phenotype-ontology.github.io/"
+   )
+)
+```
+
+The message displayed in the console indicates if the data fit the data model.
+It relies on the `ReDaMoR::confront_data()` functions and check by default
+the first 10 rows of each file.
+
+The data model can then be drawn.
+
+```{r}
+plot(data_model(file_hpo))
+```
+
+In this model, the *HPO_hp* table refers to the concept of phenotype
+and the *HPO_disease* to the concept of disease.
+These concepts are used to define the condition of individuals.
+The **Condition** collection is built in the TKCat package.
+Identifying the collection members in an MDB is done by providing
+a table of the shape as displayed below and using
+the `collection_members()` function.
+As described in the [!!REF!!] section, collections are useful to identify
+concepts shared by different MDB and can be used to merge them.
+
+```{r}
+cn <- c(
+   "collection", "cid",                "resource", "mid", "table",        "field",     "static", "value",    "type"
+)
+cm <- matrix(data=c(
+   "Condition",  "HPO_conditions_1.0", "HPO",      1,     "HPO_hp",       "condition",  TRUE,    "Phenotype", NA,
+   "Condition",  "HPO_conditions_1.0", "HPO",      1,     "HPO_hp",       "source",     TRUE,    "HP",        NA,
+   "Condition",  "HPO_conditions_1.0", "HPO",      1,     "HPO_hp",       "identifier", FALSE,   "id",        NA,
+   "Condition",  "HPO_conditions_1.0", "HPO",      2,     "HPO_diseases", "condition",  TRUE,    "Disease",   NA,
+   "Condition",  "HPO_conditions_1.0", "HPO",      2,     "HPO_diseases", "source",     FALSE,   "db",        NA,
+   "Condition",  "HPO_conditions_1.0", "HPO",      2,     "HPO_diseases", "identifier", FALSE,   "id",        NA
+   ),
+   ncol=9, byrow=TRUE
+) %>%
+   set_colnames(cn) %>% 
+   as_tibble() %>% 
+   mutate(mid=as.integer(mid), static=as.logical(static))
+collection_members(file_hpo) <- cm
+file_hpo
+```
+
+### ClinVar
+
+```{r}
+file_clinvar <- read_fileMDB(
+   path=system.file("examples/ClinVar", package="devTKCat")
+)
+```
+
+
+### CHEMBL
+
+<!------------->
+## MDB implementations
+
+<!------------->
+## Subsetting and combining
+
+<!------------->
+## Filtering and joining
+
+<!------------->
+## Merging
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# MDB catalogs as TKCat objects
+
+<!------------->
+## Local TKCat
+
+<!------------->
+## ClickHouse TKCat: chTKCat
+
+<!------------->
+## A shiny app for exploring MDBs
+
+
+
+
+
+# Biblio
+
+
+tidy tuesday
+
+https://relational.fit.cvut.cz : https://arxiv.org/abs/1511.03086
+
+https://www.re3data.org/
+
+https://app.sqldbm.com (ReDaMoR)

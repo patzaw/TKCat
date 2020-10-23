@@ -319,6 +319,7 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE){
    ## Add relevant collections ----
    if(!is.null(collectionMembers) && nrow(collectionMembers)>0){
       toAdd <- unique(collectionMembers$collection)
+      toAdd <- setdiff(toAdd, pull(list_chTKCat_collections(tkcon), "title"))
       for(col in toAdd){
          add_chTKCat_collection(tkcon, col)
       }
@@ -841,6 +842,7 @@ c.chMDB <- function(...){
 as_fileMDB.chMDB <- function(
    x, path,
    readParameters=DEFAULT_READ_PARAMS,
+   htmlModel=TRUE,
    by=10^5,
    ...
 ){
@@ -867,8 +869,10 @@ as_fileMDB.chMDB <- function(
    jModelPath <- file.path(modelPath, paste0(dbName, ".json"))
    hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
    write_json_data_model(dm, jModelPath)
-   plot(dm) %>%
-      visNetwork::visSave(hModelPath)
+   if(htmlModel){
+      plot(dm) %>%
+         visNetwork::visSave(hModelPath)
+   }
    
    ## Collection members ----
    cm <- collection_members(x)

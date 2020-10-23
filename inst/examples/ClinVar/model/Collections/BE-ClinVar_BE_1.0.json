@@ -1,0 +1,30 @@
+{
+  "$schema": "TKCat_BE_collection_1.0",
+  "$id": "ClinVar_BE_1.0",
+  "collection": "BE",
+  "resource": "ClinVar",
+  "tables": [
+    {
+      "name": "ClinVar_entrezNames",
+      "fields": {
+        "be": {
+          "static": true,
+          "value": "Gene"
+        },
+        "identifier": {
+          "static": false,
+          "value": "entrez"
+        },
+        "organism": {
+          "static": true,
+          "value": "Homo sapiens",
+          "type": "Scientific name"
+        },
+        "source": {
+          "static": true,
+          "value": "EntrezGene"
+        }
+      }
+    }
+  ]
+}

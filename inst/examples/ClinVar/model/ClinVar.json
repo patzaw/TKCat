@@ -1,0 +1,1187 @@
+{
+  "ClinVar_ReferenceClinVarAssertion": {
+    "tableName": ["ClinVar_ReferenceClinVarAssertion"],
+    "fields": [
+      {
+        "name": "cvs",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": "ClinVar Set ID"
+      },
+      {
+        "name": "id",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": "Reference ClinVar Assertion ID"
+      },
+      {
+        "name": "accession",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "The accession assigned by ClinVar."
+      },
+      {
+        "name": "assertion",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "reviewStatus",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "clinicalSignificance",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "explanation",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Explanation is used only when the description is 'conflicting data from submitters'. The element summarizes the conflict."
+      },
+      {
+        "name": "title",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "The title is contructed from the concatenation of the description of the variation and the phenotype. In the database it is extracted from the title of RCV accession"
+      }
+    ],
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_clinSigOrder"],
+        "key": [
+          {
+            "from": "clinicalSignificance",
+            "to": "label"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      },
+      {
+        "refTable": ["ClinVar_revStatOrder"],
+        "key": [
+          {
+            "from": "reviewStatus",
+            "to": "label"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["clinicalSignificance"],
+        "unique": [false]
+      },
+      {
+        "fields": ["id"],
+        "unique": [true]
+      },
+      {
+        "fields": ["cvs"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-370],
+      "y": [344],
+      "color": ["#DFFB86"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_rcvaVariant": {
+    "tableName": ["ClinVar_rcvaVariant"],
+    "fields": [
+      {
+        "name": "varId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Variant ID"
+      },
+      {
+        "name": "rcvaId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Reference ClinVar Assertion ID"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_ReferenceClinVarAssertion"],
+        "key": [
+          {
+            "from": "rcvaId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      },
+      {
+        "refTable": ["ClinVar_variants"],
+        "key": [
+          {
+            "from": "varId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["rcvaId"],
+        "unique": [false]
+      }
+    ],
+    "display": {
+      "x": [55],
+      "y": [345],
+      "color": ["#D9D9D9"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_ClinVarAssertions": {
+    "tableName": ["ClinVar_ClinVarAssertions"],
+    "fields": [
+      {
+        "name": "cvs",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "ClinVar Set ID"
+      },
+      {
+        "name": "id",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": "ClinVar Assertion ID"
+      },
+      {
+        "name": "accession",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "The accession assigned by ClinVar."
+      },
+      {
+        "name": "clinicalSignificance",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "primaryKey": ["id"],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_ReferenceClinVarAssertion"],
+        "key": [
+          {
+            "from": "cvs",
+            "to": "cvs"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["cvs"],
+        "unique": [false]
+      },
+      {
+        "fields": ["id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-767],
+      "y": [338],
+      "color": ["#DFFB86"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_rcvaInhMode": {
+    "tableName": ["ClinVar_rcvaInhMode"],
+    "fields": [
+      {
+        "name": "rcvaId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Reference ClinVar Assertion ID"
+      },
+      {
+        "name": "inhMode",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Mode of inheritance"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_ReferenceClinVarAssertion"],
+        "key": [
+          {
+            "from": "rcvaId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": {},
+    "display": {
+      "x": [-311],
+      "y": [521],
+      "color": ["#DFFB86"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_rcvaObservedIn": {
+    "tableName": ["ClinVar_rcvaObservedIn"],
+    "fields": [
+      {
+        "name": "rcvaId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Reference ClinVar Assertion ID"
+      },
+      {
+        "name": "origin",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Sample origin"
+      },
+      {
+        "name": "taxonomyId",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Taxonomy ID"
+      },
+      {
+        "name": "species",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Species name"
+      },
+      {
+        "name": "affectedStatus",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Affected status"
+      },
+      {
+        "name": "numberTested",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_ReferenceClinVarAssertion"],
+        "key": [
+          {
+            "from": "rcvaId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": {},
+    "display": {
+      "x": [-114],
+      "y": [498],
+      "color": ["#DFFB86"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_rcvaTraits": {
+    "tableName": ["ClinVar_rcvaTraits"],
+    "fields": [
+      {
+        "name": "rcvaId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Reference ClinVar Assertion ID"
+      },
+      {
+        "name": "t.id",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "ClinVar trait ID"
+      },
+      {
+        "name": "traitType",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Trait type"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_traits"],
+        "key": [
+          {
+            "from": "t.id",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      },
+      {
+        "refTable": ["ClinVar_ReferenceClinVarAssertion"],
+        "key": [
+          {
+            "from": "rcvaId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["t.id"],
+        "unique": [false]
+      }
+    ],
+    "display": {
+      "x": [-368],
+      "y": [168],
+      "color": ["#D9D9D9"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_clinSigOrder": {
+    "tableName": ["ClinVar_clinSigOrder"],
+    "fields": [
+      {
+        "name": "label",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": ""
+      },
+      {
+        "name": "order",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "An integer indicating the order of clinical significance: the lowest the best clinical outcome."
+      }
+    ],
+    "primaryKey": ["label"],
+    "foreignKeys": {},
+    "indexes": [
+      {
+        "fields": ["label"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-540],
+      "y": [524],
+      "color": ["#DFFB86"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_revStatOrder": {
+    "tableName": ["ClinVar_revStatOrder"],
+    "fields": [
+      {
+        "name": "label",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": ""
+      },
+      {
+        "name": "order",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "An integer indicating the order of review status: the lowest the least significant."
+      }
+    ],
+    "primaryKey": ["label"],
+    "foreignKeys": {},
+    "indexes": [
+      {
+        "fields": ["label"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-443],
+      "y": [603],
+      "color": ["#DFFB86"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_variants": {
+    "tableName": ["ClinVar_variants"],
+    "fields": [
+      {
+        "name": "id",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": "Variant ID"
+      },
+      {
+        "name": "type",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Variant type"
+      },
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Variant preferred or first alternate name"
+      }
+    ],
+    "primaryKey": ["id"],
+    "foreignKeys": {},
+    "indexes": [
+      {
+        "fields": ["id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [430],
+      "y": [346],
+      "color": ["#F8DEC3"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_cvaObservedIn": {
+    "tableName": ["ClinVar_cvaObservedIn"],
+    "fields": [
+      {
+        "name": "cvaId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "origin",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Sample origin"
+      },
+      {
+        "name": "species",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Species name"
+      },
+      {
+        "name": "affectedStatus",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Affected status"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_ClinVarAssertions"],
+        "key": [
+          {
+            "from": "cvaId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": {},
+    "display": {
+      "x": [-766],
+      "y": [186],
+      "color": ["#DFFB86"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_cvaSubmitters": {
+    "tableName": ["ClinVar_cvaSubmitters"],
+    "fields": [
+      {
+        "name": "cvaId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "ClinVar Assertion ID"
+      },
+      {
+        "name": "submitter",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Submitter name"
+      },
+      {
+        "name": "primary",
+        "type": "logical",
+        "nullable": false,
+        "unique": false,
+        "comment": "The submitter is of pirmary type"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_ClinVarAssertions"],
+        "key": [
+          {
+            "from": "cvaId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": {},
+    "display": {
+      "x": [-771],
+      "y": [488],
+      "color": ["#DFFB86"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_traits": {
+    "tableName": ["ClinVar_traits"],
+    "fields": [
+      {
+        "name": "id",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": "ClinVar trait ID"
+      },
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Trait preferred or first alternate name"
+      }
+    ],
+    "primaryKey": ["id"],
+    "foreignKeys": {},
+    "indexes": [
+      {
+        "fields": ["id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-371],
+      "y": [31],
+      "color": ["#9BC8FE"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_varEntrez": {
+    "tableName": ["ClinVar_varEntrez"],
+    "fields": [
+      {
+        "name": "varId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Variant ID"
+      },
+      {
+        "name": "entrez",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Entrez Gene ID"
+      },
+      {
+        "name": "type",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Type of the association between the variant and the gene"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_variants"],
+        "key": [
+          {
+            "from": "varId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      },
+      {
+        "refTable": ["ClinVar_entrezNames"],
+        "key": [
+          {
+            "from": "entrez",
+            "to": "entrez"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["varId"],
+        "unique": [false]
+      }
+    ],
+    "display": {
+      "x": [266],
+      "y": [178],
+      "color": ["#8FE6E0"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_varAttributes": {
+    "tableName": ["ClinVar_varAttributes"],
+    "fields": [
+      {
+        "name": "varId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Variant ID"
+      },
+      {
+        "name": "Type",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "integerValue",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "Change",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "value",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_variants"],
+        "key": [
+          {
+            "from": "varId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["varId"],
+        "unique": [false]
+      }
+    ],
+    "display": {
+      "x": [243],
+      "y": [503],
+      "color": ["#F8DEC3"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_varCytoLoc": {
+    "tableName": ["ClinVar_varCytoLoc"],
+    "fields": [
+      {
+        "name": "varId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Variant ID"
+      },
+      {
+        "name": "location",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Cytogenic location"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_variants"],
+        "key": [
+          {
+            "from": "varId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["varId"],
+        "unique": [false]
+      }
+    ],
+    "display": {
+      "x": [486],
+      "y": [489],
+      "color": ["#F8DEC3"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_varNames": {
+    "tableName": ["ClinVar_varNames"],
+    "fields": [
+      {
+        "name": "varId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Variant ID"
+      },
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Variant name"
+      },
+      {
+        "name": "type",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Variant name type: Preferred or Alternate"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_variants"],
+        "key": [
+          {
+            "from": "varId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["varId"],
+        "unique": [false]
+      }
+    ],
+    "display": {
+      "x": [494],
+      "y": [194],
+      "color": ["#F8DEC3"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_varSeqLoc": {
+    "tableName": ["ClinVar_varSeqLoc"],
+    "fields": [
+      {
+        "name": "varId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Variant ID"
+      },
+      {
+        "name": "Accession",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Sequence accession ID"
+      },
+      {
+        "name": "alternateAllele",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Alternate allele"
+      },
+      {
+        "name": "Assembly",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Assembly"
+      },
+      {
+        "name": "AssemblyAccessionVersion",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Version of assembly accession"
+      },
+      {
+        "name": "AssemblyStatus",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Status of the assembly: current or previous"
+      },
+      {
+        "name": "Chr",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Chromosome name"
+      },
+      {
+        "name": "display_start",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "display_stop",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "innerStart",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "innerStop",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "outerStart",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "outerStop",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "referenceAllele",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Reference allele"
+      },
+      {
+        "name": "start",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "stop",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "Strand",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "variantLength",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": "Length of the variant"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_variants"],
+        "key": [
+          {
+            "from": "varId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["varId"],
+        "unique": [false]
+      }
+    ],
+    "display": {
+      "x": [751],
+      "y": [214],
+      "color": ["#F8DEC3"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_varXRef": {
+    "tableName": ["ClinVar_varXRef"],
+    "fields": [
+      {
+        "name": "varId",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Variant ID"
+      },
+      {
+        "name": "id",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "External ID"
+      },
+      {
+        "name": "db",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "External DB"
+      },
+      {
+        "name": "type",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Reference type"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_variants"],
+        "key": [
+          {
+            "from": "varId",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["varId"],
+        "unique": [false]
+      }
+    ],
+    "display": {
+      "x": [721],
+      "y": [461],
+      "color": ["#F8DEC3"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_traitCref": {
+    "tableName": ["ClinVar_traitCref"],
+    "fields": [
+      {
+        "name": "t.id",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "ClinVar trait ID"
+      },
+      {
+        "name": "id",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "External ID"
+      },
+      {
+        "name": "db",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "External DB"
+      },
+      {
+        "name": "type",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Reference type"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_traits"],
+        "key": [
+          {
+            "from": "t.id",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": {},
+    "display": {
+      "x": [-507],
+      "y": [-87],
+      "color": ["#9BC8FE"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_traitNames": {
+    "tableName": ["ClinVar_traitNames"],
+    "fields": [
+      {
+        "name": "t.id",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "ClinVar trait ID"
+      },
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Trait name"
+      },
+      {
+        "name": "type",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "\"Alternate\" or \"Preferred\""
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["ClinVar_traits"],
+        "key": [
+          {
+            "from": "t.id",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": {},
+    "display": {
+      "x": [-264],
+      "y": [-91],
+      "color": ["#9BC8FE"],
+      "comment": ["NA"]
+    }
+  },
+  "ClinVar_entrezNames": {
+    "tableName": ["ClinVar_entrezNames"],
+    "fields": [
+      {
+        "name": "entrez",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": "Entrez Gene ID"
+      },
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Gene name"
+      },
+      {
+        "name": "symbol",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Gene symbol"
+      }
+    ],
+    "primaryKey": ["entrez"],
+    "foreignKeys": {},
+    "indexes": [
+      {
+        "fields": ["entrez"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [265],
+      "y": [37],
+      "color": ["#8FE6E0"],
+      "comment": ["NA"]
+    }
+  }
+}

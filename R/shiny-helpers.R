@@ -39,7 +39,10 @@
 
 
 ###############################################################################@
-.etkc_sd_sidebar <- function(sysInterface){
+.etkc_sd_sidebar <- function(
+   sysInterface,
+   manList
+){
    
    ## Resources ----
    sbelts <- list(
@@ -83,17 +86,27 @@
    }
    
    ## Documentation ----
-   sbelts <- c(sbelts, list(
-      shiny::tags$hr(),
-      shinydashboard::menuItem(
-         "Documentation",
-         icon=shiny::icon("question-circle"),
-         shinydashboard::menuSubItem(
-            "clichouse dm",
-            href="doc/chTKCat-data-models.html"
-         )
-      )
-   ))
+   if(length(manList)>0){
+      mit <- list()
+      for(i in 1:length(manList)){
+         mit <- c(mit, list(
+            shinydashboard::menuSubItem(
+               names(manList)[i],
+               href=as.character(manList)[i]
+            )
+         ))
+      }
+      sbelts <- c(sbelts, list(
+         shiny::tags$hr(),
+         do.call(shinydashboard::menuItem, c(
+            list(
+               text="Documentation",
+               icon=shiny::icon("question-circle")
+            ),
+            mit
+         ))
+      ))
+   }
    
    return(shinydashboard::dashboardSidebar(
       ## Logo ----

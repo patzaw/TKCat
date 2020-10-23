@@ -1,0 +1,119 @@
+---
+title: "chTKCat Operations manual"
+author: "Patrice Godard"
+date:  "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+   html_document:
+     number_sections: yes
+     self_contained: yes
+     theme: cerulean
+     toc: yes
+     toc_float: yes
+vignette: >
+   %\VignetteIndexEntry{chTKCat Operations manual}
+   %\VignetteEncoding{UTF-8}
+   %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, message=FALSE, echo=FALSE, include=FALSE, cache=FALSE}
+library(knitr)
+opts_chunk$set(
+   include=TRUE,
+   echo=FALSE,
+   message=FALSE,
+   warning=FALSE,
+   cache=FALSE,
+   cache.lazy=FALSE
+)
+library(devTKCat)
+```
+
+```{r child = 'supp/urls.Rmd'}
+```
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Introduction
+
+```{r child = 'supp/genIntro.Rmd'}
+```
+
+This vignette describes how to create and administrate
+a TKCat [ClickHouse][clickhouse] instance.
+An [other vignette][chuguide] focuses how TKCat can be used
+with a ClickHouse database.
+Users should also refer to the [general TKCat user guide][uguide].
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Implementation
+
+<!-------------->
+## Data models
+
+### Default database
+
+The default database stores information about chTKCat instance, users
+and user access.
+
+```{r}
+plot(devTKCat:::DEFAULT_DATA_MODEL)
+```
+
+### Modeled databases
+
+Modeled databases (MDB) are stored in dedicated database in chTKCat.
+Their data model is provided in dedicated tables described below.
+
+```{r}
+plot(devTKCat:::CHMDB_DATA_MODEL)
+```
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# User management
+
+```{r, eval=FALSE}
+k <- chTKCat(port=9201L, user="pgodard")
+create_chTKCat_user(k, login="lfrancois", contact="Liesbeth.Francois@ucb.com")
+```
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# MDB management
+
+<!-------------->
+## MDB Creation
+
+```{r, eval=FALSE}
+toCreate <- readLines("~/Shared/Data-Science/Data-Source-Model-Repository/01-lfrancois-Resources/All-Resources.txt")
+for(r in toCreate){
+   if(!r %in% list_MDBs(k, withInfo=FALSE)){
+      create_chMDB(k, r)
+   }
+   set_chMDB_access(k, r, public=TRUE)
+   add_chMDB_user(k, r, "lfrancois", admin=TRUE)
+}
+```
+
+<!-------------->
+## Populating MDB
+
+```{r, eval=FALSE}
+toFeed <- readLines("~/Shared/Data-Science/Data-Source-Model-Repository/01-pgodard-Resources/All-Resources.txt")
+lc <- scan_fileMDBs(
+   "~/Shared/Data-Science/Data-Source-Model-Repository/",
+   subdirs=toFeed
+)
+# explore_MDBs(lc)
+for(r in toFeed){
+   message(r)
+   lr <- as_memoMDB(lc[[r]])
+   cr <- as_chMDB(lr, k, overwrite=TRUE)
+}
+```

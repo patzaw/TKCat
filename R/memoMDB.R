@@ -458,6 +458,7 @@ c.memoMDB <- function(...){
 as_fileMDB.memoMDB <- function(
    x, path,
    readParameters=DEFAULT_READ_PARAMS,
+   htmlModel=TRUE,
    ...
 ){
    stopifnot(is.character(path), length(path)==1, !is.na(path))
@@ -483,8 +484,10 @@ as_fileMDB.memoMDB <- function(
    jModelPath <- file.path(modelPath, paste0(dbName, ".json"))
    hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
    write_json_data_model(dm, jModelPath)
-   plot(dm) %>%
-      visNetwork::visSave(hModelPath)
+   if(htmlModel){
+      plot(dm) %>%
+         visNetwork::visSave(hModelPath)
+   }
    
    ## Collection members ----
    cm <- collection_members(x)

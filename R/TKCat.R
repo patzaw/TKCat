@@ -359,7 +359,12 @@ explore_MDBs.TKCat <- function(
          ########################@
          ## Sidebar ----
          ## Uses uiOutput("currentUser") and uiOutput("signin")
-         sidebar=.etkc_sd_sidebar(sysInterface=FALSE),
+         sidebar=.etkc_sd_sidebar(
+            sysInterface=FALSE,
+            manList=c(
+               "General TKCat user guide"="doc/TKCat-User-guide.html"
+            )
+         ),
          
          ########################@
          ## Body ----

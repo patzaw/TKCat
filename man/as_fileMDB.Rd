@@ -9,15 +9,46 @@
 \alias{as_fileMDB.metaMDB}
 \title{Write an MDB object}
 \usage{
-\method{as_fileMDB}{chMDB}(x, path, readParameters = DEFAULT_READ_PARAMS, by = 10^5, ...)
+\method{as_fileMDB}{chMDB}(
+  x,
+  path,
+  readParameters = DEFAULT_READ_PARAMS,
+  htmlModel = TRUE,
+  by = 10^5,
+  ...
+)
 
-\method{as_fileMDB}{fileMDB}(x, path, readParameters = DEFAULT_READ_PARAMS, ...)
+\method{as_fileMDB}{fileMDB}(
+  x,
+  path,
+  readParameters = DEFAULT_READ_PARAMS,
+  htmlModel = TRUE,
+  ...
+)
 
-as_fileMDB(x, path, readParameters = DEFAULT_READ_PARAMS, ...)
+as_fileMDB(
+  x,
+  path,
+  readParameters = DEFAULT_READ_PARAMS,
+  htmlModel = TRUE,
+  ...
+)
 
-\method{as_fileMDB}{memoMDB}(x, path, readParameters = DEFAULT_READ_PARAMS, ...)
+\method{as_fileMDB}{memoMDB}(
+  x,
+  path,
+  readParameters = DEFAULT_READ_PARAMS,
+  htmlModel = TRUE,
+  ...
+)
 
-\method{as_fileMDB}{metaMDB}(x, path, readParameters = DEFAULT_READ_PARAMS, ...)
+\method{as_fileMDB}{metaMDB}(
+  x,
+  path,
+  readParameters = DEFAULT_READ_PARAMS,
+  htmlModel = TRUE,
+  ...
+)
 }
 \arguments{
 \item{x}{an MDB object}
@@ -32,6 +63,9 @@ as_fileMDB(x, path, readParameters = DEFAULT_READ_PARAMS, ...)
 should bbe treated as missing values or strings
 (FALSE: the default \strong{different} from \link[readr:read_delim]{readr::read_delim})
 }}
+
+\item{htmlModel}{a logical. If TRUE (default) the model is also plotted in
+an html file.}
 
 \item{by}{the size of the batch: number of records to write
 together (default: 10^5)}
