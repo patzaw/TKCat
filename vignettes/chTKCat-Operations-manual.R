@@ -8,16 +8,16 @@ opts_chunk$set(
    cache=FALSE,
    cache.lazy=FALSE
 )
-library(devTKCat)
+library(TKCat)
 
 ## -----------------------------------------------------------------------------
-plot(devTKCat:::DEFAULT_DATA_MODEL)
+plot(TKCat:::DEFAULT_DATA_MODEL)
 
 ## -----------------------------------------------------------------------------
-plot(devTKCat:::CHMDB_DATA_MODEL)
+plot(TKCat:::CHMDB_DATA_MODEL)
 
 ## ---- eval=FALSE--------------------------------------------------------------
-#  k <- chTKCat(port=9201L, user="pgodard")
+#  k <- chTKCat(port=9101L, user="pgodard")
 #  create_chTKCat_user(k, login="lfrancois", contact="Liesbeth.Francois@ucb.com")
 
 ## ---- eval=FALSE--------------------------------------------------------------

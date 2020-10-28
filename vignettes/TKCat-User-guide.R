@@ -8,7 +8,7 @@ opts_chunk$set(
    cache=FALSE,
    cache.lazy=FALSE
 )
-library(devTKCat)
+library(TKCat)
 
 ## -----------------------------------------------------------------------------
 file_hpo <- read_fileMDB(
@@ -50,12 +50,12 @@ file_hpo
 
 ## -----------------------------------------------------------------------------
 file_clinvar <- read_fileMDB(
-   path=system.file("examples/ClinVar", package="devTKCat")
+   path=system.file("examples/ClinVar", package="TKCat")
 )
 
 ## -----------------------------------------------------------------------------
 file_chembl <- read_fileMDB(
-   path=system.file("examples/CHEMBL", package="devTKCat")
+   path=system.file("examples/CHEMBL", package="TKCat")
 )
 
 ## -----------------------------------------------------------------------------

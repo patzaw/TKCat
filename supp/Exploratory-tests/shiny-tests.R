@@ -1,8 +1,8 @@
-library(devTKCat)
+library(TKCat)
 
 k <- chTKCat(
    host="bel040344",
-   port=9201, http=9211,
+   port=9101, http=9111,
    user="default", password=""
 )
 explore_MDBs(k)

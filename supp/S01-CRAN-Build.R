@@ -27,6 +27,6 @@ pv <- desc::desc_get_version(here())
 system(paste(
    sprintf("cd %s", here("..")),
    "R CMD build TKCat",
-   sprintf("R CMD check --as-cran devTKCat_%s.tar.gz", pv),
+   sprintf("R CMD check --as-cran TKCat_%s.tar.gz", pv),
    sep=" ; "
 ))

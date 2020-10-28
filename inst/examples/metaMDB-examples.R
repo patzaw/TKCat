@@ -1,5 +1,3 @@
-library(devTKCat)
-
 hpof <- read_fileMDB("~/Tmp/HPO")
 cvf <- read_fileMDB("~/Tmp/ClinVar")
 pmf <- read_fileMDB("~/Tmp/PubMed/")

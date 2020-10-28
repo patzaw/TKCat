@@ -8,5 +8,5 @@ opts_chunk$set(
    cache=FALSE,
    cache.lazy=FALSE
 )
-library(devTKCat)
+library(TKCat)
 

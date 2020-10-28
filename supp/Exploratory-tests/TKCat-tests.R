@@ -1,4 +1,4 @@
-library(devTKCat)
+library(TKCat)
 
 dscf <- "~/Tmp/dsc.rds"
 if(file.exists(dscf)){
@@ -9,6 +9,6 @@ if(file.exists(dscf)){
    )
    saveRDS(dsc, file=dscf)
 }
-k <- chTKCat(port=9201L, password="")
+k <- chTKCat(port=9101L, password="")
 
 mdsc <- c(dsc[9:11], TKCat(get_MDB(k, "HPO")))

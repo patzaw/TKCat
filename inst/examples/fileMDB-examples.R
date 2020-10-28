@@ -1,5 +1,3 @@
-library(devTKCat)
-
 hpof <- read_fileMDB(
    path=system.file("examples/HPO-subset", package="ReDaMoR"),
    dataModel=system.file("examples/HPO-model.json", package="ReDaMoR"),

@@ -1,8 +1,8 @@
-library(devTKCat)
+library(TKCat)
 library(here)
 library(BED)
 
-k <- chTKCat(port=9201L)
+k <- chTKCat(port=9101L)
 
 chembl <- get_MDB(k, "CHEMBL")
 scv <- read_fileMDB(here("inst/examples/ClinVar"))

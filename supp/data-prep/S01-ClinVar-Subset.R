@@ -1,7 +1,7 @@
-library(devTKCat)
+library(TKCat)
 library(here)
 
-k <- chTKCat(port=9201L)
+k <- chTKCat(port=9101L)
 
 clinvar <- get_MDB(k, "ClinVar")
 

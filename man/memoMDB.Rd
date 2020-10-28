@@ -61,8 +61,6 @@ A memoMDB object
 An \link{MDB} (Modeled DataBase) in memory: memoMDB
 }
 \examples{
-library(devTKCat)
-
 hpo <- read_fileMDB(
    path=system.file("examples/HPO-subset", package="ReDaMoR"),
    dataModel=system.file("examples/HPO-model.json", package="ReDaMoR"),

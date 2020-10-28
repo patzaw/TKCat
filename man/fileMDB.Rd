@@ -68,8 +68,6 @@ A fileMDB object
 An \link{MDB} (Modeled DataBase) based on files: fileMDB
 }
 \examples{
-library(devTKCat)
-
 hpof <- read_fileMDB(
    path=system.file("examples/HPO-subset", package="ReDaMoR"),
    dataModel=system.file("examples/HPO-model.json", package="ReDaMoR"),

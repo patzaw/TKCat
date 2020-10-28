@@ -1,11 +1,11 @@
-library(devTKCat)
+library(TKCat)
 
 ###############################################################################@
 ## Configuration ----
 
 TKCAT_HOME <- "/data/pgodard/Projects/TKCat_UCB_TBN"
-TKCAT_NAT_PORT <- 9201 # mv back to 9101 when tests are finished
-TKCAT_HTTP_PORT <- 9211 # mv back to 9111 when tests are finished
+TKCAT_NAT_PORT <- 9101
+TKCAT_HTTP_PORT <- 9111
 
 SRC_DIR <- here::here("ClickHouse", "ClickHouse-Files")
 CH_VERSION <- "20.8.2.3"
@@ -64,7 +64,7 @@ k <- chTKCat(
    http=TKCAT_HTTP_PORT,
    password=NA
 )
-k <- devTKCat:::init_chTKCat(
+k <- TKCat:::init_chTKCat(
    k,
    instance=INSTANCE_NAME,
    version=as.character(Sys.Date()),

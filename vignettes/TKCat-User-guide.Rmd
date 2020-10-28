@@ -36,7 +36,7 @@ opts_chunk$set(
    cache=FALSE,
    cache.lazy=FALSE
 )
-library(devTKCat)
+library(TKCat)
 ```
 
 ```{r child = 'supp/urls.Rmd'}
@@ -165,7 +165,7 @@ case and it is organized as following:
 
 ```{r}
 file_clinvar <- read_fileMDB(
-   path=system.file("examples/ClinVar", package="devTKCat")
+   path=system.file("examples/ClinVar", package="TKCat")
 )
 ```
 
@@ -177,7 +177,7 @@ It can be read the same way as the ClinVar resource.
 
 ```{r}
 file_chembl <- read_fileMDB(
-   path=system.file("examples/CHEMBL", package="devTKCat")
+   path=system.file("examples/CHEMBL", package="TKCat")
 )
 ```
 

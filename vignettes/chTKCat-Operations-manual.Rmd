@@ -27,7 +27,7 @@ opts_chunk$set(
    cache=FALSE,
    cache.lazy=FALSE
 )
-library(devTKCat)
+library(TKCat)
 ```
 
 ```{r child = 'supp/urls.Rmd'}
@@ -60,7 +60,7 @@ The default database stores information about chTKCat instance, users
 and user access.
 
 ```{r}
-plot(devTKCat:::DEFAULT_DATA_MODEL)
+plot(TKCat:::DEFAULT_DATA_MODEL)
 ```
 
 ### Modeled databases
@@ -69,7 +69,7 @@ Modeled databases (MDB) are stored in dedicated database in chTKCat.
 Their data model is provided in dedicated tables described below.
 
 ```{r}
-plot(devTKCat:::CHMDB_DATA_MODEL)
+plot(TKCat:::CHMDB_DATA_MODEL)
 ```
 
 
@@ -78,7 +78,7 @@ plot(devTKCat:::CHMDB_DATA_MODEL)
 # User management
 
 ```{r, eval=FALSE}
-k <- chTKCat(port=9201L, user="pgodard")
+k <- chTKCat(port=9101L, user="pgodard")
 create_chTKCat_user(k, login="lfrancois", contact="Liesbeth.Francois@ucb.com")
 ```
 

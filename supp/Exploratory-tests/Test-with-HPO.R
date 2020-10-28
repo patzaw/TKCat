@@ -1,7 +1,7 @@
-library(devTKCat)
+library(TKCat)
 
 ## Different type of MDBs ----
-k <- chTKCat(port=9201, user="pgodard", password="1234")
+k <- chTKCat(port=9101, user="pgodard")
 hpof <- read_fileMDB("~/Tmp/HPO")
 if(!"HPO" %in% list_MDBs(k, withInfo=FALSE)){
    create_chMDB(k, "HPO")

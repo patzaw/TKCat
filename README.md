@@ -4,6 +4,6 @@ Put the following lines in the **app.R** file.
 
 ```
 library(TKCat)
-tkcon <- chTKCat(host="bel040344")
-explore(tkcon)
+k <- chTKCat(host="bel040344")
+explore_MDBs(k)
 ```
