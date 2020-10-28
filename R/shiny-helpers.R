@@ -351,18 +351,11 @@
          )
       })
       mdbListProxy <- DT::dataTableProxy("mdbList")
-      shiny::observe({
-         mdbListProxy %>%
-            DT::selectRows(
-               which(isolate(mdbs$list$name) %in% selStatus$resource)
-            )
-      })
       
       shiny::observe({
          shiny::req(mdbs$validInput)
          s <- input$mdbList_rows_selected
          n <- mdbs$list$name[s]
-         selStatus$resource <- n
          if(length(n)==0 || n==""){
             selStatus$resource <- NULL
             selStatus$mdb <- NULL
@@ -521,7 +514,8 @@
          dm <- data_model(mdb)
          dbdm$validInput <- TRUE
          nodesIdSelection <- list(enabled=TRUE, useLabels=FALSE)
-         sel <- isolate(selStatus$tables)
+         sel <- isolate(selStatus$tables) %>% 
+            intersect(names(mdb))
          if(length(sel)>0){
             nodesIdSelection$selected <- sel
          }
@@ -601,7 +595,8 @@
       output$tableInfo <- shiny::renderUI({
          mdb <- selStatus$mdb
          shiny::req(mdb)
-         sel <- selStatus$tables
+         sel <- selStatus$tables %>% 
+            intersect(names(mdb))
          shiny::req(sel)
          shiny::req(length(sel)==1)
          shiny::tagList(
@@ -639,7 +634,8 @@
          tabSubSet(NULL)
          mdb <- selStatus$mdb
          shiny::req(mdb)
-         sel <- selStatus$tables
+         sel <- selStatus$tables %>% 
+            intersect(names(mdb))
          shiny::req(sel)
          shiny::req(length(sel)==1)
          toShow <- data_tables(mdb, dplyr::all_of(sel), n_max=subSetSize)[[1]]
@@ -680,7 +676,8 @@
          content = function(file) {
             mdb <- selStatus$mdb
             shiny::req(mdb)
-            sel <- selStatus$tables
+            sel <- selStatus$tables %>% 
+               intersect(names(mdb))
             shiny::req(sel)
             shiny::req(length(sel)==1)
             readr::write_tsv(data_tables(mdb, dplyr::all_of(sel))[[1]], file)
@@ -802,7 +799,10 @@
          shiny::req(sel)
          rt <- isolate(searchRes$resources)
          shiny::req(rt)
-         selStatus$resource <- rt %>% slice(sel) %>% pull("name")
+         mdbListProxy %>%
+            DT::selectRows(
+               which(isolate(mdbs$list$name) %in% pull(slice(rt, sel), "name"))
+            )
       })
       ## _+ tables ----
       shiny::observe({
@@ -856,7 +856,12 @@
          shiny::req(sel)
          rt <- isolate(searchRes$tables)
          shiny::req(rt)
-         selStatus$resource <- rt %>% slice(sel) %>% pull("resource")
+         mdbListProxy %>%
+            DT::selectRows(
+               which(
+                  isolate(mdbs$list$name) %in% pull(slice(rt, sel), "resource")
+               )
+            )
          selStatus$tables <- rt %>% slice(sel) %>% pull("name")
       })
       ## _+ fields ----
@@ -888,8 +893,6 @@
          if(nrow(toRet)>0){
             toRet %>%
                dplyr::mutate(
-                  # resource=.highlightText(.data$resource, st),
-                  # table=.highlightText(.data$resource, st),
                   name=.highlightText(.data$name, st),
                   comment=.highlightText(.data$comment, st)
                ) %>%
@@ -912,7 +915,10 @@
          shiny::req(sel)
          rt <- isolate(searchRes$fields)
          shiny::req(rt)
-         selStatus$resource <- rt %>% slice(sel) %>% pull("resource")
+         mdbListProxy %>%
+            DT::selectRows(
+               which(isolate(mdbs$list$name) %in% pull(slice(rt, sel), "name"))
+            )
          selStatus$tables <- rt %>% slice(sel) %>% pull("table")
       })
       
@@ -1142,21 +1148,4 @@
          return(toRet)
       }
    )))
-}
-
-###############################################################################@
-.format_file_size <- function(n){
-   sunits <- c("B", "KB", "MB", "GB", "TB")
-   nunits <- log2(n)%/%10
-   toRet <- lapply(
-      1:length(n),
-      function(i){
-         format(
-            n[i]/(2^(10*nunits[i])),
-            digit=1,
-            nsmall=ifelse(nunits[i]==0, 0, 1)
-         )
-      }
-   )
-   return(paste(toRet, sunits[nunits+1]))
 }

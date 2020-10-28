@@ -31,4 +31,11 @@ fcv <- fcv %>%
          "criteria provided, multiple submitters, no conflicts",
          "reviewed by expert panel"
    ))
+dbi <- db_info(fcv)
+dbi$description <- paste(
+   dbi$description,
+   "This is a very small subset of ClinVar!",
+   "Visit the reference URL for more information."
+)
+db_info(fcv) <- dbi
 as_fileMDB(fcv, path=here("inst/examples"), htmlModel=FALSE)

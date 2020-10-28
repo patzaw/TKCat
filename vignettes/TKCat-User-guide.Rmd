@@ -3,14 +3,14 @@ title: "TKCat User guide"
 author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
 output:
-   html_document:
+   rmarkdown::html_vignette:
      number_sections: yes
      self_contained: yes
-     theme: cerulean
      toc: yes
-     toc_float: yes
+     fig_width: 7
+     fig_height: 5
 vignette: >
-   %\VignetteIndexEntry{TKCat user guide}
+   %\VignetteIndexEntry{TKCat User guide}
    %\VignetteEncoding{UTF-8}
    %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -55,6 +55,7 @@ Two other vignettes describe more specifically how TKCat can be used with
 a [ClickHouse][clickhouse] database from
 a [user][chuguide] or an [operational][opman] perspectives.
 
+
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 # Modeled databases and embeded information
@@ -77,7 +78,7 @@ called collections.
 A subset of the [Human Phenotype Ontology (HPO)][hpo]
 is provided within the [ReDaMoR][redamor] package.
 The HPO aims to provide a standardized vocabulary of phenotypic
-abnormalities encountered in human diseases.[!!REF!!].
+abnormalities encountered in human diseases.[!REF!].
 A MDB object based on files (see [MDB implementations](#MDB-implementations))
 can be read as shown below.
 As explained above, the data provided by the `path` parameter are
@@ -117,8 +118,11 @@ The **Condition** collection is built in the TKCat package.
 Identifying the collection members in an MDB is done by providing
 a table of the shape as displayed below and using
 the `collection_members()` function.
-As described in the [!!REF!!] section, collections are useful to identify
-concepts shared by different MDB and can be used to merge them.
+As described in
+the [Merging with collections](#Merging-with-collections) section,
+collections identify
+concepts shared by different MDB and can be used to merge resources
+according to these concepts.
 
 ```{r}
 cn <- c(
@@ -143,26 +147,152 @@ file_hpo
 
 ### ClinVar
 
+A subset of the [ClinVar][clinvar] database is provided within this package.
+ClinVar is a freely accessible, public archive of reports of the relationships
+among human variations and phenotypes, with supporting evidence [!REF!].
+This resource can be read as a `fileMDB` as shown above, excepted that all
+the documenting information is included in the resource directory in this
+case and it is organized as following:
+
+- **DESCRIPTION.json** contains db_information
+- **data** is a directory with all the data tables
+- **model** is a directory with model information:
+   - A **json** file with the ClinVar data model created with
+   the [ReDaMoR][redamor] package
+   - A **Collections** subfolder with one json file per collection with
+   members in the ClinVar resource
+
+
 ```{r}
 file_clinvar <- read_fileMDB(
    path=system.file("examples/ClinVar", package="devTKCat")
 )
 ```
 
-
 ### CHEMBL
+
+A self-documented subset of the [CHEMBL][chembl] database is also provided
+in this package.
+It can be read the same way as the ClinVar resource.
+
+```{r}
+file_chembl <- read_fileMDB(
+   path=system.file("examples/CHEMBL", package="devTKCat")
+)
+```
+
+CHEMBL is a manually curated chemical database of bioactive molecules with
+drug-like properties [!REF!].
 
 <!------------->
 ## MDB implementations
 
+There are 3 main implementations of MDBs:
+
+- **fileMDB** objects keep the data in files and load them only when requested
+by the user. These implementation is the first one which is used when reading
+MDB as demonstrated in the examples above.
+
+- **memoMDB** objects have all the data loaded in memory. These objects are
+very easy to use but can take time to load and can use a lot of memory.
+
+- **chMDB** objects get the data from a ClickHouse database providing a
+catalog of MDBs as described in the [chTKCat](#chTKCat) section below.
+More information about chTKCat and chMDB objects can also be found in
+the [chTKCat user guide][chuguide] and the [chTKCat operational manual][opman].
+
+The different implementations can be converted to each others using
+`as_fileMDB()`, `as_memoMDB()` and `as_chMDB()` functions.
+
+```{r}
+memo_clinvar <- as_memoMDB(file_clinvar)
+object.size(file_clinvar) %>% print(units="Kb")
+object.size(memo_clinvar) %>% print(units="Kb")
+```
+
+
+A fourth implementation is **metaMDB** which combines several MDBs glued
+together with relational tables
+(see the [Merging with collections](#Merging-with-collections) section).
+
+Most of the functions described below work with any MDB implementation.
+A few functions are specific of each implementations
+
 <!------------->
-## Subsetting and combining
+## Getting information
+
+### General information
+
+```{r}
+db_info(file_clinvar)
+```
+
+The function `db_info()<-` can be used to update this information.
+
+### Data model
+
+As shown above the data model of an MDB can be retrieved and plot the following
+way.
+
+```{r}
+plot(data_model(file_clinvar))
+```
+
+Tables names can be listed with the `names()` function and changed
+with `names()<-` or `rename()`.
+
+```{r}
+names(file_clinvar)
+```
+
+The different collection members of an MDBs are listed with
+the `collection_members()` function and updated with `collection_members()<-`.
+
+```{r}
+collection_members(file_clinvar)
+```
+
+### Size
+
+The following functions are use to get the number of tables, the number of
+fields per table and the number of records.
+
+```{r}
+length(file_clinvar)        # Number of tables
+lengths(file_clinvar)       # Number of fields per table
+count_records(file_clinvar) # Number of records per table
+```
+
+The `count_records()` function can take a lot of time when dealing
+with *fileMDB* objects if the data files are very large.
+In such case it could be more clever to list data file size.
+
+```{r}
+data_file_size(file_clinvar, hr=TRUE)
+```
+
+<!------------->
+## Pulling, subsetting and combining
+
+There are several possible ways to pull data tables from MDBs.
+The following lines return the same results.
+
+```{r, eval=FALSE}
+data_tables(file_clinvar, "ClinVar_traitNames")[[1]]
+file_clinvar[["ClinVar_traitNames"]]
+file_clinvar$"ClinVar_traitNames"
+```
+
+```{r}
+file_clinvar %>% pull(ClinVar_traitNames)
+```
+
 
 <!------------->
 ## Filtering and joining
 
 <!------------->
-## Merging
+## Merging with collections
 
 
 <!----------------------------------------------------------------------------->
@@ -173,7 +303,7 @@ file_clinvar <- read_fileMDB(
 ## Local TKCat
 
 <!------------->
-## ClickHouse TKCat: chTKCat
+## chTKCat
 
 <!------------->
 ## A shiny app for exploring MDBs

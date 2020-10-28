@@ -5,3 +5,5 @@
 [redamor]: https://github.com/patzaw/ReDaMoR
 [clickhouse]: https://clickhouse.tech/
 [hpo]: https://hpo.jax.org/app/
+[clinvar]: https://www.ncbi.nlm.nih.gov/clinvar/
+[chembl]: https://www.ebi.ac.uk/chembl/

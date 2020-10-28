@@ -513,7 +513,7 @@ as_fileMDB.memoMDB <- function(
    dfiles <- file.path(dataPath, paste0(names(x), ext))
    names(dfiles) <- names(x)
    for(tn in names(x)){
-      readr::write_delim(x=x[[tn]], path=dfiles[tn], delim=rp$delim)
+      readr::write_delim(x=x[[tn]], file=dfiles[tn], delim=rp$delim)
    }
    
    ## Return fileMDB ----

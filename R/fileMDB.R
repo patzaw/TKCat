@@ -143,7 +143,11 @@ read_fileMDB <- function(
    
    ## DB information ----
    if(is.null(dbInfo)){
-      dbInfo <- jsonlite::read_json(file.path(path, "DESCRIPTION.json"))
+      dbifp <- file.path(path, "DESCRIPTION.json")
+      if(!file.exists(dbifp)){
+         stop(sprintf("%s does not exist", dbifp))
+      }
+      dbInfo <- jsonlite::read_json(dbifp)
    }else{
       if(is.character(dbInfo)){
          stopifnot(
@@ -534,14 +538,20 @@ data_files <- function(x){
 #' Get the size of data files from a [fileMDB] object
 #' 
 #' @param x a [fileMDB] object
+#' @param hr a logical indicating if the values should be "human readable".
+#' (default: FALSE)
 #' 
-#' @return a numeric vector with size in bytes.
+#' @return a numeric vector with size in bytes (hr=FALSE) or
+#' a character vector with size and units (hr=TRUE)
 #' 
 #' @export
 #'
-data_file_size <- function(x){
+data_file_size <- function(x, hr=FALSE){
    df <- data_files(x)$dataFiles
    toRet <- file.size(df)
+   if(hr){
+      toRet <- .format_file_size(toRet)
+   }
    names(toRet) <- names(df)
    return(toRet)
 }
@@ -772,7 +782,7 @@ as_fileMDB.fileMDB <- function(
                list(
                   callback=readr::DataFrameCallback$new(function(y, pos){
                      readr::write_delim(
-                        y, path=dfiles[tn], delim=readParameters$delim,
+                        y, file=dfiles[tn], delim=readParameters$delim,
                         append=file.exists(dfiles[tn])
                      )
                   }),
@@ -1117,5 +1127,21 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
       d <- .file_filtByConta(d, fdb, nfk)
    }
    return(d)
+}
+
+.format_file_size <- function(n){
+   sunits <- c("B", "KB", "MB", "GB", "TB")
+   nunits <- log2(n)%/%10
+   toRet <- lapply(
+      1:length(n),
+      function(i){
+         format(
+            n[i]/(2^(10*nunits[i])),
+            digit=1,
+            nsmall=ifelse(nunits[i]==0, 0, 1)
+         )
+      }
+   )
+   return(paste(toRet, sunits[nunits+1]))
 }
 

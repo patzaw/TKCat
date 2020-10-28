@@ -53,3 +53,41 @@ file_clinvar <- read_fileMDB(
    path=system.file("examples/ClinVar", package="devTKCat")
 )
 
+## -----------------------------------------------------------------------------
+file_chembl <- read_fileMDB(
+   path=system.file("examples/CHEMBL", package="devTKCat")
+)
+
+## -----------------------------------------------------------------------------
+memo_clinvar <- as_memoMDB(file_clinvar)
+object.size(file_clinvar) %>% print(units="Kb")
+object.size(memo_clinvar) %>% print(units="Kb")
+
+## -----------------------------------------------------------------------------
+db_info(file_clinvar)
+
+## -----------------------------------------------------------------------------
+plot(data_model(file_clinvar))
+
+## -----------------------------------------------------------------------------
+names(file_clinvar)
+
+## -----------------------------------------------------------------------------
+collection_members(file_clinvar)
+
+## -----------------------------------------------------------------------------
+length(file_clinvar)        # Number of tables
+lengths(file_clinvar)       # Number of fields per table
+count_records(file_clinvar) # Number of records per table
+
+## -----------------------------------------------------------------------------
+data_file_size(file_clinvar, hr=TRUE)
+
+## ---- eval=FALSE--------------------------------------------------------------
+#  data_tables(file_clinvar, "ClinVar_traitNames")[[1]]
+#  file_clinvar[["ClinVar_traitNames"]]
+#  file_clinvar$"ClinVar_traitNames"
+
+## -----------------------------------------------------------------------------
+file_clinvar %>% pull(ClinVar_traitNames)
+

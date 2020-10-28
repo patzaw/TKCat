@@ -1347,7 +1347,7 @@ explore_MDBs.chTKCat <- function(
    on.exit({
       if(interactive()){
          warning(
-            "Disconnected from clickhouse database.",
+            "Disconnected from clickhouse database. ",
             "Use the db_reconnect(x) function to reconnect x."
          )
       }

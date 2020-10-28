@@ -1,0 +1,25 @@
+{
+  "$schema": "TKCat_Condition_collection_1.0",
+  "$id": "CHEMBL_Condition_1.0",
+  "collection": "Condition",
+  "resource": "CHEMBL",
+  "tables": [
+    {
+      "name": "CHEMBL_drug_indication",
+      "fields": {
+        "condition": {
+          "static": true,
+          "value": "Disease"
+        },
+        "identifier": {
+          "static": false,
+          "value": "id"
+        },
+        "source": {
+          "static": false,
+          "value": "DB"
+        }
+      }
+    }
+  ]
+}

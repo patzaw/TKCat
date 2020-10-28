@@ -1,0 +1,727 @@
+{
+  "CHEMBL_component_sequence": {
+    "tableName": ["CHEMBL_component_sequence"],
+    "fields": [
+      {
+        "name": "component_id",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": "Primary key. Unique identifier for the component."
+      },
+      {
+        "name": "accession",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Accession for the sequence in the source database from which it was taken (e.g., UniProt accession for proteins)."
+      },
+      {
+        "name": "organism",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Name of the organism the sequence comes from."
+      },
+      {
+        "name": "db_source",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "db_version",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "The version of the source sequence database from which sequences/accession were last updated.\\n"
+      }
+    ],
+    "primaryKey": ["component_id"],
+    "foreignKeys": {},
+    "indexes": [
+      {
+        "fields": ["component_id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [79],
+      "y": [204],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
+  },
+  "CHEMBL_target_component": {
+    "tableName": ["CHEMBL_target_component"],
+    "fields": [
+      {
+        "name": "tid",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "component_id",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "targcomp_id",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": "Primary key."
+      },
+      {
+        "name": "homologue",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "primaryKey": ["targcomp_id"],
+    "foreignKeys": [
+      {
+        "refTable": ["CHEMBL_component_sequence"],
+        "key": [
+          {
+            "from": "component_id",
+            "to": "component_id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      },
+      {
+        "refTable": ["CHEMBL_target_dictionary"],
+        "key": [
+          {
+            "from": "tid",
+            "to": "tid"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["tid"],
+        "unique": [false]
+      },
+      {
+        "fields": ["targcomp_id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [59],
+      "y": [337],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
+  },
+  "CHEMBL_target_dictionary": {
+    "tableName": ["CHEMBL_target_dictionary"],
+    "fields": [
+      {
+        "name": "tid",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": "Unique ID for the target"
+      },
+      {
+        "name": "target_type",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "pref_name",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Preferred target name: manually curated"
+      },
+      {
+        "name": "tax_id",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "NCBI taxonomy id of target"
+      },
+      {
+        "name": "organism",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "chembl_id",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "species_group_flag",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "primaryKey": ["tid"],
+    "foreignKeys": {},
+    "indexes": [
+      {
+        "fields": ["tid"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-216],
+      "y": [314],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
+  },
+  "CHEMBL_drug_mechanism": {
+    "tableName": ["CHEMBL_drug_mechanism"],
+    "fields": [
+      {
+        "name": "mec_id",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Primary key for each drug mechanism of action"
+      },
+      {
+        "name": "molregno",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "CHEMBL internal identifier"
+      },
+      {
+        "name": "mechanism_of_action",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "tid",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": "Target associated with this mechanism of action (foreign key to target_dictionary table)"
+      },
+      {
+        "name": "action_type",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "direct_interaction",
+        "type": "logical",
+        "nullable": false,
+        "unique": false,
+        "comment": "Flag to show whether the molecule is believed to interact directly with the target (1 = yes, 0 = no)"
+      },
+      {
+        "name": "record_id",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "site_id",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "molecular_mechanism",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "disease_efficacy",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "selectivity_comment",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "binding_site_comment",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "mechanism_comment",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "primaryKey": ["mec_id"],
+    "foreignKeys": [
+      {
+        "refTable": ["CHEMBL_molecule_dictionary"],
+        "key": [
+          {
+            "from": "molregno",
+            "to": "molregno"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      },
+      {
+        "refTable": ["CHEMBL_target_dictionary"],
+        "key": [
+          {
+            "from": "tid",
+            "to": "tid"
+          }
+        ],
+        "cardinality": [0, -1, 0, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["molregno"],
+        "unique": [false]
+      },
+      {
+        "fields": ["mec_id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-505],
+      "y": [190],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
+  },
+  "CHEMBL_molecule_dictionary": {
+    "tableName": ["CHEMBL_molecule_dictionary"],
+    "fields": [
+      {
+        "name": "molregno",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "CHEMBL internal identifier"
+      },
+      {
+        "name": "pref_name",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": " Preferred name for the molecule"
+      },
+      {
+        "name": "chembl_id",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "max_phase",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "Maximum phase of development reached for the compound (4 = approved). Null where max phase has not yet been assigned."
+      },
+      {
+        "name": "molecule_type",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "first_approval",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": "Earliest known approval year for the molecule"
+      },
+      {
+        "name": "withdrawn_flag",
+        "type": "logical",
+        "nullable": false,
+        "unique": false,
+        "comment": "Flag indicating whether the drug has been withdrawn in at least one country (not necessarily in the US)"
+      },
+      {
+        "name": "withdrawn_year",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Year the drug was first withdrawn in any country"
+      },
+      {
+        "name": "withdrawn_reason",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Reasons for withdrawl (e.g., safety)"
+      }
+    ],
+    "primaryKey": ["molregno"],
+    "foreignKeys": {},
+    "indexes": [
+      {
+        "fields": ["molregno"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-178],
+      "y": [-20],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
+  },
+  "CHEMBL_biotherapeutic_components": {
+    "tableName": ["CHEMBL_biotherapeutic_components"],
+    "fields": [
+      {
+        "name": "biocomp_id",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": ""
+      },
+      {
+        "name": "molregno",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "component_id",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "primaryKey": ["biocomp_id"],
+    "foreignKeys": [
+      {
+        "refTable": ["CHEMBL_molecule_dictionary"],
+        "key": [
+          {
+            "from": "molregno",
+            "to": "molregno"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      },
+      {
+        "refTable": ["CHEMBL_bio_component_sequences"],
+        "key": [
+          {
+            "from": "component_id",
+            "to": "component_id"
+          }
+        ],
+        "cardinality": [0, -1, 0, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["biocomp_id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-5],
+      "y": [-176],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
+  },
+  "CHEMBL_biotherapeutics": {
+    "tableName": ["CHEMBL_biotherapeutics"],
+    "fields": [
+      {
+        "name": "molregno",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": ""
+      },
+      {
+        "name": "description",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "helm_notation",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "primaryKey": ["molregno"],
+    "foreignKeys": [
+      {
+        "refTable": ["CHEMBL_molecule_dictionary"],
+        "key": [
+          {
+            "from": "molregno",
+            "to": "molregno"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["molregno"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-321],
+      "y": [-201],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
+  },
+  "CHEMBL_compound_structures": {
+    "tableName": ["CHEMBL_compound_structures"],
+    "fields": [
+      {
+        "name": "molregno",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": ""
+      },
+      {
+        "name": "standard_inchi",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "standard_inchi_key",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "canonical_smiles",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "primaryKey": ["molregno"],
+    "foreignKeys": [
+      {
+        "refTable": ["CHEMBL_molecule_dictionary"],
+        "key": [
+          {
+            "from": "molregno",
+            "to": "molregno"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["molregno"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [136],
+      "y": [13],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
+  },
+  "CHEMBL_drug_indication": {
+    "tableName": ["CHEMBL_drug_indication"],
+    "fields": [
+      {
+        "name": "drugind_id",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": "Primary key"
+      },
+      {
+        "name": "molregno",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "CHEMBL internal identifier"
+      },
+      {
+        "name": "max_phase_for_ind",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": "The maximum phase of development that the drug is known to have reached for this particular indication"
+      },
+      {
+        "name": "DB",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Database of the disease identifier"
+      },
+      {
+        "name": "id",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Disease identifier"
+      },
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Term to describe the disease identifier"
+      }
+    ],
+    "primaryKey": ["drugind_id"],
+    "foreignKeys": [
+      {
+        "refTable": ["CHEMBL_molecule_dictionary"],
+        "key": [
+          {
+            "from": "molregno",
+            "to": "molregno"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["molregno"],
+        "unique": [false]
+      },
+      {
+        "fields": ["drugind_id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-456],
+      "y": [-17],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
+  },
+  "CHEMBL_bio_component_sequences": {
+    "tableName": ["CHEMBL_bio_component_sequences"],
+    "fields": [
+      {
+        "name": "component_id",
+        "type": "integer",
+        "nullable": false,
+        "unique": true,
+        "comment": ""
+      },
+      {
+        "name": "component_type",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "description",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "sequence",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "sequence_md5sum",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "tax_id",
+        "type": "integer",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      },
+      {
+        "name": "organism",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "primaryKey": ["component_id"],
+    "foreignKeys": {},
+    "indexes": [
+      {
+        "fields": ["component_id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [306],
+      "y": [-156],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "CHEMBL",
+  "title": "Data extracted from the CHEMBL database",
+  "description": "CHEMBL is a manually curated chemical database of bioactive molecules with drug-like properties. This is a very small subset of CHEMBL! Visit the reference URL for more information.",
+  "url": "https://www.ebi.ac.uk/chembl/",
+  "version": "0.2",
+  "maintainer": "Liesbeth François <liesbeth.francois@ucb.com>",
+  "delim": "\t",
+  "quoted_na": false
+}

@@ -4,13 +4,17 @@
 \alias{data_file_size}
 \title{Get the size of data files from a \link{fileMDB} object}
 \usage{
-data_file_size(x)
+data_file_size(x, hr = FALSE)
 }
 \arguments{
 \item{x}{a \link{fileMDB} object}
+
+\item{hr}{a logical indicating if the values should be "human readable".
+(default: FALSE)}
 }
 \value{
-a numeric vector with size in bytes.
+a numeric vector with size in bytes (hr=FALSE) or
+a character vector with size and units (hr=TRUE)
 }
 \description{
 Get the size of data files from a \link{fileMDB} object

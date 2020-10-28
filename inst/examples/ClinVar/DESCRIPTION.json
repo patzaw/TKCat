@@ -1,7 +1,7 @@
 {
   "name": "ClinVar",
   "title": "Data extracted from the ClinVar database",
-  "description": "ClinVar is a freely accessible, public archive of reports of the relationships among human variations and phenotypes, with supporting evidence.",
+  "description": "ClinVar is a freely accessible, public archive of reports of the relationships among human variations and phenotypes, with supporting evidence. This is a very small subset of ClinVar! Visit the reference URL for more information.",
   "url": "https://www.ncbi.nlm.nih.gov/clinvar/",
   "version": "0.9",
   "maintainer": "Patrice Godard <patrice.godard@ucb.com>",

@@ -902,7 +902,7 @@ as_fileMDB.chMDB <- function(
       r <- nrow(toWrite)
       while(nrow(toWrite)>0){
          readr::write_delim(
-            toWrite, path=dfiles[tn],
+            toWrite, file=dfiles[tn],
             delim=rp$delim,
             append=file.exists(dfiles[tn])
          )

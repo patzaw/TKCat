@@ -1,0 +1,25 @@
+{
+  "$schema": "TKCat_BE_collection_1.0",
+  "$id": "CHEMBL_BE_1.0",
+  "collection": "BE",
+  "resource": "CHEMBL",
+  "tables": [
+    {
+      "name": "CHEMBL_component_sequence",
+      "fields": {
+        "be": {
+          "static": true,
+          "value": "Peptide"
+        },
+        "identifier": {
+          "static": false,
+          "value": "accession"
+        },
+        "source": {
+          "static": false,
+          "value": "db_source"
+        }
+      }
+    }
+  ]
+}

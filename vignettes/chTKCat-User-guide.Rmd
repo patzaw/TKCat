@@ -3,12 +3,12 @@ title: "chTKCat user guide"
 author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
 output:
-   html_document:
+   rmarkdown::html_vignette:
      number_sections: yes
      self_contained: yes
-     theme: cerulean
      toc: yes
-     toc_float: yes
+     fig_width: 7
+     fig_height: 5
 vignette: >
    %\VignetteIndexEntry{chTKCat user guide}
    %\VignetteEncoding{UTF-8}
