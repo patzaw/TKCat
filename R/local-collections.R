@@ -157,10 +157,10 @@ map_collection_members <- function(
       all(xm$value[which(!xm$static)] %in% colnames(x)),
       all(ym$value[which(!ym$static)] %in% colnames(y))
    )
-   if(!is.na(fun) & !is.function(fun)){
+   if(!is.function(fun) && !is.na(fun)){
       stop("fun should be NA or a function")
    }
-   if(is.na(fun)){
+   if(!is.function(fun)){
       fun <- get_collection_mapper(collection=collection)
    }
    

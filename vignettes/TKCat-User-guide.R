@@ -8,6 +8,7 @@ opts_chunk$set(
    cache=FALSE,
    cache.lazy=FALSE
 )
+complete <- FALSE
 library(TKCat)
 
 ## -----------------------------------------------------------------------------
@@ -90,4 +91,67 @@ data_file_size(file_clinvar, hr=TRUE)
 
 ## -----------------------------------------------------------------------------
 file_clinvar %>% pull(ClinVar_traitNames)
+
+## -----------------------------------------------------------------------------
+file_clinvar[1:3]
+c(file_clinvar[1:3], file_hpo[c(1,5,7)]) %>% 
+   data_model() %>% auto_layout(force=TRUE) %>% plot()
+
+## ---- eval=complete-----------------------------------------------------------
+#  filtered_clinvar <- file_clinvar %>%
+#     set_names(sub("ClinVar_", "", names(.))) %>%
+#     filter(
+#        entrezNames = symbol %in% c("PIK3R2", "UGT1A8")
+#     ) %>%
+#     slice(ReferenceClinVarAssertion=grep(
+#        "pathogen",
+#        .$ReferenceClinVarAssertion$clinicalSignificance,
+#        ignore.case=TRUE
+#     ))
+
+## ---- eval=complete-----------------------------------------------------------
+#  gene_traits <- filtered_clinvar %>%
+#     join_mdb_tables(
+#        "entrezNames", "varEntrez", "variants", "rcvaVariant",
+#        "ReferenceClinVarAssertion", "rcvaTraits", "traits"
+#     )
+#  gene_traits$entrezNames %>%
+#     select(symbol, name, variants.type, variants.name, traitType, traits.name)
+
+## ---- eval=complete-----------------------------------------------------------
+#  get_shared_collections(filtered_clinvar, file_chembl)
+#  sel_coll <- get_shared_collections(file_clinvar, file_chembl) %>%
+#     filter(collection=="BE")
+#  filtered_cv_chembl <- merge(
+#     file_clinvar,
+#     file_chembl,
+#     by=sel_coll
+#  )
+#  # %>% filter_with_tables(
+#  #    list("ClinVar_entrezNames"=.$ClinVar_entrezNames)
+#  # )
+#  # filtered_cv_chembl %>%
+#  #    data_model() %>%  plot()
+#  #
+#  # indications_traits <- filtered_cv_chembl %>%
+#  #    join_mdb_tables(
+#  #       "CHEMBL_drug_indication", "CHEMBL_molecule_dictionary",
+#  #       "CHEMBL_drug_mechanism", "CHEMBL_target_dictionary",
+#  #       "CHEMBL_target_component", "CHEMBL_component_sequence",
+#  #       "BE_1_ClinVar_entrezNames_1_CHEMBL_component_sequence",
+#  #       "ClinVar_entrezNames", "ClinVar_varEntrez", "ClinVar_variants",
+#  #       "ClinVar_rcvaVariant", "ClinVar_ReferenceClinVarAssertion",
+#  #       "ClinVar_rcvaTraits", "ClinVar_traits"
+#  #    )
+#  # indications_traits$CHEMBL_drug_indication %>%
+#  #    select(
+#  #       "indication"="name",
+#  #       "target_name"="CHEMBL_target_dictionary.pref_name",
+#  #       "entrez_gene"="entrez_ClinVar_entrezNames",
+#  #       "gene_name"="ClinVar_entrezNames.name",
+#  #       "gene_symbol"="ClinVar_entrezNames.symbol",
+#  #       "clinical_signif"="ClinVar_ReferenceClinVarAssertion.clinicalSignificance",
+#  #       "trait"="ClinVar_traits.name"
+#  #    ) %>%
+#  #    distinct()
 

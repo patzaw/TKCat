@@ -18,6 +18,11 @@
         "source": {
           "static": false,
           "value": "db_source"
+        },
+        "organism": {
+          "static": false,
+          "value": "organism",
+          "type": "Scientific name"
         }
       }
     }

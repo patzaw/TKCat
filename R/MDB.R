@@ -596,7 +596,8 @@ merge.MDB <- function(
             ym=ycmi,
             suffix=paste0("_", c(byi$table.x, byi$table.y)),
             fun=if(
-               is.null(funs[[byi$collection]]) || is.na(funs[[byi$collection]])
+               is.null(funs[[byi$collection]]) ||
+               !is.function(funs[[byi$collection]])
             ){
                NA
             }else{

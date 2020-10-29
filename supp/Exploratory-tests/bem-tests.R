@@ -1,4 +1,4 @@
-function(
+bem <- function(
    x, y,
    orthologs=FALSE,
    restricted=FALSE,
@@ -138,3 +138,36 @@ function(
    toRet <- dplyr::distinct(toRet)
    return(toRet)
 }
+
+
+library(TKCat)
+library(BED)
+
+k <- chTKCat(password="")
+cv <- get_MDB(k, "ClinVar")
+ch <- get_MDB(k, "CHEMBL")
+mb <- get_MDB(k, "MetaBase")
+
+sc <- get_shared_collections(cv, mb)
+cvmb <- merge(
+   cv, mb,
+   by=sc[1,],
+   # funs=list(BE=bem),
+   restricted=FALSE
+)
+sc2 <- get_shared_collections(mb, cv)
+mbcv <- merge(
+   mb, cv,
+   by=sc2[3,],
+   # funs=list(BE=bem),
+   restricted=FALSE
+)
+
+sc3 <- get_shared_collections(cv, ch)
+cvch <- merge(
+   cv, ch,
+   by=sc3[1,],
+   # funs=list(BE=bem),
+   restricted=FALSE
+)
+
