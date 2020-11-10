@@ -366,7 +366,7 @@
       shiny::observe({
          n <- selStatus$resource
          shiny::req(n)
-         mdb <- try(get_MDB(instance$tkcat, n), silent=TRUE)
+         mdb <- try(get_MDB(instance$tkcat, n, n_max=0), silent=TRUE)
          selStatus$mdb <- mdb
          if(
             inherits(mdb, "try-error") ||
@@ -436,10 +436,10 @@
                      }
                   }
                )),
-               shiny::tags$br(),
-               shiny::downloadButton(
-                  "downloadMDB", sprintf("Download %s", dbi$name)
-               )
+               # shiny::tags$br(),
+               # shiny::downloadButton(
+               #    "downloadMDB", sprintf("Download %s", dbi$name)
+               # )
             )
          }
       })
@@ -917,7 +917,9 @@
          shiny::req(rt)
          mdbListProxy %>%
             DT::selectRows(
-               which(isolate(mdbs$list$name) %in% pull(slice(rt, sel), "name"))
+               which(
+                  isolate(mdbs$list$name) %in% pull(slice(rt, sel), "resource")
+               )
             )
          selStatus$tables <- rt %>% slice(sel) %>% pull("table")
       })

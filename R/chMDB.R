@@ -11,7 +11,8 @@
 #' @param collectionMembers the members of collections as provided to the
 #' [collection_members<-] function (default: NULL ==> no member).
 #' @param n_max maximum number of records to read
-#' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
+#' for checks purpose (default: 10). If 0, the data are not checked.
+#' See also [ReDaMoR::confront_data()].
 #' @param verbose if TRUE display the data confrontation report
 #'
 #' @return A chMDB object
@@ -80,34 +81,36 @@ chMDB <- function(
    if(!is.infinite(n_max)){
       query <- paste(query, sprintf("LIMIT %s", n_max))
    }
-   dataTables <- lapply(
-      names(dbTables),
-      function(tn){
-         dbt <- dbTables[tn]
-         query <- sprintf(query, dbt)
-         toRet <- get_query(tkcon, query)
-         for(cn in colnames(toRet)){
-            toRet[,cn] <- ReDaMoR::as_type(
-               dplyr::pull(toRet, !!cn),
-               dataModel[[tn]]$fields %>%
-                  dplyr::filter(.data$name==!!cn) %>%
-                  dplyr::pull("type")
-            )
+   if(n_max>0){
+      dataTables <- lapply(
+         names(dbTables),
+         function(tn){
+            dbt <- dbTables[tn]
+            query <- sprintf(query, dbt)
+            toRet <- get_query(tkcon, query)
+            for(cn in colnames(toRet)){
+               toRet[,cn] <- ReDaMoR::as_type(
+                  dplyr::pull(toRet, !!cn),
+                  dataModel[[tn]]$fields %>%
+                     dplyr::filter(.data$name==!!cn) %>%
+                     dplyr::pull("type")
+               )
+            }
+            return(toRet)
          }
-         return(toRet)
+      )
+      names(dataTables) <- names(dbTables)
+      cr <- ReDaMoR::confront_data(
+         dataModel, data=dataTables, n_max=n_max, verbose=FALSE,
+         returnData=FALSE
+      )
+      assign("confrontationReport", cr, envir=tkcatEnv)
+      if(!cr$success){
+         stop(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
       }
-   )
-   names(dataTables) <- names(dbTables)
-   cr <- ReDaMoR::confront_data(
-      dataModel, data=dataTables, n_max=n_max, verbose=FALSE,
-      returnData=FALSE
-   )
-   assign("confrontationReport", cr, envir=tkcatEnv)
-   if(!cr$success){
-      stop(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
-   }
-   if(verbose){
-      cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+      if(verbose){
+         cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+      }
    }
    
    # ## Object ----
