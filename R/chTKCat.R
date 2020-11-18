@@ -1332,6 +1332,11 @@ collection_members.chTKCat <- function(
 #'
 #' @param subSetSize the maximum number of records to show
 #' @param host the name of the host to show in the application
+#' @param download a logical indicating if data can be downloaded
+#' (default: FALSE). If TRUE a temporary directory is created and made
+#' available for shiny.
+#' @param workers number of available workers when download is available
+#' (default: 4)
 #' 
 #' @rdname explore_MDBs
 #' @method explore_MDBs chTKCat
@@ -1342,8 +1347,22 @@ explore_MDBs.chTKCat <- function(
    x,
    subSetSize=100,
    host=x$chcon@host,
+   download=FALSE,
+   workers=4,
    ...
 ){
+   stopifnot(
+      is.logical(download), length(download)==1, !is.na(download)
+   )
+   if(download){
+      ddir <- tempfile()
+      dir.create(ddir)
+      oplan <- future::plan(
+         future::multisession, workers=workers
+      )
+   }else{
+      ddir <- NULL
+   }
    on.exit({
       if(interactive()){
          warning(
@@ -1351,22 +1370,31 @@ explore_MDBs.chTKCat <- function(
             "Use the db_reconnect(x) function to reconnect x."
          )
       }
-   })
+   }, add=TRUE)
    shiny::shinyApp(
-      ui=.build_etkc_ui(x=x),
+      ui=.build_etkc_ui(x=x, ddir=ddir),
       server=.build_etkc_server(
          x=x,
          subSetSize=subSetSize,
-         host=host
+         host=host,
+         ddir=ddir
       ),
-      enableBookmarking="url"
+      enableBookmarking="url",
+      onStart=function(){
+         shiny::onStop(function(){
+            unlink(ddir, recursive=TRUE, force=TRUE)
+            if(exists("oplan")){
+               future::plan(oplan)
+            }
+         })
+      }
    )
 }
 
 ###############################################################################@
-.build_etkc_ui.chTKCat <- function(x, ...){
+.build_etkc_ui.chTKCat <- function(x, ddir=NULL, ...){
    
-   .etkc_add_resources()
+   .etkc_add_resources(ddir=ddir)
    
    function(req){
       shinydashboard::dashboardPage(
@@ -1402,9 +1430,11 @@ explore_MDBs.chTKCat <- function(
 .build_etkc_server.chTKCat <- function(
    x,
    subSetSize=100,
-   host=x$chcon@host
+   host=x$chcon@host,
+   ddir=NULL
 ){
    .build_etkc_server_default(
-      x=x, subSetSize=subSetSize, xparams=list(host=host)
+      x=x, subSetSize=subSetSize, xparams=list(host=host),
+      ddir=ddir
    )
 }

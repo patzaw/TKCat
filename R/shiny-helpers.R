@@ -4,7 +4,7 @@
 
 
 ###############################################################################@
-.etkc_add_resources <- function(){
+.etkc_add_resources <- function(ddir=NULL){
    shiny::addResourcePath(
       "www",
       system.file("www", package=utils::packageName())
@@ -13,6 +13,12 @@
       "doc",
       system.file("doc", package=utils::packageName())
    )
+   if(!is.null(ddir)){
+      shiny::addResourcePath(
+         "data",
+         ddir
+      )
+   }
    return(invisible(NULL))
 }
 
@@ -234,7 +240,8 @@
 .build_etkc_server_default <- function(
    x,
    subSetSize=100,
-   xparams=list()
+   xparams=list(),
+   ddir=NULL
 ){
    
    function(input, output, session) {
@@ -279,6 +286,17 @@
          })
          shiny::onSessionEnded(function(){
             suppressWarnings(db_disconnect(shiny::isolate(instance$tkcat)))
+         })
+      }
+      
+      ########################@
+      ## Download directory ----
+      dd <- !is.null(ddir) && dir.exists(ddir)
+      if(dd){
+         tddir <- file.path(ddir, session$token)
+         dir.create(tddir, showWarnings=TRUE)
+         shiny::onStop(function(){
+            unlink(tddir, recursive=TRUE, force=TRUE)
          })
       }
       
@@ -436,35 +454,96 @@
                      }
                   }
                )),
-               # shiny::tags$br(),
-               # shiny::downloadButton(
-               #    "downloadMDB", sprintf("Download %s", dbi$name)
-               # )
+               shiny::uiOutput("dbDownload")
             )
          }
       })
       
-      output$downloadMDB <- shiny::downloadHandler(
-         filename = function() {
-            n <- selStatus$resource
-            shiny::req(n)
-            paste0(n, ".zip")
-         },
-         content = function(file) {
+      if(dd){
+         
+         reqDbs <- shiny::reactiveVal(character(0))
+         dbdone <- shiny::reactiveVal(character(0))
+         
+         output$dbDownload <- renderUI({
+            dbdone()
+            input$refreshDbdown
             mdb <- selStatus$mdb
             shiny::req(mdb)
             n <- shiny::isolate(selStatus$resource)
-            dbloc <- tempfile()
-            as_fileMDB(mdb, path=dbloc)
-            cd <- getwd()
-            on.exit({
-               setwd(cd)
-               unlink(dbloc, recursive=TRUE)
-            })
-            setwd(dbloc)
-            suppressMessages(utils::zip(zipfile=file, files=n, flags="-r9Xq"))
-         }
-      )
+            
+            fname <- paste0(n, ".zip")
+            if(!fname %in% reqDbs()){
+               return(
+                  shiny::p(
+                     shiny::actionButton(
+                        "prepDbdown",
+                        "Request database for download"
+                     ),
+                     shiny::strong(paste(
+                        "(Preparing the data may take time)"
+                     ))
+                  )
+               )
+            }
+            f <- file.path(tddir, fname)
+            if(!file.exists(f)){
+               return(
+                  p(
+                     strong(
+                        "The archive is being prepared", style="color:blue;"
+                     ),
+                     shiny::actionButton("refreshDbdown", "Check availability")
+                  )
+               )
+            }
+            return(
+               shiny::a(
+                  list(icon("download"), sprintf("Download %s", n)),
+                  id="downloadTable",
+                  class="btn btn-default shiny-download-link shiny-bound-output",
+                  href=file.path("data", session$token, fname),
+                  target="_blank",
+                  download=""
+               )
+            )
+         })
+         
+         observeEvent(input$prepDbdown, {
+            mdb <- isolate(selStatus$mdb)
+            shiny::req(mdb)
+            n <- shiny::isolate(selStatus$resource)
+            fname <- paste0(n, ".zip")
+            reqDbs(union(reqDbs(), fname))
+            f <- file.path(tddir, fname)
+            tf <- tempfile(tmpdir=tddir, fileext=".zip")
+            if(!file.exists(f)){
+               if(is.chMDB(mdb)){
+                  p <- isolate(upwd())
+               }
+               future::future({
+                  if(is.chMDB(mdb)){
+                     db_reconnect(mdb, password=p)
+                  }
+                  
+                  dbloc <- tempfile()
+                  as_fileMDB(mdb, path=dbloc)
+                  cd <- getwd()
+                  on.exit({
+                     setwd(cd)
+                     unlink(dbloc, recursive=TRUE)
+                  })
+                  setwd(dbloc)
+                  suppressMessages(
+                     utils::zip(zipfile=tf, files=n, flags="-r9Xq")
+                  )
+                  
+                  file.rename(tf, f)
+                  return(fname)
+               }, seed=TRUE) %>% dbdone()
+            }
+         })
+         
+      }
       
       ########################@
       ## Data model ----
@@ -623,9 +702,7 @@
             ),
             DT::DTOutput("dataSample"),
             shiny::tags$br(),
-            shiny::downloadButton(
-               "downloadTable", sprintf("Download %s", sel)
-            )
+            shiny::uiOutput("tableDownload")
          )
       })
       
@@ -666,23 +743,88 @@
          )
       })
       
-      output$downloadTable <- shiny::downloadHandler(
-         filename = function() {
-            sel <- selStatus$tables
-            shiny::req(sel)
-            shiny::req(length(sel)==1)
-            paste0(sel, ".txt.gz")
-         },
-         content = function(file) {
+      if(dd){
+         
+         reqtables <- shiny::reactiveVal(character(0))
+         tabledone <- shiny::reactiveVal(character(0))
+         
+         output$tableDownload <- renderUI({
+            tabledone()
+            input$refreshTabledown
             mdb <- selStatus$mdb
             shiny::req(mdb)
             sel <- selStatus$tables %>% 
                intersect(names(mdb))
             shiny::req(sel)
             shiny::req(length(sel)==1)
-            readr::write_tsv(data_tables(mdb, dplyr::all_of(sel))[[1]], file)
-         }
-      )
+            fname <- file.path(db_info(mdb)$name, paste0(sel, ".txt.gz"))
+            if(!fname %in% reqtables()){
+               return(
+                  shiny::p(
+                     shiny::actionButton(
+                        "prepTabledown",
+                        "Request table for download"
+                     ),
+                     shiny::strong(paste(
+                        "(Preparing the data may take time)"
+                     ))
+                  )
+               )
+            }
+            f <- file.path(tddir, fname)
+            if(!file.exists(f)){
+               return(
+                  p(
+                     strong("The file is being prepared", style="color:blue;"),
+                     shiny::actionButton("refreshTabledown", "Check availability")
+                  )
+               )
+            }
+            return(
+               shiny::a(
+                  list(icon("download"), sprintf("Download %s", sel)),
+                  id="downloadTable",
+                  class="btn btn-default shiny-download-link shiny-bound-output",
+                  href=file.path("data", session$token, fname),
+                  target="_blank",
+                  download=""
+               )
+            )
+         })
+         
+         observeEvent(input$prepTabledown, {
+            mdb <- isolate(selStatus$mdb)
+            shiny::req(mdb)
+            sel <- isolate(selStatus$tables) %>% 
+               intersect(names(mdb))
+            shiny::req(sel)
+            shiny::req(length(sel)==1)
+            fname <- file.path(db_info(mdb)$name, paste0(sel, ".txt.gz"))
+            reqtables(union(reqtables(), fname))
+            f <- file.path(tddir, fname)
+            tf <- tempfile(tmpdir=tddir, fileext=".txt.gz")
+            if(!file.exists(f)){
+               if(is.chMDB(mdb)){
+                  p <- isolate(upwd())
+               }
+               future::future({
+                  if(is.chMDB(mdb)){
+                     db_reconnect(mdb, password=p)
+                  }
+                  if(!dir.exists(dirname(f))){
+                     dir.create(dirname(f))
+                  }
+                  readr::write_tsv(
+                     data_tables(mdb, dplyr::all_of(sel))[[1]], tf
+                  )
+                  file.rename(tf, f)
+                  return(fname)
+               }, seed=TRUE) %>% tabledone()
+            }
+         })
+         
+      }
+      
       
       ########################@
       ## Search ----
@@ -928,6 +1070,8 @@
       ## Managing connection of chTKCat objects   ####
       ###############################################@
       if(is.chTKCat(x)){
+         
+         upwd <- reactiveVal(value="")
             
          ########################@
          ## System information ----
@@ -1019,6 +1163,7 @@
          shiny::observeEvent(input$connect, {
             u <- shiny::isolate(input$userName)
             p <- shiny::isolate(input$password)
+            upwd(p)
             nk <- try(db_reconnect(
                shiny::isolate(instance$tkcat),
                user=u, password=p

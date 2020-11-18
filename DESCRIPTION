@@ -34,7 +34,9 @@ Imports:
    jsonlite,
    jsonvalidate,
    base64enc,
-   markdown
+   markdown,
+   promises,
+   future
 Suggests:
    knitr,
    rmarkdown,

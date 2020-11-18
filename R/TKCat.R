@@ -320,6 +320,11 @@ collection_members.TKCat <- function(
 ###############################################################################@
 #'
 #' @param subSetSize the maximum number of records to show
+#' @param download a logical indicating if data can be downloaded
+#' (default: FALSE). If TRUE a temporary directory is created and made
+#' available for shiny.
+#' @param workers number of available workers when download is available
+#' (default: 4)
 #' 
 #' @rdname explore_MDBs
 #' @method explore_MDBs TKCat
@@ -329,22 +334,45 @@ collection_members.TKCat <- function(
 explore_MDBs.TKCat <- function(
    x,
    subSetSize=100,
+   download=FALSE,
+   workers=4,
    ...
 ){
+   stopifnot(
+      is.logical(download), length(download)==1, !is.na(download)
+   )
+   if(download){
+      ddir <- tempfile()
+      dir.create(ddir)
+      oplan <- future::plan(
+         future::multisession, workers=workers
+      )
+   }else{
+      ddir <- NULL
+   }
    shiny::shinyApp(
-      ui=.build_etkc_ui(x=x),
+      ui=.build_etkc_ui(x=x, ddir=ddir),
       server=.build_etkc_server(
          x=x,
-         subSetSize=subSetSize
+         subSetSize=subSetSize,
+         ddir=ddir
       ),
-      enableBookmarking="url"
+      enableBookmarking="url",
+      onStart=function(){
+         shiny::onStop(function(){
+            unlink(ddir, recursive=TRUE, force=TRUE)
+            if(exists("oplan")){
+               future::plan(oplan)
+            }
+         })
+      }
    )
 }
 
 ###############################################################################@
-.build_etkc_ui.TKCat <- function(x, ...){
+.build_etkc_ui.TKCat <- function(x, ddir=NULL, ...){
    
-   .etkc_add_resources()
+   .etkc_add_resources(ddir=ddir)
    
    function(req){
       shinydashboard::dashboardPage(
@@ -378,10 +406,12 @@ explore_MDBs.TKCat <- function(
 ###############################################################################@
 .build_etkc_server.TKCat <- function(
    x,
-   subSetSize=100
+   subSetSize=100,
+   ddir=NULL
 ){
    .build_etkc_server_default(
-      x=x, subSetSize=subSetSize
+      x=x, subSetSize=subSetSize,
+      ddir=ddir
    )
 }
 
