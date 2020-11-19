@@ -2,6 +2,8 @@
 title: "TKCat User guide"
 author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
+package: "TKCat (version `r packageVersion('TKCat')`)"
+bibliography: TKCat.bib
 output:
    rmarkdown::html_vignette:
      number_sections: yes
@@ -36,7 +38,6 @@ opts_chunk$set(
    cache=FALSE,
    cache.lazy=FALSE
 )
-complete <- FALSE
 library(TKCat)
 ```
 
@@ -79,8 +80,8 @@ called collections.
 A subset of the [Human Phenotype Ontology (HPO)][hpo]
 is provided within the [ReDaMoR][redamor] package.
 The HPO aims to provide a standardized vocabulary of phenotypic
-abnormalities encountered in human diseases.[!REF!].
-A MDB object based on files (see [MDB implementations](#MDB-implementations))
+abnormalities encountered in human diseases [@kohler_expansion_2019].
+An MDB object based on files (see [MDB implementations](#MDB-implementations))
 can be read as shown below.
 As explained above, the data provided by the `path` parameter are
 documented with a model (`dataModel` parameter) and general
@@ -150,7 +151,8 @@ file_hpo
 
 A subset of the [ClinVar][clinvar] database is provided within this package.
 ClinVar is a freely accessible, public archive of reports of the relationships
-among human variations and phenotypes, with supporting evidence [!REF!].
+among human variations and phenotypes,
+with supporting evidence [@landrum_clinvar_2018].
 This resource can be read as a `fileMDB` as shown above, excepted that all
 the documenting information is included in the resource directory in this
 case and it is organized as following:
@@ -183,7 +185,7 @@ file_chembl <- read_fileMDB(
 ```
 
 CHEMBL is a manually curated chemical database of bioactive molecules with
-drug-like properties [!REF!].
+drug-like properties [@mendez_chembl_2019].
 
 <!------------->
 ## MDB implementations
@@ -217,7 +219,7 @@ together with relational tables
 (see the [Merging with collections](#Merging-with-collections) section).
 
 Most of the functions described below work with any MDB implementation.
-A few functions are specific of each implementations
+A few functions are specific to each implementation.
 
 <!------------->
 ## Getting information
@@ -309,7 +311,7 @@ the [Merging with collections](#Merging-with-collections) section.
 
 An MDB can be filtered by filtering one or several tables based on
 field values. The filtering is propagated to other tables using the
-embeded data model.
+embedded data model.
 
 In the example below, the `file_clinvar` object is filtered in order
 to focus on a few genes with pathogenic variants
@@ -318,7 +320,7 @@ to improve the readability of the example).
 The object returned by `filter()` or `slice` is a *memoMDB*: all the data
 are in memory.
 
-```{r, eval=complete}
+```{r}
 filtered_clinvar <- file_clinvar %>% 
    set_names(sub("ClinVar_", "", names(.))) %>%
    filter(
@@ -333,7 +335,7 @@ filtered_clinvar <- file_clinvar %>%
 
 Tables can be easily joined to get diseases associated to the genes of interest.
 
-```{r, eval=complete}
+```{r}
 gene_traits <- filtered_clinvar %>% 
    join_mdb_tables(
       "entrezNames", "varEntrez", "variants", "rcvaVariant",
@@ -346,42 +348,146 @@ gene_traits$entrezNames %>%
 <!------------->
 ## Merging with collections
 
-```{r, eval=complete}
+### Collections and collection members
+
+Some databases refer to the same concepts and could be merged accordingly.
+However they often use different vocabularies.
+
+For example, CHEMBL refers to biological entities (BE) in
+the *CHEMBL_component_sequence* table using mainly
+Uniprot peptide identifiers from different species.
+
+```{r}
+file_chembl$CHEMBL_component_sequence %>% head()
+```
+
+Whereas ClinVar refers to BE in
+the *ClinVar_entrezNames* table using human Entrez gene identifiers.
+
+```{r}
+file_clinvar$ClinVar_entrezNames %>% head()
+```
+
+Some tools exist to convert such BE identifiers from one scope to
+the other ([BED][bed], [mygene][mygene], [biomaRt][biomart]).
+TKCat provides mechanism to document these scopes in order to allow
+automatic conversions from and to any of them.
+Those concepts are called **Collections** in TKCat and they should be
+formally defined before being able to document any of their members.
+Two collection definitions are provided within the TKCat package
+and other can be imported with the `import_local_collection()` function.
+
+```{r}
+list_local_collections()
+```
+
+The way to describe the scope of a collection member is formally defined
+by a JSON schema (the json column above).
+Here are the definition of the BE collection members provided by
+the *CHEMBL_component_sequence* and the *ClinVar_entrezNames* tables.
+
+```{r}
+collection_members(file_chembl, "BE")
+collection_members(file_clinvar, "BE")
+```
+
+The *Collection* column indicates the collection to which the table refers.
+The *cid* column indicates the version of the collection definition which
+should correspond to the `$id` of JSON schema. The *resource* column indicated
+the name of the resource and the *mid* column an identifier which is unique
+for each member of a collection in each resource. The *field* column indicated
+each part of the scope of collection. In the case of BE, 4 fields should be
+documented:
+
+- be: the type of BE (e.g. Gene or Peptide)
+- source: the source of the identifier (e.g. EntrezGene or Peptide)
+- organism: the organism to which the identifier refers (e.g Homo sapiens)
+- identifier: the identifier itself.
+
+Each of these fields can be *static* or not. `TRUE` means that the value of
+this field is the same for all the records and is provided in the *value*
+column. Whereas `FALSE` means that the value can be different for each
+record and is provided in the column the name of which is given in the *value*
+column. The *type* column is only used for the organism field in the case
+of the BE collection and can take 2 values: "Scientific name"
+or "NCBI taxon identifier".
+The definition of the pre-build BE collection members follows the terminology
+used in the [BED][bed] package [@godard_bed:_2018].
+But it can be adapted according to the solution chosen for converting
+BE identifiers from one scope to another.
+
+Setting up the definition of such scope is done using
+the `collection_members<-()` function
+as shown in the [Reading HPO example](#hpo) above.
+
+### Shared collections and merging
+
+The aim of collections is to identify potential bridges between MDBs.
+The `get_shared_collection()` function is used to list all the collections
+shared by two MDBs.
+
+```{r}
 get_shared_collections(filtered_clinvar, file_chembl)
+```
+
+In this example, there are 3 different ways to merge the
+two MDBs *filtered_clinvar* and *file_chembl*:
+
+- Based on conditions provided respectively in the *traits* and
+in the *CHEMBL_drug_indication* tables
+- Based on conditions provided respectively in the *traitsCref* and
+in the *CHEMBL_drug_indication* tables
+- Based on BE provided respectively in the *entrezNames* and
+in the *CHEMBL_component_sequence* tables
+
+The code below shows how to merge these two resources based on BE information.
+To achieve this task it relies on a function provided with TKCat along with
+BE collection definition
+(to get the function: `get_collection_mapper("BE")`). This function uses
+the BED package and you need this package to be installed with a connection
+to BED database in order to run the code below.
+
+```{r, eval=FALSE}
 sel_coll <- get_shared_collections(file_clinvar, file_chembl) %>% 
    filter(collection=="BE")
 filtered_cv_chembl <- merge(
-   file_clinvar,
-   file_chembl,
+   x=file_clinvar,
+   y=file_chembl,
    by=sel_coll
 )
-# %>% filter_with_tables(
-#    list("ClinVar_entrezNames"=.$ClinVar_entrezNames)
-# )
-# filtered_cv_chembl %>% 
-#    data_model() %>%  plot()
-# 
-# indications_traits <- filtered_cv_chembl %>%
-#    join_mdb_tables(
-#       "CHEMBL_drug_indication", "CHEMBL_molecule_dictionary",
-#       "CHEMBL_drug_mechanism", "CHEMBL_target_dictionary",
-#       "CHEMBL_target_component", "CHEMBL_component_sequence",
-#       "BE_1_ClinVar_entrezNames_1_CHEMBL_component_sequence",
-#       "ClinVar_entrezNames", "ClinVar_varEntrez", "ClinVar_variants",
-#       "ClinVar_rcvaVariant", "ClinVar_ReferenceClinVarAssertion",
-#       "ClinVar_rcvaTraits", "ClinVar_traits"
-#    )
-# indications_traits$CHEMBL_drug_indication %>%
-#    select(
-#       "indication"="name",
-#       "target_name"="CHEMBL_target_dictionary.pref_name",
-#       "entrez_gene"="entrez_ClinVar_entrezNames",
-#       "gene_name"="ClinVar_entrezNames.name",
-#       "gene_symbol"="ClinVar_entrezNames.symbol",
-#       "clinical_signif"="ClinVar_ReferenceClinVarAssertion.clinicalSignificance",
-#       "trait"="ClinVar_traits.name"
-#    ) %>%
-#    distinct()
+```
+
+The returned object is **metaMDB** gathering the original MDBs and a
+relational table between members of the same collection as defined
+by the `by` parameter.
+
+### Merging without collection
+
+If the *Collection* column of the `by` parameter
+is `NA`, then the relational table is built by merging identical columns in
+table.x and table.y (No conversion occurs).
+For example, *file_hpo* and *file_clinvar* MDBs could be merged according
+to conditions provided in the *HPO_diseases* and the *ClinVar_traitCref* tables
+respectively.
+
+```{r}
+get_shared_collections(file_hpo, file_clinvar)
+```
+
+These conditions could be converted using a function provided
+with TKCat (`get_collection_mapper("Condition")`) and
+which rely on the DODO package.
+The two tables can also be simply concatenated without applying any conversion
+(loosing the advantage of such conversion obviously).
+
+```{r}
+sel_coll <- get_shared_collections(file_hpo, file_clinvar) %>% 
+   filter(table.x=="HPO_diseases", table.y=="ClinVar_traitCref") %>% 
+   mutate(collection=NA)
+sel_coll
+hpo_clinvar <- merge(file_hpo, file_clinvar, by=sel_coll)
+plot(data_model(hpo_clinvar))
+hpo_clinvar$HPO_diseases_ClinVar_traitCref %>% head()
 ```
 
 
@@ -392,23 +498,50 @@ filtered_cv_chembl <- merge(
 <!------------->
 ## Local TKCat
 
+MDB can be gathered in a *TKCat* (Tailored Knowledge Catalog) object.
+
+```{r}
+k <- TKCat(file_hpo, file_clinvar, file_chembl)
+```
+
+Gathering MDBs in such a catalog facilitate their exploration and their
+preparation for potential integration. Several functions are available
+to achieve this goal.
+
+```{r}
+list_MDBs(k)                     # list all the MDBs in a TKCat object
+get_MDB(k, "HPO")                # get a specific MDBs from the catalog
+search_MDB_tables(k, "disease")  # Search table about "disease"
+search_MDB_fields(k, "disease")  # Search a field about "disease"
+collection_members(k)            # Get collection members of the different MDBs
+```
+
 <!------------->
 ## chTKCat
+
+A *chTKCat* object is a catalog of MDB as a *TKCat* object described above
+but relying on a [ClickHouse][clickhouse] database.
+Therefore it requires the installation and the initialization of such a
+database. Two additional vignettes describes:
+
+- [How to install and administrate a chTKCat database][opman]
+- [How to connect to an existing chTKCat database and use it][chuguide]
 
 <!------------->
 ## A shiny app for exploring MDBs
 
+The function `explore_MDBs(k)` launches a shiny interface to explore
+MDBs in a *TKCat* or a *chTKCat* object.
+This exploration interface can be easily deployed using an *app.R* file
+with content similar to the one below.
 
+```{r, eval=FALSE}
+library(TKCat)
+explore_MDBs(k, download=TRUE)
+```
 
+![](explore_MDBs-local.png){width=100%}
 
+# References
 
-# Biblio
-
-
-tidy tuesday
-
-https://relational.fit.cvut.cz : https://arxiv.org/abs/1511.03086
-
-https://www.re3data.org/
-
-https://app.sqldbm.com (ReDaMoR)
+<!-- Bibliography -->
