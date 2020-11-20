@@ -1,9 +1,102 @@
-# Running a shiny app
+-   [Installation](#installation)
+    -   [Dependencies](#dependencies)
+    -   [From github](#from-github)
+-   [Documentation](#documentation)
+-   [Acknowledgments](#acknowledgments)
 
-Put the following lines in the **app.R** file.
+<img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px" />
 
+The aim of TKCat is to facilitate the management of data from knowledge
+resources that are frequently used alone or together in research
+environments. In TKCat, knowledge resources are manipulated as modeled
+database (MDB) objects. These objects provide access to the data tables
+along with a general description of the resource and a detail data model
+documenting the tables, their fields and their relationships. These MDB
+are then gathered in catalogs that can be easily explored an shared.
+TKCat provides tools to easily subset, filter and combine MDBs and
+create new catalogs suited for specific needs.
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+
+Installation
+============
+
+<!---->
+
+Dependencies
+------------
+
+<!----------->
+
+The following R packages available on CRAN are required:
+
+-   [ReDaMoR](https://CRAN.R-project.org/package=ReDaMoR): Relational
+    Data Modeler
+-   [magrittr](https://CRAN.R-project.org/package=magrittr): A
+    Forward-Pipe Operator for R
+-   [dplyr](https://CRAN.R-project.org/package=dplyr): A Grammar of Data
+    Manipulation
+-   [DBI](https://CRAN.R-project.org/package=DBI): R Database Interface
+-   [RClickhouse](https://CRAN.R-project.org/package=RClickhouse): A
+    ‘DBI’ Interface to the ‘Yandex Clickhouse’ Database Providing Basic
+    ‘dplyr’ Support
+-   [rlang](https://CRAN.R-project.org/package=rlang): Functions for
+    Base Types and Core R and ‘Tidyverse’ Features
+-   [tidyselect](https://CRAN.R-project.org/package=tidyselect): Select
+    from a Set of Strings
+-   [visNetwork](https://CRAN.R-project.org/package=visNetwork): Network
+    Visualization using ‘vis.js’ Library
+-   [getPass](https://CRAN.R-project.org/package=getPass): Masked User
+    Input
+-   [shiny](https://CRAN.R-project.org/package=shiny): Web Application
+    Framework for R
+-   [shinydashboard](https://CRAN.R-project.org/package=shinydashboard):
+    Create Dashboards with ‘Shiny’
+-   [DT](https://CRAN.R-project.org/package=DT): A Wrapper of the
+    JavaScript Library ‘DataTables’
+-   [readr](https://CRAN.R-project.org/package=readr): Read Rectangular
+    Text Data
+-   [jsonlite](https://CRAN.R-project.org/package=jsonlite): A Simple
+    and Robust JSON Parser and Generator for R
+-   [jsonvalidate](https://CRAN.R-project.org/package=jsonvalidate):
+    Validate ‘JSON’
+-   [base64enc](https://CRAN.R-project.org/package=base64enc): Tools for
+    base64 encoding
+-   [markdown](https://CRAN.R-project.org/package=markdown): Render
+    Markdown with the C Library ‘Sundown’
+-   [promises](https://CRAN.R-project.org/package=promises):
+    Abstractions for Promise-Based Asynchronous Programming
+-   [future](https://CRAN.R-project.org/package=future): Unified
+    Parallel and Distributed Processing in R for Everyone
+
+<!---->
+
+From github
+-----------
+
+<!----------->
+
+``` r
+devtools::install_github("patzaw/TKCat")
 ```
-library(TKCat)
-k <- chTKCat(host="bel040344")
-explore_MDBs(k)
-```
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+
+Documentation
+=============
+
+Documentation is available in the following vignettes
+
+-   [this
+    vignette](https://patzaw.github.io/TKCat/TKCat-User-guide.html).
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+
+Acknowledgments
+===============
+
+This work was entirely supported by [UCB Pharma](https://www.ucb.com/)
+(Early Solutions department).

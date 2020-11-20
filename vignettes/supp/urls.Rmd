@@ -1,6 +1,7 @@
 [uguide]: TKCat-User-guide.html
 [chuguide]: chTKCat-User-guide.html
 [opman]: chTKCat-Operations-manual.html
+[collections]: TKCat-Collections.html
 
 [redamor]: https://github.com/patzaw/ReDaMoR
 [clickhouse]: https://clickhouse.tech/

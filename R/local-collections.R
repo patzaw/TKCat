@@ -56,7 +56,7 @@ import_local_collection <- function(txt, overwrite=FALSE){
 list_local_collections <- function(withJson=FALSE){
    toRet <- tkcatEnv$COLLECTIONS
    if(!withJson){
-      dplyr::select(toRet, "title", "description")
+      toRet <- dplyr::select(toRet, "title", "description")
    }
    return(toRet)
 }
@@ -138,7 +138,7 @@ get_collection_mapper <- function(collection){
 #' 
 #' @details fun must have at least an x and a y parameters.
 #' Each of them should be a data.frame with all the field values
-#' given n xm and ym. Additional parameters
+#' given in xm and ym. Additional parameters
 #' can be defined and will be forwarded using `...`.
 #' fun should return a data frame with all the fields values
 #' given in xm and ym followed by "_x" and "_y" suffix.

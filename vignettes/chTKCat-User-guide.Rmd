@@ -2,6 +2,7 @@
 title: "chTKCat user guide"
 author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
+package: "TKCat (version `r packageVersion('TKCat')`)"
 output:
    rmarkdown::html_vignette:
      number_sections: yes
@@ -35,6 +36,10 @@ library(TKCat)
 ```{r child = 'supp/urls.Rmd'}
 ```
 
+<div style="width:200px;">
+![](TKCat.png){width="100%"}
+</div>
+
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
@@ -48,7 +53,9 @@ a [ClickHouse][clickhouse] database.
 Users should also refer
 to the [general TKCat user guide][uguide].
 Finally, a [specific vignette][opman] describes
-how to create and administrate a TKCat ClickHouse instance.
+how to create and administrate a TKCat ClickHouse instance,
+and another is dedicated to
+an [extended documentation of collections][collections].
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
@@ -68,11 +75,11 @@ k <- chTKCat(
 
 Connection parameters should be adapted according to the ClickHouse database
 setup which is documented in the web exploration
-interface (The "System" button).
+interface (in the "System" tab).
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
-# Usage
+# Use
 
 The *chTKCat* object can be used as
 a [*TKCat* object](TKCat-User-guide.html#local-tkcat).

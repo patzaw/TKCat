@@ -14,7 +14,7 @@
 
 <meta name="date" content="2020-11-20" />
 
-<title>chTKCat user guide</title>
+<title>TKCat Collections</title>
 
 <script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
 // v0.0.1
@@ -365,7 +365,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">chTKCat user guide</h1>
+<h1 class="title toc-ignore">TKCat Collections</h1>
 <h4 class="author">Patrice Godard</h4>
 <h4 class="date">November 20, 2020</h4>
 
@@ -373,10 +373,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="TOC">
 <ul>
 <li><a href="#introduction"><span class="toc-section-number">1</span> Introduction</a></li>
-<li><a href="#connection"><span class="toc-section-number">2</span> Connection</a></li>
-<li><a href="#use"><span class="toc-section-number">3</span> Use</a></li>
-<li><a href="#reconnecting"><span class="toc-section-number">4</span> Reconnecting</a></li>
-<li><a href="#pushing-an-mdb-in-a-chtkcat-instance"><span class="toc-section-number">5</span> Pushing an MDB in a chTKCat instance</a></li>
+<li><a href="#creating-a-collection"><span class="toc-section-number">2</span> Creating a collection</a></li>
+<li><a href="#identifying-collection-members"><span class="toc-section-number">3</span> Identifying collection members</a></li>
+<li><a href="#collection-mapper-functions"><span class="toc-section-number">4</span> Collection mapper functions</a></li>
 </ul>
 </div>
 
@@ -388,61 +387,273 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="introduction" class="section level1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
 <p>The aim of TKCat is to facilitate the management of data from knowledge resources that are frequently used alone or together in research environments. In TKCat, knowledge resources are manipulated as modeled database (MDB) objects. These objects provide access to the data tables along with a general description of the resource and a detail data model documenting the tables, their fields and their relationships. These MDB are then gathered in catalogs that can be easily explored an shared. TKCat provides tools to easily subset, filter and combine MDBs and create new catalogs suited for specific needs.</p>
-<p>This vignette describes how TKCat can be used with a <a href="https://clickhouse.tech/">ClickHouse</a> database. Users should also refer to the <a href="TKCat-User-guide.html">general TKCat user guide</a>. Finally, a <a href="chTKCat-Operations-manual.html">specific vignette</a> describes how to create and administrate a TKCat ClickHouse instance, and another is dedicated to an <a href="TKCat-Collections.html">extended documentation of collections</a>.</p>
+<p>Some MDBs refer to the same concepts and could be merged accordingly. However they often use different vocabularies or scopes. Collections are a used to identify such concepts and to define a way to document formally the scope used by the different members of these collections. Thanks to this formal description, tools can be used to automatically combine MDBs refering to the same collection but using different scopes.</p>
+<p>This vignette describes how to create TKCat Collections, document collection members and create functions to support the merging of MDBs. The advantages and uses of Collections are presented in the <a href="TKCat-User-guide.html#merging-with-collections">general user guide</a>.</p>
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 </div>
-<div id="connection" class="section level1">
-<h1><span class="header-section-number">2</span> Connection</h1>
-<p>The connection to a chTKCat database is achieved by instantiating <em>chTKCat</em> object.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>k &lt;-<span class="st"> </span><span class="kw">chTKCat</span>(</span>
-<span id="cb1-2"><a href="#cb1-2"></a>   <span class="dt">host=</span><span class="st">&quot;localhost&quot;</span>, <span class="co"># default parameter</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a>   <span class="dt">port=</span>9101L,       <span class="co"># default parameter</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a>   <span class="dt">user=</span><span class="st">&quot;default&quot;</span>,   <span class="co"># default parameter</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a>   <span class="dt">password=</span><span class="st">&quot;&quot;</span>       <span class="co"># if not provided the password is requested interactively </span></span>
-<span id="cb1-6"><a href="#cb1-6"></a>)</span></code></pre></div>
-<p>Connection parameters should be adapted according to the ClickHouse database setup which is documented in the web exploration interface (in the “System” tab).</p>
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
-</div>
-<div id="use" class="section level1">
-<h1><span class="header-section-number">3</span> Use</h1>
-<p>The <em>chTKCat</em> object can be used as a <a href="TKCat-User-guide.html#local-tkcat"><em>TKCat</em> object</a>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">list_MDBs</span>(k)                     <span class="co"># list all the MDBs in a TKCat object</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>khpo &lt;-<span class="st"> </span><span class="kw">get_MDB</span>(k, <span class="st">&quot;HPO&quot;</span>)        <span class="co"># get a specific MDBs from the catalog</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a><span class="kw">search_MDB_tables</span>(k, <span class="st">&quot;disease&quot;</span>)  <span class="co"># Search table about &quot;disease&quot;</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a><span class="kw">search_MDB_fields</span>(k, <span class="st">&quot;disease&quot;</span>)  <span class="co"># Search a field about &quot;disease&quot;</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a><span class="kw">collection_members</span>(k)            <span class="co"># Get collection members of the different MDBs</span></span></code></pre></div>
-<p>The <em>khpo</em> object in the example above is a <em>chMDB</em> object. The data of this type of MDB are located in the ClickHouse database until the user requests them. They can be use like any other <em>MDB</em> object:</p>
+<div id="creating-a-collection" class="section level1">
+<h1><span class="header-section-number">2</span> Creating a collection</h1>
+<p>A collection is defined by a JSON document. This document should fulfill the requirements defined by the <a href="https://github.com/patzaw/TKCat/blob/master/inst/Collections/Collection-Schema.json">Collection-Schema.json</a>. Two collection are available by default in the TKCat package.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">list_local_collections</span>()</span></code></pre></div>
+<pre><code>## # A tibble: 2 x 2
+##   title     description                                  
+##   &lt;chr&gt;     &lt;chr&gt;                                        
+## 1 BE        Collection of biological entity (BE) concepts
+## 2 Condition Collection of condition concepts</code></pre>
+<p>Here is how the <em>BE</em> collection is defined.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">get_local_collection</span>(<span class="st">&quot;BE&quot;</span>) <span class="op">%&gt;%</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="st">   </span><span class="kw">paste</span>(<span class="st">&#39;```json&#39;</span>, ., <span class="st">&#39;```&#39;</span>, <span class="dt">sep=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">cat</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">{</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>   <span class="dt">&quot;$schema&quot;</span><span class="fu">:</span> <span class="st">&quot;TKCat_collections_1.0&quot;</span><span class="fu">,</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>   <span class="dt">&quot;$id&quot;</span><span class="fu">:</span><span class="st">&quot;TKCat_BE_collection_1.0&quot;</span><span class="fu">,</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a>    <span class="dt">&quot;title&quot;</span><span class="fu">:</span> <span class="st">&quot;BE collection&quot;</span><span class="fu">,</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>    <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;object&quot;</span><span class="fu">,</span></span>
+<span id="cb4-6"><a href="#cb4-6"></a>    <span class="dt">&quot;description&quot;</span><span class="fu">:</span> <span class="st">&quot;Collection of biological entity (BE) concepts&quot;</span><span class="fu">,</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a>    <span class="dt">&quot;properties&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>      <span class="dt">&quot;$schema&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;enum&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;TKCat_BE_collection_1.0&quot;</span><span class="ot">]</span><span class="fu">},</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>      <span class="dt">&quot;$id&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">},</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a>        <span class="dt">&quot;collection&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;enum&quot;</span><span class="fu">:</span><span class="ot">[</span><span class="st">&quot;BE&quot;</span><span class="ot">]</span><span class="fu">},</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>        <span class="dt">&quot;resource&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">},</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a>        <span class="dt">&quot;tables&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a>            <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;array&quot;</span><span class="fu">,</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a>            <span class="dt">&quot;minItems&quot;</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>            <span class="dt">&quot;items&quot;</span><span class="fu">:{</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a>                <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;object&quot;</span><span class="fu">,</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a>                <span class="dt">&quot;properties&quot;</span><span class="fu">:{</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a>                    <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">},</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a>                    <span class="dt">&quot;fields&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a>                        <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;object&quot;</span><span class="fu">,</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a>                        <span class="dt">&quot;properties&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-22"><a href="#cb4-22"></a>                            <span class="dt">&quot;be&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a>                                <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;object&quot;</span><span class="fu">,</span></span>
+<span id="cb4-24"><a href="#cb4-24"></a>                                <span class="dt">&quot;properties&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-25"><a href="#cb4-25"></a>                                    <span class="dt">&quot;static&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;boolean&quot;</span><span class="fu">},</span></span>
+<span id="cb4-26"><a href="#cb4-26"></a>                                    <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">}</span></span>
+<span id="cb4-27"><a href="#cb4-27"></a>                                <span class="fu">},</span></span>
+<span id="cb4-28"><a href="#cb4-28"></a>                                <span class="dt">&quot;required&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;static&quot;</span><span class="ot">,</span> <span class="st">&quot;value&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb4-29"><a href="#cb4-29"></a>                                <span class="dt">&quot;additionalProperties&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb4-30"><a href="#cb4-30"></a>                            <span class="fu">},</span></span>
+<span id="cb4-31"><a href="#cb4-31"></a>                            <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-32"><a href="#cb4-32"></a>                                <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;object&quot;</span><span class="fu">,</span></span>
+<span id="cb4-33"><a href="#cb4-33"></a>                                <span class="dt">&quot;properties&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-34"><a href="#cb4-34"></a>                                    <span class="dt">&quot;static&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;boolean&quot;</span><span class="fu">},</span></span>
+<span id="cb4-35"><a href="#cb4-35"></a>                                    <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">}</span></span>
+<span id="cb4-36"><a href="#cb4-36"></a>                                <span class="fu">},</span></span>
+<span id="cb4-37"><a href="#cb4-37"></a>                                <span class="dt">&quot;required&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;static&quot;</span><span class="ot">,</span> <span class="st">&quot;value&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb4-38"><a href="#cb4-38"></a>                                <span class="dt">&quot;additionalProperties&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb4-39"><a href="#cb4-39"></a>                            <span class="fu">},</span></span>
+<span id="cb4-40"><a href="#cb4-40"></a>                            <span class="dt">&quot;organism&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-41"><a href="#cb4-41"></a>                                <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;object&quot;</span><span class="fu">,</span></span>
+<span id="cb4-42"><a href="#cb4-42"></a>                                <span class="dt">&quot;properties&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-43"><a href="#cb4-43"></a>                                    <span class="dt">&quot;static&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;boolean&quot;</span><span class="fu">},</span></span>
+<span id="cb4-44"><a href="#cb4-44"></a>                                    <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">},</span></span>
+<span id="cb4-45"><a href="#cb4-45"></a>                                    <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;enum&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;Scientific name&quot;</span><span class="ot">,</span> <span class="st">&quot;NCBI taxon identifier&quot;</span><span class="ot">]</span><span class="fu">}</span></span>
+<span id="cb4-46"><a href="#cb4-46"></a>                                <span class="fu">},</span></span>
+<span id="cb4-47"><a href="#cb4-47"></a>                                <span class="dt">&quot;required&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;static&quot;</span><span class="ot">,</span> <span class="st">&quot;value&quot;</span><span class="ot">,</span> <span class="st">&quot;type&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb4-48"><a href="#cb4-48"></a>                                <span class="dt">&quot;additionalProperties&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb4-49"><a href="#cb4-49"></a>                            <span class="fu">},</span></span>
+<span id="cb4-50"><a href="#cb4-50"></a>                            <span class="dt">&quot;identifier&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-51"><a href="#cb4-51"></a>                                <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;object&quot;</span><span class="fu">,</span></span>
+<span id="cb4-52"><a href="#cb4-52"></a>                                <span class="dt">&quot;properties&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb4-53"><a href="#cb4-53"></a>                                    <span class="dt">&quot;static&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;boolean&quot;</span><span class="fu">},</span></span>
+<span id="cb4-54"><a href="#cb4-54"></a>                                    <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">}</span></span>
+<span id="cb4-55"><a href="#cb4-55"></a>                                <span class="fu">},</span></span>
+<span id="cb4-56"><a href="#cb4-56"></a>                                <span class="dt">&quot;required&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;static&quot;</span><span class="ot">,</span> <span class="st">&quot;value&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb4-57"><a href="#cb4-57"></a>                                <span class="dt">&quot;additionalProperties&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb4-58"><a href="#cb4-58"></a>                            <span class="fu">}</span></span>
+<span id="cb4-59"><a href="#cb4-59"></a>                        <span class="fu">},</span></span>
+<span id="cb4-60"><a href="#cb4-60"></a>                        <span class="dt">&quot;required&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;be&quot;</span><span class="ot">,</span> <span class="st">&quot;source&quot;</span><span class="ot">,</span> <span class="st">&quot;identifier&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb4-61"><a href="#cb4-61"></a>                        <span class="dt">&quot;additionalProperties&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb4-62"><a href="#cb4-62"></a>                    <span class="fu">}</span></span>
+<span id="cb4-63"><a href="#cb4-63"></a>                <span class="fu">},</span></span>
+<span id="cb4-64"><a href="#cb4-64"></a>                <span class="dt">&quot;required&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;name&quot;</span><span class="ot">,</span> <span class="st">&quot;fields&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb4-65"><a href="#cb4-65"></a>                <span class="dt">&quot;additionalProperties&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb4-66"><a href="#cb4-66"></a>            <span class="fu">}</span></span>
+<span id="cb4-67"><a href="#cb4-67"></a>        <span class="fu">}</span></span>
+<span id="cb4-68"><a href="#cb4-68"></a>    <span class="fu">},</span></span>
+<span id="cb4-69"><a href="#cb4-69"></a>    <span class="dt">&quot;required&quot;</span><span class="fu">:</span> <span class="ot">[</span><span class="st">&quot;$schema&quot;</span><span class="ot">,</span> <span class="st">&quot;$id&quot;</span><span class="ot">,</span> <span class="st">&quot;collection&quot;</span><span class="ot">,</span> <span class="st">&quot;resource&quot;</span><span class="ot">,</span> <span class="st">&quot;tables&quot;</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb4-70"><a href="#cb4-70"></a>    <span class="dt">&quot;additionalProperties&quot;</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb4-71"><a href="#cb4-71"></a><span class="fu">}</span></span></code></pre></div>
+<p>A collection should refer to the <code>&quot;TKCat_collections_1.0&quot;</code> <strong>$schema</strong>. It should then have the following properties:</p>
 <ul>
-<li><a href="TKCat-User-guide.html#getting-information">Getting information</a></li>
-<li><a href="TKCat-User-guide.html#pulling-subsetting-and-combining">Pulling, subsetting and combining</a></li>
-<li><a href="TKCat-User-guide.html#filtering-and-joining">Filtering and joining</a></li>
-<li><a href="TKCat-User-guide.html#merging-with-collections">Merging using collections</a></li>
-</ul>
-<p>The user is able to access only <em>chMDB</em> allowed according to his rights (see the <a href="chTKCat-Operations-manual.html">operation manual</a>).</p>
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
-</div>
-<div id="reconnecting" class="section level1">
-<h1><span class="header-section-number">4</span> Reconnecting</h1>
-<p>If the connection to the database is lost the user can reactivate it by using the <code>db_reconnect()</code> function which works with <em>chTKCat</em> objects but also with <em>chMDB</em> objects.</p>
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
-</div>
-<div id="pushing-an-mdb-in-a-chtkcat-instance" class="section level1">
-<h1><span class="header-section-number">5</span> Pushing an MDB in a chTKCat instance</h1>
-<p>MDB can be add to the ClickHouse database of a <em>chTKCat</em> object with the <code>as_chMDB()</code> function.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>lk &lt;-<span class="st"> </span><span class="kw">TKCat</span>(<span class="kw">read_fileMDB</span>(</span>
-<span id="cb3-2"><a href="#cb3-2"></a>   <span class="dt">path=</span><span class="kw">system.file</span>(<span class="st">&quot;examples/ClinVar&quot;</span>, <span class="dt">package=</span><span class="st">&quot;TKCat&quot;</span>)</span>
-<span id="cb3-3"><a href="#cb3-3"></a>))</span>
-<span id="cb3-4"><a href="#cb3-4"></a><span class="kw">names</span>(lk)</span>
-<span id="cb3-5"><a href="#cb3-5"></a><span class="kw">as_chMDB</span>(lk<span class="op">$</span>ClinVar, k, <span class="dt">overwrite=</span><span class="ot">FALSE</span>)</span></code></pre></div>
-<p>This function works only if (see the <a href="chTKCat-Operations-manual.html">operation manual</a>):</p>
+<li><p><strong>$id</strong>: the identifier of the collection</p></li>
+<li><p><strong>title</strong>: the title of the collection</p></li>
+<li><p><strong>type</strong>: always <code>object</code></p></li>
+<li><p><strong>description</strong>: a short description of the collection</p></li>
+<li><p><strong>properties</strong>: the properties that should be provided by collection members. In this case:</p>
 <ul>
-<li>the <em>ClinVar</em> database has been initiated by the administrator of the ClickHouse database,</li>
-<li>the user is allowed to write in the database.</li>
+<li><p><strong>$schema</strong>: should be the <em>$id</em> of the collection</p></li>
+<li><p><strong>$id</strong>: the identifier of the collection member: a string</p></li>
+<li><p><strong>collection</strong>: should be “BE”</p></li>
+<li><p><strong>resource</strong>: the name of the resource having collection members: a string</p></li>
+<li><p><strong>tables</strong>: an array of tables corresponding to collection members. Each item being a table with the following features:</p>
+<ul>
+<li><p><strong>name</strong>: the name of the table</p></li>
+<li><p><strong>fields</strong>: the required fields</p>
+<ul>
+<li><strong>be</strong>: if <strong>static</strong> is true then <strong>value</strong> correspond to the be value valid for all the records. If not <strong>value</strong> correspond to the table column with the be value for each record.</li>
+<li><strong>source</strong>: if <strong>static</strong> is true then <strong>value</strong> correspond to the source value valid for all the records. If not <strong>value</strong> correspond to the table column with the source value for each record.</li>
+<li><strong>organism</strong>: if <strong>static</strong> is true then <strong>value</strong> correspond to the organism value valid for all the records. If not <strong>value</strong> correspond to the table column with the organism value for each record. <strong>type</strong> indicate how organisms are identified: <code>&quot;Scientific name&quot;</code> or <code>&quot;NCBI taxon identifier&quot;</code>.</li>
+</ul></li>
+</ul></li>
+</ul></li>
 </ul>
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+</div>
+<div id="identifying-collection-members" class="section level1">
+<h1><span class="header-section-number">3</span> Identifying collection members</h1>
+<p>Identifying collection members of an <em>MDB</em> can be done by providing a table as shown in the <a href="TKCat-User-guide.html#hpo">general user guide</a> or by writing a JSON file like the following one which correspond to BE members of the CHEMBL MDB.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="kw">system.file</span>(</span>
+<span id="cb5-2"><a href="#cb5-2"></a>   <span class="st">&quot;examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json&quot;</span>,</span>
+<span id="cb5-3"><a href="#cb5-3"></a>   <span class="dt">package=</span><span class="st">&quot;TKCat&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb5-5"><a href="#cb5-5"></a><span class="st">   </span><span class="kw">readLines</span>() <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">paste</span>(<span class="dt">collapse=</span><span class="st">&quot;</span><span class="ch">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">{</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="dt">&quot;$schema&quot;</span><span class="fu">:</span> <span class="st">&quot;TKCat_BE_collection_1.0&quot;</span><span class="fu">,</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a>  <span class="dt">&quot;$id&quot;</span><span class="fu">:</span> <span class="st">&quot;CHEMBL_BE_1.0&quot;</span><span class="fu">,</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>  <span class="dt">&quot;collection&quot;</span><span class="fu">:</span> <span class="st">&quot;BE&quot;</span><span class="fu">,</span></span>
+<span id="cb6-5"><a href="#cb6-5"></a>  <span class="dt">&quot;resource&quot;</span><span class="fu">:</span> <span class="st">&quot;CHEMBL&quot;</span><span class="fu">,</span></span>
+<span id="cb6-6"><a href="#cb6-6"></a>  <span class="dt">&quot;tables&quot;</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb6-7"><a href="#cb6-7"></a>    <span class="fu">{</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>      <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;CHEMBL_component_sequence&quot;</span><span class="fu">,</span></span>
+<span id="cb6-9"><a href="#cb6-9"></a>      <span class="dt">&quot;fields&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a>        <span class="dt">&quot;be&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a>          <span class="dt">&quot;static&quot;</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a>          <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="st">&quot;Peptide&quot;</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a>        <span class="fu">},</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a>        <span class="dt">&quot;identifier&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a>          <span class="dt">&quot;static&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a>          <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="st">&quot;accession&quot;</span></span>
+<span id="cb6-17"><a href="#cb6-17"></a>        <span class="fu">},</span></span>
+<span id="cb6-18"><a href="#cb6-18"></a>        <span class="dt">&quot;source&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-19"><a href="#cb6-19"></a>          <span class="dt">&quot;static&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb6-20"><a href="#cb6-20"></a>          <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="st">&quot;db_source&quot;</span></span>
+<span id="cb6-21"><a href="#cb6-21"></a>        <span class="fu">},</span></span>
+<span id="cb6-22"><a href="#cb6-22"></a>        <span class="dt">&quot;organism&quot;</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb6-23"><a href="#cb6-23"></a>          <span class="dt">&quot;static&quot;</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb6-24"><a href="#cb6-24"></a>          <span class="dt">&quot;value&quot;</span><span class="fu">:</span> <span class="st">&quot;organism&quot;</span><span class="fu">,</span></span>
+<span id="cb6-25"><a href="#cb6-25"></a>          <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;Scientific name&quot;</span></span>
+<span id="cb6-26"><a href="#cb6-26"></a>        <span class="fu">}</span></span>
+<span id="cb6-27"><a href="#cb6-27"></a>      <span class="fu">}</span></span>
+<span id="cb6-28"><a href="#cb6-28"></a>    <span class="fu">}</span></span>
+<span id="cb6-29"><a href="#cb6-29"></a>  <span class="ot">]</span></span>
+<span id="cb6-30"><a href="#cb6-30"></a><span class="fu">}</span></span></code></pre></div>
+<p>The identification of collection members should fulfill the requirements defined by the collection JSON document, and therefore pass the following validation.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>jsonvalidate<span class="op">::</span><span class="kw">json_validate</span>(</span>
+<span id="cb7-2"><a href="#cb7-2"></a>   <span class="dt">json=</span><span class="kw">system.file</span>(</span>
+<span id="cb7-3"><a href="#cb7-3"></a>      <span class="st">&quot;examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4"></a>      <span class="dt">package=</span><span class="st">&quot;TKCat&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a>   ),</span>
+<span id="cb7-6"><a href="#cb7-6"></a>   <span class="dt">schema=</span><span class="kw">get_local_collection</span>(<span class="st">&quot;BE&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7"></a>)</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<p>This validation is done automatically when reading a <em>fileMDB</em> object or when setting collection members with the <code>collection_members()</code> function.</p>
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+</div>
+<div id="collection-mapper-functions" class="section level1">
+<h1><span class="header-section-number">4</span> Collection mapper functions</h1>
+<p>The <code>merge.MDB()</code> and the <code>map_collection_members()</code> functions rely on functions to map members of the same collection. When recorded (using the <code>import_collection_mapper()</code> function), these function can be automatically identified by TKCat, otherwise or according to user needs, these functions could be provided using the <code>funs</code> (for <code>merge.MDB()</code>) or the <code>fun</code> (for <code>map_collection_members()</code>) parameters. Two mappers are pre-recorded in TKCat, one for the <em>BE</em> collection and one for the <em>Condition</em> collection. They can be retrieved with the <code>get_collection_mapper()</code> function.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">get_collection_mapper</span>(<span class="st">&quot;BE&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="cf">function</span> (x, y, <span class="dt">orthologs =</span> <span class="ot">FALSE</span>, <span class="dt">restricted =</span> <span class="ot">FALSE</span>, ...) </span>
+<span id="cb10-2"><a href="#cb10-2"></a>{</span>
+<span id="cb10-3"><a href="#cb10-3"></a>    <span class="cf">if</span> (<span class="op">!</span><span class="kw">requireNamespace</span>(<span class="st">&quot;BED&quot;</span>)) {</span>
+<span id="cb10-4"><a href="#cb10-4"></a>        <span class="kw">stop</span>(<span class="st">&quot;The BED package is required&quot;</span>)</span>
+<span id="cb10-5"><a href="#cb10-5"></a>    }</span>
+<span id="cb10-6"><a href="#cb10-6"></a>    <span class="cf">if</span> (<span class="op">!</span>BED<span class="op">::</span><span class="kw">checkBedConn</span>()) {</span>
+<span id="cb10-7"><a href="#cb10-7"></a>        <span class="kw">stop</span>(<span class="st">&quot;You need to connect to a BED database using&quot;</span>, <span class="st">&quot; the BED::connectToBed() function&quot;</span>)</span>
+<span id="cb10-8"><a href="#cb10-8"></a>    }</span>
+<span id="cb10-9"><a href="#cb10-9"></a>    <span class="cf">if</span> (<span class="op">!</span><span class="st">&quot;organism&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">colnames</span>(x)) {</span>
+<span id="cb10-10"><a href="#cb10-10"></a>        d &lt;-<span class="st"> </span>x</span>
+<span id="cb10-11"><a href="#cb10-11"></a>        scopes &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">distinct</span>(d, be, source)</span>
+<span id="cb10-12"><a href="#cb10-12"></a>        nd &lt;-<span class="st"> </span><span class="kw">c</span>()</span>
+<span id="cb10-13"><a href="#cb10-13"></a>        <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(scopes)) {</span>
+<span id="cb10-14"><a href="#cb10-14"></a>            be &lt;-<span class="st"> </span>scopes<span class="op">$</span>be[i]</span>
+<span id="cb10-15"><a href="#cb10-15"></a>            source &lt;-<span class="st"> </span>scopes<span class="op">$</span>source[i]</span>
+<span id="cb10-16"><a href="#cb10-16"></a>            toadd &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(be <span class="op">==</span><span class="st"> </span>be, source <span class="op">==</span><span class="st"> </span></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="st">                </span>source)</span>
+<span id="cb10-18"><a href="#cb10-18"></a>            organism &lt;-<span class="st"> </span>BED<span class="op">::</span><span class="kw">guessIdScope</span>(toadd<span class="op">$</span>identifier, <span class="dt">be =</span> be, </span>
+<span id="cb10-19"><a href="#cb10-19"></a>                <span class="dt">source =</span> source, <span class="dt">tcLim =</span> <span class="ot">Inf</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">attr</span>(<span class="st">&quot;details&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-20"><a href="#cb10-20"></a><span class="st">                </span><span class="kw">filter</span>(be <span class="op">==</span><span class="st"> </span><span class="op">!!</span>be <span class="op">&amp;</span><span class="st"> </span>source <span class="op">==</span><span class="st"> </span><span class="op">!!</span>source) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>(organism) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-21"><a href="#cb10-21"></a><span class="st">                </span><span class="kw">unique</span>()</span>
+<span id="cb10-22"><a href="#cb10-22"></a>            toadd &lt;-<span class="st"> </span><span class="kw">merge</span>(toadd, <span class="kw">tibble</span>(<span class="dt">organism =</span> organism))</span>
+<span id="cb10-23"><a href="#cb10-23"></a>            nd &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(nd, toadd)</span>
+<span id="cb10-24"><a href="#cb10-24"></a>        }</span>
+<span id="cb10-25"><a href="#cb10-25"></a>        x &lt;-<span class="st"> </span>nd <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">organism_type =</span> <span class="st">&quot;Scientific name&quot;</span>)</span>
+<span id="cb10-26"><a href="#cb10-26"></a>    }</span>
+<span id="cb10-27"><a href="#cb10-27"></a>    <span class="cf">if</span> (<span class="op">!</span><span class="st">&quot;organism&quot;</span> <span class="op">%in%</span><span class="st"> </span><span class="kw">colnames</span>(y)) {</span>
+<span id="cb10-28"><a href="#cb10-28"></a>        d &lt;-<span class="st"> </span>y</span>
+<span id="cb10-29"><a href="#cb10-29"></a>        scopes &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">distinct</span>(d, be, source)</span>
+<span id="cb10-30"><a href="#cb10-30"></a>        nd &lt;-<span class="st"> </span><span class="kw">c</span>()</span>
+<span id="cb10-31"><a href="#cb10-31"></a>        <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(scopes)) {</span>
+<span id="cb10-32"><a href="#cb10-32"></a>            be &lt;-<span class="st"> </span>scopes<span class="op">$</span>be[i]</span>
+<span id="cb10-33"><a href="#cb10-33"></a>            source &lt;-<span class="st"> </span>scopes<span class="op">$</span>source[i]</span>
+<span id="cb10-34"><a href="#cb10-34"></a>            toadd &lt;-<span class="st"> </span>d <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(be <span class="op">==</span><span class="st"> </span>be, source <span class="op">==</span><span class="st"> </span></span>
+<span id="cb10-35"><a href="#cb10-35"></a><span class="st">                </span>source)</span>
+<span id="cb10-36"><a href="#cb10-36"></a>            organism &lt;-<span class="st"> </span>BED<span class="op">::</span><span class="kw">guessIdScope</span>(toadd<span class="op">$</span>identifier, <span class="dt">be =</span> be, </span>
+<span id="cb10-37"><a href="#cb10-37"></a>                <span class="dt">source =</span> source, <span class="dt">tcLim =</span> <span class="ot">Inf</span>) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">attr</span>(<span class="st">&quot;details&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-38"><a href="#cb10-38"></a><span class="st">                </span><span class="kw">filter</span>(be <span class="op">==</span><span class="st"> </span><span class="op">!!</span>be <span class="op">&amp;</span><span class="st"> </span>source <span class="op">==</span><span class="st"> </span><span class="op">!!</span>source) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">pull</span>(organism) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-39"><a href="#cb10-39"></a><span class="st">                </span><span class="kw">unique</span>()</span>
+<span id="cb10-40"><a href="#cb10-40"></a>            toadd &lt;-<span class="st"> </span><span class="kw">merge</span>(toadd, <span class="kw">tibble</span>(<span class="dt">organism =</span> organism))</span>
+<span id="cb10-41"><a href="#cb10-41"></a>            nd &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(nd, toadd)</span>
+<span id="cb10-42"><a href="#cb10-42"></a>        }</span>
+<span id="cb10-43"><a href="#cb10-43"></a>        y &lt;-<span class="st"> </span>nd <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">organism_type =</span> <span class="st">&quot;Scientific name&quot;</span>)</span>
+<span id="cb10-44"><a href="#cb10-44"></a>    }</span>
+<span id="cb10-45"><a href="#cb10-45"></a>    <span class="kw">assign</span>(<span class="st">&quot;x&quot;</span>, x, <span class="dt">envir =</span> .GlobalEnv)</span>
+<span id="cb10-46"><a href="#cb10-46"></a>    <span class="kw">assign</span>(<span class="st">&quot;y&quot;</span>, y, <span class="dt">envir =</span> .GlobalEnv)</span>
+<span id="cb10-47"><a href="#cb10-47"></a>    xscopes &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">distinct</span>(x, be, source, organism, organism_type)</span>
+<span id="cb10-48"><a href="#cb10-48"></a>    yscopes &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">distinct</span>(y, be, source, organism, organism_type)</span>
+<span id="cb10-49"><a href="#cb10-49"></a>    toRet &lt;-<span class="st"> </span><span class="ot">NULL</span></span>
+<span id="cb10-50"><a href="#cb10-50"></a>    <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(xscopes)) {</span>
+<span id="cb10-51"><a href="#cb10-51"></a>        xscope &lt;-<span class="st"> </span>xscopes[i, ]</span>
+<span id="cb10-52"><a href="#cb10-52"></a>        <span class="cf">if</span> (<span class="kw">any</span>(<span class="kw">apply</span>(xscope, <span class="dv">2</span>, is.na))) {</span>
+<span id="cb10-53"><a href="#cb10-53"></a>            (<span class="cf">next</span>)()</span>
+<span id="cb10-54"><a href="#cb10-54"></a>        }</span>
+<span id="cb10-55"><a href="#cb10-55"></a>        xi &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">right_join</span>(x, xscope, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;be&quot;</span>, <span class="st">&quot;source&quot;</span>, </span>
+<span id="cb10-56"><a href="#cb10-56"></a>            <span class="st">&quot;organism&quot;</span>, <span class="st">&quot;organism_type&quot;</span>))</span>
+<span id="cb10-57"><a href="#cb10-57"></a>        xorg &lt;-<span class="st"> </span><span class="kw">ifelse</span>(xscope<span class="op">$</span>organism_type <span class="op">==</span><span class="st"> &quot;NCBI taxon identifier&quot;</span>, </span>
+<span id="cb10-58"><a href="#cb10-58"></a>            BED<span class="op">::</span><span class="kw">getOrgNames</span>(xscope<span class="op">$</span>organism) <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(nameClass <span class="op">==</span><span class="st"> </span></span>
+<span id="cb10-59"><a href="#cb10-59"></a><span class="st">                &quot;scientific name&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">pull</span>(name), xscope<span class="op">$</span>organism)</span>
+<span id="cb10-60"><a href="#cb10-60"></a>        <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(yscopes)) {</span>
+<span id="cb10-61"><a href="#cb10-61"></a>            yscope &lt;-<span class="st"> </span>yscopes[j, ]</span>
+<span id="cb10-62"><a href="#cb10-62"></a>            <span class="cf">if</span> (<span class="kw">any</span>(<span class="kw">apply</span>(yscope, <span class="dv">2</span>, is.na))) {</span>
+<span id="cb10-63"><a href="#cb10-63"></a>                (<span class="cf">next</span>)()</span>
+<span id="cb10-64"><a href="#cb10-64"></a>            }</span>
+<span id="cb10-65"><a href="#cb10-65"></a>            yi &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">right_join</span>(y, yscope, <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;be&quot;</span>, <span class="st">&quot;source&quot;</span>, </span>
+<span id="cb10-66"><a href="#cb10-66"></a>                <span class="st">&quot;organism&quot;</span>, <span class="st">&quot;organism_type&quot;</span>))</span>
+<span id="cb10-67"><a href="#cb10-67"></a>            yorg &lt;-<span class="st"> </span><span class="kw">ifelse</span>(yscope<span class="op">$</span>organism_type <span class="op">==</span><span class="st"> &quot;NCBI taxon identifier&quot;</span>, </span>
+<span id="cb10-68"><a href="#cb10-68"></a>                BED<span class="op">::</span><span class="kw">getOrgNames</span>(yscope<span class="op">$</span>organism) <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">filter</span>(nameClass <span class="op">==</span><span class="st"> </span></span>
+<span id="cb10-69"><a href="#cb10-69"></a><span class="st">                  &quot;scientific name&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">pull</span>(name), yscope<span class="op">$</span>organism)</span>
+<span id="cb10-70"><a href="#cb10-70"></a>            <span class="cf">if</span> (xorg <span class="op">==</span><span class="st"> </span>yorg <span class="op">||</span><span class="st"> </span>orthologs) {</span>
+<span id="cb10-71"><a href="#cb10-71"></a>                xy &lt;-<span class="st"> </span>BED<span class="op">::</span><span class="kw">convBeIds</span>(<span class="dt">ids =</span> xi<span class="op">$</span>identifier, <span class="dt">from =</span> xscope<span class="op">$</span>be, </span>
+<span id="cb10-72"><a href="#cb10-72"></a>                  <span class="dt">from.source =</span> xscope<span class="op">$</span>source, <span class="dt">from.org =</span> xorg, </span>
+<span id="cb10-73"><a href="#cb10-73"></a>                  <span class="dt">to =</span> yscope<span class="op">$</span>be, <span class="dt">to.source =</span> yscope<span class="op">$</span>source, </span>
+<span id="cb10-74"><a href="#cb10-74"></a>                  <span class="dt">to.org =</span> yorg, <span class="dt">restricted =</span> restricted) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-75"><a href="#cb10-75"></a><span class="st">                  </span>dplyr<span class="op">::</span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(from, </span>
+<span id="cb10-76"><a href="#cb10-76"></a>                  to)</span>
+<span id="cb10-77"><a href="#cb10-77"></a>                <span class="cf">if</span> (restricted) {</span>
+<span id="cb10-78"><a href="#cb10-78"></a>                  xy &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">bind_rows</span>(xy, BED<span class="op">::</span><span class="kw">convBeIds</span>(<span class="dt">ids =</span> yi<span class="op">$</span>identifier, </span>
+<span id="cb10-79"><a href="#cb10-79"></a>                    <span class="dt">from =</span> yscope<span class="op">$</span>be, <span class="dt">from.source =</span> yscope<span class="op">$</span>source, </span>
+<span id="cb10-80"><a href="#cb10-80"></a>                    <span class="dt">from.org =</span> yorg, <span class="dt">to =</span> xscope<span class="op">$</span>be, <span class="dt">to.source =</span> xscope<span class="op">$</span>source, </span>
+<span id="cb10-81"><a href="#cb10-81"></a>                    <span class="dt">to.org =</span> xorg, <span class="dt">restricted =</span> restricted) <span class="op">%&gt;%</span><span class="st"> </span></span>
+<span id="cb10-82"><a href="#cb10-82"></a><span class="st">                    </span>dplyr<span class="op">::</span><span class="kw">as_tibble</span>() <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="dt">to =</span> from, </span>
+<span id="cb10-83"><a href="#cb10-83"></a>                    <span class="dt">from =</span> to))</span>
+<span id="cb10-84"><a href="#cb10-84"></a>                }</span>
+<span id="cb10-85"><a href="#cb10-85"></a>                xy &lt;-<span class="st"> </span>xy <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">rename</span>(<span class="dt">identifier_x =</span> <span class="st">&quot;from&quot;</span>, </span>
+<span id="cb10-86"><a href="#cb10-86"></a>                  <span class="dt">identifier_y =</span> <span class="st">&quot;to&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">mutate</span>(<span class="dt">be_x =</span> xscope<span class="op">$</span>be, </span>
+<span id="cb10-87"><a href="#cb10-87"></a>                  <span class="dt">source_x =</span> xscope<span class="op">$</span>source, <span class="dt">organism_x =</span> xscope<span class="op">$</span>organism, </span>
+<span id="cb10-88"><a href="#cb10-88"></a>                  <span class="dt">be_y =</span> yscope<span class="op">$</span>be, <span class="dt">source_y =</span> yscope<span class="op">$</span>source, </span>
+<span id="cb10-89"><a href="#cb10-89"></a>                  <span class="dt">organism_y =</span> yscope<span class="op">$</span>organism)</span>
+<span id="cb10-90"><a href="#cb10-90"></a>                toRet &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">bind_rows</span>(toRet, xy)</span>
+<span id="cb10-91"><a href="#cb10-91"></a>            }</span>
+<span id="cb10-92"><a href="#cb10-92"></a>        }</span>
+<span id="cb10-93"><a href="#cb10-93"></a>    }</span>
+<span id="cb10-94"><a href="#cb10-94"></a>    toRet &lt;-<span class="st"> </span>dplyr<span class="op">::</span><span class="kw">distinct</span>(toRet)</span>
+<span id="cb10-95"><a href="#cb10-95"></a>    <span class="kw">return</span>(toRet)</span>
+<span id="cb10-96"><a href="#cb10-96"></a>}</span></code></pre></div>
+<p>A mapper function must have at least an x and a y parameters. Each of them should be a data.frame with all the field values corresponding to the fields defined in the collection. Additional parameters can be defined and will be forwarded using <code>...</code>. This function should return a data frame with all the fields values followed by &quot;_x&quot; and &quot;_y&quot; suffix accordingly.</p>
 </div>
 
 

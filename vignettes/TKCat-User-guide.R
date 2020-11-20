@@ -155,7 +155,7 @@ plot(data_model(hpo_clinvar))
 hpo_clinvar$HPO_diseases_ClinVar_traitCref %>% head()
 
 ## -----------------------------------------------------------------------------
-k <- TKCat(file_hpo, file_clinvar, file_chembl)
+k <- TKCat(file_hpo, file_clinvar)
 
 ## -----------------------------------------------------------------------------
 list_MDBs(k)                     # list all the MDBs in a TKCat object
@@ -163,6 +163,7 @@ get_MDB(k, "HPO")                # get a specific MDBs from the catalog
 search_MDB_tables(k, "disease")  # Search table about "disease"
 search_MDB_fields(k, "disease")  # Search a field about "disease"
 collection_members(k)            # Get collection members of the different MDBs
+c(k, TKCat(file_chembl))         # Merge 2 TKCat objects
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  library(TKCat)

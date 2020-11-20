@@ -45,7 +45,7 @@ Map different collection members
 \details{
 fun must have at least an x and a y parameters.
 Each of them should be a data.frame with all the field values
-given n xm and ym. Additional parameters
+given in xm and ym. Additional parameters
 can be defined and will be forwarded using \code{...}.
 fun should return a data frame with all the fields values
 given in xm and ym followed by "_x" and "_y" suffix.

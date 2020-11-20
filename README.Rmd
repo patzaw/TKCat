@@ -1,0 +1,89 @@
+---
+title: "README"
+output:
+  md_document:
+    variant: markdown_github
+    toc: true
+    toc_depth: 2
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include = FALSE}
+library(knitr)
+library(TKCat)
+cranRef <- function(x){
+  sprintf(
+    "[%s](https://CRAN.R-project.org/package=%s): %s",
+    x, x, packageDescription(x)$Title
+  )
+}
+```
+
+
+<img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px" />
+
+The aim of TKCat is to facilitate the management of data from knowledge
+resources that are frequently used alone or together in research environments.
+In TKCat, knowledge resources are manipulated as modeled database (MDB)
+objects. These objects provide access to the data tables along with a general
+description of the resource and a detail data model documenting the
+tables, their fields and their relationships.
+These MDB are then gathered in catalogs that can be easily explored an shared.
+TKCat provides tools to easily subset, filter and combine MDBs and
+create new catalogs suited for specific needs.
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Installation
+
+<!---->
+## Dependencies
+<!----------->
+
+The following R packages available on CRAN are required:
+
+- `r cranRef("ReDaMoR")`
+- `r cranRef("magrittr")`
+- `r cranRef("dplyr")`
+- `r cranRef("DBI")`
+- `r cranRef("RClickhouse")`
+- `r cranRef("rlang")`
+- `r cranRef("tidyselect")`
+- `r cranRef("visNetwork")`
+- `r cranRef("getPass")`
+- `r cranRef("shiny")`
+- `r cranRef("shinydashboard")`
+- `r cranRef("DT")`
+- `r cranRef("readr")`
+- `r cranRef("jsonlite")`
+- `r cranRef("jsonvalidate")`
+- `r cranRef("base64enc")`
+- `r cranRef("markdown")`
+- `r cranRef("promises")`
+- `r cranRef("future")`
+
+<!---->
+## From github
+<!----------->
+
+```{r, eval=FALSE}
+devtools::install_github("patzaw/TKCat")
+```
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Documentation
+
+Documentation is available in the following vignettes
+
+   - [this vignette](https://patzaw.github.io/TKCat/TKCat-User-guide.html).
+
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Acknowledgments
+
+This work was entirely supported 
+by [UCB Pharma](https://www.ucb.com/) (Early Solutions department).

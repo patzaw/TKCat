@@ -2,6 +2,7 @@
 title: "chTKCat Operations manual"
 author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
+package: "TKCat (version `r packageVersion('TKCat')`)"
 output:
    rmarkdown::html_vignette:
      number_sections: yes
@@ -21,7 +22,7 @@ editor_options:
 library(knitr)
 opts_chunk$set(
    include=TRUE,
-   echo=FALSE,
+   echo=TRUE,
    message=FALSE,
    warning=FALSE,
    cache=FALSE,
@@ -34,6 +35,10 @@ library(TKCat)
 
 ```{r child = 'supp/urls.Rmd'}
 ```
+
+<div style="width:200px;">
+![](TKCat.png){width="100%"}
+</div>
 
 
 <!----------------------------------------------------------------------------->
@@ -69,7 +74,7 @@ The data are stored in the `TKCAT_HOME` folder.
 Stop and remove the docker container.
 
 ```{sh, eval=FALSE}
-
+# In shell
 docker stop ucb_tbn_tkcat
 docker rm ucb_tbn_tkcat
 docker volume prune -f
@@ -89,7 +94,7 @@ User management requires admin right on the database.
 
 ```{r, eval=FALSE}
 k <- chTKCat(user="pgodard")
-create_chTKCat_user(k, login="lfrancois", contact=NA)
+create_chTKCat_user(k, login="lfrancois", contact=NA, admin=FALSE)
 ```
 
 The function will require to setup a password for the new user.
@@ -101,40 +106,92 @@ drop_chTKCat_user(k, login="lfrancois")
 ```
 
 
-
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
-# MDB management
+# chMDB management
 
 <!-------------->
-## MDB Creation
+## chMDB Creation
+
+Before MDB data can be uploaded, the database should be created.
 
 ```{r, eval=FALSE}
-toCreate <- readLines("~/Shared/Data-Science/Data-Source-Model-Repository/01-lfrancois-Resources/All-Resources.txt")
-for(r in toCreate){
-   if(!r %in% list_MDBs(k, withInfo=FALSE)){
-      create_chMDB(k, r)
-   }
-   set_chMDB_access(k, r, public=TRUE)
-   add_chMDB_user(k, r, "lfrancois", admin=TRUE)
-}
+create_chMDB(k, "CHEMBL", public=FALSE)
+```
+
+By default chMDB are not public. It can be changed through the `public`
+parameter when creating the chMDB or by using the `set_chMDB_access`
+afterward.
+
+```{r, eval=FALSE}
+set_chMDB_access(k, "CHEMBL", public=TRUE)
+```
+
+Then, users having access to the chMDB can be identified with or without
+admin rights on the chMDB. Admin rights allow the user to update the
+chMDB data.
+
+
+```{r, eval=FALSE}
+add_chMDB_user(k, "CHEMBL", "lfrancois", admin=TRUE)
+# remove_chMDB_user(k, "CHEMBL", "lfrancois")
+list_chMDB_users(k, "CHEMBL")
 ```
 
 <!-------------->
-## Populating MDB
+## Populating chMDB
+
+Each chMDB can be populated individualy using the `as_chMDB()` function.
+The code chunk below shows how to scan a directory for all *fileMDB* it
+contains. The `as_memoMDB()` function load all the data in memory and checks
+that all the model constraints are fulfilled (this step is optional).
+The `overwrite` parameter of the `as_chMDB()` function allows updating the
+data in the database.
 
 ```{r, eval=FALSE}
-toFeed <- readLines("~/Shared/Data-Science/Data-Source-Model-Repository/01-pgodard-Resources/All-Resources.txt")
-lc <- scan_fileMDBs(
-   "~/Shared/Data-Science/Data-Source-Model-Repository/",
-   subdirs=toFeed
-)
+lc <- scan_fileMDBs("fileMDB_directory")
+## The commented line below allows the exploration of the data models in lc.
 # explore_MDBs(lc)
 for(r in toFeed){
    message(r)
    lr <- as_memoMDB(lc[[r]])
    cr <- as_chMDB(lr, k, overwrite=TRUE)
 }
+```
+
+<!-------------->
+## Deleting a chMDB
+
+Any admin user of a chMDB can delete the corresponding data.
+
+```{r, eval=FALSE}
+empty_chMDB(k, "CHEMBL")
+```
+
+Only a system admin can delete the chMDB from the ClickHouse database.
+
+```{r, eval=FALSE}
+drop_chMDB(k, "CHEMBL")
+```
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Collection management
+
+The aim of collections is described in
+the [general user guide](TKCat-User-guide.html#merging-with-collections)
+
+Collections needs to be added to a chTKCat instance in order to support
+collection members of the different chMDB.
+They can be taken from the TKCat package environment, from a JSON file
+or directly from a JSON text variable.
+Additional functions are available to list and remove chTKCat collections.
+
+```{r, eval=FALSE}
+add_chTKCat_collection(k, "BE")
+list_chTKCat_collections(k)
+remove_chTKCat_collection(k, "BE")
 ```
 
 
@@ -150,7 +207,7 @@ for(r in toFeed){
 The default database stores information about chTKCat instance, users
 and user access.
 
-```{r}
+```{r, echo=FALSE}
 plot(TKCat:::DEFAULT_DATA_MODEL)
 ```
 
@@ -159,6 +216,6 @@ plot(TKCat:::DEFAULT_DATA_MODEL)
 Modeled databases (MDB) are stored in dedicated database in chTKCat.
 Their data model is provided in dedicated tables described below.
 
-```{r}
+```{r, echo=FALSE}
 plot(TKCat:::CHMDB_DATA_MODEL)
 ```

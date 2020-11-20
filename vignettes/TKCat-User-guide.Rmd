@@ -44,6 +44,10 @@ library(TKCat)
 ```{r child = 'supp/urls.Rmd'}
 ```
 
+<div style="width:200px;">
+![](TKCat.png){width="100%"}
+</div>
+
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
@@ -56,6 +60,8 @@ This vignette focuses on a local usage of TKCat in R console.
 Two other vignettes describe more specifically how TKCat can be used with
 a [ClickHouse][clickhouse] database from
 a [user][chuguide] or an [operational][opman] perspectives.
+A final vignette is dedicated to
+an [extended documentation of collections][collections].
 
 
 <!----------------------------------------------------------------------------->
@@ -382,7 +388,7 @@ list_local_collections()
 ```
 
 The way to describe the scope of a collection member is formally defined
-by a JSON schema (the json column above).
+by a JSON schema (use `get_local_collection()` to get the JSON of a collection).
 Here are the definition of the BE collection members provided by
 the *CHEMBL_component_sequence* and the *ClinVar_entrezNames* tables.
 
@@ -460,6 +466,8 @@ filtered_cv_chembl <- merge(
 The returned object is **metaMDB** gathering the original MDBs and a
 relational table between members of the same collection as defined
 by the `by` parameter.
+
+Additional information about collection can be found [here][[collections].
 
 ### Merging without collection
 
