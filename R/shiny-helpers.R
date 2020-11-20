@@ -117,10 +117,14 @@
    return(shinydashboard::dashboardSidebar(
       ## Logo ----
       div(
-         shiny::img(
-            src="www/TKCat-small.png",
-            height="120px",
-            id="mainLogo"
+         shiny::a(
+            shiny::img(
+               src="www/TKCat-small.png",
+               height="120px",
+               id="mainLogo"
+            ),
+            href="https://github.com/patzaw/TKCat",
+            target="_blank"
          ),
          style=paste(
             "width:150px;",

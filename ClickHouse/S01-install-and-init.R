@@ -71,6 +71,6 @@ k <- TKCat:::init_chTKCat(
    path=TKCAT_HOME,
    login=ADMIN,
    contact=CONTACT
-)
+) ## The function will ask to setup a password here.
 add_chTKCat_collection(k, "BE")
 add_chTKCat_collection(k, "Condition")

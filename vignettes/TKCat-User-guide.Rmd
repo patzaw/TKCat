@@ -81,7 +81,7 @@ A subset of the [Human Phenotype Ontology (HPO)][hpo]
 is provided within the [ReDaMoR][redamor] package.
 The HPO aims to provide a standardized vocabulary of phenotypic
 abnormalities encountered in human diseases [@kohler_expansion_2019].
-An MDB object based on files (see [MDB implementations](#MDB-implementations))
+An MDB object based on files (see [MDB implementations](#mdb-implementations))
 can be read as shown below.
 As explained above, the data provided by the `path` parameter are
 documented with a model (`dataModel` parameter) and general
@@ -501,7 +501,7 @@ hpo_clinvar$HPO_diseases_ClinVar_traitCref %>% head()
 MDB can be gathered in a *TKCat* (Tailored Knowledge Catalog) object.
 
 ```{r}
-k <- TKCat(file_hpo, file_clinvar, file_chembl)
+k <- TKCat(file_hpo, file_clinvar)
 ```
 
 Gathering MDBs in such a catalog facilitate their exploration and their
@@ -514,6 +514,7 @@ get_MDB(k, "HPO")                # get a specific MDBs from the catalog
 search_MDB_tables(k, "disease")  # Search table about "disease"
 search_MDB_fields(k, "disease")  # Search a field about "disease"
 collection_members(k)            # Get collection members of the different MDBs
+c(k, TKCat(file_chembl))         # Merge 2 TKCat objects
 ```
 
 <!------------->
@@ -542,6 +543,16 @@ explore_MDBs(k, download=TRUE)
 
 ![](explore_MDBs-local.png){width=100%}
 
+In this interface the users can explore the resources available in the catalog.
+They can browse the data model of each of them with some sample data.
+They can also search for information provided in resources, tables or fields.
+Finally, if the parameter `download` is set to `TRUE`, the users will also
+be able to download the data: either each table individually or
+an archive of the whole MDB.
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 # References
 
 <!-- Bibliography -->

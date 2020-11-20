@@ -27,6 +27,8 @@ opts_chunk$set(
    cache=FALSE,
    cache.lazy=FALSE
 )
+## The following line is to avoid building errors on CRAN
+knitr::opts_chunk$set(eval=Sys.getenv("USER") %in% c("pgodard"))
 library(TKCat)
 ```
 
@@ -49,27 +51,31 @@ Users should also refer to the [general TKCat user guide][uguide].
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
-# Implementation
+# Instantiating the ClickHouse database
 
-<!-------------->
-## Data models
+## Install ClickHouse, initialize and configure the TKCat instance
 
-### Default database
+The ClickHouse docker container supporting TKCat,
+its initialization and its configuration procedures
+are implemented
+here: [S01-install-and-init.R](https://github.com/patzaw/TKCat/blob/master/ClickHouse/S01-install-and-init.R)
+	
+This script should be adapted according to requirements and needs.
 
-The default database stores information about chTKCat instance, users
-and user access.
+The data are stored in the `TKCAT_HOME` folder.
 
-```{r}
-plot(TKCat:::DEFAULT_DATA_MODEL)
-```
+## Cleaning and removing a TKCat instance
 
-### Modeled databases
+Stop and remove the docker container.
 
-Modeled databases (MDB) are stored in dedicated database in chTKCat.
-Their data model is provided in dedicated tables described below.
+```{sh, eval=FALSE}
 
-```{r}
-plot(TKCat:::CHMDB_DATA_MODEL)
+docker stop ucb_tbn_tkcat
+docker rm ucb_tbn_tkcat
+docker volume prune -f
+# Remove the folder with all the data: `$TKCAT_HOME`.`
+sudo rm -rf ~/Documents/Projects/TKCat_UCB_TBN
+
 ```
 
 
@@ -77,10 +83,23 @@ plot(TKCat:::CHMDB_DATA_MODEL)
 <!----------------------------------------------------------------------------->
 # User management
 
+User management requires admin right on the database.
+
+## Creation
+
 ```{r, eval=FALSE}
-k <- chTKCat(port=9101L, user="pgodard")
-create_chTKCat_user(k, login="lfrancois", contact="Liesbeth.Francois@ucb.com")
+k <- chTKCat(user="pgodard")
+create_chTKCat_user(k, login="lfrancois", contact=NA)
 ```
+
+The function will require to setup a password for the new user.
+
+## Drop
+
+```{r, eval=FALSE}
+drop_chTKCat_user(k, login="lfrancois")
+```
+
 
 
 <!----------------------------------------------------------------------------->
@@ -116,4 +135,30 @@ for(r in toFeed){
    lr <- as_memoMDB(lc[[r]])
    cr <- as_chMDB(lr, k, overwrite=TRUE)
 }
+```
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Implementation
+
+<!-------------->
+## Data models
+
+### Default database
+
+The default database stores information about chTKCat instance, users
+and user access.
+
+```{r}
+plot(TKCat:::DEFAULT_DATA_MODEL)
+```
+
+### Modeled databases
+
+Modeled databases (MDB) are stored in dedicated database in chTKCat.
+Their data model is provided in dedicated tables described below.
+
+```{r}
+plot(TKCat:::CHMDB_DATA_MODEL)
 ```

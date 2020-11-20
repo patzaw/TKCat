@@ -7,7 +7,7 @@ are implemented here:
 	
 	- **S01-install-and-init.R**
 	
-The data are stored in the `TBKM_HOME` folder.
+The data are stored in the `TKCAT_HOME` folder.
 
 ----------------------------------------
 # Cleaning and removing a TKCat instance
