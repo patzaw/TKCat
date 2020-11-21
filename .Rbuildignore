@@ -7,3 +7,5 @@
 ^ClickHouse$
 ^LICENSE$
 ^NEWS.html$
+^README.Rmd$
+^README.md$

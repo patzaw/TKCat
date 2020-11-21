@@ -27,8 +27,9 @@ The aim of TKCat is to facilitate the management of data from knowledge
 resources that are frequently used alone or together in research environments.
 In TKCat, knowledge resources are manipulated as modeled database (MDB)
 objects. These objects provide access to the data tables along with a general
-description of the resource and a detail data model documenting the
-tables, their fields and their relationships.
+description of the resource and
+a detail data model generated with [ReDaMoR](https://github.com/patzaw/ReDaMoR)
+documenting the tables, their fields and their relationships.
 These MDB are then gathered in catalogs that can be easily explored an shared.
 TKCat provides tools to easily subset, filter and combine MDBs and
 create new catalogs suited for specific needs.
@@ -77,9 +78,37 @@ devtools::install_github("patzaw/TKCat")
 
 Documentation is available in the following vignettes
 
-   - [this vignette](https://patzaw.github.io/TKCat/TKCat-User-guide.html).
+- [General documentation](https://patzaw.github.io/TKCat/TKCat-User-guide.html)
+- [Using TKCat with ClickHouse](https://patzaw.github.io/TKCat/chTKCat-User-guide.html)
+- [TKCat ClickHouse operation manual](https://patzaw.github.io/TKCat/chTKCat-Operations-manual.html)
+- [TKCat collections](https://patzaw.github.io/TKCat/TKCat-Collections.html)
 
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Alternatives
 
+- The [dm](https://github.com/krlmlr/dm) package provides similar
+features but with different implementation choices. Here are the main
+differences:
+  
+  - The **dm** data model feature is built upon
+  the [datamodelr](https://github.com/bergant/datamodelr) package whereas
+  **TKCat** relies on [ReDaMoR](https://github.com/patzaw/ReDaMoR).
+  - Both **dm** and **TKCat** provides mechanisms to check the fulfillment
+  of the data model constrains and tools to automatically take advantage
+  of them.
+  - **dm** supports connection to many different DBMS.
+  It also take advantage of constraints which are documented in the DBMS when
+  available.
+  **TKCat** only supports the [ClickHouse](https://clickhouse.tech/) system
+  through the [RClickhouse](https://github.com/IMSMWU/RClickhouse) package.
+  - **TKCat** implements 3 main type of MDB based on files, memory tables or
+  ClickHouse database. It also provides mechanisms to automatically convert
+  from and to any of these implementations.
+  - **TKCat** supports catalogs of MDBs facilitating the exploration of existing
+  data. It also allows the integration of different MDBs through the automatic
+  identification of similar concepts (Collections) and the automatic conversion
+  of the different vocabulary on which they rely.
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
