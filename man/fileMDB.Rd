@@ -55,7 +55,8 @@ fileMDB(
 \item{n_max}{maximum number of records to read
 for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}
 
-\item{verbose}{if TRUE display the data confrontation report}
+\item{verbose}{if TRUE display the data confrontation report
+(default: FALSE)}
 
 \item{value}{new table names}
 

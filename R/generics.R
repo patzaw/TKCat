@@ -211,6 +211,10 @@ list_MDBs <- function(x, withInfo=TRUE){
 #' 
 #' @return An [MDB] object
 #' 
+#' @seealso [get_confrontation_report], [ReDaMoR::format_confrontation_report]
+#' and [ReDaMoR::format_confrontation_report_md] for getting and formatting
+#' the report confronting the data to the model.
+#' 
 #' @export
 #' 
 get_MDB <- function(x, dbName, ...){

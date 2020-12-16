@@ -17,3 +17,8 @@ A \link{memoMDB} object
 \description{
 Convert  any MDB object in a \link{memoMDB} object
 }
+\seealso{
+\link{get_confrontation_report}, \link[ReDaMoR:format_confrontation_report]{ReDaMoR::format_confrontation_report}
+and \link[ReDaMoR:format_confrontation_report_md]{ReDaMoR::format_confrontation_report_md} for getting and formatting
+the report confronting the data to the model.
+}

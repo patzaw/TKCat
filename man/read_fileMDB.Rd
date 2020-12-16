@@ -9,7 +9,8 @@ read_fileMDB(
   dbInfo = NULL,
   dataModel = NULL,
   collectionMembers = NULL,
-  n_max = 10
+  n_max = 10,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -44,10 +45,17 @@ are taken from json files found in path/model/Collections}
 
 \item{n_max}{maximum number of records to read
 for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}
+
+\item{verbose}{if TRUE (default) display the data confrontation report}
 }
 \value{
 A \link{fileMDB} object
 }
 \description{
 Read a \link{fileMDB} from a path
+}
+\seealso{
+\link{get_confrontation_report}, \link[ReDaMoR:format_confrontation_report]{ReDaMoR::format_confrontation_report}
+and \link[ReDaMoR:format_confrontation_report_md]{ReDaMoR::format_confrontation_report_md} for getting and formatting
+the report confronting the data to the model.
 }

@@ -1,7 +1,7 @@
 Package: TKCat
 Type: Package
 Title: Tailored Knowledge Catalog
-Version: 0.5.0
+Version: 0.5.1
 Author: Patrice Godard
 Maintainer: Patrice Godard <patrice.godard@gmail.com>
 Description: Facilitate the management of data from knowledge

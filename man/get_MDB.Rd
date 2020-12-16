@@ -28,3 +28,8 @@ An \link{MDB} object
 \description{
 Get an \link{MDB} object from a \link{TKCat} related object
 }
+\seealso{
+\link{get_confrontation_report}, \link[ReDaMoR:format_confrontation_report]{ReDaMoR::format_confrontation_report}
+and \link[ReDaMoR:format_confrontation_report_md]{ReDaMoR::format_confrontation_report_md} for getting and formatting
+the report confronting the data to the model.
+}

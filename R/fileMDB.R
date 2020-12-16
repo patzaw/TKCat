@@ -14,6 +14,7 @@
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
 #' @param verbose if TRUE display the data confrontation report
+#' (default: FALSE)
 #'
 #' @return A fileMDB object
 #' 
@@ -127,8 +128,13 @@ fileMDB <- function(
 #' are taken from json files found in path/model/Collections
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
+#' @param verbose if TRUE (default) display the data confrontation report
 #'
 #' @return A [fileMDB] object
+#' 
+#' @seealso [get_confrontation_report], [ReDaMoR::format_confrontation_report]
+#' and [ReDaMoR::format_confrontation_report_md] for getting and formatting
+#' the report confronting the data to the model.
 #' 
 #' @export
 #' 
@@ -137,7 +143,8 @@ read_fileMDB <- function(
    dbInfo=NULL,
    dataModel=NULL,
    collectionMembers=NULL,
-   n_max=10
+   n_max=10,
+   verbose=TRUE
 ){
    stopifnot(file.exists(path))
    
@@ -234,7 +241,7 @@ read_fileMDB <- function(
       readParameters=readParameters,
       collectionMembers=collectionMembers,
       n_max=n_max,
-      verbose=TRUE
+      verbose=verbose
    ))
 }
 

@@ -23,6 +23,9 @@
 #' [count_records], [filter_with_tables], [as_fileMDB]
 #' - Additional general documentation is related to [MDB].
 #' - [filter.metaMDB], [slice.metaMDB]
+#' - [get_confrontation_report], [ReDaMoR::format_confrontation_report]
+#' and [ReDaMoR::format_confrontation_report_md] for getting and formatting
+#' the report confronting the data to the model.
 #'
 #' @export
 #'

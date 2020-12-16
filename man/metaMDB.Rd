@@ -58,5 +58,8 @@ relational tables.
 \link{count_records}, \link{filter_with_tables}, \link{as_fileMDB}
 \item Additional general documentation is related to \link{MDB}.
 \item \link{filter.metaMDB}, \link{slice.metaMDB}
+\item \link{get_confrontation_report}, \link[ReDaMoR:format_confrontation_report]{ReDaMoR::format_confrontation_report}
+and \link[ReDaMoR:format_confrontation_report_md]{ReDaMoR::format_confrontation_report_md} for getting and formatting
+the report confronting the data to the model.
 }
 }

@@ -87,6 +87,10 @@ is.memoMDB <- function(x){
 #' 
 #' @return A [memoMDB] object
 #' 
+#' @seealso [get_confrontation_report], [ReDaMoR::format_confrontation_report]
+#' and [ReDaMoR::format_confrontation_report_md] for getting and formatting
+#' the report confronting the data to the model.
+#' 
 #' @export
 #'
 as_memoMDB <- function(x, ...){
