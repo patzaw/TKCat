@@ -5,13 +5,14 @@
 
 ###############################################################################@
 .etkc_add_resources <- function(ddir=NULL){
+   pckn <- utils::packageName()
    shiny::addResourcePath(
       "www",
-      system.file("www", package=utils::packageName())
+      system.file("www", package=pckn)
    )
    shiny::addResourcePath(
       "doc",
-      system.file("doc", package=utils::packageName())
+      system.file("doc", package=pckn)
    )
    if(!is.null(ddir)){
       shiny::addResourcePath(
