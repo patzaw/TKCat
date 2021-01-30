@@ -2,7 +2,7 @@
 title: "README"
 output:
   md_document:
-    variant: markdown_github
+    variant: gfm
     toc: true
     toc_depth: 2
 editor_options: 
@@ -20,99 +20,87 @@ cranRef <- function(x){
 }
 ```
 
-
-<img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px" />
+<img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px"/>
 
 The aim of TKCat is to facilitate the management of data from knowledge
 resources that are frequently used alone or together in research environments.
-In TKCat, knowledge resources are manipulated as modeled database (MDB)
-objects. These objects provide access to the data tables along with a general
-description of the resource and
-a detail data model generated with [ReDaMoR](https://github.com/patzaw/ReDaMoR)
-documenting the tables, their fields and their relationships.
-These MDB are then gathered in catalogs that can be easily explored an shared.
-TKCat provides tools to easily subset, filter and combine MDBs and
-create new catalogs suited for specific needs.
+In TKCat, knowledge resources are manipulated as modeled database (MDB) objects.
+These objects provide access to the data tables along with a general description
+of the resource and a detail data model generated with
+[ReDaMoR](https://github.com/patzaw/ReDaMoR) documenting the tables, their
+fields and their relationships. These MDB are then gathered in catalogs that can
+be easily explored an shared. TKCat provides tools to easily subset, filter and
+combine MDBs and create new catalogs suited for specific needs.
 
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
 # Installation
 
-<!---->
 ## Dependencies
-<!----------->
 
 The following R packages available on CRAN are required:
 
-- `r cranRef("ReDaMoR")`
-- `r cranRef("magrittr")`
-- `r cranRef("dplyr")`
-- `r cranRef("DBI")`
-- `r cranRef("RClickhouse")`
-- `r cranRef("rlang")`
-- `r cranRef("tidyselect")`
-- `r cranRef("visNetwork")`
-- `r cranRef("getPass")`
-- `r cranRef("shiny")`
-- `r cranRef("shinydashboard")`
-- `r cranRef("DT")`
-- `r cranRef("readr")`
-- `r cranRef("jsonlite")`
-- `r cranRef("jsonvalidate")`
-- `r cranRef("base64enc")`
-- `r cranRef("markdown")`
-- `r cranRef("promises")`
-- `r cranRef("future")`
+-   `r cranRef("ReDaMoR")`
+-   `r cranRef("magrittr")`
+-   `r cranRef("dplyr")`
+-   `r cranRef("DBI")`
+-   `r cranRef("RClickhouse")`
+-   `r cranRef("rlang")`
+-   `r cranRef("tidyselect")`
+-   `r cranRef("visNetwork")`
+-   `r cranRef("getPass")`
+-   `r cranRef("shiny")`
+-   `r cranRef("shinydashboard")`
+-   `r cranRef("DT")`
+-   `r cranRef("readr")`
+-   `r cranRef("jsonlite")`
+-   `r cranRef("jsonvalidate")`
+-   `r cranRef("base64enc")`
+-   `r cranRef("markdown")`
+-   `r cranRef("promises")`
+-   `r cranRef("future")`
 
-<!---->
 ## From github
-<!----------->
 
 ```{r, eval=FALSE}
 devtools::install_github("patzaw/TKCat")
 ```
 
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
 # Documentation
 
 Documentation is available in the following vignettes
 
-- [General documentation](https://patzaw.github.io/TKCat/TKCat-User-guide.html)
-- [Using TKCat with ClickHouse](https://patzaw.github.io/TKCat/chTKCat-User-guide.html)
-- [TKCat ClickHouse operation manual](https://patzaw.github.io/TKCat/chTKCat-Operations-manual.html)
-- [TKCat collections](https://patzaw.github.io/TKCat/TKCat-Collections.html)
+-   [General
+    documentation](https://patzaw.github.io/TKCat/TKCat-User-guide.html)
+-   [Using TKCat with
+    ClickHouse](https://patzaw.github.io/TKCat/chTKCat-User-guide.html)
+-   [TKCat ClickHouse operation
+    manual](https://patzaw.github.io/TKCat/chTKCat-Operations-manual.html)
+-   [TKCat collections](https://patzaw.github.io/TKCat/TKCat-Collections.html)
 
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
 # Alternatives
 
-- The [dm](https://github.com/krlmlr/dm) package provides similar
-features but with different implementation choices. Here are the main
-differences:
-  
-  - The **dm** data model feature is built upon
-  the [datamodelr](https://github.com/bergant/datamodelr) package whereas
-  **TKCat** relies on [ReDaMoR](https://github.com/patzaw/ReDaMoR).
-  - Both **dm** and **TKCat** provides mechanisms to check the fulfillment
-  of the data model constrains and tools to automatically take advantage
-  of them.
-  - **dm** supports connection to many different DBMS.
-  It also take advantage of constraints which are documented in the DBMS when
-  available.
-  **TKCat** only supports the [ClickHouse](https://clickhouse.tech/) system
-  through the [RClickhouse](https://github.com/IMSMWU/RClickhouse) package.
-  - **TKCat** implements 3 main type of MDB based on files, memory tables or
-  ClickHouse database. It also provides mechanisms to automatically convert
-  from and to any of these implementations.
-  - **TKCat** supports catalogs of MDBs facilitating the exploration of existing
-  data. It also allows the integration of different MDBs through the automatic
-  identification of similar concepts (Collections) and the automatic conversion
-  of the different vocabulary on which they rely.
+-   The [dm](https://github.com/krlmlr/dm) package provides similar features but
+    with different implementation choices. Here are the main differences:
 
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
+    -   The **dm** data model feature is built upon the
+        [datamodelr](https://github.com/bergant/datamodelr) package whereas
+        **TKCat** relies on [ReDaMoR](https://github.com/patzaw/ReDaMoR).
+    -   Both **dm** and **TKCat** provides mechanisms to check the fulfillment
+        of the data model constrains and tools to automatically take advantage
+        of them.
+    -   **dm** supports connection to many different DBMS. It also take
+        advantage of constraints which are documented in the DBMS when
+        available. **TKCat** only supports the
+        [ClickHouse](https://clickhouse.tech/) system through the
+        [RClickhouse](https://github.com/IMSMWU/RClickhouse) package.
+    -   **TKCat** implements 3 main type of MDB based on files, memory tables or
+        ClickHouse database. It also provides mechanisms to automatically
+        convert from and to any of these implementations.
+    -   **TKCat** supports catalogs of MDBs facilitating the exploration of
+        existing data. It also allows the integration of different MDBs through
+        the automatic identification of similar concepts (Collections) and the
+        automatic conversion of the different vocabulary on which they rely.
+
 # Acknowledgments
 
-This work was entirely supported 
-by [UCB Pharma](https://www.ucb.com/) (Early Solutions department).
+This work was entirely supported by [UCB Pharma](https://www.ucb.com/) (Early
+Solutions department).

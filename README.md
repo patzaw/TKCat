@@ -5,7 +5,7 @@
 -   [Alternatives](#alternatives)
 -   [Acknowledgments](#acknowledgments)
 
-<img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px" />
+<img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px"/>
 
 The aim of TKCat is to facilitate the management of data from knowledge
 resources that are frequently used alone or together in research
@@ -18,18 +18,9 @@ gathered in catalogs that can be easily explored an shared. TKCat
 provides tools to easily subset, filter and combine MDBs and create new
 catalogs suited for specific needs.
 
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
+# Installation
 
-Installation
-============
-
-<!---->
-
-Dependencies
-------------
-
-<!----------->
+## Dependencies
 
 The following R packages available on CRAN are required:
 
@@ -72,22 +63,13 @@ The following R packages available on CRAN are required:
 -   [future](https://CRAN.R-project.org/package=future): Unified
     Parallel and Distributed Processing in R for Everyone
 
-<!---->
-
-From github
------------
-
-<!----------->
+## From github
 
 ``` r
 devtools::install_github("patzaw/TKCat")
 ```
 
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
-
-Documentation
-=============
+# Documentation
 
 Documentation is available in the following vignettes
 
@@ -100,11 +82,7 @@ Documentation is available in the following vignettes
 -   [TKCat
     collections](https://patzaw.github.io/TKCat/TKCat-Collections.html)
 
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
-
-Alternatives
-============
+# Alternatives
 
 -   The [dm](https://github.com/krlmlr/dm) package provides similar
     features but with different implementation choices. Here are the
@@ -131,11 +109,7 @@ Alternatives
         (Collections) and the automatic conversion of the different
         vocabulary on which they rely.
 
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
-
-Acknowledgments
-===============
+# Acknowledgments
 
 This work was entirely supported by [UCB Pharma](https://www.ucb.com/)
 (Early Solutions department).

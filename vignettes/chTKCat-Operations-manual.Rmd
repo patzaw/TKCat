@@ -4,12 +4,15 @@ author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
 package: "TKCat (version `r packageVersion('TKCat')`)"
 output:
-   rmarkdown::html_vignette:
-     number_sections: yes
-     self_contained: yes
-     toc: yes
-     fig_width: 7
-     fig_height: 5
+   rmarkdown::html_document:
+      number_sections: yes
+      self_contained: false
+      lib_dir: "libs"
+      theme: cerulean
+      toc: yes
+      toc_float: yes
+      fig_width: 7
+      fig_height: 5
 vignette: >
    %\VignetteIndexEntry{chTKCat Operations manual}
    %\VignetteEncoding{UTF-8}
@@ -36,35 +39,28 @@ library(TKCat)
 ```{r child = 'supp/urls.Rmd'}
 ```
 
-<div style="width:200px;">
-![](TKCat.png){width="100%"}
-</div>
+::: {style="width:200px;"}
+![](libs/figs/TKCat.png){width="100%"}
+:::
 
-
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
 # Introduction
 
 ```{r child = 'supp/genIntro.Rmd'}
 ```
 
-This vignette describes how to create and administrate
-a TKCat [ClickHouse][clickhouse] instance.
-An [other vignette][chuguide] focuses how TKCat can be used
-with a ClickHouse database.
-Users should also refer to the [general TKCat user guide][uguide].
+This vignette describes how to create and administrate a TKCat
+[ClickHouse][clickhouse] instance. An [other vignette][chuguide] focuses how
+TKCat can be used with a ClickHouse database. Users should also refer to the
+[general TKCat user guide][uguide].
 
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
 # Instantiating the ClickHouse database
 
 ## Install ClickHouse, initialize and configure the TKCat instance
 
-The ClickHouse docker container supporting TKCat,
-its initialization and its configuration procedures
-are implemented
-here: [S01-install-and-init.R](https://github.com/patzaw/TKCat/blob/master/ClickHouse/S01-install-and-init.R)
-	
+The ClickHouse docker container supporting TKCat, its initialization and its
+configuration procedures are implemented here:
+[S01-install-and-init.R](https://github.com/patzaw/TKCat/blob/master/ClickHouse/S01-install-and-init.R)
+
 This script should be adapted according to requirements and needs.
 
 The data are stored in the `TKCAT_HOME` folder.
@@ -83,9 +79,6 @@ sudo rm -rf ~/Documents/Projects/TKCat_UCB_TBN
 
 ```
 
-
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
 # User management
 
 User management requires admin right on the database.
@@ -105,12 +98,8 @@ The function will require to setup a password for the new user.
 drop_chTKCat_user(k, login="lfrancois")
 ```
 
-
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
 # chMDB management
 
-<!-------------->
 ## chMDB Creation
 
 Before MDB data can be uploaded, the database should be created.
@@ -120,17 +109,14 @@ create_chMDB(k, "CHEMBL", public=FALSE)
 ```
 
 By default chMDB are not public. It can be changed through the `public`
-parameter when creating the chMDB or by using the `set_chMDB_access`
-afterward.
+parameter when creating the chMDB or by using the `set_chMDB_access` afterward.
 
 ```{r, eval=FALSE}
 set_chMDB_access(k, "CHEMBL", public=TRUE)
 ```
 
-Then, users having access to the chMDB can be identified with or without
-admin rights on the chMDB. Admin rights allow the user to update the
-chMDB data.
-
+Then, users having access to the chMDB can be identified with or without admin
+rights on the chMDB. Admin rights allow the user to update the chMDB data.
 
 ```{r, eval=FALSE}
 add_chMDB_user(k, "CHEMBL", "lfrancois", admin=TRUE)
@@ -138,15 +124,13 @@ add_chMDB_user(k, "CHEMBL", "lfrancois", admin=TRUE)
 list_chMDB_users(k, "CHEMBL")
 ```
 
-<!-------------->
 ## Populating chMDB
 
-Each chMDB can be populated individualy using the `as_chMDB()` function.
-The code chunk below shows how to scan a directory for all *fileMDB* it
-contains. The `as_memoMDB()` function load all the data in memory and checks
-that all the model constraints are fulfilled (this step is optional).
-The `overwrite` parameter of the `as_chMDB()` function allows updating the
-data in the database.
+Each chMDB can be populated individualy using the `as_chMDB()` function. The
+code chunk below shows how to scan a directory for all *fileMDB* it contains.
+The `as_memoMDB()` function load all the data in memory and checks that all the
+model constraints are fulfilled (this step is optional). The `overwrite`
+parameter of the `as_chMDB()` function allows updating the data in the database.
 
 ```{r, eval=FALSE}
 lc <- scan_fileMDBs("fileMDB_directory")
@@ -159,7 +143,6 @@ for(r in toFeed){
 }
 ```
 
-<!-------------->
 ## Deleting a chMDB
 
 Any admin user of a chMDB can delete the corresponding data.
@@ -174,18 +157,14 @@ Only a system admin can delete the chMDB from the ClickHouse database.
 drop_chMDB(k, "CHEMBL")
 ```
 
-
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
 # Collection management
 
-The aim of collections is described in
-the [general user guide](TKCat-User-guide.html#merging-with-collections)
+The aim of collections is described in the [general user
+guide](TKCat-User-guide.html#merging-with-collections)
 
 Collections needs to be added to a chTKCat instance in order to support
-collection members of the different chMDB.
-They can be taken from the TKCat package environment, from a JSON file
-or directly from a JSON text variable.
+collection members of the different chMDB. They can be taken from the TKCat
+package environment, from a JSON file or directly from a JSON text variable.
 Additional functions are available to list and remove chTKCat collections.
 
 ```{r, eval=FALSE}
@@ -194,18 +173,14 @@ list_chTKCat_collections(k)
 remove_chTKCat_collection(k, "BE")
 ```
 
-
-<!----------------------------------------------------------------------------->
-<!----------------------------------------------------------------------------->
 # Implementation
 
-<!-------------->
 ## Data models
 
 ### Default database
 
-The default database stores information about chTKCat instance, users
-and user access.
+The default database stores information about chTKCat instance, users and user
+access.
 
 ```{r, echo=FALSE}
 plot(TKCat:::DEFAULT_DATA_MODEL)
@@ -213,9 +188,14 @@ plot(TKCat:::DEFAULT_DATA_MODEL)
 
 ### Modeled databases
 
-Modeled databases (MDB) are stored in dedicated database in chTKCat.
-Their data model is provided in dedicated tables described below.
+Modeled databases (MDB) are stored in dedicated database in chTKCat. Their data
+model is provided in dedicated tables described below.
 
 ```{r, echo=FALSE}
 plot(TKCat:::CHMDB_DATA_MODEL)
 ```
+
+# Acknowledgments
+
+This work was entirely supported by [UCB Pharma](https://www.ucb.com/) (Early
+Solutions department).
