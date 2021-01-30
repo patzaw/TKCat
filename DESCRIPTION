@@ -2,8 +2,13 @@ Package: TKCat
 Type: Package
 Title: Tailored Knowledge Catalog
 Version: 0.5.1
-Author: Patrice Godard
-Maintainer: Patrice Godard <patrice.godard@gmail.com>
+Authors@R: c(
+    person(
+        "Patrice", "Godard",
+        role = c("aut", "cre","cph"),
+        email = "patrice.godard@gmail.com"
+    )
+    )
 Description: Facilitate the management of data from knowledge
    resources that are frequently used alone or together
    in research environments.
