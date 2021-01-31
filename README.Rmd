@@ -22,6 +22,9 @@ cranRef <- function(x){
 
 <img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px"/>
 
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
+[![](http://cranlogs.r-pkg.org/badges/TKCat)](https://cran.r-project.org/package=TKCat)
+
 The aim of TKCat is to facilitate the management of data from knowledge
 resources that are frequently used alone or together in research environments.
 In TKCat, knowledge resources are manipulated as modeled database (MDB) objects.
