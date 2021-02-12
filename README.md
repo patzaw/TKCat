@@ -23,7 +23,7 @@ easily subset, filter and combine MDBs and create new catalogs suited
 for specific needs.
 
 The ReDaMoR R package is licensed under
-\[GPL-3\](<https://www.gnu.org/licenses/gpl-3.0.en.html).>
+[GPL-3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 # Installation
 
