@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Patrice Godard" />
+
+<meta name="date" content="2021-02-12" />
+
+<title>TKCat Collections</title>
+
+<script src="libs/header-attrs-2.6/header-attrs.js"></script>
+<script src="libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
+<script src="libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="libs/navigation-1.1/tabsets.js"></script>
+<link href="libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">TKCat Collections</h1>
+<h4 class="author">Patrice Godard</h4>
+<h4 class="date">February 12, 2021</h4>
+
+</div>
+
+
+<div style="width:200px;">
+<p><img src="libs/figs/TKCat.png" style="width:100.0%" /></p>
+</div>
+<div id="introduction" class="section level1" number="1">
+<h1 number="1"><span class="header-section-number">1</span> Introduction</h1>
+<p>The aim of TKCat (Tailored Knowledge Catalog) is to facilitate the management of data from knowledge resources that are frequently used alone or together in research environments. In TKCat, knowledge resources are manipulated as modeled database (MDB) objects. These objects provide access to the data tables along with a general description of the resource and a detail data model generated with <a href="https://github.com/patzaw/ReDaMoR">ReDaMoR</a> documenting the tables, their fields and their relationships. These MDB are then gathered in catalogs that can be easily explored an shared. TKCat provides tools to easily subset, filter and combine MDBs and create new catalogs suited for specific needs.</p>
+<p>The ReDaMoR R package is licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPL-3</a>.</p>
+<p>Some MDBs refer to the same concepts and could be merged accordingly. However they often use different vocabularies or scopes. Collections are a used to identify such concepts and to define a way to document formally the scope used by the different members of these collections. Thanks to this formal description, tools can be used to automatically combine MDBs refering to the same collection but using different scopes.</p>
+<p>This vignette describes how to create TKCat Collections, document collection members and create functions to support the merging of MDBs. The advantages and uses of Collections are presented in the <a href="TKCat-User-guide.html#merging-with-collections">general user guide</a>.</p>
+</div>
+<div id="creating-a-collection" class="section level1" number="2">
+<h1 number="2"><span class="header-section-number">2</span> Creating a collection</h1>
+<p>A collection is defined by a JSON document. This document should fulfill the requirements defined by the <a href="https://github.com/patzaw/TKCat/blob/master/inst/Collections/Collection-Schema.json">Collection-Schema.json</a>. Two collection are available by default in the TKCat package.</p>
+<pre class="r"><code>list_local_collections()</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   title     description                                  
+##   &lt;chr&gt;     &lt;chr&gt;                                        
+## 1 BE        Collection of biological entity (BE) concepts
+## 2 Condition Collection of condition concepts</code></pre>
+<p>Here is how the <em>BE</em> collection is defined.</p>
+<pre class="r"><code>get_local_collection(&quot;BE&quot;) %&gt;%
+   paste(&#39;```json&#39;, ., &#39;```&#39;, sep=&quot;\n&quot;) %&gt;% cat()</code></pre>
+<pre class="json"><code>{
+   &quot;$schema&quot;: &quot;TKCat_collections_1.0&quot;,
+   &quot;$id&quot;:&quot;TKCat_BE_collection_1.0&quot;,
+    &quot;title&quot;: &quot;BE collection&quot;,
+    &quot;type&quot;: &quot;object&quot;,
+    &quot;description&quot;: &quot;Collection of biological entity (BE) concepts&quot;,
+    &quot;properties&quot;: {
+      &quot;$schema&quot;: {&quot;enum&quot;: [&quot;TKCat_BE_collection_1.0&quot;]},
+      &quot;$id&quot;: {&quot;type&quot;: &quot;string&quot;},
+        &quot;collection&quot;: {&quot;enum&quot;:[&quot;BE&quot;]},
+        &quot;resource&quot;: {&quot;type&quot;: &quot;string&quot;},
+        &quot;tables&quot;: {
+            &quot;type&quot;: &quot;array&quot;,
+            &quot;minItems&quot;: 1,
+            &quot;items&quot;:{
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;properties&quot;:{
+                    &quot;name&quot;: {&quot;type&quot;: &quot;string&quot;},
+                    &quot;fields&quot;: {
+                        &quot;type&quot;: &quot;object&quot;,
+                        &quot;properties&quot;: {
+                            &quot;be&quot;: {
+                                &quot;type&quot;: &quot;object&quot;,
+                                &quot;properties&quot;: {
+                                    &quot;static&quot;: {&quot;type&quot;: &quot;boolean&quot;},
+                                    &quot;value&quot;: {&quot;type&quot;: &quot;string&quot;}
+                                },
+                                &quot;required&quot;: [&quot;static&quot;, &quot;value&quot;],
+                                &quot;additionalProperties&quot;: false
+                            },
+                            &quot;source&quot;: {
+                                &quot;type&quot;: &quot;object&quot;,
+                                &quot;properties&quot;: {
+                                    &quot;static&quot;: {&quot;type&quot;: &quot;boolean&quot;},
+                                    &quot;value&quot;: {&quot;type&quot;: &quot;string&quot;}
+                                },
+                                &quot;required&quot;: [&quot;static&quot;, &quot;value&quot;],
+                                &quot;additionalProperties&quot;: false
+                            },
+                            &quot;organism&quot;: {
+                                &quot;type&quot;: &quot;object&quot;,
+                                &quot;properties&quot;: {
+                                    &quot;static&quot;: {&quot;type&quot;: &quot;boolean&quot;},
+                                    &quot;value&quot;: {&quot;type&quot;: &quot;string&quot;},
+                                    &quot;type&quot;: {&quot;enum&quot;: [&quot;Scientific name&quot;, &quot;NCBI taxon identifier&quot;]}
+                                },
+                                &quot;required&quot;: [&quot;static&quot;, &quot;value&quot;, &quot;type&quot;],
+                                &quot;additionalProperties&quot;: false
+                            },
+                            &quot;identifier&quot;: {
+                                &quot;type&quot;: &quot;object&quot;,
+                                &quot;properties&quot;: {
+                                    &quot;static&quot;: {&quot;type&quot;: &quot;boolean&quot;},
+                                    &quot;value&quot;: {&quot;type&quot;: &quot;string&quot;}
+                                },
+                                &quot;required&quot;: [&quot;static&quot;, &quot;value&quot;],
+                                &quot;additionalProperties&quot;: false
+                            }
+                        },
+                        &quot;required&quot;: [&quot;be&quot;, &quot;source&quot;, &quot;identifier&quot;],
+                        &quot;additionalProperties&quot;: false
+                    }
+                },
+                &quot;required&quot;: [&quot;name&quot;, &quot;fields&quot;],
+                &quot;additionalProperties&quot;: false
+            }
+        }
+    },
+    &quot;required&quot;: [&quot;$schema&quot;, &quot;$id&quot;, &quot;collection&quot;, &quot;resource&quot;, &quot;tables&quot;],
+    &quot;additionalProperties&quot;: false
+}</code></pre>
+<p>A collection should refer to the <code>"TKCat_collections_1.0"</code> <strong>$schema</strong>. It should then have the following properties:</p>
+<ul>
+<li><p><strong>$id</strong>: the identifier of the collection</p></li>
+<li><p><strong>title</strong>: the title of the collection</p></li>
+<li><p><strong>type</strong>: always <code>object</code></p></li>
+<li><p><strong>description</strong>: a short description of the collection</p></li>
+<li><p><strong>properties</strong>: the properties that should be provided by collection members. In this case:</p>
+<ul>
+<li><p><strong>$schema</strong>: should be the <em>$id</em> of the collection</p></li>
+<li><p><strong>$id</strong>: the identifier of the collection member: a string</p></li>
+<li><p><strong>collection</strong>: should be “BE”</p></li>
+<li><p><strong>resource</strong>: the name of the resource having collection members: a string</p></li>
+<li><p><strong>tables</strong>: an array of tables corresponding to collection members. Each item being a table with the following features:</p>
+<ul>
+<li><p><strong>name</strong>: the name of the table</p></li>
+<li><p><strong>fields</strong>: the required fields</p>
+<ul>
+<li><strong>be</strong>: if <strong>static</strong> is true then <strong>value</strong> correspond to the be value valid for all the records. If not <strong>value</strong> correspond to the table column with the be value for each record.</li>
+<li><strong>source</strong>: if <strong>static</strong> is true then <strong>value</strong> correspond to the source value valid for all the records. If not <strong>value</strong> correspond to the table column with the source value for each record.</li>
+<li><strong>organism</strong>: if <strong>static</strong> is true then <strong>value</strong> correspond to the organism value valid for all the records. If not <strong>value</strong> correspond to the table column with the organism value for each record. <strong>type</strong> indicate how organisms are identified: <code>"Scientific name"</code> or <code>"NCBI taxon identifier"</code>.</li>
+</ul></li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div id="identifying-collection-members" class="section level1" number="3">
+<h1 number="3"><span class="header-section-number">3</span> Identifying collection members</h1>
+<p>Identifying collection members of an <em>MDB</em> can be done by providing a table as shown in the <a href="TKCat-User-guide.html#hpo">general user guide</a> or by writing a JSON file like the following one which correspond to BE members of the CHEMBL MDB.</p>
+<pre class="r"><code>system.file(
+   &quot;examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json&quot;,
+   package=&quot;TKCat&quot;
+) %&gt;% 
+   readLines() %&gt;% paste(collapse=&quot;\n&quot;)</code></pre>
+<pre class="json"><code>{
+  &quot;$schema&quot;: &quot;TKCat_BE_collection_1.0&quot;,
+  &quot;$id&quot;: &quot;CHEMBL_BE_1.0&quot;,
+  &quot;collection&quot;: &quot;BE&quot;,
+  &quot;resource&quot;: &quot;CHEMBL&quot;,
+  &quot;tables&quot;: [
+    {
+      &quot;name&quot;: &quot;CHEMBL_component_sequence&quot;,
+      &quot;fields&quot;: {
+        &quot;be&quot;: {
+          &quot;static&quot;: true,
+          &quot;value&quot;: &quot;Peptide&quot;
+        },
+        &quot;identifier&quot;: {
+          &quot;static&quot;: false,
+          &quot;value&quot;: &quot;accession&quot;
+        },
+        &quot;source&quot;: {
+          &quot;static&quot;: false,
+          &quot;value&quot;: &quot;db_source&quot;
+        },
+        &quot;organism&quot;: {
+          &quot;static&quot;: false,
+          &quot;value&quot;: &quot;organism&quot;,
+          &quot;type&quot;: &quot;Scientific name&quot;
+        }
+      }
+    }
+  ]
+}</code></pre>
+<p>The identification of collection members should fulfill the requirements defined by the collection JSON document, and therefore pass the following validation.</p>
+<pre class="r"><code>jsonvalidate::json_validate(
+   json=system.file(
+      &quot;examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json&quot;,
+      package=&quot;TKCat&quot;
+   ),
+   schema=get_local_collection(&quot;BE&quot;)
+)</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>This validation is done automatically when reading a <em>fileMDB</em> object or when setting collection members with the <code>collection_members()</code> function.</p>
+</div>
+<div id="collection-mapper-functions" class="section level1" number="4">
+<h1 number="4"><span class="header-section-number">4</span> Collection mapper functions</h1>
+<p>The <code>merge.MDB()</code> and the <code>map_collection_members()</code> functions rely on functions to map members of the same collection. When recorded (using the <code>import_collection_mapper()</code> function), these function can be automatically identified by TKCat, otherwise or according to user needs, these functions could be provided using the <code>funs</code> (for <code>merge.MDB()</code>) or the <code>fun</code> (for <code>map_collection_members()</code>) parameters. Two mappers are pre-recorded in TKCat, one for the <em>BE</em> collection and one for the <em>Condition</em> collection. They can be retrieved with the <code>get_collection_mapper()</code> function.</p>
+<pre class="r"><code>get_collection_mapper(&quot;BE&quot;)</code></pre>
+<pre class="r"><code>function (x, y, orthologs = FALSE, restricted = FALSE, ...) 
+{
+    if (!requireNamespace(&quot;BED&quot;)) {
+        stop(&quot;The BED package is required&quot;)
+    }
+    if (!BED::checkBedConn()) {
+        stop(&quot;You need to connect to a BED database using&quot;, &quot; the BED::connectToBed() function&quot;)
+    }
+    if (!&quot;organism&quot; %in% colnames(x)) {
+        d &lt;- x
+        scopes &lt;- dplyr::distinct(d, be, source)
+        nd &lt;- c()
+        for (i in 1:nrow(scopes)) {
+            be &lt;- scopes$be[i]
+            source &lt;- scopes$source[i]
+            toadd &lt;- d %&gt;% dplyr::filter(be == be, source == 
+                source)
+            organism &lt;- BED::guessIdScope(toadd$identifier, be = be, 
+                source = source, tcLim = Inf) %&gt;% attr(&quot;details&quot;) %&gt;% 
+                filter(be == !!be &amp; source == !!source) %&gt;% pull(organism) %&gt;% 
+                unique()
+            toadd &lt;- merge(toadd, tibble(organism = organism))
+            nd &lt;- bind_rows(nd, toadd)
+        }
+        x &lt;- nd %&gt;% mutate(organism_type = &quot;Scientific name&quot;)
+    }
+    if (!&quot;organism&quot; %in% colnames(y)) {
+        d &lt;- y
+        scopes &lt;- dplyr::distinct(d, be, source)
+        nd &lt;- c()
+        for (i in 1:nrow(scopes)) {
+            be &lt;- scopes$be[i]
+            source &lt;- scopes$source[i]
+            toadd &lt;- d %&gt;% dplyr::filter(be == be, source == 
+                source)
+            organism &lt;- BED::guessIdScope(toadd$identifier, be = be, 
+                source = source, tcLim = Inf) %&gt;% attr(&quot;details&quot;) %&gt;% 
+                filter(be == !!be &amp; source == !!source) %&gt;% pull(organism) %&gt;% 
+                unique()
+            toadd &lt;- merge(toadd, tibble(organism = organism))
+            nd &lt;- bind_rows(nd, toadd)
+        }
+        y &lt;- nd %&gt;% mutate(organism_type = &quot;Scientific name&quot;)
+    }
+    assign(&quot;x&quot;, x, envir = .GlobalEnv)
+    assign(&quot;y&quot;, y, envir = .GlobalEnv)
+    xscopes &lt;- dplyr::distinct(x, be, source, organism, organism_type)
+    yscopes &lt;- dplyr::distinct(y, be, source, organism, organism_type)
+    toRet &lt;- NULL
+    for (i in 1:nrow(xscopes)) {
+        xscope &lt;- xscopes[i, ]
+        if (any(apply(xscope, 2, is.na))) {
+            (next)()
+        }
+        xi &lt;- dplyr::right_join(x, xscope, by = c(&quot;be&quot;, &quot;source&quot;, 
+            &quot;organism&quot;, &quot;organism_type&quot;))
+        xorg &lt;- ifelse(xscope$organism_type == &quot;NCBI taxon identifier&quot;, 
+            BED::getOrgNames(xscope$organism) %&gt;% dplyr::filter(nameClass == 
+                &quot;scientific name&quot;) %&gt;% dplyr::pull(name), xscope$organism)
+        for (j in 1:nrow(yscopes)) {
+            yscope &lt;- yscopes[j, ]
+            if (any(apply(yscope, 2, is.na))) {
+                (next)()
+            }
+            yi &lt;- dplyr::right_join(y, yscope, by = c(&quot;be&quot;, &quot;source&quot;, 
+                &quot;organism&quot;, &quot;organism_type&quot;))
+            yorg &lt;- ifelse(yscope$organism_type == &quot;NCBI taxon identifier&quot;, 
+                BED::getOrgNames(yscope$organism) %&gt;% dplyr::filter(nameClass == 
+                  &quot;scientific name&quot;) %&gt;% dplyr::pull(name), yscope$organism)
+            if (xorg == yorg || orthologs) {
+                xy &lt;- BED::convBeIds(ids = xi$identifier, from = xscope$be, 
+                  from.source = xscope$source, from.org = xorg, 
+                  to = yscope$be, to.source = yscope$source, 
+                  to.org = yorg, restricted = restricted) %&gt;% 
+                  dplyr::as_tibble() %&gt;% dplyr::select(from, 
+                  to)
+                if (restricted) {
+                  xy &lt;- dplyr::bind_rows(xy, BED::convBeIds(ids = yi$identifier, 
+                    from = yscope$be, from.source = yscope$source, 
+                    from.org = yorg, to = xscope$be, to.source = xscope$source, 
+                    to.org = xorg, restricted = restricted) %&gt;% 
+                    dplyr::as_tibble() %&gt;% dplyr::select(to = from, 
+                    from = to))
+                }
+                xy &lt;- xy %&gt;% dplyr::rename(identifier_x = &quot;from&quot;, 
+                  identifier_y = &quot;to&quot;) %&gt;% dplyr::mutate(be_x = xscope$be, 
+                  source_x = xscope$source, organism_x = xscope$organism, 
+                  be_y = yscope$be, source_y = yscope$source, 
+                  organism_y = yscope$organism)
+                toRet &lt;- dplyr::bind_rows(toRet, xy)
+            }
+        }
+    }
+    toRet &lt;- dplyr::distinct(toRet)
+    return(toRet)
+}</code></pre>
+<p>A mapper function must have at least an x and a y parameters. Each of them should be a data.frame with all the field values corresponding to the fields defined in the collection. Additional parameters can be defined and will be forwarded using <code>...</code>. This function should return a data frame with all the fields values followed by “_x” and “_y” suffix accordingly.</p>
+</div>
+<div id="acknowledgments" class="section level1" number="5">
+<h1 number="5"><span class="header-section-number">5</span> Acknowledgments</h1>
+<p>This work was entirely supported by <a href="https://www.ucb.com/">UCB Pharma</a> (Early Solutions department).</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

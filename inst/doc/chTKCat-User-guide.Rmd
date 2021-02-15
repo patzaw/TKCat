@@ -1,0 +1,129 @@
+---
+title: "chTKCat user guide"
+author: "Patrice Godard"
+date:  "`r format(Sys.time(), '%B %d, %Y')`"
+package: "TKCat (version `r packageVersion('TKCat')`)"
+output:
+   rmarkdown::html_document:
+      number_sections: yes
+      self_contained: false
+      lib_dir: "libs"
+      theme: cerulean
+      toc: yes
+      toc_float: yes
+      fig_width: 7
+      fig_height: 5
+vignette: >
+   %\VignetteIndexEntry{chTKCat user guide}
+   %\VignetteEncoding{UTF-8}
+   %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, message=FALSE, echo=FALSE, include=FALSE, cache=FALSE}
+library(knitr)
+opts_chunk$set(
+   include=TRUE,
+   echo=TRUE,
+   message=TRUE,
+   warning=TRUE,
+   cache=FALSE,
+   cache.lazy=FALSE
+)
+## The following line is to avoid building errors on CRAN
+knitr::opts_chunk$set(eval=Sys.getenv("USER") %in% c("pgodard"))
+library(TKCat)
+```
+
+```{r child = 'supp/urls.Rmd'}
+```
+
+::: {style="width:200px;"}
+![](libs/figs/TKCat.png){width="100%"}
+:::
+
+# Introduction
+
+```{r child = 'supp/genIntro.Rmd'}
+```
+
+This vignette describes how TKCat can be used with a [ClickHouse][clickhouse]
+database. Users should also refer to the [general TKCat user guide][uguide].
+Finally, a [specific vignette][opman] describes how to create and administrate a
+TKCat ClickHouse instance, and another is dedicated to an [extended
+documentation of collections][collections].
+
+# Connection
+
+The connection to a chTKCat database is achieved by instantiating *chTKCat*
+object.
+
+```{r}
+k <- chTKCat(
+   host="localhost", # default parameter
+   port=9101L,       # default parameter
+   user="default",   # default parameter
+   password=""       # if not provided the password is requested interactively 
+)
+```
+
+Connection parameters should be adapted according to the ClickHouse database
+setup which is documented in the web exploration interface (in the "System"
+tab).
+
+# Use
+
+The *chTKCat* object can be used as a [*TKCat*
+object](TKCat-User-guide.html#local-tkcat).
+
+```{r, eval=FALSE}
+list_MDBs(k)                     # list all the MDBs in a TKCat object
+khpo <- get_MDB(k, "HPO")        # get a specific MDBs from the catalog
+search_MDB_tables(k, "disease")  # Search table about "disease"
+search_MDB_fields(k, "disease")  # Search a field about "disease"
+collection_members(k)            # Get collection members of the different MDBs
+```
+
+The *khpo* object in the example above is a *chMDB* object. The data of this
+type of MDB are located in the ClickHouse database until the user requests them.
+They can be use like any other *MDB* object:
+
+-   [Getting information](TKCat-User-guide.html#getting-information)
+-   [Pulling, subsetting and
+    combining](TKCat-User-guide.html#pulling-subsetting-and-combining)
+-   [Filtering and joining](TKCat-User-guide.html#filtering-and-joining)
+-   [Merging using collections](TKCat-User-guide.html#merging-with-collections)
+
+The user is able to access only *chMDB* allowed according to his rights (see the
+[operation manual][opman]).
+
+# Reconnecting
+
+If the connection to the database is lost the user can reactivate it by using
+the `db_reconnect()` function which works with *chTKCat* objects but also with
+*chMDB* objects.
+
+# Pushing an MDB in a chTKCat instance
+
+MDB can be add to the ClickHouse database of a *chTKCat* object with the
+`as_chMDB()` function.
+
+```{r, eval=FALSE}
+lk <- TKCat(read_fileMDB(
+   path=system.file("examples/ClinVar", package="TKCat")
+))
+names(lk)
+as_chMDB(lk$ClinVar, k, overwrite=FALSE)
+```
+
+This function works only if (see the [operation manual][opman]):
+
+-   the *ClinVar* database has been initiated by the administrator of the
+    ClickHouse database,
+-   the user is allowed to write in the database.
+
+# Acknowledgments
+
+This work was entirely supported by [UCB Pharma](https://www.ucb.com/) (Early
+Solutions department).
