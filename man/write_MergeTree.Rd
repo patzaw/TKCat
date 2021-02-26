@@ -3,7 +3,7 @@
 \name{write_MergeTree}
 \alias{write_MergeTree}
 \title{Write a Clickhouse
-\href{https://clickhouse.yandex/docs/en/operations/table_engines/mergetree/}{MergeTree}
+\href{https://clickhouse.tech/docs/en/engines/table-engines/mergetree-family/mergetree/}{MergeTree}
 table}
 \usage{
 write_MergeTree(
@@ -37,6 +37,6 @@ are used in the key.}
 }
 \description{
 Write a Clickhouse
-\href{https://clickhouse.yandex/docs/en/operations/table_engines/mergetree/}{MergeTree}
+\href{https://clickhouse.tech/docs/en/engines/table-engines/mergetree-family/mergetree/}{MergeTree}
 table
 }

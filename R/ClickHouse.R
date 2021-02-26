@@ -98,7 +98,7 @@ list_tables <- function(
 
 ###############################################################################@
 #' Write a Clickhouse
-#' [MergeTree](https://clickhouse.yandex/docs/en/operations/table_engines/mergetree/)
+#' [MergeTree](https://clickhouse.tech/docs/en/engines/table-engines/mergetree-family/mergetree/)
 #' table
 #' 
 #' @param con the clickhouse connection
