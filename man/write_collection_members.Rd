@@ -16,6 +16,9 @@ not written but returned by the function.}
 If NULL (default), it is taken from TKCat environment
 (see \code{\link[=list_local_collections]{list_local_collections()}}.}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Write a collection member JSON file
 }

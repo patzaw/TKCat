@@ -11,6 +11,9 @@ is_chMDB_public(x, mdb)
 
 \item{mdb}{name of the modeled database}
 }
+\value{
+A logical indicating if the chMDB is public or not.
+}
 \description{
 Is a chMDB public
 }

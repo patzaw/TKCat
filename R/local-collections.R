@@ -5,6 +5,9 @@
 #' @param overwrite a single logical. If TRUE the collection is overwritten
 #' if it already exists (default: FALSE)
 #' 
+#' @return No return value, called for side effects. The collection will be
+#' available and operations will be possible on its members.
+#' 
 #' @export
 #' 
 import_local_collection <- function(txt, overwrite=FALSE){
@@ -51,6 +54,9 @@ import_local_collection <- function(txt, overwrite=FALSE){
 #' @param withJson if TRUE, returns the json strings of the collection
 #' (default: FALSE)
 #' 
+#' @return A tibble with the title, the description and optionally the json
+#' definition of the collections
+#' 
 #' @export
 #'
 list_local_collections <- function(withJson=FALSE){
@@ -66,6 +72,8 @@ list_local_collections <- function(withJson=FALSE){
 #' Get the json definition of a local collection of concepts
 #' 
 #' @param title the title of the collection to get
+#' 
+#' @return The definition of the collection as a JSON string.
 #' 
 #' @export
 #'
@@ -86,6 +94,9 @@ get_local_collection <- function(title){
 #' (it should belong to local collections: see [list_local_collections()]).
 #' @param fun a function which takes 2 data.frames (x an y) with
 #' fields described in the collection definition and map the different elements.
+#' 
+#' @return No return value, called for side effects. The function will be used
+#' to map collection members.
 #' 
 #' @export
 #' 
@@ -110,6 +121,8 @@ import_collection_mapper <- function(collection, fun){
 #' 
 #' @param collection the name of the targeted collection
 #' (it should belong to local collections: see [list_local_collections()]).
+#' 
+#' @return A function to map collection members.
 #' 
 #' @export
 #' 

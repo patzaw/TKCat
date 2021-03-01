@@ -9,6 +9,9 @@ get_local_collection(title)
 \arguments{
 \item{title}{the title of the collection to get}
 }
+\value{
+The definition of the collection as a JSON string.
+}
 \description{
 Get the json definition of a local collection of concepts
 }

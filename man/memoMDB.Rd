@@ -3,6 +3,7 @@
 \name{memoMDB}
 \alias{memoMDB}
 \alias{names<-.memoMDB}
+\alias{rename.memoMDB}
 \alias{[.memoMDB}
 \alias{[[.memoMDB}
 \alias{$.memoMDB}
@@ -19,6 +20,8 @@ memoMDB(
 )
 
 \method{names}{memoMDB}(x) <- value
+
+\method{rename}{memoMDB}(.data, ...)
 
 \method{[}{memoMDB}(x, i)
 
@@ -50,15 +53,19 @@ done (all of them c("unique", "not nullable", "foreign keys"))}
 
 \item{value}{new table names}
 
-\item{i}{the index or the name of the tables to take}
+\item{.data}{a \link{memoMDB} object}
 
 \item{...}{\link{memoMDB} objects}
+
+\item{i}{the index or the name of the tables to take}
 }
 \value{
 A memoMDB object
 }
 \description{
 An \link{MDB} (Modeled DataBase) in memory: memoMDB
+
+Rename tables of a \link{memoMDB} object
 }
 \examples{
 hpo <- read_fileMDB(

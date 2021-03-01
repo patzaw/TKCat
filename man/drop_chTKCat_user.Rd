@@ -11,6 +11,9 @@ drop_chTKCat_user(x, login)
 
 \item{login}{login of the user to drop}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Drop a user from a \link{chTKCat} object
 }

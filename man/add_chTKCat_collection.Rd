@@ -19,6 +19,9 @@ add_chTKCat_collection(x, json, overwrite = FALSE)
 \item{overwrite}{a logical indicating if the existing collection should
 be replaced.}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Import a collection in a \link{chTKCat} database
 }

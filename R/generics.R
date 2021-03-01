@@ -196,6 +196,9 @@ as_fileMDB <- function(
 #' @param withInfo if TRUE (default), the function returns a table with
 #' [db_info]. If FALSE, it returns only [MDB] names.
 #' 
+#' @return A tibble with information about the [MDB] available in
+#' a [TKCat] related object.
+#' 
 #' @export
 #' 
 list_MDBs <- function(x, withInfo=TRUE){
@@ -267,6 +270,8 @@ search_MDB_fields <- function(x, searchTerm){
 #'
 #' @param x an object with a database connection
 #' 
+#' @return No return value, called for side effects
+#' 
 #' @export
 #'
 db_disconnect <- function(x){
@@ -284,6 +289,8 @@ db_disconnect <- function(x){
 #' user to provide a password.
 #' @param ntries the number of times the user can enter a wrong password
 #' (default: 3)
+#' 
+#' @return No return value, called for side effects
 #' 
 #' @export
 #' 
@@ -313,6 +320,8 @@ get_query <- function(x, query, ...){
 #' 
 #' @param x a [TKCat] related object (e.g. [chTKCat])
 #' @param ... method specific parameters
+#' 
+#' @return No return value, called for side effects
 #' 
 #' @export
 #' 

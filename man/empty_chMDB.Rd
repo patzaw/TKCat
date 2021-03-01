@@ -11,6 +11,9 @@ empty_chMDB(x, name)
 
 \item{name}{the name of the database to empty}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Empty a chMDB in a \link{chTKCat}
 }

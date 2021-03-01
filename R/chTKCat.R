@@ -441,6 +441,8 @@ list_chTKCat_users <- function(x){
 #' @param admin a logical indicating if the user is an admin of the chTKCat
 #' instance
 #' 
+#' @return No return value, called for side effects
+#' 
 #' @export
 create_chTKCat_user <- function(
    x, login, password, contact, admin=FALSE
@@ -541,6 +543,8 @@ create_chTKCat_user <- function(
 #'
 #' @param x a [chTKCat] object
 #' @param login login of the user to drop
+#' 
+#' @return No return value, called for side effects
 #' 
 #' @export
 #'
@@ -727,6 +731,8 @@ search_MDB_fields.chTKCat <- function(x, searchTerm){
 #' @param name the name of the new database
 #' @param public if the database data are accessible to any user (default:FALSE)
 #' 
+#' @return No return value, called for side effects
+#' 
 #' @export
 #' 
 create_chMDB <- function(x, name, public=FALSE){
@@ -768,6 +774,8 @@ create_chMDB <- function(x, name, public=FALSE){
 #' @param x a [chTKCat] object
 #' @param name the name of the database to remove
 #' 
+#' @return No return value, called for side effects
+#' 
 #' @export
 #' 
 drop_chMDB <- function(x, name){
@@ -802,6 +810,8 @@ drop_chMDB <- function(x, name){
 #' 
 #' @param x a [chTKCat] object
 #' @param name the name of the database to empty
+#' 
+#' @return No return value, called for side effects
 #' 
 #' @export
 #' 
@@ -845,6 +855,8 @@ empty_chMDB <- function(x, name){
 #' @param x a [chTKCat] object
 #' @param mdb name of the modeled database
 #' 
+#' @return A logical indicating if the chMDB is public or not.
+#' 
 #' @export
 #' 
 is_chMDB_public <- function(x, mdb){
@@ -875,6 +887,8 @@ is_chMDB_public <- function(x, mdb){
 #' @param x a [chTKCat] object
 #' @param mdb name of the modeled database
 #' @param public if access is public
+#' 
+#' @return No return value, called for side effects
 #' 
 #' @export
 #' 
@@ -992,6 +1006,8 @@ list_chMDB_users <- function(x, mdb){
 #' @param login login of the user to drop
 #' @param admin if the user is an admin of the MDB
 #' 
+#' @return No return value, called for side effects
+#' 
 #' @export
 #'
 add_chMDB_user <- function(x, mdb, login, admin=FALSE){
@@ -1054,6 +1070,8 @@ add_chMDB_user <- function(x, mdb, login, admin=FALSE){
 #' @param x a [chTKCat] object
 #' @param mdb name of the modeled database
 #' @param login login of the user to drop
+#' 
+#' @return No return value, called for side effects
 #' 
 #' @export
 #'
@@ -1122,6 +1140,9 @@ remove_chMDB_user <- function(x, mdb, login){
 #' @param withJson if TRUE, returns the json strings of the collection
 #' (default: FALSE)
 #' 
+#' @return A tibble with the title, the description and optionally the json
+#' definition of the collections
+#' 
 #' @export
 #' 
 list_chTKCat_collections <- function(x, withJson=FALSE){
@@ -1143,6 +1164,8 @@ list_chTKCat_collections <- function(x, withJson=FALSE){
 #' 
 #' @param x a [chTKCat] object
 #' @param title the title of the collection to get
+#' 
+#' @return The definition of the collection as a JSON string.
 #' 
 #' @export
 #' 
@@ -1173,6 +1196,8 @@ get_chTKCat_collection <- function(x, title){
 #' - the json text defining the collection
 #' @param overwrite a logical indicating if the existing collection should
 #' be replaced.
+#' 
+#' @return No return value, called for side effects
 #' 
 #' @export
 #' 
@@ -1249,6 +1274,8 @@ add_chTKCat_collection <- function(x, json, overwrite=FALSE){
 #' 
 #' @param x a [chTKCat] object
 #' @param title the title of the collection to remove
+#' 
+#' @return No return value, called for side effects
 #' 
 #' @export
 #' 

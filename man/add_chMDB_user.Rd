@@ -15,6 +15,9 @@ add_chMDB_user(x, mdb, login, admin = FALSE)
 
 \item{admin}{if the user is an admin of the MDB}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Add a user to an MDB of a \link{chTKCat} object
 }

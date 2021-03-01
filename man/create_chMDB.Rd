@@ -13,6 +13,9 @@ create_chMDB(x, name, public = FALSE)
 
 \item{public}{if the database data are accessible to any user (default:FALSE)}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Create a database in a \link{chTKCat}
 }

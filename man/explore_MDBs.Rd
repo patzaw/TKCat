@@ -35,6 +35,9 @@ available for shiny.}
 
 \item{host}{the name of the host to show in the application}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Explore available \link{MDB} in a shiny web interface
 }

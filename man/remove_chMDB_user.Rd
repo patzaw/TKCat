@@ -13,6 +13,9 @@ remove_chMDB_user(x, mdb, login)
 
 \item{login}{login of the user to drop}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Drop a user of an MDB of a \link{chTKCat} object
 }

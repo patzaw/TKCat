@@ -24,6 +24,9 @@ user to provide a password.}
 \item{ntries}{the number of times the user can enter a wrong password
 (default: 3)}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Reconnect an object to a database
 }

@@ -13,6 +13,9 @@ mergeTrees_from_RelDataModel(con, dbName, dbm)
 
 \item{dbm}{a \link[ReDaMoR:RelDataModel]{ReDaMoR::RelDataModel} object}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Create ClickHouse MergeTree tables from a \link[ReDaMoR:RelDataModel]{ReDaMoR::RelDataModel}
 }

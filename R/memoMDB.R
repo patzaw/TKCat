@@ -146,6 +146,8 @@ as_memoMDB <- function(x, ...){
 #' @param .data a [memoMDB] object
 #' @param ... Use new_name = old_name to rename selected tables
 #' 
+#' @rdname memoMDB
+#' 
 #' @export
 #' 
 rename.memoMDB <- function(.data, ...){

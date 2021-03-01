@@ -1,7 +1,7 @@
 Package: TKCat
 Type: Package
 Title: Tailored Knowledge Catalog
-Version: 0.5.2
+Version: 0.5.3
 Authors@R: c(
     person(
         "Patrice", "Godard",
@@ -12,13 +12,13 @@ Authors@R: c(
 Description: Facilitate the management of data from knowledge
    resources that are frequently used alone or together
    in research environments.
-   In TKCat, knowledge resources are manipulated as modeled database (MDB)
+   In 'TKCat', knowledge resources are manipulated as modeled database (MDB)
    objects. These objects provide access to the data tables along with a general
    description of the resource and a detail data model documenting the
    tables, their fields and their relationships.
    These MDB are then gathered in catalogs that can be easily
    explored an shared.
-   Finally, TKCat provides tools to easily subset, filter and combine MDBs and
+   Finally, 'TKCat' provides tools to easily subset, filter and combine MDBs and
    create new catalogs suited for specific needs.
 URL: https://github.com/patzaw/TKCat
 BugReports: https://github.com/patzaw/TKCat/issues

@@ -18,6 +18,10 @@ list_MDBs(x, withInfo = TRUE)
 \item{withInfo}{if TRUE (default), the function returns a table with
 \link{db_info}. If FALSE, it returns only \link{MDB} names.}
 }
+\value{
+A tibble with information about the \link{MDB} available in
+a \link{TKCat} related object.
+}
 \description{
 List available \link{MDB}
 }

@@ -4,6 +4,7 @@
 \alias{$.chMDB}
 \alias{fileMDB}
 \alias{names<-.fileMDB}
+\alias{rename.fileMDB}
 \alias{[.fileMDB}
 \alias{[[.fileMDB}
 \alias{$.fileMDB}
@@ -23,6 +24,8 @@ fileMDB(
 )
 
 \method{names}{fileMDB}(x) <- value
+
+\method{rename}{fileMDB}(.data, ...)
 
 \method{[}{fileMDB}(x, i)
 
@@ -60,6 +63,8 @@ for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{Re
 
 \item{value}{new table names}
 
+\item{.data}{a \link{fileMDB} object}
+
 \item{...}{\link{fileMDB} objects}
 }
 \value{
@@ -67,6 +72,8 @@ A fileMDB object
 }
 \description{
 An \link{MDB} (Modeled DataBase) based on files: fileMDB
+
+Rename tables of a \link{fileMDB} object
 }
 \examples{
 hpof <- read_fileMDB(

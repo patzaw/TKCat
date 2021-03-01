@@ -71,6 +71,8 @@ read_collection_members <- function(txt){
 #' If NULL (default), it is taken from TKCat environment
 #' (see [list_local_collections()].
 #' 
+#' @return No return value, called for side effects
+#' 
 #' @export
 #' 
 write_collection_members <- function(colMembers, path=NA, collection=NULL){

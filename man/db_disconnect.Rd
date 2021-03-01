@@ -15,6 +15,9 @@ db_disconnect(x)
 \arguments{
 \item{x}{an object with a database connection}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Disconnect an object from a database
 }

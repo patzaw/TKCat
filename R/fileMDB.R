@@ -297,6 +297,8 @@ is.fileMDB <- function(x){
 #' @param .data a [fileMDB] object
 #' @param ... Use new_name = old_name to rename selected tables
 #' 
+#' @rdname fileMDB
+#' 
 #' @export
 #' 
 rename.fileMDB <- function(.data, ...){

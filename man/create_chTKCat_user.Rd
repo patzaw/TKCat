@@ -18,6 +18,9 @@ create_chTKCat_user(x, login, password, contact, admin = FALSE)
 \item{admin}{a logical indicating if the user is an admin of the chTKCat
 instance}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Create a chTKCat user
 }

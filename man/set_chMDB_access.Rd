@@ -13,6 +13,9 @@ set_chMDB_access(x, mdb, public)
 
 \item{public}{if access is public}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Set  chMDB access
 }

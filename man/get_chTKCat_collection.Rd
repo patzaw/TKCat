@@ -11,6 +11,9 @@ get_chTKCat_collection(x, title)
 
 \item{title}{the title of the collection to get}
 }
+\value{
+The definition of the collection as a JSON string.
+}
 \description{
 Get a collection from a \link{chTKCat}
 }

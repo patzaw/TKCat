@@ -3,6 +3,7 @@
 \name{chMDB}
 \alias{chMDB}
 \alias{names<-.chMDB}
+\alias{rename.chMDB}
 \alias{[.chMDB}
 \alias{[[.chMDB}
 \alias{c.chMDB}
@@ -19,6 +20,8 @@ chMDB(
 )
 
 \method{names}{chMDB}(x) <- value
+
+\method{rename}{chMDB}(.data, ...)
 
 \method{[}{chMDB}(x, i)
 
@@ -51,15 +54,19 @@ See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}
 
 \item{value}{new table names}
 
-\item{i}{the index or the name of the tables to take}
+\item{.data}{a \link{chMDB} object}
 
 \item{...}{\link{chMDB} objects}
+
+\item{i}{the index or the name of the tables to take}
 }
 \value{
 A chMDB object
 }
 \description{
 An \link{MDB} (Modeled DataBase) relying on ClickHouse: chMDB
+
+Rename tables of a \link{chMDB} object
 }
 \seealso{
 \itemize{

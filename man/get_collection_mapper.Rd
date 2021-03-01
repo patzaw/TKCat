@@ -10,6 +10,9 @@ get_collection_mapper(collection)
 \item{collection}{the name of the targeted collection
 (it should belong to local collections: see \code{\link[=list_local_collections]{list_local_collections()}}).}
 }
+\value{
+A function to map collection members.
+}
 \description{
 Get the default mapper function for a collection
 }

@@ -3,6 +3,7 @@
 \name{TKCat}
 \alias{TKCat}
 \alias{names<-.TKCat}
+\alias{rename.TKCat}
 \alias{[.TKCat}
 \alias{c.TKCat}
 \title{TKCat: a catalog of \link{MDB}}
@@ -10,6 +11,8 @@
 TKCat(..., list = NULL)
 
 \method{names}{TKCat}(x) <- value
+
+\method{rename}{TKCat}(.data, ...)
 
 \method{[}{TKCat}(x, i)
 
@@ -24,6 +27,8 @@ TKCat(..., list = NULL)
 
 \item{value}{new \link{MDB} names}
 
+\item{.data}{a \link{TKCat} object}
+
 \item{i}{index or names of the MDB to take}
 }
 \value{
@@ -31,6 +36,8 @@ a TKCat object
 }
 \description{
 TKCat: a catalog of \link{MDB}
+
+Rename a \link{TKCat} object
 }
 \seealso{
 \link{scan_fileMDBs}

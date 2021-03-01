@@ -12,6 +12,10 @@ import_local_collection(txt, overwrite = FALSE)
 \item{overwrite}{a single logical. If TRUE the collection is overwritten
 if it already exists (default: FALSE)}
 }
+\value{
+No return value, called for side effects. The collection will be
+available and operations will be possible on its members.
+}
 \description{
 Import a  the definition of a collection of concepts in the local environment
 }

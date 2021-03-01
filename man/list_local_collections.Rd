@@ -10,6 +10,10 @@ list_local_collections(withJson = FALSE)
 \item{withJson}{if TRUE, returns the json strings of the collection
 (default: FALSE)}
 }
+\value{
+A tibble with the title, the description and optionally the json
+definition of the collections
+}
 \description{
 List local collections of concepts
 }

@@ -13,6 +13,10 @@ import_collection_mapper(collection, fun)
 \item{fun}{a function which takes 2 data.frames (x an y) with
 fields described in the collection definition and map the different elements.}
 }
+\value{
+No return value, called for side effects. The function will be used
+to map collection members.
+}
 \description{
 Import a  function to map collection members
 }

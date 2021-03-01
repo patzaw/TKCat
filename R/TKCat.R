@@ -137,6 +137,8 @@ print.TKCat <- function(x, ...){
 #' @param .data a [TKCat] object
 #' @param ... Use new_name = old_name to rename selected [MDB]
 #' 
+#' @rdname TKCat
+#' 
 #' @export
 #' 
 rename.TKCat <- function(.data, ...){

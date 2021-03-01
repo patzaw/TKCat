@@ -55,9 +55,6 @@ function(
       y <- nd %>% mutate(organism_type="Scientific name")
    }
    
-   assign("x", x, envir=.GlobalEnv)
-   assign("y", y, envir=.GlobalEnv)
-   
    xscopes <- dplyr::distinct(x, be, source, organism, organism_type)
    yscopes <- dplyr::distinct(y, be, source, organism, organism_type)
    

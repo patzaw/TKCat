@@ -11,6 +11,9 @@ drop_chMDB(x, name)
 
 \item{name}{the name of the database to remove}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Drop a database from a \link{chTKCat}
 }

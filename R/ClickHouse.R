@@ -264,6 +264,8 @@ ch_insert <- function(
 #' @param dbName the name of the database in which the tables should be written
 #' @param dbm a [ReDaMoR::RelDataModel] object
 #' 
+#' @return No return value, called for side effects
+#' 
 #' @export
 #' 
 #' 
@@ -286,6 +288,8 @@ mergeTrees_from_RelDataModel <- function(
 #' @param con the clickhouse connection
 #' @param dbName the name of the database in which the table should be written
 #' @param tm a [ReDaMoR::RelTableModel] object
+#' 
+#' @return No return value, called for side effects
 #' 
 #' @export
 #' 

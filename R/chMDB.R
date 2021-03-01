@@ -441,6 +441,8 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE){
 #' @param .data a [chMDB] object
 #' @param ... Use new_name = old_name to rename selected tables
 #' 
+#' @rdname chMDB
+#' 
 #' @export
 #' 
 rename.chMDB <- function(.data, ...){

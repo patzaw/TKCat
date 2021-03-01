@@ -11,6 +11,9 @@ remove_chTKCat_collection(x, title)
 
 \item{title}{the title of the collection to remove}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Remove a collection from a \link{chTKCat} database
 }
