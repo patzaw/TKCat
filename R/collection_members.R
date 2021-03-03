@@ -65,13 +65,14 @@ read_collection_members <- function(txt){
 #' Write a collection member JSON file
 #' 
 #' @param colMembers A tibble as returned by [read_collection_members()]
-#' @param path the JSON file to write. If NA (default), the JSON file is
+#' @param path the JSON file to write. If `NA` (default), the JSON file is
 #' not written but returned by the function.
 #' @param collection The collection definition (json string).
 #' If NULL (default), it is taken from TKCat environment
 #' (see [list_local_collections()].
 #' 
-#' @return No return value, called for side effects
+#' @return The JSON representation of collection members.
+#' If a path is provided, then the JSON is also written in it.
 #' 
 #' @export
 #' 
@@ -118,6 +119,7 @@ write_collection_members <- function(colMembers, path=NA, collection=NULL){
    }
    if(!is.na(path)){
       writeLines(toWrite, path)
+      invisible(toWrite)
    }else{
       return(toWrite)
    }

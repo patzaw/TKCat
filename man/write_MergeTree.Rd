@@ -35,6 +35,9 @@ which are nullable (default: NULL)}
 used in the sort key. If NULL (default), all the non-nullable columns
 are used in the key.}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Write a Clickhouse
 \href{https://clickhouse.tech/docs/en/engines/table-engines/mergetree-family/mergetree/}{MergeTree}

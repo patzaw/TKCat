@@ -31,13 +31,19 @@ the \code{\link[=read_collection_members]{read_collection_members()}} function.}
 the \code{\link[=read_collection_members]{read_collection_members()}} function.}
 
 \item{suffix}{the suffix to append to field names from x and y tables.
-Default: c("_x", "_y")}
+Default: \code{c("_x", "_y")}}
 
 \item{fun}{the function used to map x and y collection members.
 By default (NA) it is automatically identified if recorded in the system.
 The way to write this function is provided in the details section.}
 
 \item{...}{additional parameters for the fun function.}
+}
+\value{
+A tibble giving necessary information to map elements in x and y.
+The columns corresponds to the field values in xm and ym followed by a
+suffix (default: \code{c("_x", "_y")}). Only fields documented as non static
+in xm and ym are kept.
 }
 \description{
 Map different collection members

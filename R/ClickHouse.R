@@ -113,6 +113,8 @@ list_tables <- function(
 #' used in the sort key. If NULL (default), all the non-nullable columns
 #' are used in the key.
 #' 
+#' @return No return value, called for side effects
+#' 
 #' @export
 #' 
 write_MergeTree <- function(
@@ -186,6 +188,8 @@ write_MergeTree <- function(
    
    ch_insert(con, dbName, tableName, value)
    
+   invisible()
+   
 }
 
 ###############################################################################@
@@ -197,6 +201,8 @@ write_MergeTree <- function(
 #' @param value the table to import
 #' @param by the size of the batch: number of records to import
 #' together (default: 10^6)
+#' 
+#' @return No return value, called for side effects
 #' 
 #' @export
 #' 
@@ -255,6 +261,7 @@ ch_insert <- function(
          }
       }
    }
+   invisible()
 }
 
 ###############################################################################@
@@ -280,6 +287,7 @@ mergeTrees_from_RelDataModel <- function(
    for(tn in names(dbm)){
       mergeTree_from_RelTableModel(con, dbName, dbm[[tn]])
    }
+   invisible()
 }
 
 ###############################################################################@
@@ -320,6 +328,7 @@ mergeTree_from_RelTableModel <- function(
          pull("name"),
       sortKey=.get_tm_sortKey(tm)
    )
+   invisible()
 }
 
 

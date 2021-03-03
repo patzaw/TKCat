@@ -45,6 +45,7 @@ import_local_collection <- function(txt, overwrite=FALSE){
          )),
       envir=tkcatEnv
    )
+   invisible()
 }
 
 
@@ -113,6 +114,7 @@ import_collection_mapper <- function(collection, fun){
       value=c(tkcatEnv$MAPPERS, toAdd),
       envir=tkcatEnv
    )
+   invisible()
 }
 
 
@@ -143,7 +145,7 @@ get_collection_mapper <- function(collection){
 #' "field", "static", "value", "type" as returned by
 #' the [read_collection_members()] function.
 #' @param suffix the suffix to append to field names from x and y tables.
-#' Default: c("_x", "_y")
+#' Default: `c("_x", "_y")`
 #' @param fun the function used to map x and y collection members.
 #' By default (NA) it is automatically identified if recorded in the system.
 #' The way to write this function is provided in the details section.
@@ -156,6 +158,10 @@ get_collection_mapper <- function(collection){
 #' fun should return a data frame with all the fields values
 #' given in xm and ym followed by "_x" and "_y" suffix.
 #' 
+#' @return A tibble giving necessary information to map elements in x and y.
+#' The columns corresponds to the field values in xm and ym followed by a
+#' suffix (default: `c("_x", "_y")`). Only fields documented as non static
+#' in xm and ym are kept.
 #' 
 #' @export
 #' 

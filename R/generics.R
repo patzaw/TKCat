@@ -290,7 +290,7 @@ db_disconnect <- function(x){
 #' @param ntries the number of times the user can enter a wrong password
 #' (default: 3)
 #' 
-#' @return No return value, called for side effects
+#' @return A new database connection object.
 #' 
 #' @export
 #' 

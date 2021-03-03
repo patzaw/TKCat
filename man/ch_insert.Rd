@@ -18,6 +18,9 @@ ch_insert(con, dbName, tableName, value, by = 10^6)
 \item{by}{the size of the batch: number of records to import
 together (default: 10^6)}
 }
+\value{
+No return value, called for side effects
+}
 \description{
 Insert records by batches in a Clickhouse table
 }

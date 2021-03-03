@@ -9,7 +9,7 @@ write_collection_members(colMembers, path = NA, collection = NULL)
 \arguments{
 \item{colMembers}{A tibble as returned by \code{\link[=read_collection_members]{read_collection_members()}}}
 
-\item{path}{the JSON file to write. If NA (default), the JSON file is
+\item{path}{the JSON file to write. If \code{NA} (default), the JSON file is
 not written but returned by the function.}
 
 \item{collection}{The collection definition (json string).
@@ -17,7 +17,8 @@ If NULL (default), it is taken from TKCat environment
 (see \code{\link[=list_local_collections]{list_local_collections()}}.}
 }
 \value{
-No return value, called for side effects
+The JSON representation of collection members.
+If a path is provided, then the JSON is also written in it.
 }
 \description{
 Write a collection member JSON file

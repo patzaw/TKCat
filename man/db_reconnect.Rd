@@ -25,7 +25,7 @@ user to provide a password.}
 (default: 3)}
 }
 \value{
-No return value, called for side effects
+A new database connection object.
 }
 \description{
 Reconnect an object to a database
