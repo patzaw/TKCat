@@ -247,11 +247,12 @@ ch_insert <- function(
       e <- e[which(!duplicated(e))]
       for(i in 1:length(s)){
          em <- try(
-            DBI::dbWriteTable(
-               con,
-               tableName, #qname,
-               dplyr::slice(value, s[i]:e[i]),
-               append=TRUE
+            DBI::dbAppendTable(
+               conn=con,
+               name=tableName, #qname,
+               value=dplyr::slice(value, s[i]:e[i]),
+               row.names=FALSE
+               # append=TRUE
             ),
             silent=TRUE
          )

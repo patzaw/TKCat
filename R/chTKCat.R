@@ -1147,15 +1147,20 @@ remove_chMDB_user <- function(x, mdb, login){
 #' 
 list_chTKCat_collections <- function(x, withJson=FALSE){
    stopifnot(is.chTKCat(x))
-   dbGetQuery(
-      conn=x$chcon,
-      statement=sprintf(
-         "SELECT title, description %s FROM default.Collections",
-         ifelse(withJson, ", json", "")
-      )
-   ) %>%
-      as_tibble() %>% 
-      return()
+   if("Collections" %in% list_tables(x$chcon, "default")){
+      toRet <- dbGetQuery(
+         conn=x$chcon,
+         statement=sprintf(
+            "SELECT title, description %s FROM default.Collections",
+            ifelse(withJson, ", json", "")
+         )
+      ) %>%
+         as_tibble() %>% 
+         return()
+   }else{
+      toRet <- tibble("title"=character(), "description"=character())
+   }
+   return(toRet)
 }
 
 
