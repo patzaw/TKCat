@@ -605,12 +605,40 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
             sprintf("SHOW TABLES FROM `%s`", dbName)
          )
          if("___MDB___" %in% dbTables$name){
-            toRet <- bind_rows(
-               toRet,
-               DBI::dbGetQuery(
-                  con, sprintf("SELECT * FROM `%s`.___MDB___", dbName)
-               ) %>% as_tibble()
-            )
+            toAdd <- DBI::dbGetQuery(
+               con, sprintf("SELECT * FROM `%s`.___MDB___", dbName)
+            ) %>% as_tibble()
+            public <- is_chMDB_public(x, dbName)
+            toAdd <- mutate(toAdd, public=public)
+            users <- try(list_chMDB_users(x, dbName), silent=TRUE)
+            if(inherits(users, "try-error")){
+               if(public){
+                  toAdd <- mutate(toAdd, access="read only")
+               }else{
+                  toAdd <- mutate(toAdd, access="none")
+               }
+            }else{
+               if(x$chcon@user %in% users$login){
+                  user <- users %>% filter(.data$login==x$chcon@user)
+                  toAdd <- toAdd %>% 
+                     mutate(
+                        access=ifelse(user$admin, "write and read", "read only")
+                     )
+               }else{
+                  if(public){
+                     toAdd <- mutate(toAdd, access="read only")
+                  }else{
+                     toAdd <- mutate(toAdd, access="none")
+                  }
+               }
+            }
+            toRet <- bind_rows(toRet, toAdd) %>%
+               mutate(
+                  access=factor(
+                     .data$access,
+                     levels=c("none", "read only", "write and read")
+                  )
+               )
          }
       }
       return(toRet)

@@ -151,11 +151,11 @@
          tabName="resources",
          shiny::fluidRow(
             shiny::column(
-               6,
+               9,
                DT::DTOutput("mdbList")
             ),
             shiny::column(
-               6,
+               3,
                shiny::uiOutput("dbInfo")
             )
          )
@@ -336,9 +336,19 @@
       })
       output$mdbList <- DT::renderDT({
          shiny::req(mdbs$list)
+         colToTake <- intersect(
+            c("name", "title", "access"),
+            colnames(mdbs$list)
+         )
          toShow <- mdbs$list %>%
-            dplyr::select("name", "title") %>%
-            dplyr::rename("Resource"="name", "Title"="title")
+            dplyr::select(all_of(colToTake)) %>%
+            dplyr::rename("Resource"="name") %>% 
+            rename_all(function(x){
+               paste0(
+                  toupper(substr(x, 1, 1)),
+                  substr(x, 2, nchar(x))
+               )
+            })
          cm <- mdbs$collections %>%
             dplyr::select("collection", "resource") %>%
             dplyr::distinct() %>%
@@ -350,7 +360,7 @@
             dplyr::rename("Collections"="collection")
          toShow <- dplyr::left_join(toShow, cm, by=c("Resource"="resource"))
          mdbs$validInput <- TRUE
-         DT::datatable(
+         toRet <- DT::datatable(
             toShow,
             rownames=FALSE,
             filter="top",
@@ -365,13 +375,22 @@
                deferRender = TRUE,
                scrollY = "70vh",
                scroller = TRUE,
-               columnDefs=list(
-                  list(width='60%', targets=1)
-               ),
-               order=list(list(0, 'asc')),
-               dom=c("ti")
+               dom=c("ti"),
+               order=list(list(0, 'asc'))
             )
          )
+         if("Access" %in% colnames(toShow)){
+            toRet <- toRet %>% 
+               DT::formatStyle(
+                  1:ncol(toShow), valueColumns="Access",
+                  target="row",
+                  color=DT::styleEqual("none", "red", default="black"),
+                  'font-style'=DT::styleEqual(
+                     "none", "italic", default="normal"
+                  )
+               )
+            }
+         toRet
       })
       mdbListProxy <- DT::dataTableProxy("mdbList")
       
@@ -389,7 +408,7 @@
       shiny::observe({
          n <- selStatus$resource
          shiny::req(n)
-         mdb <- try(get_MDB(instance$tkcat, n, n_max=0), silent=TRUE)
+         mdb <- try(get_MDB(instance$tkcat, n, n_max=1), silent=TRUE)
          selStatus$mdb <- mdb
          if(
             inherits(mdb, "try-error") ||

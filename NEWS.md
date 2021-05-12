@@ -4,6 +4,7 @@
 
 - Correcting bug during initialization of collections in chTKCat
 - Use `DBI::dbAppendTable()` instead of `DBI::dbWriteTable()`
+- Better display of access rights in `explore_MDBs()`
 - Tested with Clickhouse 21.4.6
 
 <!----------------------------------------------------------------------------->
