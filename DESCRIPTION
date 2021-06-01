@@ -1,7 +1,7 @@
 Package: TKCat
 Type: Package
 Title: Tailored Knowledge Catalog
-Version: 0.5.5
+Version: 0.5.6
 Authors@R: c(
     person(
         "Patrice", "Godard",
