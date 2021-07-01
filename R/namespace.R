@@ -22,4 +22,6 @@
 #' 
 #' @importFrom markdown renderMarkdown
 #' 
+#' @importFrom xml2 read_xml xml_children xml_name xml_replace write_xml
+#' 
 NULL

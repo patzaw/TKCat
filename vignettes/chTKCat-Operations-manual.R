@@ -17,6 +17,11 @@ library(TKCat)
 #  create_chTKCat_user(k, login="lfrancois", contact=NA, admin=FALSE)
 
 ## ---- eval=FALSE--------------------------------------------------------------
+#  k <- chTKCat(user="pgodard")
+#  change_chTKCat_password(k, "lfrancois")
+#  update_chTKCat_user(k, contact="email", admin=FALSE)
+
+## ---- eval=FALSE--------------------------------------------------------------
 #  drop_chTKCat_user(k, login="lfrancois")
 
 ## ---- eval=FALSE--------------------------------------------------------------

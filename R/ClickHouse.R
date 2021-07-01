@@ -10,9 +10,17 @@ db_disconnect.ClickhouseConnection <- function(x){
 
 ###############################################################################@
 #'
+#' @rdname db_reconnect
+#' @method db_reconnect ClickhouseConnection
+#' 
+#' @param settings list of
+#' [Clickhouse settings](https://clickhouse.tech/docs/en/operations/settings/settings/)
+#'
 #' @export
 #'
-db_reconnect.ClickhouseConnection <- function(x, user, password, ntries=3){
+db_reconnect.ClickhouseConnection <- function(
+   x, user, password, ntries=3, settings=list(), ...
+){
    xn <- deparse(substitute(x))
    if(missing(user)){
       user <- x@user
@@ -51,6 +59,9 @@ db_reconnect.ClickhouseConnection <- function(x, user, password, ntries=3){
          port=x@port,
          user=user, password=password
       )
+   }
+   for(s in names(settings)){
+      RClickhouse::dbSendQuery(nv, sprintf("SET %s='%s'", s, settings[[s]]))
    }
    assign(xn, nv, envir=parent.frame(n=1))
 }

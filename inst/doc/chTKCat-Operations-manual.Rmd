@@ -92,6 +92,14 @@ create_chTKCat_user(k, login="lfrancois", contact=NA, admin=FALSE)
 
 The function will require to setup a password for the new user.
 
+## Update
+
+```{r, eval=FALSE}
+k <- chTKCat(user="pgodard")
+change_chTKCat_password(k, "lfrancois")
+update_chTKCat_user(k, contact="email", admin=FALSE)
+```
+
 ## Drop
 
 ```{r, eval=FALSE}

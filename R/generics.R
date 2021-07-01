@@ -289,12 +289,13 @@ db_disconnect <- function(x){
 #' user to provide a password.
 #' @param ntries the number of times the user can enter a wrong password
 #' (default: 3)
+#' @param ... additional parameters for methods
 #' 
 #' @return A new database connection object.
 #' 
 #' @export
 #' 
-db_reconnect <- function(x, user, password, ntries=3){
+db_reconnect <- function(x, user, password, ntries=3, ...){
    UseMethod("db_reconnect", x)
 }
 

@@ -1,5 +1,16 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
+## Version 0.5.6
+
+- Correcting bug in setting chMDB collections
+- More generic implementation of `list_MDBs.chTKCat()` and `list_chMDB_users()`
+- Update user information
+- Better management of GRANTs
+- settings management when connecting and re-connecting
+- Installation and initialization of ClickHouse is easier
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 ## Version 0.5.5
 
 - Correcting bug during initialization of collections in chTKCat

@@ -43,7 +43,8 @@ Imports:
    base64enc,
    markdown,
    promises,
-   future
+   future,
+   xml2
 Suggests:
    knitr,
    rmarkdown,

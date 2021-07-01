@@ -9,7 +9,10 @@ chTKCat(
   port = 9101L,
   user = "default",
   password,
-  http = NULL
+  http = NULL,
+  settings = list(max_query_size = 1073741824, use_uncompressed_cache = 0,
+    load_balancing = "random", max_memory_usage = 0, allow_introspection_functions = 1,
+    joined_subquery_requires_alias = 0)
 )
 }
 \arguments{
@@ -25,6 +28,9 @@ database is listening (default: 9101)}
 
 \item{http}{an integer specifying the HTTP port of the
 ClickHouse database (default: NULL). Used for documentation only.}
+
+\item{settings}{list of
+\href{https://clickhouse.tech/docs/en/operations/settings/settings/}{Clickhouse settings}}
 }
 \value{
 a chTKCat object

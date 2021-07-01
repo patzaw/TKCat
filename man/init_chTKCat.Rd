@@ -4,16 +4,7 @@
 \alias{init_chTKCat}
 \title{Initialize a chTKCat database}
 \usage{
-init_chTKCat(
-  x,
-  instance,
-  version,
-  path,
-  login,
-  password,
-  contact,
-  userfile = NULL
-)
+init_chTKCat(x, instance, version, path, login, password, contact)
 }
 \arguments{
 \item{x}{a \link{chTKCat} object}
@@ -30,11 +21,6 @@ init_chTKCat(
 
 \item{contact}{contact information for the primary administrator of
 the database}
-
-\item{userfile}{path to a ClickHouse users.xml file. If NULL (default),
-the file provided within the TKCat
-package (\code{system.file("ClickHouse/users.xml", package="TKCat")})
-is used.}
 }
 \value{
 a \link{chTKCat}

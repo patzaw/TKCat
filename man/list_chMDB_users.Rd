@@ -4,12 +4,13 @@
 \alias{list_chMDB_users}
 \title{List users of an MDB of a \link{chTKCat} object}
 \usage{
-list_chMDB_users(x, mdb)
+list_chMDB_users(x, mdbs = NULL)
 }
 \arguments{
 \item{x}{a \link{chTKCat} object}
 
-\item{mdb}{name of the modeled database}
+\item{mdbs}{names of the modeled databases.
+If NULL (default), all the databases are considered.}
 }
 \value{
 A tibble with 3 columns:

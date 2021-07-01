@@ -11,11 +11,11 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2021-06-01" />
+<meta name="date" content="2021-07-01" />
 
 <title>TKCat Collections</title>
 
-<script src="libs/header-attrs-2.8/header-attrs.js"></script>
+<script src="libs/header-attrs-2.9/header-attrs.js"></script>
 <script src="libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
@@ -243,7 +243,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">TKCat Collections</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">June 01, 2021</h4>
+<h4 class="date">July 01, 2021</h4>
 
 </div>
 
@@ -558,6 +558,9 @@ $(document).ready(function () {
 
 <script>
 $(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
 
     // move toc-ignore selectors from section div to header
     $('div.section.toc-ignore')

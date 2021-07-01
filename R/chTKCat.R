@@ -14,6 +14,8 @@
 #' @param password user password
 #' @param http an integer specifying the HTTP port of the 
 #' ClickHouse database (default: NULL). Used for documentation only.
+#' @param settings list of
+#' [Clickhouse settings](https://clickhouse.tech/docs/en/operations/settings/settings/)
 #'
 #' @return a chTKCat object
 #'
@@ -26,7 +28,25 @@ chTKCat <- function(
    port=9101L,
    user="default",
    password,
-   http=NULL
+   http=NULL,
+   settings=list(
+      # Which part of the query can be read into RAM for parsing
+      # (the remaining data for INSERT, if any, is read later)
+      "max_query_size"=1073741824,
+      # Whether to use the cache of uncompressed blocks. Zero means FALSE.
+      "use_uncompressed_cache"=0,
+      # Which replicas (among healthy replicas) to preferably send
+      # a query to (on the first attempt) for distributed processing.
+      "load_balancing"="random",
+      # Maximum memory usage for processing of single query.
+      # Zero means unlimited.
+      "max_memory_usage"=0,
+      # Enabling introspection functions for GRANT access. Zero means FALSE.
+      "allow_introspection_functions"=1,
+      # Force joined subqueries and table functions to have aliases for correct
+      # name qualification. Zero means FALSE.
+      "joined_subquery_requires_alias"=0
+   )
 ){
    if(missing(password)){
       password <- getPass::getPass(
@@ -42,9 +62,15 @@ chTKCat <- function(
       user=user, password=ifelse(is.na(password), "", password)
    )
    
+   
+   for(s in names(settings)){
+      RClickhouse::dbSendQuery(chcon, sprintf("SET %s='%s'", s, settings[[s]]))
+   }
+   
    toRet <- list(
       chcon=chcon,
-      http=http
+      http=http,
+      settings=settings
    )
    class(toRet) <- "chTKCat"
    
@@ -198,6 +224,20 @@ format.chTKCat <- function(x, ...){
    toRet <- sprintf(
       "chTKCat on %s:%s", x$chcon@host, x$chcon@port
    )
+   toRet <- paste(
+      toRet,
+      sprintf(
+         "   - ClickHouse: %s",
+         get_query(
+            x,
+            paste(
+               "SELECT value FROM system.build_options ",
+               "WHERE name='VERSION_DESCRIBE'"
+            )
+         )$value
+      ),
+      sep="\n"
+   )
    if(x$init){
       toRet <- paste(
          toRet,
@@ -243,10 +283,13 @@ db_disconnect.chTKCat <- function(x){
 #' 
 #' @export
 #'
-db_reconnect.chTKCat <- function(x, user, password, ntries=3){
+db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
    xn <- deparse(substitute(x))
    con <- x$chcon
-   db_reconnect(con, user=user, password=password, ntries=ntries)
+   db_reconnect(
+      con, user=user, password=password, ntries=ntries,
+      settings=x$settings
+   )
    nv <- x
    nv$chcon <- con
    nv <- check_chTKCat(nv)
@@ -301,10 +344,6 @@ get_query.chTKCat <- function(x, query, ...){
 #' @param password password for the primary administrator of the database
 #' @param contact contact information for the primary administrator of
 #' the database
-#' @param userfile path to a ClickHouse users.xml file. If NULL (default),
-#' the file provided within the TKCat
-#' package (`system.file("ClickHouse/users.xml", package="TKCat")`)
-#' is used.
 #'
 #' @return a [chTKCat]
 #' 
@@ -312,7 +351,7 @@ get_query.chTKCat <- function(x, query, ...){
 #'
 init_chTKCat <- function(
    x, instance, version, path,
-   login, password, contact, userfile=NULL
+   login, password, contact
 ){
    con <- x$chcon
    ## Check that ClickHouse is empty and ready for initialization ----
@@ -335,26 +374,17 @@ init_chTKCat <- function(
       is.character(login), length(login)==1, !is.na(login),
       length(grep("[^[:alnum:]_]", login))==0
    )
+   TKCAT_USERS <- file.path(path, "conf/users.xml")
+   if(!file.exists(TKCAT_USERS)){
+      stop(sprintf("%s does not exist", TKCAT_USERS))
+   }
    if(missing(password)){
       password <- .create_password(login)
    }
    stopifnot(
       is.character(password), length(password)==1
    )
-   
-   ## users.xml file ----
-   if(!is.null(userfile)){
-      stopifnot(length(userfile)==1, file.exists(userfile))
-   }else{
-      userfile <- system.file(
-         "ClickHouse/users.xml",
-         package=utils::packageName()
-      )
-   }
-   
-   ## Enabling introspection functions (for GRANT access) ----
-   RClickhouse::dbSendQuery(con, "SET allow_introspection_functions=1")
-   
+
    ## Create default tables ----
    mergeTrees_from_RelDataModel(
       con, "default",
@@ -378,7 +408,15 @@ init_chTKCat <- function(
       x, login=login, password=password, contact=contact, admin=TRUE
    )
    db_disconnect(x)
-   file.copy(userfile, file.path(path, "conf", "users.xml"), overwrite=TRUE)
+   uf <- xml2::read_xml(TKCAT_USERS)
+   users <- xml2::xml_children(uf)[which(
+      xml2::xml_name(xml2::xml_children(uf))=="users"
+   )]
+   if(length(users)!=1){
+      stop("Cannot find <users> in users.xml config")
+   }
+   xml2::xml_replace(users, xml2::read_xml("<users></users>"))
+   xml2::write_xml(uf, file=TKCAT_USERS)
    Sys.sleep(3)
    x <- chTKCat(
       host=con@host,
@@ -479,6 +517,16 @@ create_chTKCat_user <- function(
          )
       )
    )
+   
+   ## Register the user ----
+   ch_insert(
+      con, "default", "Users", dplyr::tibble(
+         login=login,
+         contact=as.character(contact),
+         admin=admin
+      )
+   )
+   
    ## Grant access ----
    if(admin){
       RClickhouse::dbSendQuery(
@@ -512,31 +560,185 @@ create_chTKCat_user <- function(
          con, sprintf("GRANT SELECT ON default.Collections TO %s", login)
       )
       RClickhouse::dbSendQuery(
-         con, sprintf("GRANT SELECT(login, admin) ON default.Users TO %s", login)
+         con,
+         sprintf("GRANT SELECT(login, admin) ON default.Users TO %s", login)
       )
-      for(db in list_MDBs(x, withInfo=FALSE)){
-         for(tn in names(CHMDB_DATA_MODEL)){
-            RClickhouse::dbSendQuery(
-               con, 
-               sprintf(
-                  "GRANT SELECT on `%s`.`%s` TO %s",
-                  db, tn, login
-               )
-            )
-         }
-      }
    }
-   ## Register the user ----
-   ch_insert(
-      con, "default", "Users", dplyr::tibble(
-         login=login,
-         contact=as.character(contact),
-         admin=admin
-      )
-   )
+   for(db in list_MDBs(x, withInfo=TRUE)$name){
+      update_chMDB_grants(x, db)
+   }
+   
    invisible()
 }
 
+###############################################################################@
+#' Change chTKCat password
+#' 
+#' @param x a [chTKCat] object
+#' @param login user login
+#' @param password new user password
+#' 
+#' @return No return value, called for side effects
+#' 
+#' @export
+change_chTKCat_password <- function(
+   x, login, password
+){
+   
+   stopifnot(
+      is.chTKCat(x),
+      is.character(login), length(login)==1, !is.na(login)
+   )
+   if(!x$admin){
+      stop("Only chTKCat admin can change user information")
+   }
+   if(!login %in% list_chTKCat_users(x)$login){
+      stop("The user does not exist")
+   }
+   
+   if(missing(password)){
+      password <- .create_password(login)
+   }
+   password <- as.character(password)
+   stopifnot(
+      is.character(password), length(password)==1
+   )
+   con <- x$chcon
+   ## Create the user in ClickHouse ----
+   RClickhouse::dbSendQuery(
+      con, 
+      sprintf(
+         "ALTER USER %s %s",
+         login,
+         ifelse(
+            is.na(password),
+            "IDENTIFIED WITH no_password",
+            sprintf("IDENTIFIED BY '%s'", password)
+         )
+      )
+   )
+   
+   invisible()
+}
+
+###############################################################################@
+#' Update a chTKCat user information
+#' 
+#' @param x a [chTKCat] object
+#' @param login user login
+#' @param contact contact information (can be NA)
+#' @param admin a logical indicating if the user is an admin of the chTKCat
+#' instance
+#' 
+#' @return No return value, called for side effects
+#' 
+#' @export
+update_chTKCat_user <- function(
+   x, login, contact, admin
+){
+   
+   stopifnot(
+      is.chTKCat(x),
+      is.character(login), length(login)==1, !is.na(login)
+   )
+   if(!x$admin){
+      stop("Only chTKCat admin can change user information")
+   }
+   if(!login %in% list_chTKCat_users(x)$login){
+      stop("The user does not exist")
+   }
+   
+   if(!missing(contact) || !missing(admin)){
+      
+      con <- x$chcon
+      
+      new_val <- get_query(
+         x,
+         sprintf("SELECT * FROM default.Users WHERE login='%s'", login)
+      )
+      
+      ## Contact information ----
+      if(!missing(contact)){
+         contact <- as.character(contact)
+         stopifnot(is.character(contact), length(contact)==1)
+         new_val$contact <- contact
+      }
+      
+      ## Admin right ----
+      updateGrants <- FALSE
+      if(!missing(admin)){
+         stopifnot(is.logical(admin), length(admin)==1, !is.na(admin))
+         new_val$admin <- admin
+         updateGrants <- TRUE
+      }
+
+      ## Update the value in 2 steps because of issues with Clickhouse UPDATE 
+      RClickhouse::dbSendQuery(
+         con,
+         sprintf(
+            "ALTER TABLE default.Users DELETE WHERE login='%s'",
+            login
+         )
+      )
+      ch_insert(con, "default", "Users", new_val)
+      
+      ## Update GRANTs if necessary ----
+      if(updateGrants){
+         if(admin){
+            RClickhouse::dbSendQuery(
+               con,
+               sprintf(
+                  "GRANT ALL ON *.* TO %s WITH GRANT OPTION",
+                  login
+               )
+            )
+         }else{
+            RClickhouse::dbSendQuery(
+               con,
+               sprintf(
+                  "REVOKE ALL ON *.* FROM %s",
+                  login
+               )
+            )
+            RClickhouse::dbSendQuery(
+               con, sprintf("GRANT SHOW DATABASES ON *.* TO %s", login)
+            )
+            RClickhouse::dbSendQuery(
+               con, sprintf("GRANT SHOW TABLES ON *.* TO %s", login)
+            )
+            RClickhouse::dbSendQuery(
+               con, sprintf("GRANT SHOW COLUMNS ON *.* TO %s", login)
+            )
+            RClickhouse::dbSendQuery(
+               con,
+               sprintf(
+                  paste(
+                     "GRANT SELECT(name, instance, version, contact)",
+                     "ON default.System TO %s"
+                  ),
+                  login
+               )
+            )
+            RClickhouse::dbSendQuery(
+               con, sprintf("GRANT SELECT ON default.Collections TO %s", login)
+            )
+            RClickhouse::dbSendQuery(
+               con,
+               sprintf(
+                  "GRANT SELECT(login, admin) ON default.Users TO %s", login
+               )
+            )
+         }
+         for(db in list_MDBs(x, withInfo=TRUE)$name){
+            update_chMDB_grants(x, db)
+         }
+      }
+      
+   }
+   
+   invisible()
+   
+}
 
 ###############################################################################@
 #' Drop a user from a [chTKCat] object
@@ -560,6 +762,9 @@ drop_chTKCat_user <- function(x, login){
       stop("The user does not exist")
    }
    con <- x$chcon
+   if(login==con@user){
+      stop("You cannot drop yourself")
+   }
    allDb <- list_MDBs(x, withInfo=FALSE)
    for(mdb in allDb){
       remove_chMDB_user(x=x, login=login, mdb=mdb)
@@ -597,49 +802,66 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
    if(!withInfo){
       return(dbNames)
    }else{
-      check_chTKCat(x, verbose=TRUE)
-      toRet <- c()
-      for(dbName in dbNames){
-         dbTables <- DBI::dbGetQuery(
-            con,
-            sprintf("SHOW TABLES FROM `%s`", dbName)
+      accessLevels <- c("none", "read only", "write and read")
+      if(length(dbNames)==0){
+         toRet <- tibble(
+            name=character(),
+            title=character(),
+            description=character(),
+            url=character(),
+            version=character(),
+            maintainer=character(),
+            public=logical(),
+            populated=logical(),
+            access=factor(c(), levels=accessLevels)
          )
-         if("___MDB___" %in% dbTables$name){
-            toAdd <- DBI::dbGetQuery(
-               con, sprintf("SELECT * FROM `%s`.___MDB___", dbName)
-            ) %>% as_tibble()
-            public <- is_chMDB_public(x, dbName)
-            toAdd <- mutate(toAdd, public=public)
-            users <- try(list_chMDB_users(x, dbName), silent=TRUE)
-            if(inherits(users, "try-error")){
-               if(public){
-                  toAdd <- mutate(toAdd, access="read only")
-               }else{
-                  toAdd <- mutate(toAdd, access="none")
-               }
-            }else{
-               if(x$chcon@user %in% users$login){
-                  user <- users %>% filter(.data$login==x$chcon@user)
-                  toAdd <- toAdd %>% 
-                     mutate(
-                        access=ifelse(user$admin, "write and read", "read only")
-                     )
-               }else{
-                  if(public){
-                     toAdd <- mutate(toAdd, access="read only")
-                  }else{
-                     toAdd <- mutate(toAdd, access="none")
-                  }
-               }
-            }
-            toRet <- bind_rows(toRet, toAdd) %>%
-               mutate(
-                  access=factor(
-                     .data$access,
-                     levels=c("none", "read only", "write and read")
-                  )
+      }else{
+         mdbDesc <- DBI::dbGetQuery(
+            con,
+            paste(
+               sprintf(
+                  "SELECT * FROM `%s`.___MDB___ CROSS JOIN `%s`.___Public___",
+                  dbNames, dbNames
+               ),
+               collapse=" UNION ALL "
+            )
+         ) %>% 
+            as_tibble() %>% 
+            mutate(
+               public=as.logical(.data$public),
+               populated=TRUE
+            )
+         mdbUsers <- list_chMDB_users(x) %>% 
+            filter(.data$login==con@user)
+         notInit <- setdiff(dbNames, mdbDesc$name)
+         if(length(notInit) >0){
+            mdbDesc <- bind_rows(
+               mdbDesc,
+               tibble(
+                  name=notInit,
+                  title=as.character(NA),
+                  description=as.character(NA),
+                  url=as.character(NA),
+                  version=as.character(NA),
+                  maintainer=as.character(NA),
+                  public=as.logical(NA),
+                  populated=FALSE
                )
+            )
          }
+         toRet <- mdbDesc %>%
+            mutate(
+               access = case_when(
+                  !!x$admin ~ "write and read",
+                  .data$name %in% !!mdbUsers$db[which(!!mdbUsers$admin)] ~
+                     "write and read",
+                  .data$name %in% !!mdbUsers$db ~ "read only",
+                  !is.na(.data$public) & .data$public ~ "read only",
+                  is.na(.data$public) ~ as.character(NA),
+                  TRUE ~ "none"
+               ) %>%
+                  factor(levels=accessLevels)
+            )
       }
       return(toRet)
    }
@@ -673,12 +895,20 @@ search_MDB_tables.chTKCat <- function(x, searchTerm){
          "0 as s2,"
       },
       sprintf(
-         "if(isNull(comment), 0, positionCaseInsensitive(comment, '%s')>0) as s3,",
+         paste(
+            "if(isNull(comment), 0, positionCaseInsensitive(comment, '%s')>0)",
+            " as s3,"
+         ),
          searchTerm
       ),
       if(nchar(searchTerm)>4){
          sprintf(
-            "if(isNull(comment), 0, ngramSearchCaseInsensitive(comment, '%s')) as s4,",
+            paste(
+               "if(",
+               "isNull(comment), 0, ngramSearchCaseInsensitive(comment, '%s')",
+               ")",
+               " as s4,"
+            ),
             searchTerm
          )
       }else{
@@ -707,7 +937,10 @@ search_MDB_fields.chTKCat <- function(x, searchTerm){
    mdbs <- list_MDBs(x)
    selQueries <- paste(
       sprintf(
-         "SELECT '%s' as resource, table, name, type, nullable, unique, comment,",
+         paste(
+            "SELECT '%s' as resource,",
+            " table, name, type, nullable, unique, comment,"
+         ),
          mdbs$name
       ),
       sprintf(
@@ -723,12 +956,20 @@ search_MDB_fields.chTKCat <- function(x, searchTerm){
          "0 as s2,"
       },
       sprintf(
-         "if(isNull(comment), 0, positionCaseInsensitive(comment, '%s')>0) as s3,",
+         paste(
+            "if(isNull(comment), 0, positionCaseInsensitive(comment, '%s')>0)",
+            " as s3,"
+         ),
          searchTerm
       ),
       if(nchar(searchTerm)>4){
          sprintf(
-            "if(isNull(comment), 0, ngramSearchCaseInsensitive(comment, '%s')) as s4,",
+            paste(
+               "if(",
+               "isNull(comment), 0, ngramSearchCaseInsensitive(comment, '%s')",
+               ")",
+               " as s4,"
+            ),
             searchTerm
          )
       }else{
@@ -781,15 +1022,6 @@ create_chMDB <- function(x, name, public=FALSE){
       CHMDB_DATA_MODEL
    )
    users <- list_chTKCat_users(x) %>% dplyr::pull("login")
-   for(tn in setdiff(names(CHMDB_DATA_MODEL), "___MDBUsers___")){
-      RClickhouse::dbSendQuery(
-         con,
-         sprintf(
-            "GRANT SELECT ON `%s`.`%s` TO %s",
-            name, tn, paste(users, collapse=", ")
-         )
-      )
-   }
    set_chMDB_access(x, name, public=public)
    add_chMDB_user(x, name, x$chcon@user, admin=TRUE)
    invisible()
@@ -832,6 +1064,101 @@ drop_chMDB <- function(x, name){
    invisible()
 }
 
+###############################################################################@
+#' Update grants on tables in an MDB of a [chTKCat] object
+#' 
+#' The update is done automatically based on user access.
+#'
+#' @param x a [chTKCat] object
+#' @param mdb name of the modeled database
+#' 
+#' @return No return value, called for side effects
+#' 
+#' @export
+#'
+update_chMDB_grants <- function(x, mdb){
+   
+   stopifnot(
+      is.chTKCat(x),
+      is.character(mdb), length(mdb)==1, !is.na(mdb)
+   )
+   managedMdbs <- list_MDBs(x, withInfo=TRUE) %>% 
+      filter(.data$access=="write and read" & .data$name==!!mdb)
+   if(!mdb %in% managedMdbs$name){
+      stop(sprintf("No admin permission on '%s' database", mdb))
+   }
+   con <- x$chcon
+   
+   ## User groups ----
+   tkcUsers <- list_chTKCat_users(x)
+   mdbUsers <- list_chMDB_users(x, mdb)
+   adminUsers <- c(
+      tkcUsers %>% filter(.data$admin) %>% pull("login"),
+      mdbUsers %>% filter(.data$admin) %>% pull("login")
+   ) %>% 
+      unique()
+   readUsers <- mdbUsers$login
+   if(!is.na(managedMdbs$public) && managedMdbs$public){
+      readUsers <- c(readUsers, tkcUsers$login)
+   }
+   readUsers <- setdiff(unique(readUsers), adminUsers)
+   others <- setdiff(tkcUsers$login, c(readUsers, adminUsers))
+   
+   ## Revoke read access ----
+   if(length(others) > 0){
+      RClickhouse::dbSendQuery(
+         con,
+         sprintf(
+            "REVOKE SELECT ON `%s`.* FROM %s",
+            mdb, paste(others, collapse=", ")
+         )
+      )
+      modelTables <- names(CHMDB_DATA_MODEL)
+      for(tn in modelTables){
+         RClickhouse::dbSendQuery(
+            con,
+            sprintf(
+               "GRANT SELECT ON `%s`.`%s` TO %s",
+               mdb, tn, paste(others, collapse=", ")
+            )
+         )
+      }
+   }
+   
+   ## Grant read access ----
+   RClickhouse::dbSendQuery(
+      con,
+      sprintf(
+         "GRANT SELECT ON `%s`.* TO %s",
+         mdb, paste(c(readUsers, adminUsers), collapse=", ")
+      )
+   )
+   
+   ## Revoke write access ----
+   if(length(c(readUsers, others)) > 0){
+      RClickhouse::dbSendQuery(
+         con,
+         sprintf(
+            "REVOKE CREATE TABLE, DROP TABLE, ALTER, INSERT ON `%s`.* FROM %s",
+            mdb, paste(c(readUsers, others), collapse=", ")
+         )
+      )
+   }
+   
+   ## Grant write access ----
+   RClickhouse::dbSendQuery(
+      con,
+      sprintf(
+         paste(
+            "GRANT SELECT, CREATE TABLE, DROP TABLE, ALTER, INSERT",
+            " ON `%s`.* TO %s WITH GRANT OPTION"
+         ),
+         mdb, paste(adminUsers, collapse=", ")
+      )
+   )
+   
+   invisible()
+}
 
 ###############################################################################@
 #' Empty a chMDB in a [chTKCat]
@@ -938,43 +1265,11 @@ set_chMDB_access <- function(x, mdb, public){
          as.integer(public)
       )
    )
-   ch_insert(con, dbName=mdb, tableName="___Public___", value=tibble(public=public))
-   users <- list_chTKCat_users(x) %>% 
-      dplyr::filter(!.data$admin) %>% 
-      dplyr::pull("login")
-   chMDBusers <- list_chMDB_users(x, mdb)$login
-   dbTables <- DBI::dbGetQuery(con, sprintf("SHOW TABLES FROM `%s`", mdb)) %>% 
-      pull("name")
-   if(public){
-      RClickhouse::dbSendQuery(
-         con,
-         sprintf(
-            "GRANT SELECT ON `%s`.* TO %s",
-            mdb, paste(users, collapse=", ")
-         )
-      )
-      ul <- setdiff(users, chMDBusers)
-      RClickhouse::dbSendQuery(
-         con,
-         sprintf(
-            "REVOKE SELECT ON `%s`.`%s` FROM %s",
-            mdb, "___MDBUsers___", paste(ul, collapse=", ")
-         )
-      )
-   }else{
-      ul <- setdiff(users, chMDBusers)
-      if(length(ul)>0){
-         for(tn in setdiff(dbTables, names(CHMDB_DATA_MODEL))){
-            RClickhouse::dbSendQuery(
-               con,
-               sprintf(
-                  "REVOKE SELECT ON `%s`.`%s` FROM %s",
-                  mdb, tn, paste(ul, collapse=", ")
-               )
-            )
-         }
-      }
-   }
+   ch_insert(
+      con, dbName=mdb, tableName="___Public___",
+      value=tibble(public=public)
+   )
+   update_chMDB_grants(x, mdb)
    invisible()
 }
 
@@ -983,7 +1278,8 @@ set_chMDB_access <- function(x, mdb, public){
 #' List users of an MDB of a [chTKCat] object
 #'
 #' @param x a [chTKCat] object
-#' @param mdb name of the modeled database
+#' @param mdbs names of the modeled databases.
+#' If NULL (default), all the databases are considered.
 #' 
 #' @return A tibble with 3 columns:
 #' - user: the user login
@@ -992,37 +1288,57 @@ set_chMDB_access <- function(x, mdb, public){
 #' 
 #' @export
 #'
-list_chMDB_users <- function(x, mdb){
+list_chMDB_users <- function(x, mdbs=NULL){
    stopifnot(
-      is.chTKCat(x),
-      is.character(mdb), length(mdb)==1, !is.na(mdb),
-      mdb %in% list_MDBs(x, withInfo=FALSE)
+      is.chTKCat(x)
    )
    con <- x$chcon
-   mdbut <- DBI::dbGetQuery(
+   ## Check access ----
+   allMdbs <- list_MDBs(x, withInfo=FALSE)
+   mdbWithUsers <- DBI::dbGetQuery(
       con,
-      sprintf(
-         paste(
-            "SELECT name FROM system.tables",
-            "WHERE name='___MDBUsers___' AND database='%s'"
-         ),
-         mdb
+      "SELECT database FROM system.tables WHERE name='___MDBUsers___'"
+   ) %>%
+      pull("database")
+   if(is.null(mdbs)){
+      mdbs <- mdbWithUsers
+   }else{
+      stopifnot(
+         is.character(mdbs), all(!is.na(mdbs)), length(mdbs) > 0
       )
-   ) %>% 
-      dplyr::pull("name")
-   if(length(mdbut)==0){
-      stop("The chMDB does not exist or is not initialized yet")
+      notIn <- setdiff(mdbs, allMdbs)
+      if(length(notIn) > 0){
+         stop(sprintf(
+            "The following mdbs do not exist: %s",
+            paste(notIn, collapse=", ")
+         ))
+      }
+      withoutUsers <- setdiff(mdbs, mdbWithUsers)
+      if(length(withoutUsers) > 0){
+         stop(sprintf(
+            "The following mdbs have not any registered user: %s",
+            paste(withoutUsers, collapse=", ")
+         ))
+      }
    }
-   DBI::dbGetQuery(
-      con,
-      sprintf(
-         "SELECT * FROM `%s`.`%s`",
-         mdb, mdbut
-      )
-   ) %>% 
-      dplyr::as_tibble() %>%
-      dplyr::mutate(admin=as.logical(.data$admin)) %>% 
-      return()
+   if(length(mdbs)==0){
+      toRet <- tibble(db=character(), login=character(), admin=logical())
+   }else{
+      toRet <-  DBI::dbGetQuery(
+         con,
+         paste(
+            sprintf(
+               "SELECT '%s' as db, login, admin from `%s`.`___MDBUsers___`",
+               mdbs, mdbs
+            ),
+            collapse=" UNION ALL "
+         )
+      ) %>%
+         as_tibble() %>% 
+         mutate(admin=as.logical(.data$admin)) %>% 
+         arrange(.data$db, .data$admin, .data$login)
+   }
+   return(toRet)
 }
 
 
@@ -1050,7 +1366,7 @@ add_chMDB_user <- function(x, mdb, login, admin=FALSE){
    if(!login %in% list_chTKCat_users(x)$login){
       stop("The user does not exist")
    }
-   if(login %in% list_chMDB_users(x, mdb=mdb)$login){
+   if(login %in% list_chMDB_users(x, mdbs=mdb)$login){
       stop(sprintf("%s is already registered for %s chMDB", login, mdb))
    }
    con <- x$chcon
@@ -1058,36 +1374,7 @@ add_chMDB_user <- function(x, mdb, login, admin=FALSE){
       con, dbName=mdb, tableName="___MDBUsers___",
       value=tibble(login=login, admin=admin)
    )
-   RClickhouse::dbSendQuery(
-      con,
-      sprintf(
-         "GRANT SELECT ON `%s`.* TO %s",
-         mdb, login
-      )
-   )
-   if(admin){
-      RClickhouse::dbSendQuery(
-         con,
-         sprintf(
-            "GRANT CREATE TABLE, DROP TABLE, ALTER, INSERT ON `%s`.* TO %s",
-            mdb, login
-         )
-      )
-      dbTables <- DBI::dbGetQuery(
-         con, sprintf("SHOW TABLES FROM `%s`", mdb)
-      ) %>% 
-         dplyr::pull("name")
-      modelTables <- names(CHMDB_DATA_MODEL)
-      for(tn in setdiff(dbTables, modelTables)){
-         RClickhouse::dbSendQuery(
-            con,
-            sprintf(
-               "GRANT DROP TABLE ON `%s`.`%s` TO %s",
-               mdb, tn, login
-            )
-         )
-      }
-   }
+   update_chMDB_grants(x, mdb)
    invisible()
 }
 
@@ -1120,38 +1407,7 @@ remove_chMDB_user <- function(x, mdb, login){
          mdb, login
       )
    )
-   mdbAdmin <- list_chTKCat_users(x) %>% 
-      dplyr::filter(.data$login==!!login) %>% 
-      dplyr::pull("admin")
-   if(!mdbAdmin){
-      public <- is_chMDB_public(x, mdb)
-      RClickhouse::dbSendQuery(
-         con,
-         sprintf(
-            "REVOKE %s ON `%s`.* FROM %s",
-            paste(
-               CH_DB_STATEMENTS,
-               collapse=", "
-            ),
-            mdb,
-            login
-         )
-      )
-      selTables <- names(CHMDB_DATA_MODEL)
-      if(public){
-         selTables <- DBI::dbGetQuery(
-            con, sprintf("SHOW TABLES FROM `%s`", mdb)
-         ) %>% 
-            dplyr::pull("name")
-      }
-      selTables <- setdiff(selTables, "___MDBUsers___")
-      for(tn in selTables){
-         RClickhouse::dbSendQuery(
-            con,
-            sprintf("GRANT SELECT ON `%s`.`%s` TO %s", mdb, tn, login)
-         )
-      }
-   }
+   update_chMDB_grants(x, mdb)
    invisible()
 }
 

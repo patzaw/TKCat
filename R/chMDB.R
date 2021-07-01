@@ -149,7 +149,7 @@ db_disconnect.chMDB <- function(x){
 #' 
 #' @export
 #'
-db_reconnect.chMDB <- function(x, user, password, ntries=3){
+db_reconnect.chMDB <- function(x, user, password, ntries=3, ...){
    xn <- deparse(substitute(x))
    x <- unclass(x)
    tkcon <- x$tkcon
@@ -193,9 +193,16 @@ get_MDB.chTKCat <- function(x, dbName, n_max=10, ...){
    stopifnot(
       is.chTKCat(x)
    )
-   dbl <- list_MDBs(x)
+   dbl <- list_MDBs(x) %>% 
+      filter(.data$populated)
    if(!is.data.frame(dbl) || !dbName %in% dbl$name){
-      stop(sprintf("%s does not exist in the provided chTKCat", dbName))
+      stop(sprintf(
+         "%s does not exist in the provided chTKCat or is not populated",
+         dbName
+      ))
+   }
+   if(filter(dbl, .data$name==!!dbName)$access=="none"){
+      stop(sprintf("You don't have permission to access %s", dbName))
    }
    
    ## Data model ----
@@ -307,7 +314,8 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE){
       )
    }
    if(
-      dbName %in% list_MDBs(tkcon, withInfo=TRUE)$name
+      dbName %in%
+         pull(filter(list_MDBs(tkcon, withInfo=TRUE), .data$populated), "name")
    ){
       if(!overwrite){
          stop(
@@ -398,6 +406,9 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE){
       empty_chMDB(tkcon, dbName)
       stop(as.character(er))
    }
+   
+   ## Update grants ----
+   update_chMDB_grants(tkcon, dbName)
    
    ## Return the chMDB object ----
    return(get_MDB(x=tkcon, dbName=dbName))
