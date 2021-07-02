@@ -22,7 +22,7 @@ read_collection_members <- function(txt){
    }
    schema <- tkcatEnv$COLLECTIONS %>%
       dplyr::filter(.data$title==mbl$collection) %>%
-      dplyr:: pull("json")
+      dplyr::pull("json")
    if(length(schema)==0){
       stop(sprintf('"%s" is not defined as a collection', mbl$collection))
    }

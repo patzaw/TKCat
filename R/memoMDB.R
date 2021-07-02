@@ -661,8 +661,12 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin>0)
       fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin>0)
       nfk <<- nfk %>%
-         dplyr::anti_join(select(fkf, "from", "to"), by=c("from", "to")) %>% 
-         dplyr::anti_join(select(fkt, "from", "to"), by=c("from", "to"))
+         dplyr::anti_join(
+            dplyr::select(fkf, "from", "to"), by=c("from", "to")
+         ) %>% 
+         dplyr::anti_join(
+            dplyr::select(fkt, "from", "to"), by=c("from", "to")
+         )
       fkl <- dplyr::bind_rows(
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
@@ -689,8 +693,12 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin==0)
       fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin==0)
       nfk <<- nfk %>%
-         dplyr::anti_join(select(fkf, "from", "to"), by=c("from", "to")) %>% 
-         dplyr::anti_join(select(fkt, "from", "to"), by=c("from", "to"))
+         dplyr::anti_join(
+            dplyr::select(fkf, "from", "to"), by=c("from", "to")
+         ) %>% 
+         dplyr::anti_join(
+            dplyr::select(fkt, "from", "to"), by=c("from", "to")
+         )
       fkl <- dplyr::bind_rows(
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
@@ -733,7 +741,7 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       return(toRet)
    }
    fk <- fk %>%
-      filter(
+      dplyr::filter(
          .data$from %in% names(dataTables) | .data$to %in% names(dataTables)
       )
    .norm_table <- function(tn){

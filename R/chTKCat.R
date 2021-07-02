@@ -826,18 +826,18 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
                collapse=" UNION ALL "
             )
          ) %>% 
-            as_tibble() %>% 
-            mutate(
+            dplyr::as_tibble() %>% 
+            dplyr::mutate(
                public=as.logical(.data$public),
                populated=TRUE
             )
          mdbUsers <- list_chMDB_users(x) %>% 
-            filter(.data$login==con@user)
+            dplyr::filter(.data$login==con@user)
          notInit <- setdiff(dbNames, mdbDesc$name)
          if(length(notInit) >0){
-            mdbDesc <- bind_rows(
+            mdbDesc <- dplyr::bind_rows(
                mdbDesc,
-               tibble(
+               dplyr::tibble(
                   name=notInit,
                   title=as.character(NA),
                   description=as.character(NA),
@@ -850,8 +850,8 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
             )
          }
          toRet <- mdbDesc %>%
-            mutate(
-               access = case_when(
+            dplyr::mutate(
+               access = dplyr::case_when(
                   !!x$admin ~ "write and read",
                   .data$name %in% !!mdbUsers$db[which(!!mdbUsers$admin)] ~
                      "write and read",
@@ -1083,7 +1083,7 @@ update_chMDB_grants <- function(x, mdb){
       is.character(mdb), length(mdb)==1, !is.na(mdb)
    )
    managedMdbs <- list_MDBs(x, withInfo=TRUE) %>% 
-      filter(.data$access=="write and read" & .data$name==!!mdb)
+      dplyr::filter(.data$access=="write and read" & .data$name==!!mdb)
    if(!mdb %in% managedMdbs$name){
       stop(sprintf("No admin permission on '%s' database", mdb))
    }
@@ -1093,8 +1093,8 @@ update_chMDB_grants <- function(x, mdb){
    tkcUsers <- list_chTKCat_users(x)
    mdbUsers <- list_chMDB_users(x, mdb)
    adminUsers <- c(
-      tkcUsers %>% filter(.data$admin) %>% pull("login"),
-      mdbUsers %>% filter(.data$admin) %>% pull("login")
+      tkcUsers %>% dplyr::filter(.data$admin) %>% dplyr::pull("login"),
+      mdbUsers %>% dplyr::filter(.data$admin) %>% dplyr::pull("login")
    ) %>% 
       unique()
    readUsers <- mdbUsers$login
@@ -1299,7 +1299,7 @@ list_chMDB_users <- function(x, mdbs=NULL){
       con,
       "SELECT database FROM system.tables WHERE name='___MDBUsers___'"
    ) %>%
-      pull("database")
+      dplyr::pull("database")
    if(is.null(mdbs)){
       mdbs <- mdbWithUsers
    }else{
@@ -1334,9 +1334,9 @@ list_chMDB_users <- function(x, mdbs=NULL){
             collapse=" UNION ALL "
          )
       ) %>%
-         as_tibble() %>% 
-         mutate(admin=as.logical(.data$admin)) %>% 
-         arrange(.data$db, .data$admin, .data$login)
+         dplyr::as_tibble() %>% 
+         dplyr::mutate(admin=as.logical(.data$admin)) %>% 
+         dplyr::arrange(.data$db, .data$admin, .data$login)
    }
    return(toRet)
 }
@@ -1614,7 +1614,7 @@ collection_members.chTKCat <- function(
          sprintf("SHOW TABLES FROM `%s`", dbName)
       )
       if("___CollectionMembers___" %in% dbTables$name){
-         toRet <- bind_rows(
+         toRet <- dplyr::bind_rows(
             toRet,
             DBI::dbGetQuery(
                con,
@@ -1652,6 +1652,9 @@ collection_members.chTKCat <- function(
 #' available for shiny.
 #' @param workers number of available workers when download is available
 #' (default: 4)
+#' @param userManager URL for user management interface
+#' (see [manage_chTKCat_users()]). If NULL (default), the functionality
+#' is not added.
 #' 
 #' @rdname explore_MDBs
 #' @method explore_MDBs chTKCat
@@ -1664,11 +1667,17 @@ explore_MDBs.chTKCat <- function(
    host=x$chcon@host,
    download=FALSE,
    workers=4,
+   userManager=NULL,
    ...
 ){
    stopifnot(
       is.logical(download), length(download)==1, !is.na(download)
    )
+   if(!is.null(userManager)){
+      stopifnot(
+         is.character(userManager), length(userManager)==1, !is.na(userManager)
+      )
+   }
    if(download){
       ddir <- tempfile()
       dir.create(ddir)
@@ -1687,12 +1696,13 @@ explore_MDBs.chTKCat <- function(
       }
    }, add=TRUE)
    shiny::shinyApp(
-      ui=.build_etkc_ui(x=x, ddir=ddir),
+      ui=.build_etkc_ui(x=x, ddir=ddir, userManager=!is.null(userManager)),
       server=.build_etkc_server(
          x=x,
          subSetSize=subSetSize,
          host=host,
-         ddir=ddir
+         ddir=ddir,
+         userManager=userManager
       ),
       enableBookmarking="url",
       onStart=function(){
@@ -1707,7 +1717,7 @@ explore_MDBs.chTKCat <- function(
 }
 
 ###############################################################################@
-.build_etkc_ui.chTKCat <- function(x, ddir=NULL, ...){
+.build_etkc_ui.chTKCat <- function(x, ddir=NULL, userManager=FALSE, ...){
    
    .etkc_add_resources(ddir=ddir)
    
@@ -1725,6 +1735,7 @@ explore_MDBs.chTKCat <- function(
          ## Uses uiOutput("currentUser") and uiOutput("signin")
          sidebar=.etkc_sd_sidebar(
             sysInterface=TRUE,
+            userManager=userManager,
             manList=c(
                "chTKCat user guide"="doc/chTKCat-User-guide.html",
                "General TKCat user guide"="doc/TKCat-User-guide.html",
@@ -1746,10 +1757,244 @@ explore_MDBs.chTKCat <- function(
    x,
    subSetSize=100,
    host=x$chcon@host,
-   ddir=NULL
+   ddir=NULL,
+   userManager=NULL
 ){
    .build_etkc_server_default(
       x=x, subSetSize=subSetSize, xparams=list(host=host),
-      ddir=ddir
+      ddir=ddir,
+      userManager=userManager
+   )
+}
+
+
+###############################################################################@
+#### SHINY MANAGER ####
+###############################################################################@
+
+
+###############################################################################@
+#' Manage user information in a shiny interface
+#' 
+#' @param x a [chTKCat] object
+#' @param pwdFile a local file in which the password for x can be found.
+#' If NULL (default), the connection is shared by all sessions and can
+#' be disabled at some point.
+#' 
+#' @export
+#'
+manage_chTKCat_users <- function(x, pwdFile=NULL){
+   
+   stopifnot(
+      is.chTKCat(x), x$admin
+   )
+   check_chTKCat(x)
+   
+   .etkc_add_resources(ddir=NULL)
+   
+   shiny::shinyApp(
+      
+      ui=function(req){
+         shiny::fluidPage(
+            shiny::tags$script("
+               Shiny.addCustomMessageHandler(
+                  'current_password',
+                  function(value) {
+                     Shiny.setInputValue('current_password', value);
+                  }
+               );
+               $(document).keyup(function(event) {
+                  if(event.key == 'Enter'){
+                     if($('#update')[0]) {
+                        $('#update').click();
+                     }else{
+                        if($('#connect')[0]) {
+                           $('#connect').click();
+                        }
+                     }
+                  }
+               });
+            "),
+            shiny::fluidRow(
+               shiny::column(
+                  6,
+                  shiny::textInput(
+                     "login", "User name"
+                  ),
+                  shiny::passwordInput(
+                     "current_password", "Current password"
+                  ),
+                  shiny::actionButton(
+                     "connect", "Connect to check and modify settings"
+                  )
+               ),
+               shiny::column(
+                  6,
+                  shiny::uiOutput("userInfo")
+               )
+            )
+         )
+      },
+      
+      server=function(input, output, session){
+         
+         ## Manage DB connection ----
+         if(!is.null(pwdFile)){
+            db_reconnect(x, password=readLines(pwdFile))
+            shiny::onSessionEnded(function() db_disconnect(x))
+         }
+         shiny::onStop(function() db_disconnect(x))
+         userInstance <- shiny::reactiveVal()
+         
+         ## Connect as user ----
+         observeEvent(input$connect, {
+            l <- shiny::isolate(input$login)
+            p <- shiny::isolate(input$current_password)
+            shiny::req(l)
+            userInstance(try(
+               chTKCat(
+                  host=x$chcon@host, port=x$chcon@port,
+                  user=l, password=p,
+                  settings=x$settings
+               ),
+               silent=TRUE
+            ))
+            session$sendCustomMessage("current_password", 'null')
+         })
+         
+         ## Display user settings ----
+         newpwd <- shiny::reactiveValues(
+            pwd=character(0),
+            cpwd=character(0),
+            valid=FALSE
+         )
+         output$userInfo <- shiny::renderUI({
+            ui <- userInstance()
+            shiny::req(!is.null(ui))
+            if(inherits(ui, "try-error")){
+               return(shiny::fluidRow(column(
+                  12,
+                  shiny::p(shiny::strong("Bad credentials", style="color:red;"))
+               )))
+            }
+            if(ui$chcon@user=="default"){
+               return(shiny::fluidRow(column(
+                  12,
+                  shiny::p(shiny::strong(
+                     "The default user cannot be modified",
+                     style="color:red;"
+                  ))
+               )))
+            }
+            if(ui$chcon@user==x$chcon@user){
+               return(shiny::fluidRow(column(
+                  12,
+                  shiny::p(shiny::strong(
+                     sprintf("The %s user cannot be modified", x$chcon@user),
+                     style="color:red;"
+                  ))
+               )))
+            }
+            ut <- list_chTKCat_users(x)
+            cur_cont <- ut %>%
+               dplyr::filter(.data$login==ui$chcon@user) %>%
+               dplyr::pull("contact")
+            toRet <- shiny::fluidRow(column(
+               12,
+               shiny::textInput(
+                  "contact", "Contact", placeholder=cur_cont
+               ),
+               shiny::passwordInput(
+                  "new_password", "New password (8 charcters or more)"
+               ),
+               shiny::passwordInput(
+                  "conf_password", "Confirm new password"
+               ),
+               shiny::uiOutput("pwdCheck"),
+               shiny::actionButton(
+                  "update", "Update settings"
+               ),
+               shiny::uiOutput("updInfo")
+            ))
+            return(toRet)
+         })
+         output$pwdCheck <- shiny::renderUI({
+            nclim <- 8
+            pwd <- input$new_password
+            cpwd <- input$conf_password
+            valid <- nchar(pwd) >= nclim &
+               pwd==cpwd
+            newpwd$pwd <- pwd
+            newpwd$cpwd <- cpwd
+            newpwd$valid <- valid
+            if(!valid){
+               if(nchar(pwd)==0){
+                  return()
+               }else{
+                  if(nchar(pwd) < nclim){
+                     return(shiny::strong(
+                        "8 characters or more are required",
+                        style="color:red;"
+                     ))
+                  }
+                  if(pwd != cpwd){
+                     return(shiny::strong(
+                        "Passwords are differents",
+                        style="color:red;"
+                     ))
+                  }
+               }
+            }else{
+               return(shiny::strong(
+                  "Valid new password, ready for update",
+                  style="color:green;"
+               ))
+            }
+         })
+         
+         ## Update settings ----
+         output$updInfo <- shiny::renderUI({
+            shiny::req(input$update)
+            ui <- shiny::isolate(userInstance())
+            shiny::req(ui)
+            vui <- try(check_chTKCat(ui), silent=TRUE)
+            if(inherits(vui, "try-error")){
+               userInstance(vui)
+               return()
+            }
+            newCont <- shiny::isolate(input$contact)
+            toRet <- shiny::tagList()
+            if(!is.na(newCont) & length(newCont) & nchar(newCont)>0){
+               update_chTKCat_user(x, login=ui$chcon@user, contact=newCont)
+               toRet <- c(
+                  toRet,
+                  shiny::tagList(shiny::p(shiny::strong(
+                     "- Contact information has been updated",
+                     style="color:green;"
+                  )))
+               )
+            }
+            if(shiny::isolate(newpwd$valid)){
+               pwd <- shiny::isolate(newpwd$pwd)
+               change_chTKCat_password(x, login=ui$chcon@user, password=pwd)
+               db_disconnect(ui)
+               newpwd$pwd <- ""
+               newpwd$cpwd <- ""
+               newpwd$valid <- FALSE
+               toRet <- c(
+                  toRet,
+                  shiny::tagList(shiny::p(shiny::strong(
+                     paste(
+                        "- Password has been updated",
+                        "(you need to reconnect to make other changes)"
+                     ),
+                     style="color:green;"
+                  )))
+               )
+            }
+            return(toRet)
+         })
+         
+      }
    )
 }

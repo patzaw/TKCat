@@ -14,6 +14,7 @@
   host = x$chcon@host,
   download = FALSE,
   workers = 4,
+  userManager = NULL,
   ...
 )
 
@@ -34,6 +35,10 @@ available for shiny.}
 \item{...}{method specific parameters}
 
 \item{host}{the name of the host to show in the application}
+
+\item{userManager}{URL for user management interface
+(see \code{\link[=manage_chTKCat_users]{manage_chTKCat_users()}}). If NULL (default), the functionality
+is not added.}
 }
 \value{
 No return value, called for side effects

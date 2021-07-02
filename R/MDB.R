@@ -257,7 +257,7 @@ compare_MDB <- function(former, new){
       "Information"=dbif,
       "Former"=unlist(fdbi)[dbif],
       "New"=unlist(ndbi)[dbif]
-   ) %>% mutate(
+   ) %>% dplyr::mutate(
       "Identical"=.data$Former==.data$New
    )
    
@@ -294,7 +294,7 @@ compare_MDB <- function(former, new){
             "Information"=c(sprintf("Table %s", names(fnr)), "Total"),
             "Former"=format(c(fnr, sum(fnr)), big.mark=",", trim=FALSE),
             "New"=format(c(nnr, sum(nnr)), big.mark=",", trim=FALSE)
-         ) %>% mutate(
+         ) %>% dplyr::mutate(
             "Identical"=c(fnr, sum(fnr))==c(nnr, sum(nnr))
          )
       )
@@ -557,8 +557,12 @@ merge.MDB <- function(
          tm <- ReDaMoR::RelTableModel(list(
             tableName=byi$rt,
             fields=dplyr::bind_rows(
-               select(dxcmi, "name", "type", "nullable", "unique", "comment"),
-               select(dycmi, "name", "type", "nullable", "unique", "comment")
+               dplyr::select(
+                  dxcmi, "name", "type", "nullable", "unique", "comment"
+               ),
+               dplyr::select(
+                  dycmi, "name", "type", "nullable", "unique", "comment"
+               )
             ),
             primaryKey=NULL,
             foreignKeys=list(

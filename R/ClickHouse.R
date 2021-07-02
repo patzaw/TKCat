@@ -99,7 +99,7 @@ list_tables <- function(
       )
    }
    toRet <- dplyr::as_tibble(DBI::dbGetQuery(con, query)) %>% 
-      mutate(
+      dplyr::mutate(
          total_rows=as.numeric(.data$total_rows),
          total_bytes=as.numeric(.data$total_bytes)
       )
@@ -149,7 +149,7 @@ write_MergeTree <- function(
    if(is.null(rtypes)){
       rtypes <- c()
       for(cn in colnames(value)){
-         rtypes[cn] <- class(pull(value, !!cn))[1]
+         rtypes[cn] <- class(dplyr::pull(value, !!cn))[1]
       }
    }
    stopifnot(
@@ -337,7 +337,7 @@ mergeTree_from_RelTableModel <- function(
       rtypes=rtypes,
       nullable=tm$fields %>%
          dplyr::filter(.data$nullable) %>%
-         pull("name"),
+         dplyr::pull("name"),
       sortKey=.get_tm_sortKey(tm)
    )
    invisible()
@@ -364,7 +364,7 @@ mergeTree_from_RelTableModel <- function(
          # If no primary key, sort by the first unique index
          if(nrow(uit)>0){
             toRet <- dplyr::filter(uit, .data$index==min(uit$index)) %>% 
-               pull("field")
+               dplyr::pull("field")
          }else{
             
             # If no unique index, sort by index and the remaining columns

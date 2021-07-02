@@ -69,6 +69,7 @@ The following R packages available on CRAN are required:
     Abstractions for Promise-Based Asynchronous Programming
 -   [future](https://CRAN.R-project.org/package=future): Unified
     Parallel and Distributed Processing in R for Everyone
+-   [xml2](https://CRAN.R-project.org/package=xml2): Parse XML
 
 ## From github
 

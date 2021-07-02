@@ -8,6 +8,7 @@
 - Better management of GRANTs
 - settings management when connecting and re-connecting
 - Installation and initialization of ClickHouse is easier
+- Shiny interface for user settings (contact and password)
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->

@@ -194,14 +194,14 @@ get_MDB.chTKCat <- function(x, dbName, n_max=10, ...){
       is.chTKCat(x)
    )
    dbl <- list_MDBs(x) %>% 
-      filter(.data$populated)
+      dplyr::filter(.data$populated)
    if(!is.data.frame(dbl) || !dbName %in% dbl$name){
       stop(sprintf(
          "%s does not exist in the provided chTKCat or is not populated",
          dbName
       ))
    }
-   if(filter(dbl, .data$name==!!dbName)$access=="none"){
+   if(dplyr::filter(dbl, .data$name==!!dbName)$access=="none"){
       stop(sprintf("You don't have permission to access %s", dbName))
    }
    
@@ -315,7 +315,10 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE){
    }
    if(
       dbName %in%
-         pull(filter(list_MDBs(tkcon, withInfo=TRUE), .data$populated), "name")
+         dplyr::pull(
+            dplyr::filter(list_MDBs(tkcon, withInfo=TRUE), .data$populated),
+            "name"
+         )
    ){
       if(!overwrite){
          stop(
@@ -330,7 +333,9 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE){
    ## Add relevant collections ----
    if(!is.null(collectionMembers) && nrow(collectionMembers)>0){
       toAdd <- unique(collectionMembers$collection)
-      toAdd <- setdiff(toAdd, pull(list_chTKCat_collections(tkcon), "title"))
+      toAdd <- setdiff(
+         toAdd, dplyr::pull(list_chTKCat_collections(tkcon), "title")
+      )
       for(col in toAdd){
          add_chTKCat_collection(tkcon, col)
       }
@@ -1014,7 +1019,7 @@ slice.chMDB <- function(.data, ..., by=10^5, .preserve=FALSE){
    i <- dots[[tn]]
    
    ft <- data_tables(x, dplyr::all_of(tn), skip=0, n_max=1)[[1]] %>% 
-      slice(2)
+      dplyr::slice(2)
    s <- 0
    j <- i-s
    j <- j[j>0 & j <=by]
@@ -1119,8 +1124,12 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
       fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin>0)
       fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin>0)
       nfk <<- nfk %>%
-         dplyr::anti_join(select(fkf, "from", "to"), by=c("from", "to")) %>% 
-         dplyr::anti_join(select(fkt, "from", "to"), by=c("from", "to"))
+         dplyr::anti_join(
+            dplyr::select(fkf, "from", "to"), by=c("from", "to")
+         ) %>% 
+         dplyr::anti_join(
+            dplyr::select(fkt, "from", "to"), by=c("from", "to")
+         )
       fkl <- dplyr::bind_rows(
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
@@ -1164,8 +1173,10 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
       fkf <- fk %>% dplyr::filter(.data$from==!!tn & .data$fmin==0)
       fkt <- fk %>% dplyr::filter(.data$to==!!tn & .data$tmin==0)
       nfk <<- nfk %>%
-         dplyr::anti_join(select(fkf, "from", "to"), by=c("from", "to")) %>% 
-         dplyr::anti_join(select(fkt, "from", "to"), by=c("from", "to"))
+         dplyr::anti_join(
+            dplyr::select(fkf, "from", "to"), by=c("from", "to")
+         ) %>% 
+         dplyr::anti_join(dplyr::select(fkt, "from", "to"), by=c("from", "to"))
       fkl <- dplyr::bind_rows(
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")

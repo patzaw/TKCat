@@ -100,6 +100,16 @@ change_chTKCat_password(k, "lfrancois")
 update_chTKCat_user(k, contact="email", admin=FALSE)
 ```
 
+A shiny application can be launched for updating user settings:
+
+```{r, eval=FALSE}
+manage_chTKCat_users(k)
+```
+
+If this application is deployed, it can be made directly accessible from the
+`explore_MDBs` Shiny application by providing the URL as the `userManager`
+parameter.
+
 ## Drop
 
 ```{r, eval=FALSE}

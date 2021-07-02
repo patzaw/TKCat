@@ -185,7 +185,7 @@ map_collection_members <- function(
    
    ## Prepare for conversion ----
    ## x
-   xp <- select(
+   xp <- dplyr::select(
       x,
       dplyr::all_of(xm$value[which(!xm$static)])
    ) %>% 
@@ -200,7 +200,7 @@ map_collection_members <- function(
       }
    }
    ## y
-   yp <- select(
+   yp <- dplyr::select(
       y,
       dplyr::all_of(ym$value[which(!ym$static)])
    ) %>% 

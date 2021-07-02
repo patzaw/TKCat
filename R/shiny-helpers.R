@@ -48,6 +48,7 @@
 ###############################################################################@
 .etkc_sd_sidebar <- function(
    sysInterface,
+   userManager=FALSE,
    manList
 ){
    
@@ -90,6 +91,15 @@
             icon=NULL
          )
       ))
+      if(userManager){
+         sbelts <- c(sbelts, list(
+            shinydashboard::menuItem(
+               shiny::uiOutput("userManager"),
+               tabName="userManagerTab",
+               icon=NULL
+            )
+         ))
+      }
    }
    
    ## Documentation ----
@@ -246,7 +256,8 @@
    x,
    subSetSize=100,
    xparams=list(),
-   ddir=NULL
+   ddir=NULL,
+   userManager=NULL
 ){
    
    function(input, output, session) {
@@ -412,7 +423,7 @@
          selStatus$mdb <- mdb
          if(
             inherits(mdb, "try-error") ||
-            !all(isolate(selStatus$tables) %in% names(mdb))
+            !all(shiny::isolate(selStatus$tables) %in% names(mdb))
          ){
             selStatus$tables <- NULL
          }
@@ -420,7 +431,7 @@
       shiny::observe({
          mdb <- selStatus$mdb
          shiny::req(mdb)
-         tn <- isolate(selStatus$tables)
+         tn <- shiny::isolate(selStatus$tables)
          if(!all(tn %in% names(mdb))){
             selStatus$tables <- NULL
          }
@@ -433,7 +444,7 @@
          mdb <- selStatus$mdb
          shiny::req(!is.null(mdb))
          if(inherits(mdb, "try-error")){
-            n <- isolate(selStatus$resource)
+            n <- shiny::isolate(selStatus$resource)
             shiny::tagList(
                shiny::tags$p(
                   "You don't have access to",
@@ -533,7 +544,7 @@
          })
          
          observeEvent(input$prepDbdown, {
-            mdb <- isolate(selStatus$mdb)
+            mdb <- shiny::isolate(selStatus$mdb)
             shiny::req(mdb)
             n <- shiny::isolate(selStatus$resource)
             fname <- paste0(n, ".zip")
@@ -542,7 +553,7 @@
             tf <- tempfile(tmpdir=tddir, fileext=".zip")
             if(!file.exists(f)){
                if(is.chMDB(mdb)){
-                  p <- isolate(upwd())
+                  p <- shiny::isolate(upwd())
                }
                future::future({
                   if(is.chMDB(mdb)){
@@ -617,7 +628,7 @@
          dm <- data_model(mdb)
          dbdm$validInput <- TRUE
          nodesIdSelection <- list(enabled=TRUE, useLabels=FALSE)
-         sel <- isolate(selStatus$tables) %>% 
+         sel <- shiny::isolate(selStatus$tables) %>% 
             intersect(names(mdb))
          if(length(sel)>0){
             nodesIdSelection$selected <- sel
@@ -632,7 +643,7 @@
       shiny::observe({
          shiny::req(dbdm$validInput)
          n <- input$dataModel_selected
-         mdb <- isolate(selStatus$mdb)
+         mdb <- shiny::isolate(selStatus$mdb)
          shiny::req(mdb)
          if(length(n)==0 || n=="" || !all(n %in% names(mdb))){
             selStatus$tables <- NULL
@@ -684,7 +695,7 @@
       shiny::observe({
          cs <- input$colMembers_rows_selected
          shiny::req(cs)
-         mdb <- isolate(selStatus$mdb)
+         mdb <- shiny::isolate(selStatus$mdb)
          shiny::req(mdb)
          cmt <- collection_members(mdb) %>%
             dplyr::slice(cs) %>%
@@ -817,9 +828,9 @@
          })
          
          observeEvent(input$prepTabledown, {
-            mdb <- isolate(selStatus$mdb)
+            mdb <- shiny::isolate(selStatus$mdb)
             shiny::req(mdb)
-            sel <- isolate(selStatus$tables) %>% 
+            sel <- shiny::isolate(selStatus$tables) %>% 
                intersect(names(mdb))
             shiny::req(sel)
             shiny::req(length(sel)==1)
@@ -829,7 +840,7 @@
             tf <- tempfile(tmpdir=tddir, fileext=".txt.gz")
             if(!file.exists(f)){
                if(is.chMDB(mdb)){
-                  p <- isolate(upwd())
+                  p <- shiny::isolate(upwd())
                }
                future::future({
                   if(is.chMDB(mdb)){
@@ -885,7 +896,7 @@
          mdb <- selStatus$mdb
          shiny::req(!is.null(mdb))
          if(inherits(mdb, "try-error")){
-            n <- isolate(selStatus$resource)
+            n <- shiny::isolate(selStatus$resource)
             shiny::tagList(
                shiny::tags$p(
                   "You don't have access to",
@@ -963,11 +974,14 @@
       shiny::observe({
          sel <- input$searchResRes_rows_selected
          shiny::req(sel)
-         rt <- isolate(searchRes$resources)
+         rt <- shiny::isolate(searchRes$resources)
          shiny::req(rt)
          mdbListProxy %>%
             DT::selectRows(
-               which(isolate(mdbs$list$name) %in% pull(slice(rt, sel), "name"))
+               which(
+                  shiny::isolate(mdbs$list$name) %in%
+                     dplyr::pull(dplyr::slice(rt, sel), "name")
+               )
             )
       })
       ## _+ tables ----
@@ -1020,15 +1034,16 @@
       shiny::observe({
          sel <- input$searchTabRes_rows_selected
          shiny::req(sel)
-         rt <- isolate(searchRes$tables)
+         rt <- shiny::isolate(searchRes$tables)
          shiny::req(rt)
          mdbListProxy %>%
             DT::selectRows(
                which(
-                  isolate(mdbs$list$name) %in% pull(slice(rt, sel), "resource")
+                  shiny::isolate(mdbs$list$name) %in%
+                     dplyr::pull(dplyr::slice(rt, sel), "resource")
                )
             )
-         selStatus$tables <- rt %>% slice(sel) %>% pull("name")
+         selStatus$tables <- rt %>% dplyr::slice(sel) %>% dplyr::pull("name")
       })
       ## _+ fields ----
       shiny::observe({
@@ -1079,15 +1094,16 @@
       shiny::observe({
          sel <- input$searchFieldRes_rows_selected
          shiny::req(sel)
-         rt <- isolate(searchRes$fields)
+         rt <- shiny::isolate(searchRes$fields)
          shiny::req(rt)
          mdbListProxy %>%
             DT::selectRows(
                which(
-                  isolate(mdbs$list$name) %in% pull(slice(rt, sel), "resource")
+                  shiny::isolate(mdbs$list$name) %in%
+                     dplyr::pull(dplyr::slice(rt, sel), "resource")
                )
             )
-         selStatus$tables <- rt %>% slice(sel) %>% pull("table")
+         selStatus$tables <- rt %>% dplyr::slice(sel) %>% dplyr::pull("table")
       })
       
       ###############################################@
@@ -1143,7 +1159,7 @@
          })
          shiny::observeEvent(input$silink, {
             okConnect(TRUE)
-            showModal(modalDialog(
+            shiny::showModal(shiny::modalDialog(
                title="Sign in",
                shiny::div(
                   shiny::fluidRow(
@@ -1257,6 +1273,31 @@
                session$sendCustomMessage('hideNavs', 'signinTab')
             }
          })
+         
+         ########################@
+         ## User manager ----
+         if(!is.null(userManager)){
+            output$userManager <- shiny::renderUI({
+               shiny::actionLink(
+                  inputId="umlink",
+                  label=shiny::span("User settings", style="margin-left:6px;"),
+                  icon=shiny::icon("user-cog"),
+                  style="margin:0;"
+               )
+            })
+            shiny::observeEvent(input$umlink, {
+               shiny::showModal(shiny::modalDialog(
+                  title="User settings",
+                  shiny::div(
+                     shiny::tags$iframe(
+                        src=userManager, height=600, width="100%"
+                     )
+                  ),
+                  size="l",
+                  easyClose=TRUE
+               ))
+            })
+         }
       }
       
       ########################@

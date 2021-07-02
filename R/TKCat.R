@@ -256,7 +256,7 @@ search_MDB_tables.TKCat <- function(x, searchTerm){
       grep(searchTerm, dmt$name, ignore.case=TRUE),
       grep(searchTerm, dmt$comment, ignore.case=TRUE)
    ))
-   toRet <- dmt %>% slice(c(0, toTake))
+   toRet <- dmt %>% dplyr::slice(c(0, toTake))
    return(toRet)
 }
 
@@ -274,7 +274,7 @@ search_MDB_fields.TKCat <- function(x, searchTerm){
       grep(searchTerm, dmf$name, ignore.case=TRUE),
       grep(searchTerm, dmf$comment, ignore.case=TRUE)
    ))
-   toRet <- dmf %>% slice(c(0, toTake))
+   toRet <- dmf %>% dplyr::slice(c(0, toTake))
    return(toRet)
 }
 

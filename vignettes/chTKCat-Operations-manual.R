@@ -22,6 +22,9 @@ library(TKCat)
 #  update_chTKCat_user(k, contact="email", admin=FALSE)
 
 ## ---- eval=FALSE--------------------------------------------------------------
+#  manage_chTKCat_users(k)
+
+## ---- eval=FALSE--------------------------------------------------------------
 #  drop_chTKCat_user(k, login="lfrancois")
 
 ## ---- eval=FALSE--------------------------------------------------------------
