@@ -108,7 +108,7 @@ Documentation is available in the following vignettes
         available. **TKCat** only supports the
         [ClickHouse](https://clickhouse.tech/) system through the
         [RClickhouse](https://github.com/IMSMWU/RClickhouse) package.
-    -   **TKCat** implements 3 main type of MDB based on files, memory
+    -   **TKCat** implements 3 main types of MDB based on files, memory
         tables or ClickHouse database. It also provides mechanisms to
         automatically convert from and to any of these implementations.
     -   **TKCat** supports catalogs of MDBs facilitating the exploration
