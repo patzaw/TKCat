@@ -786,7 +786,7 @@ db_tables <- function(x){
          grep('.rs.explorer.inspectObject', deparse(sys.calls()), value=FALSE)
       )
       if(length(cc)!=0){
-         invisible(as.character(data_files(x)$dataFiles[i]))
+         invisible()
       }else{
          return(data_tables(x, dplyr::all_of(i))[[1]])
       }
@@ -1101,9 +1101,6 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
 ## Helpers ----
 .write_chTables.chMDB <- function(x, con, dbName, by=10^5){
    dm <- data_model(x)
-   df <- data_files(x)
-   rp <- df$readParameters
-   df <- df$dataFiles
    for(tn in names(x)){
       toWrite <- data_tables(x, dplyr::all_of(tn), skip=0, n_max=by)[[1]]
       r <- nrow(toWrite)
