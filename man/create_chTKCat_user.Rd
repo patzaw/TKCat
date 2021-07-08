@@ -4,7 +4,14 @@
 \alias{create_chTKCat_user}
 \title{Create a chTKCat user}
 \usage{
-create_chTKCat_user(x, login, password, contact, admin = FALSE)
+create_chTKCat_user(
+  x,
+  login,
+  password,
+  contact,
+  admin = FALSE,
+  provider = admin
+)
 }
 \arguments{
 \item{x}{a \link{chTKCat} object}
@@ -16,7 +23,11 @@ create_chTKCat_user(x, login, password, contact, admin = FALSE)
 \item{contact}{contact information (can be NA)}
 
 \item{admin}{a logical indicating if the user is an admin of the chTKCat
-instance}
+instance (default: TRUE)}
+
+\item{provider}{a logical indicating if the user is data provider (TRUE)
+or a data consumer (FALSE: default). If admin
+is set to TRUE provider will be set to TRUE}
 }
 \value{
 No return value, called for side effects

@@ -111,6 +111,13 @@
         "nullable": false,
         "unique": false,
         "comment": "If the user is an admin of the chTKCat instance"
+      },
+      {
+        "name": "provider",
+        "type": "logical",
+        "nullable": false,
+        "unique": false,
+        "comment": "If the user is a data provider (TRUE), or a data consumer only (FALSE)"
       }
     ],
     "foreignKeys": [],

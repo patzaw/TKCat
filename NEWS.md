@@ -1,5 +1,15 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
+## Version 0.6.0
+
+### New features
+
+- A user can be a data consumer (default) or a data provider
+(set the "provider" setting to TRUE). A data provider can create and manage
+a database.
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 ## Version 0.5.6
 
 - Correcting bug in setting chMDB collections

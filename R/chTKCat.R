@@ -123,11 +123,28 @@ check_chTKCat <- function(x, verbose=FALSE){
       }
       
       ## User permissions
-      admin <- DBI::dbGetQuery(
-         con, sprintf("SELECT admin FROM Users WHERE login='%s'", con@user)
-      ) %>% 
-         dplyr::pull("admin") %>%
-         as.logical()
+      ui <- try(DBI::dbGetQuery(
+         con,
+         sprintf(
+            "SELECT admin, provider FROM Users WHERE login='%s'",
+            con@user
+         )
+      ), silent=TRUE)
+      if(inherits(ui, "try-error")){
+         ui <- dbGetQuery(
+            con,
+            sprintf(
+               "SELECT admin FROM Users WHERE login='%s'",
+               con@user
+            )
+         )
+      }
+      admin <- as.logical(ui$admin)
+      if("provider" %in% colnames(ui)){
+         provider <- as.logical(ui$provider)
+      }else{
+         provider <- as.logical(NA)
+      }
       
       ## System information
       dbSys <- DBI::dbGetQuery(
@@ -157,8 +174,14 @@ check_chTKCat <- function(x, verbose=FALSE){
       toRet$contact <- dbSys$contact
       toRet$path <- dbSys$path
       toRet$admin <- admin
+      toRet$provider <- provider
    }
-   for(i in setdiff(intersect(names(x), names(toRet)), c("path", "admin"))){
+   for(
+      i in setdiff(
+         intersect(names(x), names(toRet)),
+         c("path", "admin", "provider")
+      )
+   ){
       if(!identical(x[[i]], toRet[[i]])){
          print(toRet)
          stop(sprintf('Incoherent "%s" information', i))
@@ -454,16 +477,30 @@ list_chTKCat_users <- function(x){
       is.chTKCat(x)
    )
    con <- x$chcon
+   uf <- DBI::dbGetQuery(
+      con,
+      paste(
+         "SELECT name FROM system.columns",
+         "WHERE database='default' AND table='Users'"
+      )
+   ) %>%
+      dplyr::pull("name")
    toRet <- DBI::dbGetQuery(
       con,
       sprintf(
          "SELECT %s FROM default.Users",
-         ifelse(x$admin, "*", "login, admin")
+         ifelse(
+            x$admin, "*",
+            paste(intersect(uf, c("login", "admin", "provider")), collapse=", ")
+         )
       )
    ) %>% 
       dplyr::as_tibble()
    if("admin" %in% colnames(toRet)){
       toRet$admin <- as.logical(toRet$admin)
+   }
+   if("provider" %in% colnames(toRet)){
+      toRet$provider <- as.logical(toRet$provider)
    }
    return(toRet)
 }
@@ -478,12 +515,17 @@ list_chTKCat_users <- function(x){
 #' @param contact contact information (can be NA)
 #' @param admin a logical indicating if the user is an admin of the chTKCat
 #' instance
+#' @param admin a logical indicating if the user is an admin of the chTKCat
+#' instance (default: TRUE)
+#' @param provider a logical indicating if the user is data provider (TRUE)
+#' or a data consumer (FALSE: default). If admin
+#' is set to TRUE provider will be set to TRUE
 #' 
 #' @return No return value, called for side effects
 #' 
 #' @export
 create_chTKCat_user <- function(
-   x, login, password, contact, admin=FALSE
+   x, login, password, contact, admin=FALSE, provider=admin
 ){
    contact <- as.character(contact)
    stopifnot(
@@ -491,7 +533,8 @@ create_chTKCat_user <- function(
       is.character(login), length(login)==1, !is.na(login),
       length(grep("[^[:alnum:]_]", login))==0,
       is.character(contact), length(contact)==1,
-      is.logical(admin), length(admin)==1, !is.na(admin)
+      is.logical(admin), length(admin)==1, !is.na(admin),
+      is.logical(provider), length(provider)==1, !is.na(provider)
    )
    if(!x$admin){
       stop("Only chTKCat admin can add users")
@@ -519,11 +562,15 @@ create_chTKCat_user <- function(
    )
    
    ## Register the user ----
+   if(admin){
+      provider=TRUE
+   }
    ch_insert(
       con, "default", "Users", dplyr::tibble(
          login=login,
          contact=as.character(contact),
-         admin=admin
+         admin=admin,
+         provider=provider
       )
    )
    
@@ -537,6 +584,45 @@ create_chTKCat_user <- function(
          )
       )
    }else{
+      
+      RClickhouse::dbSendQuery(
+         con,
+         sprintf(
+            "REVOKE ALL ON *.* FROM %s",
+            login
+         )
+      )
+      
+      if(provider){
+         RClickhouse::dbSendQuery(
+            con, 
+            sprintf(
+               paste(
+                  "GRANT SELECT,",
+                  " CREATE DATABASE, CREATE TABLE, DROP TABLE, ALTER, INSERT",
+                  " ON *.* TO %s WITH GRANT OPTION"
+               ),
+               login
+            )
+         )
+         
+         RClickhouse::dbSendQuery(
+            con,
+            sprintf(
+               "REVOKE ALL ON default.* FROM %s",
+               login
+            )
+         )
+         RClickhouse::dbSendQuery(
+            con,
+            sprintf(
+               "REVOKE ALL ON system.* FROM %s",
+               login
+            )
+         )
+         
+      }
+      
       RClickhouse::dbSendQuery(
          con, sprintf("GRANT SHOW DATABASES ON *.* TO %s", login)
       )
@@ -561,7 +647,10 @@ create_chTKCat_user <- function(
       )
       RClickhouse::dbSendQuery(
          con,
-         sprintf("GRANT SELECT(login, admin) ON default.Users TO %s", login)
+         sprintf(
+            "GRANT SELECT(login, admin, provider) ON default.Users TO %s",
+            login
+         )
       )
    }
    for(db in list_MDBs(x, withInfo=TRUE)$name){
@@ -604,7 +693,7 @@ change_chTKCat_password <- function(
       is.character(password), length(password)==1
    )
    con <- x$chcon
-   ## Create the user in ClickHouse ----
+   ## Alter the user in ClickHouse ----
    RClickhouse::dbSendQuery(
       con, 
       sprintf(
@@ -629,12 +718,14 @@ change_chTKCat_password <- function(
 #' @param contact contact information (can be NA)
 #' @param admin a logical indicating if the user is an admin of the chTKCat
 #' instance
+#' @param provider a logical indicating if the user is data provider (TRUE)
+#' or a data consumer (FALSE: default)
 #' 
 #' @return No return value, called for side effects
 #' 
 #' @export
 update_chTKCat_user <- function(
-   x, login, contact, admin
+   x, login, contact, admin, provider
 ){
    
    stopifnot(
@@ -648,7 +739,7 @@ update_chTKCat_user <- function(
       stop("The user does not exist")
    }
    
-   if(!missing(contact) || !missing(admin)){
+   if(!missing(contact) || !missing(admin) || !missing(provider)){
       
       con <- x$chcon
       
@@ -669,6 +760,17 @@ update_chTKCat_user <- function(
       if(!missing(admin)){
          stopifnot(is.logical(admin), length(admin)==1, !is.na(admin))
          new_val$admin <- admin
+         if(admin){
+            provider <- TRUE
+         }else{
+            provider <- new_val$provider
+         }
+         updateGrants <- TRUE
+      }
+      if(!missing(provider)){
+         stopifnot(is.logical(provider), length(provider)==1, !is.na(provider))
+         new_val$provider <- provider
+         admin <- new_val$admin
          updateGrants <- TRUE
       }
 
@@ -693,6 +795,7 @@ update_chTKCat_user <- function(
                )
             )
          }else{
+            
             RClickhouse::dbSendQuery(
                con,
                sprintf(
@@ -700,6 +803,38 @@ update_chTKCat_user <- function(
                   login
                )
             )
+            
+            if(provider){
+               RClickhouse::dbSendQuery(
+                  con, 
+                  sprintf(
+                     paste(
+                        "GRANT SELECT,",
+                        " CREATE DATABASE, CREATE TABLE, DROP TABLE,",
+                        " ALTER, INSERT",
+                        " ON *.* TO %s WITH GRANT OPTION"
+                     ),
+                     login
+                  )
+               )
+               
+               RClickhouse::dbSendQuery(
+                  con,
+                  sprintf(
+                     "REVOKE ALL ON default.* FROM %s",
+                     login
+                  )
+               )
+               RClickhouse::dbSendQuery(
+                  con,
+                  sprintf(
+                     "REVOKE ALL ON system.* FROM %s",
+                     login
+                  )
+               )
+               
+            }
+            
             RClickhouse::dbSendQuery(
                con, sprintf("GRANT SHOW DATABASES ON *.* TO %s", login)
             )
@@ -725,7 +860,8 @@ update_chTKCat_user <- function(
             RClickhouse::dbSendQuery(
                con,
                sprintf(
-                  "GRANT SELECT(login, admin) ON default.Users TO %s", login
+                  "GRANT SELECT(login, admin, provider) ON default.Users TO %s",
+                  login
                )
             )
          }
@@ -1009,8 +1145,17 @@ create_chMDB <- function(x, name, public=FALSE){
       is.chTKCat(x),
       is.character(name), length(name)==1, !is.na(name)
    )
-   if(!x$admin){
-      stop("Only chTKCat admin can create an MDB in ClickHouse")
+   if(!is.na(x$provider)){
+      if(!x$provider && !x$admin){
+         stop(paste(
+            "Only chTKCat admin or data provider",
+            "can create an MDB in ClickHouse"
+         ))
+      }
+   }else{
+      if(!x$admin){
+         stop("Only chTKCat admin can create an MDB in ClickHouse")
+      }
    }
    if(name %in% list_MDBs(x, withInfo=FALSE)){
       stop("The database exists already")
@@ -1022,8 +1167,8 @@ create_chMDB <- function(x, name, public=FALSE){
       CHMDB_DATA_MODEL
    )
    users <- list_chTKCat_users(x) %>% dplyr::pull("login")
-   set_chMDB_access(x, name, public=public)
    add_chMDB_user(x, name, x$chcon@user, admin=TRUE)
+   set_chMDB_access(x, name, public=public)
    invisible()
 }
 
@@ -1052,15 +1197,39 @@ drop_chMDB <- function(x, name){
    con <- x$chcon
    RClickhouse::dbSendQuery(con, sprintf("DROP DATABASE `%s`", name))
    ul <- list_chTKCat_users(x) %>% 
-      dplyr::filter(!.data$admin) %>% 
-      dplyr::pull("login")
-   RClickhouse::dbSendQuery(
-      con,
-      sprintf(
-         "REVOKE %s ON `%s`.* FROM %s",
-         paste(CH_DB_STATEMENTS, collapse=", "), name, paste(ul, collapse=", ")
+      dplyr::filter(!.data$admin)
+   if("provider" %in%  colnames(ul)){
+      pl <- ul$login[which(ul$provider)]
+      if(length(pl) > 0){
+         RClickhouse::dbSendQuery(
+            con, 
+            sprintf(
+               paste(
+                  "GRANT SELECT,",
+                  " CREATE DATABASE, CREATE TABLE, DROP TABLE,",
+                  " ALTER, INSERT",
+                  " ON %s.* TO %s WITH GRANT OPTION"
+               ),
+               name,
+               paste(pl, collapse=", ")
+            )
+         )
+      }
+      cl <- ul$login[which(!ul$provider)]
+   }else{
+      cl <- ul$login
+   }
+   if(length(cl) > 0){
+      RClickhouse::dbSendQuery(
+         con,
+         sprintf(
+            "REVOKE %s ON `%s`.* FROM %s",
+            paste(CH_DB_STATEMENTS, collapse=", "),
+            name,
+            paste(cl, collapse=", ")
+         )
       )
-   )
+   }
    invisible()
 }
 

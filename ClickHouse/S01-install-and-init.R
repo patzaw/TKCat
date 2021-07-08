@@ -3,23 +3,24 @@ library(TKCat)
 ###############################################################################@
 ## Configuration ----
 
-TKCAT_HOME <- "/data/pgodard/Projects/TKCat_UCB_TBN"
-# TKCAT_HOME <- "/data/pgodard/Projects/TKCat_Test"
-TKCAT_NAT_PORT <- 9101
-# TKCAT_NAT_PORT <- 9301
-TKCAT_HTTP_PORT <- 9111
-# TKCAT_HTTP_PORT <- 9311
-
 USERFILE <- system.file(
    "ClickHouse/users.xml",
    package="TKCat"
 )
 CH_VERSION <- "21.4.6"
 
+TKCAT_HOME <- "/data/pgodard/Projects/TKCat_UCB_TBN"
+TKCAT_NAT_PORT <- 9101
+TKCAT_HTTP_PORT <- 9111
 CONTAINER <- "ucb_tbn_tkcat"
+INSTANCE_NAME <- "UCB - TBN"
+
+# TKCAT_HOME <- "/data/pgodard/Projects/Test_TKCat"
+# TKCAT_NAT_PORT <- 9301
+# TKCAT_HTTP_PORT <- 9311
 # CONTAINER <- "test_tkcat"
-# INSTANCE_NAME <- "UCB - TBN"
-INSTANCE_NAME <- "Test"
+# INSTANCE_NAME <- "Test"
+
 ADMIN <- "pgodard"
 CONTACT <- "Patrice Godard <patrice.godard@ucb.com>"
 
