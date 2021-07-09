@@ -23,6 +23,7 @@
   path,
   readParameters = DEFAULT_READ_PARAMS,
   htmlModel = TRUE,
+  chunk_size = 10^5,
   ...
 )
 
@@ -71,6 +72,9 @@ an html file.}
 together (default: 10^5)}
 
 \item{...}{method specific parameters}
+
+\item{chunk_size}{the number of rows to consider together when copying the
+data}
 }
 \value{
 A \link{fileMDB} object.

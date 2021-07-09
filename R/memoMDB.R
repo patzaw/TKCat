@@ -322,7 +322,7 @@ data_tables.memoMDB <- function(x, ..., skip=0, n_max=Inf){
          }
          n <- skip+1
          m <- min(nrow(d), n_max+skip)
-         return(d[n:m,])
+         return(d[n:m, , drop=FALSE])
       }
    )
    names(toRet) <- names(toTake)
@@ -338,7 +338,16 @@ data_tables.memoMDB <- function(x, ..., skip=0, n_max=Inf){
 #' @export
 #'
 count_records.memoMDB <- function(x, ...){
-   lapply(data_tables(x, ...), nrow) %>% unlist()
+   lapply(
+      data_tables(x, ...),
+      function(y){
+         if(is.matrix(y)){
+            return(nrow(y)*ncol(y))
+         }else{
+            return(nrow(y))
+         }
+      }
+   ) %>% unlist()
 }
 
 
@@ -519,7 +528,12 @@ as_fileMDB.memoMDB <- function(
    dfiles <- file.path(dataPath, paste0(names(x), ext))
    names(dfiles) <- names(x)
    for(tn in names(x)){
-      readr::write_delim(x=x[[tn]], file=dfiles[tn], delim=rp$delim)
+      if(is.matrix(x[[tn]])){
+         tw <- dplyr::as_tibble(x[[tn]], rownames="___ROWNAMES___")
+      }else{
+         tw <- x[[tn]]
+      }
+      readr::write_delim(tw, file=dfiles[tn], delim=rp$delim)
    }
    
    ## Return fileMDB ----
@@ -557,6 +571,9 @@ filter.memoMDB <- function(.data, ..., .preserve=FALSE){
       if(!tn %in% names(x)){
          stop(sprintf("%s table does not exist", tn))
       }
+      if(ReDaMoR::is.MatrixModel(data_model(x)[[tn]])){
+         stop("Cannot filter a matrix: start from another table")         
+      }
       toRet[[tn]] <- dplyr::filter(x[[tn]], !!dots[[tn]])
    }
    
@@ -593,6 +610,10 @@ slice.memoMDB <- function(.data, ..., .preserve=FALSE){
    if(!tn %in% names(x)){
       stop(sprintf("%s table does not exist", tn))
    }
+   if(ReDaMoR::is.MatrixModel(data_model(x)[[tn]])){
+      stop("Cannot slice a matrix: start from another table")         
+   }
+   
    i <- dots[[tn]]
    toRet[[tn]] <- dplyr::slice(x[[tn]], i)
    
@@ -626,7 +647,7 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
    fk <- ReDaMoR::get_foreign_keys(dm)
    
    ## Filter by contamination ----
-   tables <- .memo_filtByConta(tables, data_tables(x), fk)
+   tables <- .memo_filtByConta(tables, data_tables(x), fk, dm)
    dm <- dm[names(tables), rmForeignKeys=TRUE]
    tables <- .norm_data(tables,  dm)
    
@@ -653,7 +674,7 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
    }
 }
 
-.memo_filtByConta <- function(d, all, fk){
+.memo_filtByConta <- function(d, all, fk, dm){
    nfk <- fk
    .contaminate <- function(tn){
       
@@ -680,11 +701,12 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
             }else{
                nv <- all[[ntn]]
             }
-            d[[ntn]] <<- dplyr::semi_join(
-               nv, d[[tn]],
+            d[[ntn]] <<- .mdjoin(
+               d1=nv, d2=d[[tn]],
                by=magrittr::set_names(
                   fkl$ff[[i]], fkl$tf[[i]]
-               )
+               ),
+               tm1=dm[[ntn]], tm2=dm[[tn]]
             )
          }
       }
@@ -706,19 +728,31 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
          distinct()
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
+            
             ntn <- fkl$to[i]
-            toAdd <- dplyr::semi_join(
-               all[[ntn]], d[[tn]],
+            
+            toAdd <- .mdjoin(
+               d1=all[[ntn]], d2=d[[tn]],
                by=magrittr::set_names(
                   fkl$ff[[i]], fkl$tf[[i]]
-               )
+               ),
+               tm1=dm[[ntn]], tm2=dm[[tn]]
             )
             
-            d[[ntn]] <<- dplyr::bind_rows(
-               d[[ntn]],
-               toAdd
-            ) %>%
-               dplyr::distinct()
+            if(is.matrix(toAdd)){
+               d[[ntn]] <<- all[[ntn]][
+                  c(rownames(d[[ntn]]), rownames(toAdd)),
+                  c(colnames(d[[ntn]]), colnames(toAdd)),
+                  drop=FALSE
+               ]
+            }else{
+               d[[ntn]] <<- dplyr::bind_rows(
+                  d[[ntn]],
+                  toAdd
+               ) %>%
+                  dplyr::distinct()
+            }
+            
          }
       }
    }
@@ -728,7 +762,7 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       }
    }
    if(!is.null(fk) && nrow(fk) > nrow(nfk)){
-      d <- .memo_filtByConta(d, all, nfk)
+      d <- .memo_filtByConta(d, all, nfk, dm)
    }
    return(d)
 }
@@ -754,15 +788,32 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
-            nv <- dplyr::semi_join(
-               toRet[[ntn]], toRet[[tn]],
+            # nv <- dplyr::semi_join(
+            #    toRet[[ntn]], toRet[[tn]],
+            #    by=magrittr::set_names(
+            #       fkl$ff[[i]], fkl$tf[[i]]
+            #    )
+            # )
+            nv <- .mdjoin(
+               d1=toRet[[ntn]], d2=toRet[[tn]],
                by=magrittr::set_names(
                   fkl$ff[[i]], fkl$tf[[i]]
-               )
+               ),
+               tm1=dataModel[[ntn]], tm2=dataModel[[tn]]
             )
-            if(nrow(nv) < nrow(toRet[[ntn]])){
-               toRet[[ntn]] <<- nv
-               .norm_table(ntn)
+            if(is.matrix(nv)){
+               if(
+                  nrow(nv) < nrow(toRet[[ntn]]) ||
+                  ncol(nv) < ncol(toRet[[ntn]])
+               ){
+                  toRet[[ntn]] <<- nv
+                  .norm_table(ntn)
+               }
+            }else{
+               if(nrow(nv) < nrow(toRet[[ntn]])){
+                  toRet[[ntn]] <<- nv
+                  .norm_table(ntn)
+               }
             }
          }
       }
@@ -771,4 +822,83 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       .norm_table(tn)
    }
    return(toRet)
+}
+
+.mdjoin <- function(d1, d2, by, tm1, tm2){
+   
+   ## Two tibbles ----
+   if(!is.matrix(d1) && !is.matrix(d2)){
+      return(dplyr::semi_join(d1, d2, by=by))
+   }
+   
+   getfvalues <- function(d, fields, tm){
+      lapply(fields, function(field){
+         if(tm$fields$type[which(tm$fields$name==field)]=="row"){
+            toRet <- rownames(d)
+            if(is.null(toRet)){
+               toRet <- character()
+            }
+            attr(toRet, "f") <- "row"
+            return(toRet)
+         }
+         if(tm$fields$type[which(tm$fields$name==field)]=="column"){
+            toRet <- colnames(d)
+            if(is.null(toRet)){
+               toRet <- character()
+            }
+            attr(toRet, "f") <- "column"
+            return(toRet)
+         }
+         toRet <- d
+         if(is.null(toRet)){
+            toRet <- character()
+         }
+         attr(toRet, "f") <- "value"
+         return(toRet)
+      }) %>%
+         magrittr::set_names(fields)
+   }
+   
+   ## A matrix to filter ----
+   if(is.matrix(d1)){
+      d1val <-  getfvalues(d1, names(by), tm1)
+      if(is.matrix(d2)){
+         d2val <-  getfvalues(d2, as.character(by), tm2)
+      }else{
+         d2val <- lapply(as.character(by), function(f){d2[[f]]}) %>% 
+            magrittr::set_names(as.character(by))
+      }
+      toTake <- lapply(1:length(d1val), function(fi){
+         toTake <- which(d1val[[fi]] %in% d2val[[fi]])
+         if(attr(d1val[[fi]], "f")=="column"){
+            colToTake <- toTake
+            rowToTake <- 1:nrow(d1)
+         }
+         if(attr(d1val[[fi]], "f")=="row"){
+            colToTake <- 1:ncol(d1)
+            rowToTake <- toTake
+         }
+         if(attr(d1val[[fi]], "f")=="value"){
+            colToTake <- ((toTake - 1) %/% nrow(d1)) + 1
+            rowToTake <- ((toTake - 1) %% nrow(d1)) + 1
+         }
+         return(list(rows= rowToTake, cols=colToTake))
+      })
+      rowToTake <- Reduce(intersect, lapply(toTake, function(x){x$rows}))
+      colToTake <- Reduce(intersect, lapply(toTake, function(x){x$cols}))
+      toRet <- d1[rowToTake, colToTake, drop=FALSE]
+      return(toRet)
+   }
+   
+   ## A tibble to filter with a matrix ----
+   if(is.matrix(d2)){
+      d2val <-  getfvalues(d2, as.character(by), tm2)
+      toRet <- d1
+      for(fi in 1:length(by)){
+         toTake <- which(toRet[[names(by)[fi]]] %in% d2val[[fi]])
+         toRet <- toRet[toTake,]
+      }
+      return(toRet)
+   }
+   
 }

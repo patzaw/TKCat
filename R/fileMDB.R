@@ -467,25 +467,33 @@ data_tables.fileMDB <- function(x, ..., skip=0, n_max=Inf){
    toRet <- lapply(
       toTake,
       function(y){
-         ht <- do.call(readr::read_delim, c(
+         # ht <- do.call(readr::read_delim, c(
+         #    list(
+         #       file=x$dataFiles[y],
+         #       col_types=ReDaMoR::col_types(m[[y]]),
+         #       skip=0, n_max=0
+         #    ),
+         #    x$readParameters
+         # ))
+         # toRet <- do.call(readr::read_delim, c(
+         #    list(
+         #       file=x$dataFiles[y],
+         #       col_names=colnames(ht),
+         #       col_types=ReDaMoR::col_types(m[[y]]),
+         #       skip=skip+1,
+         #       n_max=n_max
+         #    ),
+         #    x$readParameters
+         # ))
+         # attr(toRet, "spec") <- NULL
+         toRet <- do.call(.read_td, c(
             list(
-               file=x$dataFiles[y],
-               col_types=ReDaMoR::col_types(m[[y]]),
-               skip=0, n_max=0
+               tm=x$dataModel[[y]],
+               f=x$dataFiles[y],
+               skip=skip, n_max=n_max
             ),
             x$readParameters
          ))
-         toRet <- do.call(readr::read_delim, c(
-            list(
-               file=x$dataFiles[y],
-               col_names=colnames(ht),
-               col_types=ReDaMoR::col_types(m[[y]]),
-               skip=skip+1,
-               n_max=n_max
-            ),
-            x$readParameters
-         ))
-         attr(toRet, "spec") <- NULL
          return(toRet)
       }
    )
@@ -518,10 +526,19 @@ count_records.fileMDB <- function(x, ...){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
    }
-   x <- unclass(x)
-   lapply(x$dataFiles[toTake], count_lines) %>% 
-      unlist() %>% 
-      `-`(1)
+   lapply(
+      toTake, function(tn){
+         if(ReDaMoR::is.MatrixModel(data_model(x)[[tn]])){
+            nrows <- count_lines(data_files(x)$dataFiles[[tn]]) - 1
+            ncols <- ncol(data_tables(x, tn, n_max=1)[[1]])
+            return(nrows * ncols)
+         }else{
+            return(count_lines(data_files(x)$dataFiles[[tn]]) - 1)
+         }
+      }
+   ) %>% 
+      magrittr::set_names(names(x)[toTake]) %>% 
+      unlist()
 }
 
 
@@ -707,12 +724,16 @@ c.fileMDB <- function(...){
 #' @rdname as_fileMDB
 #' @method as_fileMDB fileMDB
 #' 
+#' @param chunk_size the number of rows to consider together when copying the
+#' data
+#' 
 #' @export
 #'
 as_fileMDB.fileMDB <- function(
    x, path,
    readParameters=DEFAULT_READ_PARAMS,
    htmlModel=TRUE,
+   chunk_size=10^5,
    ...
 ){
    stopifnot(is.character(path), length(path)==1, !is.na(path))
@@ -781,13 +802,13 @@ as_fileMDB.fileMDB <- function(
    if(rewrite){
       for(tn in names(x)){
          do.call(
-            readr::read_delim_chunked,
+            .read_td_chunked,
             c(
-               list(file=ofiles[tn]),
-               rp,
                list(
-                  col_types=ReDaMoR::col_types(dm[[tn]])
+                  tm=data_model(x)[[tn]],
+                  f=ofiles[tn]
                ),
+               rp,
                list(
                   callback=readr::DataFrameCallback$new(function(y, pos){
                      readr::write_delim(
@@ -795,7 +816,7 @@ as_fileMDB.fileMDB <- function(
                         append=file.exists(dfiles[tn])
                      )
                   }),
-                  chunk_size=10^5
+                  chunk_size=chunk_size
                )
             )
          )
@@ -842,6 +863,9 @@ filter.fileMDB <- function(.data, ..., .preserve=FALSE){
    for(tn in names(dots)){
       if(!tn %in% names(x)){
          stop(sprintf("%s table does not exist", tn))
+      }
+      if(ReDaMoR::is.MatrixModel(data_model(x)[[tn]])){
+         stop("Cannot filter a matrix: start from another table")         
       }
       toRet[[tn]] <- do.call(
          readr::read_delim_chunked,
@@ -895,6 +919,10 @@ slice.fileMDB <- function(.data, ..., .preserve=FALSE){
    if(!tn %in% names(x)){
       stop(sprintf("%s table does not exist", tn))
    }
+   if(ReDaMoR::is.MatrixModel(data_model(x)[[tn]])){
+      stop("Cannot slice a matrix: start from another table")         
+   }
+   
    i <- dots[[tn]]
    
    dm <- data_model(x)
@@ -950,7 +978,7 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
    fk <- ReDaMoR::get_foreign_keys(dm)
    
    ## Filter by contamination ----
-   tables <- .file_filtByConta(tables, x, fk)
+   tables <- .file_filtByConta(tables, x, fk, dm)
    dm <- dm[names(tables), rmForeignKeys=TRUE]
    tables <- .norm_data(tables,  dm)
    
@@ -1028,7 +1056,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
    }
 }
 
-.file_filtByConta <- function(d, fdb, fk){
+.file_filtByConta <- function(d, fdb, fk, dm){
    nfk <- fk
    files <- data_files(fdb)
    rp <- files$readParameters
@@ -1053,28 +1081,38 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
             if(ntn %in% names(d)){
-               nv <- dplyr::semi_join(
-                  d[[ntn]], d[[tn]],
+               # nv <- dplyr::semi_join(
+               #    d[[ntn]], d[[tn]],
+               #    by=magrittr::set_names(
+               #       fkl$ff[[i]], fkl$tf[[i]]
+               #    )
+               # )
+               nv <- .mdjoin(
+                  d1=d[[ntn]], d2=d[[tn]],
                   by=magrittr::set_names(
                      fkl$ff[[i]], fkl$tf[[i]]
-                  )
+                  ),
+                  tm1=dm[[ntn]], tm2=dm[[tn]]
                )
             }else{
                nv <- do.call(
-                  readr::read_delim_chunked,
+                  .read_td_chunked,
                   c(
-                     list(file=files[ntn]),
+                     list(tm=dm[[ntn]], f=files[ntn]),
                      rp,
                      list(
-                        col_types=ReDaMoR::col_types(dm[[ntn]])
-                     ),
-                     list(
                         callback=readr::DataFrameCallback$new(function(y, pos){
-                           dplyr::semi_join(
-                              y, d[[tn]],
+                           if(ReDaMoR::is.MatrixModel(dm[[ntn]])){
+                              y <- as.data.frame(y, stringsAsFactors=FALSE)
+                              rownames(y) <- y[[1]]
+                              y <- as.matrix(y[, -1, drop=FALSE])
+                           }
+                           .mdjoin(
+                              d1=y, d2=d[[tn]],
                               by=magrittr::set_names(
                                  fkl$ff[[i]], fkl$tf[[i]]
-                              )
+                              ),
+                              tm1=dm[[ntn]], tm2=dm[[tn]]
                            )
                         }),
                         chunk_size=10^5
@@ -1103,31 +1141,44 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
             toAdd <- do.call(
-               readr::read_delim_chunked,
+               .read_td_chunked,
                c(
-                  list(file=files[ntn]),
+                  list(tm=dm[[ntn]], f=files[ntn]),
                   rp,
                   list(
-                     col_types=ReDaMoR::col_types(dm[[ntn]])
-                  ),
-                  list(
                      callback=readr::DataFrameCallback$new(function(y, pos){
-                        dplyr::semi_join(
-                           y, d[[tn]],
+                        if(ReDaMoR::is.MatrixModel(dm[[ntn]])){
+                           y <- as.data.frame(y, stringsAsFactors=FALSE)
+                           rownames(y) <- y[[1]]
+                           y <- as.matrix(y[, -1, drop=FALSE])
+                        }
+                        .mdjoin(
+                           d1=y, d2=d[[tn]],
                            by=magrittr::set_names(
                               fkl$ff[[i]], fkl$tf[[i]]
-                           )
+                           ),
+                           tm1=dm[[ntn]], tm2=dm[[tn]]
                         )
                      }),
                      chunk_size=10^5
                   )
                )
             )
-            d[[ntn]] <<- dplyr::bind_rows(
-               d[[ntn]],
-               toAdd
-            ) %>%
-               dplyr::distinct()
+            
+            if(is.matrix(toAdd)){
+               d[[ntn]] <<- fdb[[ntn]][
+                  c(rownames(d[[ntn]]), rownames(toAdd)),
+                  c(colnames(d[[ntn]]), colnames(toAdd)),
+                  drop=FALSE
+               ]
+            }else{
+               d[[ntn]] <<- dplyr::bind_rows(
+                  d[[ntn]],
+                  toAdd
+               ) %>%
+                  dplyr::distinct()
+            }
+            
          }
       }
    }
@@ -1137,7 +1188,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
       }
    }
    if(!is.null(fk) && nrow(fk) > nrow(nfk)){
-      d <- .file_filtByConta(d, fdb, nfk)
+      d <- .file_filtByConta(d, fdb, nfk, dm)
    }
    return(d)
 }
@@ -1158,3 +1209,129 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
    return(paste(toRet, sunits[nunits+1]))
 }
 
+.read_td <- function(
+   tm,      # table model
+   f,       # file name
+   delim,
+   skip=0,
+   n_max=Inf,
+   ...      # additional parameters for read_delim()
+){
+   
+   if(ReDaMoR::is.MatrixModel(tm)){
+      cn <- readLines(f, n=1) %>%
+         strsplit(split=delim) %>%
+         unlist()
+      cn <- gsub("['`]", "", cn)
+      cn <- gsub('["]', "", cn)
+
+      vt <- tm$fields %>%
+         dplyr::filter(!.data$type %in% c("row", "column")) %>%
+         dplyr::pull("type")
+      ctypes <- do.call(
+         readr::cols,
+         structure(
+            list(
+               readr::col_character(),
+               .default = switch(
+                  vt,
+                  "integer"=readr::col_integer(),
+                  "numeric"=readr::col_double(),
+                  "logical"=readr::col_logical(),
+                  "character"=readr::col_character(),
+                  "Date"=readr::col_date(),
+                  "POSIXct"=readr::col_datetime()
+               )
+            ),
+            .Names=c("___ROWNAMES___", ".default")
+         )
+      )
+      td <- readr::read_delim(
+         f,
+         delim=delim, n_max=n_max, skip=skip+1,
+         col_types=ctypes,
+         col_names=c("___ROWNAMES___", cn[-1]),
+         ...
+      ) %>%
+         as.data.frame(stringsAsFactors=FALSE)
+      stopifnot(
+         !any(duplicated(colnames(td))),
+         !any(duplicated(td[[1]]))
+      )
+      rownames(td) <- td[[1]]
+      td <- as.matrix(td[, -1, drop=FALSE])
+         
+   }else{
+      
+      td <- readr::read_delim(
+         f,
+         delim=delim, skip=skip, n_max=n_max,
+         col_types=col_types(tm),
+         ...
+      )
+      
+   }
+   
+   return(td)
+   
+}
+
+
+.read_td_chunked <- function(
+   tm,      # table model
+   f,       # file name
+   delim,
+   skip=0,
+   ...      # additional parameters for read_delim_chunked()
+){
+   
+   if(ReDaMoR::is.MatrixModel(tm)){
+      cn <- readLines(f, n=1) %>%
+         strsplit(split=delim) %>%
+         unlist()
+      cn <- gsub("['`]", "", cn)
+      cn <- gsub('["]', "", cn)
+      
+      vt <- tm$fields %>%
+         dplyr::filter(!.data$type %in% c("row", "column")) %>%
+         dplyr::pull("type")
+      ctypes <- do.call(
+         readr::cols,
+         structure(
+            list(
+               readr::col_character(),
+               .default = switch(
+                  vt,
+                  "integer"=readr::col_integer(),
+                  "numeric"=readr::col_double(),
+                  "logical"=readr::col_logical(),
+                  "character"=readr::col_character(),
+                  "Date"=readr::col_date(),
+                  "POSIXct"=readr::col_datetime()
+               )
+            ),
+            .Names=c("___ROWNAMES___", ".default")
+         )
+      )
+      td <- readr::read_delim_chunked(
+         f,
+         delim=delim, skip=skip+1,
+         col_types=ctypes,
+         col_names=c("___ROWNAMES___", cn[-1]),
+         ...
+      )
+      
+   }else{
+      
+      td <- readr::read_delim_chunked(
+         f,
+         delim=delim, skip=skip,
+         col_types=col_types(tm),
+         ...
+      )
+      
+   }
+   
+   return(td)
+   
+}
