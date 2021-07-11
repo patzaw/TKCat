@@ -78,23 +78,76 @@ chMDB <- function(
    ## Confront data to model ----
    query <- "SELECT * FROM %s"
    stopifnot(is.numeric(n_max), !is.na(n_max), length(n_max)==1)
-   if(!is.infinite(n_max)){
-      query <- paste(query, sprintf("LIMIT %s", n_max))
-   }
    if(n_max>0){
       dataTables <- lapply(
          names(dbTables),
          function(tn){
             dbt <- dbTables[tn]
-            query <- sprintf(query, dbt)
-            toRet <- get_query(tkcon, query)
-            for(cn in colnames(toRet)){
-               toRet[,cn] <- ReDaMoR::as_type(
-                  dplyr::pull(toRet, !!cn),
-                  dataModel[[tn]]$fields %>%
-                     dplyr::filter(.data$name==!!cn) %>%
-                     dplyr::pull("type")
+            if(ReDaMoR::is.MatrixModel(dataModel[[tn]])){
+               tdb <- sub("^`", "", sub("`[.]`.*$", "", dbt))
+               tquery <- sprintf(query, dbt)
+               qr <- get_query(tkcon, tquery)
+               toRet <- c()
+               vtype <- setdiff(
+                  dataModel[[tn]]$fields$type,
+                  c("row", "column")
                )
+               dimcol <- get_query(
+                  tkcon,
+                  sprintf(
+                     paste(
+                        "SELECT name FROM system.columns",
+                        " WHERE database='%s' AND table='%s'"
+                     ),
+                     tdb, qr$table[1]
+                  )
+               )
+               dimcol <- intersect(
+                  dimcol$name, c("___COLNAMES___", "___ROWNAMES___")
+               )
+               stopifnot(length(dimcol)==1)
+               for(st in qr$table){
+                  stquery <- sprintf(
+                     paste(query, 'ORDER BY %s'),
+                     sprintf('`%s`.`%s`', tdb, st),
+                     dimcol
+                  )
+                  if(!is.infinite(n_max)){
+                     stquery <- paste(stquery, sprintf("LIMIT %s", n_max))
+                  }
+                  stqr <- get_query(tkcon, stquery)
+                  dimname <- stqr[[dimcol]]
+                  stopifnot(
+                     !any(duplicated(dimname)),
+                     ncol(stqr) > 1
+                  )
+                  if(dimcol=="___COLNAMES___"){
+                     toAdd <- stqr[, -1, drop=FALSE] %>% 
+                        as.matrix() %>% 
+                        t() %>% 
+                        magrittr::set_colnames(dimname)
+                     toRet <- rbind(toRet, toAdd)
+                  }else{
+                     toAdd <- stqr[, -1, drop=FALSE] %>% 
+                        as.matrix() %>% 
+                        magrittr::set_rownames(dimname)
+                     toRet <- cbind(toRet, toAdd)
+                  }
+               }
+            }else{
+               tquery <- sprintf(query, dbt)
+               if(!is.infinite(n_max)){
+                  tquery <- paste(tquery, sprintf("LIMIT %s", n_max))
+               }
+               toRet <- get_query(tkcon, tquery)
+               for(cn in colnames(toRet)){
+                  toRet[,cn] <- ReDaMoR::as_type(
+                     dplyr::pull(toRet, !!cn),
+                     dataModel[[tn]]$fields %>%
+                        dplyr::filter(.data$name==!!cn) %>%
+                        dplyr::pull("type")
+                  )
+               }   
             }
             return(toRet)
          }
@@ -386,20 +439,22 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE){
    }
    
    ## Write collection members ----
-   er <- try({
-      ch_insert(
-         con=con, dbName=dbName, tableName="___CollectionMembers___",
-         value=dplyr::select(
-            collectionMembers,
-            dplyr::all_of(
-               CHMDB_DATA_MODEL$"___CollectionMembers___"$fields$name
+   if(!is.null(collectionMembers)){
+      er <- try({
+         ch_insert(
+            con=con, dbName=dbName, tableName="___CollectionMembers___",
+            value=dplyr::select(
+               collectionMembers,
+               dplyr::all_of(
+                  CHMDB_DATA_MODEL$"___CollectionMembers___"$fields$name
+               )
             )
          )
-      )
-   }, silent=FALSE)
-   if(inherits(er, "try-error")){
-      empty_chMDB(tkcon, dbName)
-      stop(as.character(er))
+      }, silent=FALSE)
+      if(inherits(er, "try-error")){
+         empty_chMDB(tkcon, dbName)
+         stop(as.character(er))
+      }
    }
    
    ## Write data ----
@@ -631,22 +686,76 @@ data_tables.chMDB <- function(x, ..., skip=0, n_max=Inf){
    toRet <- lapply(
       names(toTake),
       function(tn){
-         toRet <- get_query(
-            x,
-            sprintf(
-               "SELECT * from %s ORDER BY %s LIMIT %s, %s",
-               toTake[tn],
-               .get_tm_sortKey(m[[tn]], quoted=TRUE),
-               skip, n_max
+         if(ReDaMoR::is.MatrixModel(m[[tn]])){
+            query <- "SELECT * FROM %s"
+            dbti <- toTake[[tn]]
+            tdb <- sub("^`", "", sub("`[.]`.*$", "", dbti))
+            tquery <- sprintf(query, dbti)
+            qr <- get_query(x, tquery)
+            toRet <- c()
+            vtype <- setdiff(
+               m[[tn]]$fields$type,
+               c("row", "column")
             )
-         )
-         attr(toRet, "data.type") <- NULL
-         for (cn in colnames(toRet)) {
-            toRet[, cn] <- as_type(
-               dplyr::pull(toRet, !!cn),
-               dplyr::filter(m[[tn]]$fields, .data$name==!!cn) %>%
-                  dplyr::pull("type")
+            dimcol <- get_query(
+               x,
+               sprintf(
+                  paste(
+                     "SELECT name FROM system.columns",
+                     " WHERE database='%s' AND table='%s'"
+                  ),
+                  tdb, qr$table[1]
+               )
             )
+            dimcol <- intersect(
+               dimcol$name, c("___COLNAMES___", "___ROWNAMES___")
+            )
+            stopifnot(length(dimcol)==1)
+            for(st in qr$table){
+               stquery <- sprintf(
+                  paste(query, 'ORDER BY %s'),
+                  sprintf('`%s`.`%s`', tdb, st),
+                  dimcol
+               )
+               stquery <- paste(stquery, sprintf("LIMIT %s, %s", skip, n_max))
+               stqr <- get_query(x, stquery)
+               dimname <- stqr[[dimcol]]
+               stopifnot(
+                  !any(duplicated(dimname)),
+                  ncol(stqr) > 1
+               )
+               if(dimcol=="___COLNAMES___"){
+                  toAdd <- stqr[, -1, drop=FALSE] %>% 
+                     as.matrix() %>% 
+                     t() %>% 
+                     magrittr::set_colnames(dimname)
+                  toRet <- rbind(toRet, toAdd)
+               }else{
+                  toAdd <- stqr[, -1, drop=FALSE] %>% 
+                     as.matrix() %>% 
+                     magrittr::set_rownames(dimname)
+                  toRet <- cbind(toRet, toAdd)
+               }
+            }
+         }else{
+            query <- "SELECT * FROM %s ORDER BY %s LIMIT %s, %s"
+            toRet <- get_query(
+               x,
+               sprintf(
+                  query,
+                  toTake[tn],
+                  .get_tm_sortKey(m[[tn]], quoted=TRUE),
+                  skip, n_max
+               )
+            )
+            attr(toRet, "data.type") <- NULL
+            for (cn in colnames(toRet)) {
+               toRet[, cn] <- as_type(
+                  dplyr::pull(toRet, !!cn),
+                  dplyr::filter(m[[tn]]$fields, .data$name==!!cn) %>%
+                     dplyr::pull("type")
+               )
+            }
          }
          return(toRet)
       }
@@ -680,6 +789,40 @@ count_records.chMDB <- function(x, ...){
    chTables <- list_tables(
       dbt$tkcon$chcon, dbNames=unique(dbTables_t$database)
    )
+   
+   ## Matrices
+   dm <- data_model(x)
+   matrices <- lapply(dm, ReDaMoR::is.MatrixModel) %>%
+      unlist() %>% which() %>% names() %>% 
+      intersect(names(toTake))
+   for(mt in matrices){
+      dbmt <- dbt$dbTables[mt]
+      query <- "SELECT * FROM %s"
+      tdb <- sub("^`", "", sub("`[.]`.*$", "", dbmt))
+      tquery <- sprintf(query, dbmt)
+      qr <- get_query(x, tquery)
+      nr <- chTables %>% 
+         dplyr::filter(
+            .data$database==tdb & .data$name==qr$table[1]
+         ) %>% 
+         dplyr::pull("total_rows")
+      nc <- get_query(
+         x,
+         sprintf(
+            "SELECT table, name FROM system.columns WHERE database='%s'",
+            tdb
+         )
+      ) %>% 
+         dplyr::filter(.data$table %in% qr$table) %>% 
+         nrow()
+      nc <- nc - nrow(qr)
+      chTables$total_rows <- ifelse(
+         chTables$database==tdb & chTables$name==mt,
+         nc * nr,
+         chTables$total_rows
+      )
+   }
+   
    dbTables_t <- dplyr::left_join(
       dbTables_t, chTables, by=c("database", "name")
    )

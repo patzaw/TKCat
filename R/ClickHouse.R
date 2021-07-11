@@ -321,25 +321,39 @@ mergeTree_from_RelTableModel <- function(
       is.character(dbName), length(dbName)==1, !is.na(dbName),
       ReDaMoR::is.RelTableModel(tm)
    )
-   rtypes <- tm$fields$type
-   names(rtypes) <- tm$fields$name
-   value <- dplyr::tibble()
-   for(i in 1:nrow(tm$fields)){
-      toAdd <- integer()
-      class(toAdd) <- tm$fields$type[i]
-      value[,tm$fields$name[i]] <- toAdd
+   if(ReDaMoR::is.MatrixModel(tm)){
+      write_MergeTree(
+         con=con,
+         dbName=dbName,
+         tableName=tm$tableName,
+         value=dplyr::tibble(
+            table=character()
+         ),
+         rtypes=c("table"="character"),
+         nullable=NULL,
+         sortKey="table"
+      )
+   }else{
+      rtypes <- tm$fields$type
+      names(rtypes) <- tm$fields$name
+      value <- dplyr::tibble()
+      for(i in 1:nrow(tm$fields)){
+         toAdd <- integer()
+         class(toAdd) <- tm$fields$type[i]
+         value[,tm$fields$name[i]] <- toAdd
+      }
+      write_MergeTree(
+         con=con,
+         dbName=dbName,
+         tableName=tm$tableName,
+         value=value,
+         rtypes=rtypes,
+         nullable=tm$fields %>%
+            dplyr::filter(.data$nullable) %>%
+            dplyr::pull("name"),
+         sortKey=.get_tm_sortKey(tm)
+      ) 
    }
-   write_MergeTree(
-      con=con,
-      dbName=dbName,
-      tableName=tm$tableName,
-      value=value,
-      rtypes=rtypes,
-      nullable=tm$fields %>%
-         dplyr::filter(.data$nullable) %>%
-         dplyr::pull("name"),
-      sortKey=.get_tm_sortKey(tm)
-   )
    invisible()
 }
 
@@ -400,3 +414,7 @@ CH_RESERVED_DB <- c(
    "system",
    "_temporary_and_external_tables"
 )
+
+###############################################################################@
+## Maximum number of column allowed in a ClikHouse table ----
+CH_MAX_COL <- 1000

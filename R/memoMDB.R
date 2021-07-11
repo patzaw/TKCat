@@ -669,8 +669,63 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
 
 ## Helpers ----
 .write_chTables.memoMDB <- function(x, con, dbName){
+   dm <- data_model(x)
    for(tn in names(x)){
-      ch_insert(con=con, dbName=dbName, tableName=tn, value=x[[tn]])
+      if(ReDaMoR::is.MatrixModel(dm[[tn]])){
+         if(ncol(x[[tn]]) > CH_MAX_COL && nrow(x[[tn]]) < ncol(x[[tn]])){
+            tw <- t(x[[tn]])
+            transposed <- TRUE
+         }else{
+            tw <- x[[tn]]
+            transposed <- FALSE
+         }
+         colList <- seq(1, ncol(tw), by=CH_MAX_COL)
+         colList <- lapply(
+            colList,
+            function(i){
+               colnames(tw)[i:min(i+CH_MAX_COL-1, ncol(tw))]
+            }
+         )
+         names(colList) <- uuid::UUIDgenerate(n=length(colList))
+         nullable <- dm[[tn]]$fields %>% 
+            dplyr::filter(!.data$type %in% c("column", "row")) %>% 
+            dplyr::pull("nullable")
+         vtype <- dm[[tn]]$fields %>% 
+            dplyr::filter(!.data$type %in% c("column", "row")) %>% 
+            dplyr::pull("type")
+         for(stn in names(colList)){
+            stw <- tw[,colList[[stn]]] %>% 
+               as_tibble(
+                  rownames=ifelse(
+                     transposed,
+                     "___COLNAMES___",
+                     "___ROWNAMES___"
+                  )
+               )
+            nulcol <- NULL
+            if(nullable){
+               nulcol <- colList[[stn]]
+            }
+            write_MergeTree(
+               con=con,
+               dbName=dbName,
+               tableName=stn,
+               value=stw,
+               rtypes=c("character", rep(vtype, ncol(stw) - 1)) %>% 
+                  magrittr::set_names(colnames(stw)),
+               nullable=nulcol,
+               sortKey=colnames(stw)[1]
+            )
+            rm(stw)
+            gc()
+         }
+         ch_insert(
+            con=con, dbName=dbName, tableName=tn,
+            value=tibble(table=names(colList))
+         )
+      }else{
+         ch_insert(con=con, dbName=dbName, tableName=tn, value=x[[tn]])
+      }
    }
 }
 
