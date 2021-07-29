@@ -29,7 +29,7 @@ data_tables(x, ..., skip = 0, n_max = Inf)
 \item{n_max}{maximum number of rows to return (default: Inf)}
 }
 \value{
-A list of \link[dplyr:reexports]{dplyr::tibble}
+A list of \link[dplyr:reexports]{dplyr::tibble} and \link{matrix}
 }
 \description{
 Get object data tables

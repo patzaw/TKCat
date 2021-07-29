@@ -118,7 +118,7 @@ if(requireNamespace("stringr", quietly = TRUE)){
 \itemize{
 \item MDB methods:
 \link{db_info}, \link{data_model}, \link{data_tables}, \link{collection_members},
-\link{count_records}, \link{filter_with_tables}, \link{as_fileMDB}
+\link{count_records}, \link{dims}, \link{filter_with_tables}, \link{as_fileMDB}
 \item Additional general documentation is related to \link{MDB}.
 \item \link{filter.fileMDB}, \link{slice.fileMDB}
 }

@@ -21,7 +21,7 @@
 #' @seealso
 #' - MDB methods:
 #' [db_info], [data_model], [data_tables], [collection_members],
-#' [count_records], [filter_with_tables], [as_fileMDB]
+#' [count_records], [dims], [filter_with_tables], [as_fileMDB]
 #' - Additional general documentation is related to [MDB].
 #' - [filter.fileMDB], [slice.fileMDB]
 #' 
@@ -504,12 +504,69 @@ data_tables.fileMDB <- function(x, ..., skip=0, n_max=Inf){
 
 ###############################################################################@
 #' 
-#' @rdname count_records
-#' @method count_records fileMDB
+#' @rdname heads
+#' @method heads fileMDB
 #' 
 #' @export
 #'
-count_records.fileMDB <- function(x, ...){
+heads.fileMDB <- function(x, ..., n=6L){
+   
+   stopifnot(
+      is.numeric(n), length(n)==1, n>0
+   )
+   m <- data_model(x)
+   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   if(length(toTake)==0){
+      toTake <- 1:length(x)
+      names(toTake) <- names(x)
+   }
+   
+   toRet <- lapply(
+      names(toTake),
+      function(name){
+         
+         if(is.MatrixModel(m[[name]])){
+            if(is.infinite(n)){
+               return(data_tables(x, dplyr::all_of(name))[[1]])
+            }
+            ncol <- data_tables(x, dplyr::all_of(name), n_max=1)[[1]] %>% ncol()
+            mn <- min(floor(sqrt(n)), ncol)
+            for(nc in mn:floor(mn/2)){
+               if(n %% nc == 0){
+                  break()
+               }
+            }
+            if(n %% nc == 0){
+               nr <- n %/% nc
+            }else{
+               nr <- nc <- mn
+            }
+            if(nc * nr != n){
+               warning(sprintf("Returning %s records", nc * nr))
+            }
+            d <- data_tables(x, dplyr::all_of(name), n_max=nr)[[1]]
+            return(d[1:min(nr, nrow(d)), 1:nc])
+         }else{
+            return(data_tables(x, dplyr::all_of(name), skip=0, n_max=n)[[1]])
+         }
+         
+      }
+   )
+   names(toRet) <- names(toTake)
+   
+   return(toRet)
+   
+}
+
+
+###############################################################################@
+#' 
+#' @rdname dims
+#' @method dims fileMDB
+#' 
+#' @export
+#'
+dims.fileMDB <- function(x, ...){
    count_lines <- function(f, by=10^5){
       con <- file(f, "r")
       on.exit(close(con))
@@ -526,19 +583,28 @@ count_records.fileMDB <- function(x, ...){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
    }
-   lapply(
+   toTake <- names(toTake)
+   do.call(dplyr::bind_rows, lapply(
       toTake, function(tn){
-         if(ReDaMoR::is.MatrixModel(data_model(x)[[tn]])){
-            nrows <- count_lines(data_files(x)$dataFiles[[tn]]) - 1
-            ncols <- ncol(data_tables(x, tn, n_max=1)[[1]])
-            return(nrows * ncols)
-         }else{
-            return(count_lines(data_files(x)$dataFiles[[tn]]) - 1)
-         }
+         dplyr::tibble(
+            name=tn,
+            format=ifelse(
+               ReDaMoR::is.MatrixModel(data_model(x)[[tn]]),
+               "matrix", "table"
+            ),
+            ncol=ncol(data_tables(x, dplyr::all_of(tn), n_max=1)[[1]]),
+            nrow=count_lines(data_files(x)$dataFiles[[tn]]) - 1,
+         ) %>% 
+            dplyr::mutate(
+               records=ifelse(
+                  .data$format=="matrix",
+                  .data$ncol*.data$nrow,
+                  .data$nrow
+               ),
+               transposed=FALSE
+            )
       }
-   ) %>% 
-      magrittr::set_names(names(x)[toTake]) %>% 
-      unlist()
+   ))
 }
 
 

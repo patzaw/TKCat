@@ -713,6 +713,8 @@
             intersect(names(mdb))
          shiny::req(sel)
          shiny::req(length(sel)==1)
+         tss <- tabSubSet()
+         nr <- ifelse(attr(tss, "mat"), nrow(tss)*ncol(tss), nrow(tss))
          shiny::tagList(
             shiny::h3(sel),
             shiny::tags$ul(
@@ -721,7 +723,7 @@
                      shiny::tags$strong("File size"),
                      ":",
                      .format_file_size(data_file_size(mdb)[sel]),
-                     sprintf("(showing %s records)", nrow(tabSubSet()))
+                     sprintf("(showing %s records)", nr)
                   )
                }else{
                   if(!is.metaMDB(mdb)){
@@ -730,7 +732,7 @@
                         ":",
                         count_records(mdb, dplyr::all_of(sel)) %>%
                            format(big.mark=","),
-                        sprintf("(showing %s records)", nrow(tabSubSet()))
+                        sprintf("(showing %s records)", nr)
                      )
                   }
                }
@@ -750,7 +752,8 @@
             intersect(names(mdb))
          shiny::req(sel)
          shiny::req(length(sel)==1)
-         toShow <- data_tables(mdb, dplyr::all_of(sel), n_max=subSetSize)[[1]]
+         toShow <- heads(mdb, dplyr::all_of(sel), n=subSetSize)[[1]]
+         attr(toShow, "mat") <- ReDaMoR::is.MatrixModel(data_model(mdb)[[sel]])
          if(utils::object.size(toShow) > 2^19){
             toShow <- toShow[
                1:max(c(
@@ -765,7 +768,7 @@
          shiny::req(toShow)
          DT::datatable(
             toShow,
-            rownames=FALSE,
+            rownames=attr(toShow, "mat"),
             selection = 'single',
             extensions='Scroller',
             options = list(

@@ -24,4 +24,6 @@
 #' 
 #' @importFrom xml2 read_xml xml_children xml_name xml_replace write_xml
 #' 
+#' @importFrom uuid UUIDgenerate
+#' 
 NULL

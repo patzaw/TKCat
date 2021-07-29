@@ -117,7 +117,7 @@ collection_members <- function(x, ...){
 #' @param skip the number of rows to skip (default: 0)
 #' @param n_max maximum number of rows to return (default: Inf)
 #' 
-#' @return A list of [dplyr::tibble]
+#' @return A list of [dplyr::tibble] and [matrix]
 #' 
 #' @export
 #'
@@ -138,6 +138,44 @@ data_tables <- function(x, ..., skip=0, n_max=Inf){
 #'
 count_records <- function(x, ...){
    UseMethod("count_records", x)
+}
+
+###############################################################################@
+#' Detailed information about the format of the tables
+#'
+#' @param x an object with embedded data tables
+#' @param ... the name of the tables to consider (default: all of them)
+#' 
+#' @return A tibble with one row for each considered table and the
+#' following columns:
+#' 
+#' - name: the name of the table
+#' - format: "table" or "matrix"
+#' - ncol: number of columns
+#' - nrow: number of rows
+#' - records: number of records (`nrow` for tables and `ncol*nrow` for matrices)
+#' - transposed: FALSE by default. TRUE only for matrices stored in a
+#' transposed format.
+#' 
+#' @export
+#'
+dims <- function(x, ...){
+   UseMethod("dims", x)
+}
+
+###############################################################################@
+#' Get the first records of each object data tables
+#'
+#' @param x an object with embedded data tables
+#' @param ... the name of the tables to get (default: all of them)
+#' @param n maximum number of records to return (default: 6)
+#' 
+#' @return A list of [dplyr::tibble] and [matrix]
+#' 
+#' @export
+#'
+heads <- function(x, ..., n=6L){
+   UseMethod("heads", x)
 }
 
 

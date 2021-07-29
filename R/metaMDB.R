@@ -20,7 +20,7 @@
 #' @seealso
 #' - MDB methods:
 #' [db_info], [data_model], [data_tables], [collection_members],
-#' [count_records], [filter_with_tables], [as_fileMDB]
+#' [count_records], [dims], [filter_with_tables], [as_fileMDB]
 #' - Additional general documentation is related to [MDB].
 #' - [filter.metaMDB], [slice.metaMDB]
 #' - [get_confrontation_report], [ReDaMoR::format_confrontation_report]
@@ -331,12 +331,12 @@ data_tables.metaMDB <- function(x, ...){
 
 ###############################################################################@
 #' 
-#' @rdname count_records
-#' @method count_records metaMDB
+#' @rdname dims
+#' @method dims metaMDB
 #' 
 #' @export
 #'
-count_records.metaMDB <- function(x, ...){
+dims.metaMDB <- function(x, ...){
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
@@ -348,14 +348,33 @@ count_records.metaMDB <- function(x, ...){
    for(mdb in names(x$MDBs)){
       lToTake <- intersect(toTake, names(x$MDBs[[mdb]]))
       if(length(lToTake)>0){
-         toRet <- c(toRet, count_records(x$MDBs[[mdb]], dplyr::all_of(lToTake)))
+         toRet <- dplyr::bind_rows(
+            toRet,
+            dims(x$MDBs[[mdb]], dplyr::all_of(lToTake))
+         )
       }
    }
    lToTake <- intersect(toTake, names(x$relationalTables))
    if(length(lToTake)>0){
-      toRet <- c(toRet, unlist(lapply(x$relationalTables[lToTake], nrow)))
+      toAdd <- do.call(dplyr::bind_rows, lapply(
+         lToTake,
+         function(n){
+            y <- x$relationalTables[[n]]
+            return(
+               dplyr::tibble(
+                  name=n,
+                  format=ifelse(is.matrix(y), "matrix", "table"),
+                  ncol=ncol(y),
+                  nrow=nrow(y),
+                  records=ifelse(is.matrix(y), ncol(y)*nrow(y), nrow(y)),
+                  transposed=FALSE
+               )
+            )
+         }
+      ))
+      toRet <- dplyr::bind_rows(toRet, toAdd)
    }
-   toRet <- toRet[toTake]
+   toRet <- toRet[match(toTake, toRet$name),]
    return(toRet)
 }
 

@@ -63,6 +63,19 @@ length.MDB <- function(x){
 
 
 ###############################################################################@
+#' 
+#' @rdname count_records
+#' @method count_records MDB
+#' 
+#' @export
+#'
+count_records.MDB <- function(x, ...){
+   d <- dims(x, ...)
+   d$records %>% magrittr::set_names(d$name)
+}
+
+
+###############################################################################@
 #'
 #' @param x an MDB object
 #' @param use.names return the names of the tables

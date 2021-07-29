@@ -18,7 +18,7 @@
 #' @seealso
 #' - MDB methods:
 #' [db_info], [data_model], [data_tables], [collection_members],
-#' [count_records], [filter_with_tables], [as_fileMDB]
+#' [count_records], [dims], [filter_with_tables], [as_fileMDB]
 #' - Additional general documentation is related to [MDB].
 #' - [filter.memoMDB], [slice.memoMDB]
 #' 
@@ -332,22 +332,85 @@ data_tables.memoMDB <- function(x, ..., skip=0, n_max=Inf){
 
 ###############################################################################@
 #' 
-#' @rdname count_records
-#' @method count_records memoMDB
+#' @rdname heads
+#' @method heads memoMDB
 #' 
 #' @export
 #'
-count_records.memoMDB <- function(x, ...){
-   lapply(
-      data_tables(x, ...),
-      function(y){
-         if(is.matrix(y)){
-            return(nrow(y)*ncol(y))
+heads.memoMDB <- function(x, ..., n=6L){
+   
+   stopifnot(
+      is.numeric(n), length(n)==1, n>0
+   )
+   m <- data_model(x)
+   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   if(length(toTake)==0){
+      toTake <- 1:length(x)
+      names(toTake) <- names(x)
+   }
+   x <- unclass(x)
+   
+   toRet <- lapply(
+      names(toTake),
+      function(name){
+         if(ReDaMoR::is.MatrixModel(m[[name]])){
+            d <- x$dataTables[[name]]
+            if(n >= length(d)){
+               return(d)
+            }else{
+               mn <- min(floor(sqrt(n)), ncol(d))
+               for(nc in mn:floor(mn/2)){
+                  if(n %% nc == 0){
+                     break()
+                  }
+               }
+               if(n %% nc == 0){
+                  nr <- n %/% nc
+               }else{
+                  nr <- nc <- mn
+               }
+               if(nc * nr != n){
+                  warning(sprintf("Returning %s records", nc * nr))
+               }
+               return(d[1:nr, 1:nc])
+            }
          }else{
-            return(nrow(y))
+            return(head(x$dataTables[[name]], n))
          }
       }
-   ) %>% unlist()
+   )
+   names(toRet) <- names(toTake)
+   
+   return(toRet)
+   
+}
+
+
+###############################################################################@
+#' 
+#' @rdname dims
+#' @method dims memoMDB
+#' 
+#' @export
+#'
+dims.memoMDB <- function(x, ...){
+   dl <- data_tables(x, ...)
+   do.call(dplyr::bind_rows, lapply(
+      names(dl),
+      function(n){
+         y <- dl[[n]]
+         return(
+            dplyr::tibble(
+               name=n,
+               format=ifelse(is.matrix(y), "matrix", "table"),
+               ncol=ncol(y),
+               nrow=nrow(y),
+               records=ifelse(is.matrix(y), ncol(y)*nrow(y), nrow(y)),
+               transposed=FALSE
+            )
+         )
+      }
+   ))
 }
 
 
@@ -673,19 +736,28 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
    for(tn in names(x)){
       if(ReDaMoR::is.MatrixModel(dm[[tn]])){
          if(ncol(x[[tn]]) > CH_MAX_COL && nrow(x[[tn]]) < ncol(x[[tn]])){
-            tw <- t(x[[tn]])
+            tw <- x[[tn]]
+            gc()
             transposed <- TRUE
+            twrn <- sort(rownames(tw))
+            colList <- seq(1, nrow(tw), by=CH_MAX_COL)
+            colList <- lapply(
+               colList,
+               function(i){
+                  twrn[i:min(i+CH_MAX_COL-1, nrow(tw))]
+               }
+            )
          }else{
             tw <- x[[tn]]
             transposed <- FALSE
+            colList <- seq(1, ncol(tw), by=CH_MAX_COL)
+            colList <- lapply(
+               colList,
+               function(i){
+                  colnames(tw)[i:min(i+CH_MAX_COL-1, ncol(tw))]
+               }
+            )
          }
-         colList <- seq(1, ncol(tw), by=CH_MAX_COL)
-         colList <- lapply(
-            colList,
-            function(i){
-               colnames(tw)[i:min(i+CH_MAX_COL-1, ncol(tw))]
-            }
-         )
          names(colList) <- uuid::UUIDgenerate(n=length(colList))
          nullable <- dm[[tn]]$fields %>% 
             dplyr::filter(!.data$type %in% c("column", "row")) %>% 
@@ -693,15 +765,17 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
          vtype <- dm[[tn]]$fields %>% 
             dplyr::filter(!.data$type %in% c("column", "row")) %>% 
             dplyr::pull("type")
+         print(transposed)
          for(stn in names(colList)){
-            stw <- tw[,colList[[stn]]] %>% 
-               as_tibble(
-                  rownames=ifelse(
-                     transposed,
-                     "___COLNAMES___",
-                     "___ROWNAMES___"
-                  )
-               )
+            print(stn)
+            if(transposed){
+               stw <- tw[colList[[stn]], , drop=FALSE] %>% 
+                  t() %>% 
+                  as_tibble(rownames="___COLNAMES___")
+            }else{
+               stw <- tw[, colList[[stn]], drop=FALSE] %>% 
+                  as_tibble(rownames="___ROWNAMES___")
+            }
             nulcol <- NULL
             if(nullable){
                nulcol <- colList[[stn]]
