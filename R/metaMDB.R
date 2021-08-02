@@ -378,7 +378,7 @@ heads.metaMDB <- function(x, ..., n=6L){
    }
    lToTake <- intersect(toTake, names(x$relationalTables))
    if(length(lToTake)>0){
-      toRet <- c(toRet, lapply(x$relationalTables[lToTake], head, n=n))
+      toRet <- c(toRet, lapply(x$relationalTables[lToTake], utils::head, n=n))
    }
    toRet <- toRet[toTake]
    return(toRet)

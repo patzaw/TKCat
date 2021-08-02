@@ -381,7 +381,7 @@ heads.memoMDB <- function(x, ..., n=6L){
                return(d[1:nr, 1:nc])
             }
          }else{
-            return(head(x$dataTables[[name]], n))
+            return(utils::head(x$dataTables[[name]], n))
          }
       }
    )
