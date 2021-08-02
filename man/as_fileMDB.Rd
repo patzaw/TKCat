@@ -14,6 +14,7 @@
   path,
   readParameters = DEFAULT_READ_PARAMS,
   htmlModel = TRUE,
+  compress = TRUE,
   by = 10^5,
   ...
 )
@@ -23,7 +24,8 @@
   path,
   readParameters = DEFAULT_READ_PARAMS,
   htmlModel = TRUE,
-  chunk_size = 10^5,
+  compress = TRUE,
+  by = 10^5,
   ...
 )
 
@@ -32,6 +34,8 @@ as_fileMDB(
   path,
   readParameters = DEFAULT_READ_PARAMS,
   htmlModel = TRUE,
+  compress = TRUE,
+  by = 10^5,
   ...
 )
 
@@ -40,6 +44,8 @@ as_fileMDB(
   path,
   readParameters = DEFAULT_READ_PARAMS,
   htmlModel = TRUE,
+  compress = TRUE,
+  by = 10^5,
   ...
 )
 
@@ -48,6 +54,8 @@ as_fileMDB(
   path,
   readParameters = DEFAULT_READ_PARAMS,
   htmlModel = TRUE,
+  compress = TRUE,
+  by = 10^5,
   ...
 )
 }
@@ -68,13 +76,13 @@ should bbe treated as missing values or strings
 \item{htmlModel}{a logical. If TRUE (default) the model is also plotted in
 an html file.}
 
+\item{compress}{a logical specifying whether saving data
+is to use "gzip" compression (default: TRUE)}
+
 \item{by}{the size of the batch: number of records to write
 together (default: 10^5)}
 
 \item{...}{method specific parameters}
-
-\item{chunk_size}{the number of rows to consider together when copying the
-data}
 }
 \value{
 A \link{fileMDB} object.

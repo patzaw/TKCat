@@ -282,12 +282,14 @@ is.chMDB <- function(x){
 #' @param tkcon a [chTKCat] object
 #' @param overwrite a logical indicating if existing data should be overwritten
 #' (default: FALSE)
+#' @param by the size of the batch: number of records to write
+#' together (default: 10^5)
 #' 
 #' @return A [chMDB] object.
 #' 
 #' @export
 #'
-as_chMDB <- function(x, tkcon, overwrite=FALSE){
+as_chMDB <- function(x, tkcon, overwrite=FALSE, by=10^5){
    stopifnot(is.MDB(x))
    stopifnot(is.chTKCat(tkcon))
    con <- tkcon$chcon
@@ -397,7 +399,7 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE){
    ## Write data ----
    er <- try({
       mergeTrees_from_RelDataModel(con=con, dbName=dbName, dbm=dataModel)
-      .write_chTables(x, con, dbName)
+      .write_chTables(x, con, dbName, by=by)
    }, silent=FALSE)
    if(inherits(er, "try-error")){
       empty_chMDB(tkcon, dbName)
@@ -609,6 +611,9 @@ data_tables.chMDB <- function(x, ..., skip=0, n_max=Inf){
       is.numeric(skip), length(skip)==1, skip>=0, is.finite(skip),
       is.numeric(n_max), length(n_max)==1, n_max>0
    )
+   if(length(x)==0){
+      return(list())
+   }
    if(is.infinite(n_max)){
       n_max <- max(count_records(x, ...))
    }
@@ -646,6 +651,9 @@ heads.chMDB <- function(x, ..., n=6L){
    stopifnot(
       is.numeric(n), length(n)==1, n>0
    )
+   if(length(x)==0){
+      return(list())
+   }
    m <- data_model(x)
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
@@ -677,6 +685,16 @@ heads.chMDB <- function(x, ..., n=6L){
 #' @export
 #'
 dims.chMDB <- function(x, ...){
+   if(length(x)==0){
+      return(dplyr::tibble(
+         name=character(),
+         format=character(),
+         ncol=numeric(),
+         nrow=numeric(),
+         records=numeric(),
+         transposed=logical()
+      ))
+   }
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
@@ -867,8 +885,6 @@ c.chMDB <- function(...){
 
 ###############################################################################@
 #' 
-#' @param by the size of the batch: number of records to write
-#' together (default: 10^5)
 #' 
 #' @rdname as_fileMDB
 #' @method as_fileMDB chMDB
@@ -879,6 +895,7 @@ as_fileMDB.chMDB <- function(
    x, path,
    readParameters=DEFAULT_READ_PARAMS,
    htmlModel=TRUE,
+   compress=TRUE,
    by=10^5,
    ...
 ){
@@ -930,20 +947,25 @@ as_fileMDB.chMDB <- function(
    ## Data ----
    dataPath <- file.path(fullPath, "data")
    dir.create(dataPath)
-   ext <- ".txt.gz"
+   ext <- ifelse(compress, ".txt.gz", ".txt")
    dfiles <- file.path(dataPath, paste0(names(x), ext))
    names(dfiles) <- names(x)
    for(tn in names(x)){
-      toWrite <- data_tables(x, dplyr::all_of(tn), skip=0, n_max=by)[[1]]
-      r <- nrow(toWrite)
-      while(nrow(toWrite)>0){
+      ddim <- dims(x, dplyr::all_of(tn))
+      r <- 0
+      toWrite <- data_tables(x, dplyr::all_of(tn), skip=r, n_max=by)[[1]]
+      while(!is.null(toWrite) && nrow(toWrite)>0){
+         if(is.matrix(toWrite)){
+            toWrite <- dplyr::as_tibble(toWrite, rownames="___ROWNAMES___")
+         }
          readr::write_delim(
             toWrite, file=dfiles[tn],
             delim=rp$delim,
             append=file.exists(dfiles[tn])
          )
+         r <- r + nrow(toWrite)
+         message(sprintf("%s rows written over %s", r, ddim$nrow))
          toWrite <- data_tables(x, dplyr::all_of(tn), skip=r, n_max=by)[[1]]
-         r <- r+nrow(toWrite)
       }
    }
    
@@ -984,6 +1006,9 @@ filter.chMDB <- function(.data, ..., by=10^5, .preserve=FALSE){
    for(tn in names(dots)){
       if(!tn %in% names(x)){
          stop(sprintf("%s table does not exist", tn))
+      }
+      if(ReDaMoR::is.MatrixModel(data_model(x)[[tn]])){
+         stop("Cannot filter a matrix: start from another table")         
       }
       ft <- c()
       toAdd <- data_tables(x, dplyr::all_of(tn), skip=0, n_max=by)[[1]]
@@ -1030,6 +1055,9 @@ slice.chMDB <- function(.data, ..., by=10^5, .preserve=FALSE){
    tn <- names(dots)
    if(!tn %in% names(x)){
       stop(sprintf("%s table does not exist", tn))
+   }
+   if(ReDaMoR::is.MatrixModel(data_model(x)[[tn]])){
+      stop("Cannot slice a matrix: start from another table")         
    }
    i <- dots[[tn]]
    
@@ -1114,15 +1142,71 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
 
 ###############################################################################@
 ## Helpers ----
-.write_chTables.chMDB <- function(x, con, dbName, by=10^5){
+.write_chTables.chMDB <- function(x, con, dbName, by=10^5, ...){
    dm <- data_model(x)
    for(tn in names(x)){
-      toWrite <- data_tables(x, dplyr::all_of(tn), skip=0, n_max=by)[[1]]
-      r <- nrow(toWrite)
-      while(nrow(toWrite)>0){
-         ch_insert(con=con, dbName=dbName, tableName=tn, value=toWrite)
-         toWrite <- data_tables(x, dplyr::all_of(tn), skip=r, n_max=by)[[1]]
-         r <- r+nrow(toWrite)
+      if(ReDaMoR::is.MatrixModel(dm[[tn]])){
+         nullable <- dm[[tn]]$fields %>% 
+            dplyr::filter(!.data$type %in% c("column", "row")) %>% 
+            dplyr::pull("nullable")
+         vtype <- setdiff(dm[[tn]]$fields$type, c("column", "row"))
+         tnpath <- db_tables(x)$dbTables[[tn]]
+         tndb <- sub("^`", "", sub("`[.]`.*$", "", tnpath))
+         stl <- get_query(
+            x,
+            sprintf(
+               "SELECT * FROM %s",
+               tnpath
+            )
+         )
+         ch_insert(con=con, dbName=dbName, tableName=tn, value=stl)
+         for(stn in stl$table){
+            toWrite <- get_query(
+               x,
+               sprintf("SELECT * FROM `%s`.`%s` LIMIT 0, %s", tndb, stn, by)
+            )
+            nulcol <- NULL
+            if(nullable){
+               nulcol <- colnames(toWrite)[-1]
+            }
+            write_MergeTree(
+               con=con,
+               dbName=dbName,
+               tableName=stn,
+               value=toWrite,
+               rtypes=c("character", rep(vtype, ncol(toWrite)-1)) %>% 
+                  magrittr::set_names(colnames(toWrite)),
+               nullable=nulcol,
+               sortKey=colnames(toWrite)[1]
+            )
+            r <- nrow(toWrite)
+            toWrite <- get_query(
+               x,
+               sprintf(
+                  "SELECT * FROM `%s`.`%s` LIMIT %s, %s",
+                  tndb, stn, r, by
+               )
+            )
+            while(nrow(toWrite)>0){
+               ch_insert(con=con, dbName=dbName, tableName=stn, value=toWrite)
+               r <- r + nrow(toWrite)
+               toWrite <- get_query(
+                  x,
+                  sprintf(
+                     "SELECT * FROM `%s`.`%s` LIMIT %s, %s",
+                     tndb, stn, r, by
+                  )
+               )
+            }
+         }
+      }else{
+         toWrite <- data_tables(x, dplyr::all_of(tn), skip=0, n_max=by)[[1]]
+         r <- nrow(toWrite)
+         while(nrow(toWrite)>0){
+            ch_insert(con=con, dbName=dbName, tableName=tn, value=toWrite)
+            toWrite <- data_tables(x, dplyr::all_of(tn), skip=r, n_max=by)[[1]]
+            r <- r + nrow(toWrite)
+         }
       }
    }
 }
@@ -1143,7 +1227,7 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
       tdb <- sub("^`", "", sub("`[.]`.*$", "", dbti))
       tquery <- sprintf(query, dbti)
       qr <- get_query(x, tquery)
-      toRet <- c()
+      toRet <- list()
       vtype <- setdiff(
          tableModel$fields$type,
          c("row", "column")
@@ -1162,8 +1246,21 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
          dimcol$name, c("___COLNAMES___", "___ROWNAMES___")
       )
       stopifnot(length(dimcol)==1)
+      chFields <- get_query(
+         x,
+         sprintf(
+            paste(
+               "SELECT database, table, name FROM system.columns",
+               " WHERE database='%s' AND table IN ('%s')"
+            ),
+            tdb,
+            paste(unique(qr$table), collapse="', '")
+         )
+      ) %>% 
+         dplyr::filter(.data$name!=dimcol) %>% 
+         dplyr::arrange(.data$name)
       if(dimcol=="___ROWNAMES___"){
-         for(st in qr$table){
+         for(st in unique(chFields$table)){
             stquery <- sprintf(
                paste(query, 'ORDER BY %s'),
                sprintf('`%s`.`%s`', tdb, st),
@@ -1181,24 +1278,13 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
             )
             toAdd <- stqr[, -1, drop=FALSE] %>% 
                as.matrix() %>% 
-               magrittr::set_class(vtype) %>% 
                magrittr::set_rownames(dimname)
-            toRet <- cbind(toRet, toAdd)
+            toRet <- c(toRet, list(toAdd))
          }
+         toRet <- do.call(cbind, toRet) %>%
+            magrittr::set_class(vtype)
+         toRet <- toRet[, sort(colnames(toRet))]
       }else{
-         chFields <- get_query(
-            x,
-            sprintf(
-               paste(
-                  "SELECT database, table, name FROM system.columns",
-                  " WHERE database='%s' AND table IN ('%s')"
-               ),
-               tdb,
-               paste(unique(qr$table), collapse="', '")
-            )
-         ) %>% 
-            dplyr::arrange(.data$name) %>% 
-            dplyr::filter(.data$name!=dimcol)
          if(skip >= nrow(chFields)){
             return(NULL)
          }
@@ -1224,12 +1310,14 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
                ncol(stqr) > 1
             )
             toAdd <- stqr[, -1, drop=FALSE] %>% 
-               as.matrix() %>%
-               magrittr::set_class(vtype) %>% 
-               t() %>% 
-               magrittr::set_colnames(dimname)
-            toRet <- rbind(toRet, toAdd)
+               as.matrix() %>% 
+               magrittr::set_rownames(dimname)
+            toRet <- c(toRet, list(toAdd))
          }
+         toRet <- do.call(cbind, toRet) %>%
+            t() %>%
+            magrittr::set_class(vtype)
+         toRet <- toRet[sort(rownames(toRet)),]
       }
    }else{
       query <- "SELECT * FROM %s ORDER BY %s LIMIT %s, %s"
@@ -1383,8 +1471,8 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
             paste(unique(qr$table), collapse="', '")
          )
       ) %>% 
-         dplyr::arrange(.data$name) %>% 
-         dplyr::filter(.data$name!=dimcol)
+         dplyr::filter(.data$name!=dimcol) %>% 
+         arrange(.data$name)
       if(!dd$transposed){
          chFields <- chFields[1:nc,]
          lim <- nr
@@ -1421,9 +1509,9 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
       }
       
       if(!dd$transposed){
-         return(toRet)
+         return(toRet[, sort(colnames(toRet))])
       }else{
-         return(t(toRet))
+         return(t(toRet[, sort(colnames(toRet))]))
       }
       
    }else{
@@ -1457,11 +1545,12 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
             if(ntn %in% names(d)){
-               nv <- dplyr::semi_join(
-                  d[[ntn]], d[[tn]],
+               nv <- .mdjoin(
+                  d1=d[[ntn]], d2=d[[tn]],
                   by=magrittr::set_names(
                      fkl$ff[[i]], fkl$tf[[i]]
-                  )
+                  ),
+                  tm1=dm[[ntn]], tm2=dm[[tn]]
                )
             }else{
                nv <- c()
@@ -1470,13 +1559,14 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
                )[[1]]
                r <- nrow(toAdd)
                while(nrow(toAdd)>0){
-                  toAdd <- dplyr::semi_join(
-                     toAdd, d[[tn]],
+                  toAdd <- .mdjoin(
+                     d1=toAdd, d2=d[[tn]],
                      by=magrittr::set_names(
                         fkl$ff[[i]], fkl$tf[[i]]
-                     )
+                     ),
+                     tm1=dm[[ntn]], tm2=dm[[tn]]
                   )
-                  nv <- dplyr::bind_rows(nv, toAdd)
+                  nv <- rbind(nv, toAdd)
                   toAdd <- data_tables(
                      fdb, dplyr::all_of(ntn), skip=r, n_max=by
                   )[[1]]
@@ -1509,19 +1599,20 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
             )[[1]]
             r <- nrow(toAdd)
             while(nrow(toAdd)>0){
-               toAdd <- dplyr::semi_join(
-                  toAdd, d[[tn]],
+               toAdd <- .mdjoin(
+                  d1=toAdd, d2=d[[tn]],
                   by=magrittr::set_names(
                      fkl$ff[[i]], fkl$tf[[i]]
-                  )
+                  ),
+                  tm1=dm[[ntn]], tm2=dm[[tn]]
                )
-               vta <- dplyr::bind_rows(vta, toAdd)
+               vta <- rbind(vta, toAdd)
                toAdd <- data_tables(
                   fdb, dplyr::all_of(ntn), skip=r, n_max=by
                )[[1]]
                r <- r + nrow(toAdd)
             }
-            d[[ntn]] <<- dplyr::bind_rows(
+            d[[ntn]] <<- rbind(
                d[[ntn]],
                vta
             ) %>%

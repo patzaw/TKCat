@@ -307,6 +307,9 @@ data_tables.memoMDB <- function(x, ..., skip=0, n_max=Inf){
       is.numeric(skip), length(skip)==1, skip>=0, is.finite(skip),
       is.numeric(n_max), length(n_max)==1, n_max>0
    )
+   if(length(x)==0){
+      return(list())
+   }
    m <- data_model(x)
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
@@ -342,6 +345,9 @@ heads.memoMDB <- function(x, ..., n=6L){
    stopifnot(
       is.numeric(n), length(n)==1, n>0
    )
+   if(length(x)==0){
+      return(list())
+   }
    m <- data_model(x)
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
@@ -394,6 +400,16 @@ heads.memoMDB <- function(x, ..., n=6L){
 #' @export
 #'
 dims.memoMDB <- function(x, ...){
+   if(length(x)==0){
+      return(dplyr::tibble(
+         name=character(),
+         format=character(),
+         ncol=numeric(),
+         nrow=numeric(),
+         records=numeric(),
+         transposed=logical()
+      ))
+   }
    dl <- data_tables(x, ...)
    do.call(dplyr::bind_rows, lapply(
       names(dl),
@@ -537,6 +553,8 @@ as_fileMDB.memoMDB <- function(
    x, path,
    readParameters=DEFAULT_READ_PARAMS,
    htmlModel=TRUE,
+   compress=TRUE,
+   by=10^5,
    ...
 ){
    stopifnot(is.character(path), length(path)==1, !is.na(path))
@@ -587,7 +605,7 @@ as_fileMDB.memoMDB <- function(
    ## Data ----
    dataPath <- file.path(fullPath, "data")
    dir.create(dataPath)
-   ext <- ".txt.gz"
+   ext <- ifelse(compress, ".txt.gz", ".txt")
    dfiles <- file.path(dataPath, paste0(names(x), ext))
    names(dfiles) <- names(x)
    for(tn in names(x)){
@@ -731,7 +749,7 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
 }
 
 ## Helpers ----
-.write_chTables.memoMDB <- function(x, con, dbName){
+.write_chTables.memoMDB <- function(x, con, dbName, by, ...){
    dm <- data_model(x)
    for(tn in names(x)){
       if(ReDaMoR::is.MatrixModel(dm[[tn]])){
@@ -739,22 +757,23 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
             tw <- x[[tn]]
             gc()
             transposed <- TRUE
-            twrn <- sort(rownames(tw))
+            scn <- sort(rownames(tw))
             colList <- seq(1, nrow(tw), by=CH_MAX_COL)
             colList <- lapply(
                colList,
                function(i){
-                  twrn[i:min(i+CH_MAX_COL-1, nrow(tw))]
+                  scn[i:min(i+CH_MAX_COL-1, nrow(tw))]
                }
             )
          }else{
             tw <- x[[tn]]
             transposed <- FALSE
+            scn <- sort(colnames(tw))
             colList <- seq(1, ncol(tw), by=CH_MAX_COL)
             colList <- lapply(
                colList,
                function(i){
-                  colnames(tw)[i:min(i+CH_MAX_COL-1, ncol(tw))]
+                  scn[i:min(i+CH_MAX_COL-1, ncol(tw))]
                }
             )
          }
@@ -765,9 +784,7 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
          vtype <- dm[[tn]]$fields %>% 
             dplyr::filter(!.data$type %in% c("column", "row")) %>% 
             dplyr::pull("type")
-         print(transposed)
          for(stn in names(colList)){
-            print(stn)
             if(transposed){
                stw <- tw[colList[[stn]], , drop=FALSE] %>% 
                   t() %>% 
@@ -917,12 +934,6 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
-            # nv <- dplyr::semi_join(
-            #    toRet[[ntn]], toRet[[tn]],
-            #    by=magrittr::set_names(
-            #       fkl$ff[[i]], fkl$tf[[i]]
-            #    )
-            # )
             nv <- .mdjoin(
                d1=toRet[[ntn]], d2=toRet[[tn]],
                by=magrittr::set_names(
@@ -1001,10 +1012,18 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
          toTake <- which(d1val[[fi]] %in% d2val[[fi]])
          if(attr(d1val[[fi]], "f")=="column"){
             colToTake <- toTake
-            rowToTake <- 1:nrow(d1)
+            if(nrow(d1)>0){
+               rowToTake <- 1:nrow(d1)
+            }else{
+               rowToTake <- c()
+            }
          }
          if(attr(d1val[[fi]], "f")=="row"){
-            colToTake <- 1:ncol(d1)
+            if(ncol(d1)>0){
+               colToTake <- 1:ncol(d1)
+            }else{
+               colToTake <- c()
+            }
             rowToTake <- toTake
          }
          if(attr(d1val[[fi]], "f")=="value"){
@@ -1025,7 +1044,7 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
       toRet <- d1
       for(fi in 1:length(by)){
          toTake <- which(toRet[[names(by)[fi]]] %in% d2val[[fi]])
-         toRet <- toRet[toTake,]
+         toRet <- toRet[toTake, , drop=FALSE]
       }
       return(toRet)
    }

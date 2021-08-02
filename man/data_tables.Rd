@@ -17,7 +17,7 @@ data_tables(x, ..., skip = 0, n_max = Inf)
 
 \method{data_tables}{memoMDB}(x, ..., skip = 0, n_max = Inf)
 
-\method{data_tables}{metaMDB}(x, ...)
+\method{data_tables}{metaMDB}(x, ..., skip = 0, n_max = Inf)
 }
 \arguments{
 \item{x}{an object with embedded data tables}

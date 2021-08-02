@@ -457,6 +457,9 @@ data_tables.fileMDB <- function(x, ..., skip=0, n_max=Inf){
       is.numeric(skip), length(skip)==1, skip>=0, is.finite(skip),
       is.numeric(n_max), length(n_max)==1, n_max>0
    )
+   if(length(x)==0){
+      return(list())
+   }
    m <- data_model(x)
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
@@ -514,6 +517,9 @@ heads.fileMDB <- function(x, ..., n=6L){
    stopifnot(
       is.numeric(n), length(n)==1, n>0
    )
+   if(length(x)==0){
+      return(list())
+   }
    m <- data_model(x)
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
@@ -561,22 +567,73 @@ heads.fileMDB <- function(x, ..., n=6L){
 
 ###############################################################################@
 #' 
+#' @param by the size of the batch: number of lines to count
+#' together (default: 1000)
+#' @param estimateThr file size threshold in bytes from which an estimation
+#' of row number should be computed instead of a precise count
+#' (default: 50000000 = 50MB)
+#' @param estimateSample number of values on which the estimation is based
+#' (default: 10^6)
+#' @param showWarnings a warning is raised by default if estimation is done.
+#' 
 #' @rdname dims
 #' @method dims fileMDB
 #' 
 #' @export
 #'
-dims.fileMDB <- function(x, ...){
-   count_lines <- function(f, by=10^5){
+dims.fileMDB <- function(
+   x, ...,
+   by=1000,
+   estimateThr=50000000, estimateSample=10^6,
+   showWarnings=TRUE
+){
+   if(length(x)==0){
+      return(dplyr::tibble(
+         name=character(),
+         format=character(),
+         ncol=numeric(),
+         nrow=numeric(),
+         records=numeric(),
+         transposed=logical()
+      ))
+   }
+   count_rc <- function(tn, by=1000){
+      nc <- ncol(data_tables(x, dplyr::all_of(tn), n_max=1)[[1]])
+      f <- data_files(x)$dataFiles[[tn]]
       con <- file(f, "r")
       on.exit(close(con))
       d <- c()
-      n <- cn <- length(readLines(con, n=by))
+      nr <- cn <- length(readLines(con, n=by))
       while(cn>0){
          cn <- length(readLines(con, n=by))
-         n <- n+cn
+         nr <- nr+cn
       }
-      return(n)
+      return(c(nr, nc))
+   }
+   estimate_rc <- function(tn, esamp=10^6){
+      f <- data_files(x)$dataFiles[[tn]]
+      rp <- data_files(x)$readParameters
+      fs <- file.size(f)
+      fcon <- file(f)
+      fc <- summary(fcon)$class=="gzfile"
+      close(fcon)
+      nc <- ncol(data_tables(x, dplyr::all_of(tn), n_max=1)[[1]])
+      rsamp <- round(esamp/nc)
+      st <- data_tables(x, dplyr::all_of(tn), n_max=rsamp)[[1]]
+      if(is.matrix(st)){
+         st <- dplyr::as_tibble(st, rownames="___ROWNAMES___")
+      }
+      tmpf <- tempfile(fileext=ifelse(fc, ".txt.gz", ".txt"))
+      on.exit(file.remove(tmpf))
+      if(fc){
+         tmpc <- gzfile(tmpf)
+      }else{
+         tmpc <- file(tmpf)
+      }
+      utils::write.table(st, file=tmpc, sep=rp$delim)
+      sfs <- file.size(tmpf)
+      nr <- round(fs * (rsamp + 1) / sfs)
+      return(c(nr, nc))
    }
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
@@ -586,14 +643,28 @@ dims.fileMDB <- function(x, ...){
    toTake <- names(toTake)
    do.call(dplyr::bind_rows, lapply(
       toTake, function(tn){
+         f <- data_files(x)$dataFiles[[tn]]
+         fs <- file.size(f)
+         if(fs > estimateThr){
+            if(showWarnings){
+               warning(sprintf(
+                  "Estimating %s rows based on the first %s values",
+                  tn,
+                  estimateSample
+               ))
+            }
+            n <- estimate_rc(tn, estimateSample)
+         }else{
+            n <- count_rc(tn, by)
+         }
          dplyr::tibble(
             name=tn,
             format=ifelse(
                ReDaMoR::is.MatrixModel(data_model(x)[[tn]]),
                "matrix", "table"
             ),
-            ncol=ncol(data_tables(x, dplyr::all_of(tn), n_max=1)[[1]]),
-            nrow=count_lines(data_files(x)$dataFiles[[tn]]) - 1,
+            ncol=n[2],
+            nrow=n[1] - 1,
          ) %>% 
             dplyr::mutate(
                records=ifelse(
@@ -640,11 +711,19 @@ data_files <- function(x){
 #'
 data_file_size <- function(x, hr=FALSE){
    df <- data_files(x)$dataFiles
-   toRet <- file.size(df)
+   fs <- file.size(df)
    if(hr){
-      toRet <- .format_file_size(toRet)
+      fs <- .format_file_size(fs)
    }
-   names(toRet) <- names(df)
+   fc <- lapply(
+      df, function(x){
+         fcon <- file(x)
+         toRet <- summary(fcon)$class
+         close(fcon)
+         return(toRet)
+      }
+   ) %>% unlist()
+   toRet <- dplyr::tibble(table=names(df), size=fs, compressed=fc=="gzfile")
    return(toRet)
 }
 
@@ -790,8 +869,8 @@ c.fileMDB <- function(...){
 #' @rdname as_fileMDB
 #' @method as_fileMDB fileMDB
 #' 
-#' @param chunk_size the number of rows to consider together when copying the
-#' data
+#' @param by the size of the batch: number of records to write
+#' together (default: 10^5)
 #' 
 #' @export
 #'
@@ -799,7 +878,8 @@ as_fileMDB.fileMDB <- function(
    x, path,
    readParameters=DEFAULT_READ_PARAMS,
    htmlModel=TRUE,
-   chunk_size=10^5,
+   compress=TRUE,
+   by=10^5,
    ...
 ){
    stopifnot(is.character(path), length(path)==1, !is.na(path))
@@ -882,7 +962,7 @@ as_fileMDB.fileMDB <- function(
                         append=file.exists(dfiles[tn])
                      )
                   }),
-                  chunk_size=chunk_size
+                  chunk_size=by
                )
             )
          )
@@ -1097,30 +1177,150 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
 
 ###############################################################################@
 ## Helpers ----
-.write_chTables.fileMDB <- function(x, con, dbName, by=10^5){
+.write_chTables.fileMDB <- function(x, con, dbName, by=10^5, ...){
    dm <- data_model(x)
    df <- data_files(x)
    rp <- df$readParameters
    df <- df$dataFiles
    for(tn in names(x)){
-      do.call(
-         readr::read_delim_chunked,
-         c(
-            list(file=df[tn]),
-            rp,
-            list(
-               col_types=ReDaMoR::col_types(dm[[tn]])
-            ),
-            list(
-               callback=readr::DataFrameCallback$new(function(y, pos){
-                  ch_insert(con=con, dbName=dbName, tableName=tn, value=y)
-               }),
-               chunk_size=by
+      if(ReDaMoR::is.MatrixModel(dm[[tn]])){
+         
+         nullable <- dm[[tn]]$fields %>% 
+            dplyr::filter(!.data$type %in% c("column", "row")) %>% 
+            dplyr::pull("nullable")
+         vtype <- setdiff(dm[[tn]]$fields$type, c("column", "row"))
+         ddim <- dims(x, dplyr::all_of(tn), showWarnings=FALSE)
+         
+         if(ddim$ncol > CH_MAX_COL && ddim$nrow < ddim$ncol){
+            
+            transposed <- TRUE
+            tlist <- do.call(
+               .read_td_chunked,
+               c(
+                  list(tm=dm[[tn]], f=df[tn]),
+                  rp,
+                  list(
+                     callback=readr::DataFrameCallback$new(function(y, pos){
+                        rn <- y$"___ROWNAMES___"
+                        y <- t(y[, -1]) %>%
+                           magrittr::set_colnames(rn) %>% 
+                           as_tibble(rownames="___COLNAMES___")
+                        tname <- uuid::UUIDgenerate(n=1)
+                        nulcol <- NULL
+                        if(nullable){
+                           nulcol <- setdiff(colnames(y), "___COLNAMES___")
+                        }
+                        write_MergeTree(
+                           con=con,
+                           dbName=dbName,
+                           tableName=tname,
+                           value=y,
+                           rtypes=c("character", rep(vtype, ncol(y) - 1)) %>% 
+                              magrittr::set_names(colnames(y)),
+                           nullable=nulcol,
+                           sortKey=colnames(y)[1]
+                        )
+                        return(tname)
+                     }),
+                     chunk_size=CH_MAX_COL
+                  )
+               )
+            ) %>% as.character()
+            ch_insert(
+               con=con, dbName=dbName, tableName=tn,
+               value=tibble(table=tlist)
+            )
+            
+         }else{
+            
+            transposed <- FALSE
+            cnames <- data_tables(x, dplyr::all_of(tn), n_max=1)[[1]] %>%
+               colnames() %>% 
+               sort()
+            colList <- seq(1, ddim$ncol, by=CH_MAX_COL)
+            colList <- lapply(
+               colList,
+               function(i){
+                  cnames[i:min(i+CH_MAX_COL-1, ddim$ncol)]
+               }
+            )
+            names(colList) <- uuid::UUIDgenerate(n=length(colList))
+            
+            lapply(names(colList), function(tname){
+               fields <- colList[[tname]]
+               tval <- dplyr::tibble(
+                  "___ROWNAMES___"=character()
+               )
+               for(field in fields){
+                  toAdd <- integer()
+                  class(toAdd) <- vtype
+                  toAdd <- dplyr::tibble(toAdd) %>% 
+                     magrittr::set_colnames(field)
+                  tval <- dplyr::bind_cols(tval, toAdd)
+               }
+               nulcol <- NULL
+               if(nullable){
+                  nulcol <- fields
+               }
+               write_MergeTree(
+                  con=con,
+                  dbName=dbName,
+                  tableName=tname,
+                  value=tval,
+                  rtypes=c("character", rep(vtype, length(fields))) %>% 
+                     magrittr::set_names(colnames(tval)),
+                  nullable=nulcol,
+                  sortKey=colnames(tval)[1]
+               )
+            })
+            
+            do.call(
+               .read_td_chunked,
+               c(
+                  list(tm=dm[[tn]], f=df[tn]),
+                  rp,
+                  list(
+                     callback=readr::DataFrameCallback$new(function(y, pos){
+                        lapply(names(colList), function(tname){
+                           fields <- colList[[tname]]
+                           tval <- y[,c("___ROWNAMES___", fields)]
+                           ch_insert(
+                              con=con,
+                              dbName=dbName,
+                              tableName=tname,
+                              value=tval
+                           )
+                        })
+                     }),
+                     chunk_size=by
+                  )
+               )
+            )
+            ch_insert(
+               con=con, dbName=dbName, tableName=tn,
+               value=tibble(table=names(colList))
+            )
+            
+         }
+         
+      }else{
+         do.call(
+            .read_td_chunked,
+            c(
+               list(tm=dm[[tn]], f=df[tn]),
+               rp,
+               list(
+                  callback=readr::DataFrameCallback$new(function(y, pos){
+                     ch_insert(con=con, dbName=dbName, tableName=tn, value=y)
+                  }),
+                  chunk_size=by
+               )
             )
          )
-      )
+      }
    }
 }
+
 
 .file_filtByConta <- function(d, fdb, fk, dm){
    nfk <- fk
@@ -1147,12 +1347,6 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
             if(ntn %in% names(d)){
-               # nv <- dplyr::semi_join(
-               #    d[[ntn]], d[[tn]],
-               #    by=magrittr::set_names(
-               #       fkl$ff[[i]], fkl$tf[[i]]
-               #    )
-               # )
                nv <- .mdjoin(
                   d1=d[[ntn]], d2=d[[tn]],
                   by=magrittr::set_names(

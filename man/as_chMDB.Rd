@@ -4,7 +4,7 @@
 \alias{as_chMDB}
 \title{Push an \link{MDB} object in a ClickHouse database}
 \usage{
-as_chMDB(x, tkcon, overwrite = FALSE)
+as_chMDB(x, tkcon, overwrite = FALSE, by = 10^5)
 }
 \arguments{
 \item{x}{an \link{MDB} object}
@@ -13,6 +13,9 @@ as_chMDB(x, tkcon, overwrite = FALSE)
 
 \item{overwrite}{a logical indicating if existing data should be overwritten
 (default: FALSE)}
+
+\item{by}{the size of the batch: number of records to write
+together (default: 10^5)}
 }
 \value{
 A \link{chMDB} object.

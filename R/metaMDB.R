@@ -305,7 +305,10 @@ collection_members.metaMDB <- function(
 #' 
 #' @export
 #'
-data_tables.metaMDB <- function(x, ...){
+data_tables.metaMDB <- function(x, ..., skip=0, n_max=Inf){
+   if(length(x)==0){
+      return(list())
+   }
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
@@ -317,12 +320,65 @@ data_tables.metaMDB <- function(x, ...){
    for(mdb in names(x$MDBs)){
       lToTake <- intersect(toTake, names(x$MDBs[[mdb]]))
       if(length(lToTake)>0){
-         toRet <- c(toRet, data_tables(x$MDBs[[mdb]], dplyr::all_of(lToTake)))
+         toRet <- c(
+            toRet,
+            data_tables(
+               x$MDBs[[mdb]], dplyr::all_of(lToTake),
+               skip=skip, n_max=n_max
+            )
+         )
       }
    }
    lToTake <- intersect(toTake, names(x$relationalTables))
    if(length(lToTake)>0){
-      toRet <- c(toRet, x$relationalTables[lToTake])
+      toRet <- c(
+         toRet,
+         lapply(
+            x$relationalTables[lToTake],
+            function(d){
+               if(skip >= nrow(d)){
+                  return(d[c(),])
+               }
+               n <- skip+1
+               m <- min(nrow(d), n_max+skip)
+               return(d[n:m, , drop=FALSE])
+            }
+         )
+      )
+   }
+   toRet <- toRet[toTake]
+   return(toRet)
+}
+
+
+###############################################################################@
+#' 
+#' @rdname heads
+#' @method heads metaMDB
+#' 
+#' @export
+#'
+heads.metaMDB <- function(x, ..., n=6L){
+   if(length(x)==0){
+      return(list())
+   }
+   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   if(length(toTake)==0){
+      toTake <- 1:length(x)
+      names(toTake) <- names(x)
+   }
+   toTake <- names(toTake)
+   x <- unclass(x)
+   toRet <- list()
+   for(mdb in names(x$MDBs)){
+      lToTake <- intersect(toTake, names(x$MDBs[[mdb]]))
+      if(length(lToTake)>0){
+         toRet <- c(toRet, heads(x$MDBs[[mdb]], dplyr::all_of(lToTake), n=n))
+      }
+   }
+   lToTake <- intersect(toTake, names(x$relationalTables))
+   if(length(lToTake)>0){
+      toRet <- c(toRet, lapply(x$relationalTables[lToTake], head, n=n))
    }
    toRet <- toRet[toTake]
    return(toRet)
@@ -337,6 +393,16 @@ data_tables.metaMDB <- function(x, ...){
 #' @export
 #'
 dims.metaMDB <- function(x, ...){
+   if(length(x)==0){
+      return(dplyr::tibble(
+         name=character(),
+         format=character(),
+         ncol=numeric(),
+         nrow=numeric(),
+         records=numeric(),
+         transposed=logical()
+      ))
+   }
    toTake <- tidyselect::eval_select(expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
@@ -490,6 +556,8 @@ as_fileMDB.metaMDB <- function(
    x, path,
    readParameters=DEFAULT_READ_PARAMS,
    htmlModel=TRUE,
+   compress=TRUE,
+   by=10^5,
    ...
 ){
    stopifnot(is.character(path), length(path)==1, !is.na(path))
@@ -544,7 +612,9 @@ as_fileMDB.metaMDB <- function(
    
    adfiles <- c()
    for(mdb in MDBs(x)){
-      tmp <- as_fileMDB(mdb, path=dataPath, readParameters=rp)
+      tmp <- as_fileMDB(
+         mdb, path=dataPath, readParameters=rp, compress=compress, by=by
+      )
       ofiles <- data_files(tmp)$dataFiles
       dfiles <- file.path(dataPath, basename(ofiles)) %>%
          magrittr::set_names(names(ofiles))
@@ -553,7 +623,7 @@ as_fileMDB.metaMDB <- function(
       adfiles <- c(adfiles, dfiles)
    }
    frdb <- as_memoMDB(x[names(relational_tables(x))])
-   tmp <- as_fileMDB(frdb, path=dataPath)
+   tmp <- as_fileMDB(frdb, path=dataPath, compress=compress, by=by)
    ofiles <- data_files(tmp)$dataFiles
    dfiles <- file.path(dataPath, basename(ofiles)) %>%
       magrittr::set_names(names(ofiles))
@@ -656,6 +726,10 @@ slice.metaMDB <- function(.data, ..., .preserve=FALSE){
    if(!tn %in% names(x)){
       stop(sprintf("%s table does not exist", tn))
    }
+   if(ReDaMoR::is.MatrixModel(data_model(x)[[tn]])){
+      stop("Cannot slice a matrix: start from another table")         
+   }
+   
    i <- dots[[tn]]
    toRet[[tn]] <- dplyr::slice(x[[tn]], i)
    
@@ -840,10 +914,13 @@ get_shared_collections <- function(x, y){
 
 ###############################################################################@
 ## Helpers ----
-.write_chTables.metaMDB <- function(x, con, dbName){
+.write_chTables.metaMDB <- function(x, con, dbName, by, ...){
    for(mdb in MDBs(x)){
-      .write_chTables(mdb, con, dbName)
+      .write_chTables(mdb, con, dbName, by, ...)
    }
-   .write_chTables(as_memoMDB(x[names(relational_tables(x))]), con, dbName)
+   .write_chTables(
+      as_memoMDB(x[names(relational_tables(x))]),
+      con, dbName, by, ...
+   )
 }
 

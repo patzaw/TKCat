@@ -211,6 +211,10 @@ filter_with_tables <- function(x, tables, checkTables=TRUE){
 #' (FALSE: the default **different** from [readr::read_delim])
 #' @param htmlModel a logical. If TRUE (default) the model is also plotted in
 #' an html file.
+#' @param compress a logical specifying whether saving data
+#' is to use "gzip" compression (default: TRUE)
+#' @param by the size of the batch: number of records to write
+#' together (default: 10^5)
 #' @param ... method specific parameters
 #' 
 #' @return A [fileMDB] object.
@@ -221,6 +225,8 @@ as_fileMDB <- function(
    x, path,
    readParameters=DEFAULT_READ_PARAMS,
    htmlModel=TRUE,
+   compress=TRUE,
+   by=10^5,
    ...
 ){
    UseMethod("as_fileMDB", x)
@@ -371,7 +377,7 @@ explore_MDBs <- function(x, ...){
 
 ###############################################################################@
 ## Helpers ----
-.write_chTables <- function(x, con, dbName, ...){
+.write_chTables <- function(x, con, dbName, by, ...){
    UseMethod(".write_chTables", x)
 }
 .build_etkc_ui <- function(x, ...){

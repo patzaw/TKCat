@@ -456,7 +456,7 @@
          }else{
             dbi <- db_info(mdb)
             if(is.fileMDB(mdb)){
-               dbs <- sum(data_file_size(mdb))
+               dbs <- sum(data_file_size(mdb)$size)
                dbi$size <- .format_file_size(dbs)
             }else{
                if(!is.metaMDB(mdb)){

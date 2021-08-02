@@ -11,7 +11,14 @@
 \usage{
 \method{dims}{chMDB}(x, ...)
 
-\method{dims}{fileMDB}(x, ...)
+\method{dims}{fileMDB}(
+  x,
+  ...,
+  by = 1000,
+  estimateThr = 5e+07,
+  estimateSample = 10^6,
+  showWarnings = TRUE
+)
 
 dims(x, ...)
 
@@ -23,6 +30,18 @@ dims(x, ...)
 \item{x}{an object with embedded data tables}
 
 \item{...}{the name of the tables to consider (default: all of them)}
+
+\item{by}{the size of the batch: number of lines to count
+together (default: 1000)}
+
+\item{estimateThr}{file size threshold in bytes from which an estimation
+of row number should be computed instead of a precise count
+(default: 50000000 = 50MB)}
+
+\item{estimateSample}{number of values on which the estimation is based
+(default: 10^6)}
+
+\item{showWarnings}{a warning is raised by default if estimation is done.}
 }
 \value{
 A tibble with one row for each considered table and the
