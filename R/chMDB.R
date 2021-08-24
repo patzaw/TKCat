@@ -424,6 +424,13 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE, by=10^5){
 #' @export
 #'
 'names<-.chMDB' <- function(x, value){
+   stopifnot(
+      length(x)==length(value),
+      sum(duplicated(value))==0
+   )
+   if(length(x)==0){
+      return(x)
+   }
    colMb <- collection_members(x)
    ovalues <- names(x)
    x <- unclass(x)

@@ -174,13 +174,18 @@ relational_tables <- function(x, recursive=FALSE){
       length(value)==length(x),
       sum(duplicated(value))==0
    )
+   if(length(x)==0){
+      return(x)
+   }
    x <- unclass(x)
    orinames <- names(x$dataModel)
    nnames <- value
    names(nnames) <- orinames
    names(x$dataModel) <- value
    for(mdb in names(x$MDBs)){
-      names(x$MDBs[[mdb]]) <- as.character(nnames[names(x$MDBs[[mdb]])])
+      if(length(x$MDBs[[mdb]]) > 0){
+         names(x$MDBs[[mdb]]) <- as.character(nnames[names(x$MDBs[[mdb]])])
+      }
    }
    if(length(x$relationalTables)>0){
       names(x$relationalTables) <- as.character(

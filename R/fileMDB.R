@@ -270,6 +270,13 @@ is.fileMDB <- function(x){
 #' @export
 #'
 'names<-.fileMDB' <- function(x, value){
+   stopifnot(
+      length(x)==length(value),
+      sum(duplicated(value))==0
+   )
+   if(length(x)==0){
+      return(x)
+   }
    colMb <- collection_members(x)
    ovalues <- names(x)
    x <- unclass(x)

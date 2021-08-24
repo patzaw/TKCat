@@ -384,7 +384,7 @@ init_chTKCat <- function(
    }
    defaultTables <- DBI::dbGetQuery(
       con,
-      "select name from system.tables where database='default'"
+      "SELECT name from system.tables WHERE database='default'"
    )$name
    if("System" %in% defaultTables){
       stop("chTKCat already initialized")
