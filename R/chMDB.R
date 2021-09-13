@@ -1148,6 +1148,170 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
 
 
 ###############################################################################@
+#' Filter a matrix stored in a chMDB
+#' 
+#' @param x a [chMDB] object
+#' @param tableName a character vector of length 1 corresponding to the name of
+#' the table to filter (must be a matrix)
+#' @param ... character vectors with the row names and/or columns names to
+#' select. The names of the parameters must correspond to the name of the
+#' column and of the row fields (the matrix cannot be filtered from values).
+#' 
+#' @return A sub-matrix of tableName in x
+#' 
+#' @examples
+#' \dontrun{
+#' ## Return the matrix of expression values focused on the selected genes
+#' filter_ch_matrix(x=db, "Expression_value", gene=c("SNCA", "MAPT"))
+#' }
+#' 
+#' @export
+#' 
+filter_ch_matrix <- function(x, tableName, ...){
+   
+   ## Checks ----
+   stopifnot(
+      is.chMDB(x),
+      tableName %in% names(x)
+   )
+   tableModel <- data_model(x)[[tableName]]
+   stopifnot(is.MatrixModel(tableModel))
+   iFilter <- list(...)
+   stopifnot(
+      length(names(iFilter)) > 0, length(iFilter) <= 2, 
+      !any(duplicated(names(iFilter))),
+      all(names(iFilter) %in% tableModel$fields$name)
+   )
+   vfield <- filter(tableModel$fields, !type %in% c("row", "column")) %>% 
+      pull(name) %>% 
+      intersect(names(iFilter))
+   if(length(vfield)>0){
+      stop("Cannot filter a matrix on values; only on row or column names")
+   }
+   
+   ## Table info ----
+   dbn <- db_info(x)$name
+   vtype <- setdiff(
+      tableModel$fields$type,
+      c("row", "column")
+   )
+   mtables <- get_query(x, sprintf("SELECT * FROM `%s`", tableName))$table
+   dimcol <- get_query(
+      x,
+      sprintf(
+         paste(
+            "SELECT name FROM system.columns",
+            " WHERE database='%s' AND table='%s'"
+         ),
+         dbn, mtables[1]
+      )
+   )
+   dimcol <- intersect(
+      dimcol$name, c("___COLNAMES___", "___ROWNAMES___")
+   )
+   stopifnot(length(dimcol)==1)
+   chFields <- get_query(
+      x,
+      sprintf(
+         paste(
+            "SELECT database, table, name FROM system.columns",
+            " WHERE database='%s' AND table IN ('%s')"
+         ),
+         dbn,
+         paste(unique(mtables), collapse="', '")
+      )
+   ) %>% 
+      dplyr::filter(.data$name!=dimcol) %>% 
+      dplyr::arrange(.data$name)
+   
+   ## Create clause and selected fields ----
+   clause <- ""
+   sel <- NA
+   for(f in names(iFilter)){
+      ft <- tableModel$fields %>% filter(name==!!f) %>% pull(type)
+      if(ft=="row"){
+         if(dimcol=="___ROWNAMES___"){
+            clause <- sprintf(
+               "WHERE `___ROWNAMES___` IN ('%s')",
+               paste(iFilter[[f]],  collapse="', '")
+            )
+         }else{
+            sel <- iFilter[[f]]
+         }
+      }
+      if(ft=="column"){
+         if(dimcol=="___COLNAMES___"){
+            clause <- sprintf(
+               "WHERE `___COLNAMES___` IN ('%s')",
+               paste(iFilter[[f]],  collapse="', '")
+            )
+         }else{
+            sel <- iFilter[[f]]
+         }
+      }
+   }
+   queryTemplate <- sprintf(
+      "SELECT %s FROM `%s`.`%s` %s",
+      "%s", dbn, "%s", clause
+   )
+   
+   ## Build the query ----
+   i <- 1
+   if(is.na(sel[1])){
+      tquery <- sprintf(
+         queryTemplate, "*", mtables[[i]]
+      )
+   }else{
+      tquery <- sprintf(
+         queryTemplate,
+         chFields %>%
+            filter(table==!!mtables[[i]]) %>%
+            pull("name") %>% 
+            intersect(sel) %>% 
+            c(dimcol, .) %>% 
+            paste(collapse="`, `") %>% 
+            paste0("`", ., "`"),
+         mtables[[i]]
+      )
+   }
+   query <- tquery
+   if(length(mtables)>1) for(i in 2:length(mtables)){
+      if(is.na(sel[1])){
+         tquery <- sprintf(
+            queryTemplate, "*", mtables[[i]]
+         )
+      }else{
+         tquery <- sprintf(
+            queryTemplate,
+            chFields %>%
+               filter(table==!!mtables[[i]]) %>%
+               pull("name") %>% 
+               intersect(sel) %>% 
+               c(dimcol, .) %>% 
+               paste(collapse="`, `") %>% 
+               paste0("`", ., "`"),
+            mtables[[i]]
+         )
+      }
+      query <- sprintf(
+         "SELECT * FROM (%s) FULL JOIN (%s) USING %s",
+         query, tquery, dimcol
+      )
+   }
+   
+   ## Get the results ----
+   toRet <- get_query(x, query)
+   dimname <- toRet[[dimcol]]
+   toRet <- toRet[, -which(colnames(toRet)==dimcol), drop=FALSE] %>% 
+      as.matrix() %>% 
+      magrittr::set_rownames(dimname) %>%
+      magrittr::set_class(vtype)
+   return(toRet)
+   
+}
+
+
+###############################################################################@
 ## Helpers ----
 .write_chTables.chMDB <- function(x, con, dbName, by=10^5, ...){
    dm <- data_model(x)
