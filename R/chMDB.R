@@ -1251,37 +1251,22 @@ filter_ch_matrix <- function(x, tableName, ...){
       }
    }
    queryTemplate <- sprintf(
-      "SELECT %s FROM `%s`.`%s` %s",
-      "%s", dbn, "%s", clause
+      "SELECT %s FROM `%s`.`%s`",
+      "%s", dbn, "%s"
    )
    
    ## Build the query ----
    i <- 1
    if(is.na(sel[1])){
-      tquery <- sprintf(
-         queryTemplate, "*", mtables[[i]]
+      tquery <- paste(
+         sprintf(
+            queryTemplate, "*", mtables[[i]]
+         ),
+         clause
       )
    }else{
-      tquery <- sprintf(
-         queryTemplate,
-         chFields %>%
-            filter(table==!!mtables[[i]]) %>%
-            pull("name") %>% 
-            intersect(sel) %>% 
-            c(dimcol, .) %>% 
-            paste(collapse="`, `") %>% 
-            paste0("`", ., "`"),
-         mtables[[i]]
-      )
-   }
-   query <- tquery
-   if(length(mtables)>1) for(i in 2:length(mtables)){
-      if(is.na(sel[1])){
-         tquery <- sprintf(
-            queryTemplate, "*", mtables[[i]]
-         )
-      }else{
-         tquery <- sprintf(
+      tquery <- paste(
+         sprintf(
             queryTemplate,
             chFields %>%
                filter(table==!!mtables[[i]]) %>%
@@ -1291,11 +1276,41 @@ filter_ch_matrix <- function(x, tableName, ...){
                paste(collapse="`, `") %>% 
                paste0("`", ., "`"),
             mtables[[i]]
+         ),
+         clause
+      )
+   }
+   query <- tquery
+   if(length(mtables)>1) for(i in 2:length(mtables)){
+      if(is.na(sel[1])){
+         tquery <- paste(
+            sprintf(
+               queryTemplate, "*", mtables[[i]]
+            ),
+            clause
+         )
+      }else{
+         tquery <- paste(
+            sprintf(
+               queryTemplate,
+               chFields %>%
+                  filter(table==!!mtables[[i]]) %>%
+                  pull("name") %>% 
+                  intersect(sel) %>% 
+                  c(dimcol, .) %>% 
+                  paste(collapse="`, `") %>% 
+                  paste0("`", ., "`"),
+               mtables[[i]]
+            ),
+            clause
          )
       }
-      query <- sprintf(
-         "SELECT * FROM (%s) FULL JOIN (%s) USING %s",
-         query, tquery, dimcol
+      # query <- sprintf(
+      #    "SELECT * FROM (%s) FULL JOIN (%s) USING %s",
+      #    query, tquery, dimcol
+      # )
+      query <- paste0(
+         "SELECT * FROM (", query, ") FULL JOIN (", tquery, ') USING', dimcol
       )
    }
    
