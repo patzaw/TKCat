@@ -1299,10 +1299,16 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          )
       }
       query <- paste0(
-         "SELECT * FROM (", query, ") FULL JOIN (", tquery, ') USING', dimcol
+         "SELECT * FROM (",
+         query,
+         ") FULL JOIN (",
+         tquery,
+         ') USING `',
+         dimcol,
+         '`'
       )
    }
-   
+
    ## Get the results ----
    toRet <- get_query(x, query)
    dimname <- toRet[[dimcol]]

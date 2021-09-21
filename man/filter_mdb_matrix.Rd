@@ -9,7 +9,7 @@
 \usage{
 \method{filter_mdb_matrix}{chMDB}(x, tableName, ...)
 
-\method{filter_mdb_matrix}{fileMDB}(x, tableName, by = 10^5, ...)
+\method{filter_mdb_matrix}{fileMDB}(x, tableName, .by = 10^5, ...)
 
 filter_mdb_matrix(x, tableName, ...)
 
@@ -25,7 +25,7 @@ the table to filter (must be a matrix)}
 select. The names of the parameters must correspond to the name of the
 column and of the row fields (the matrix cannot be filtered from values).}
 
-\item{by}{the size of the batch: number of lines to process
+\item{.by}{the size of the batch: number of lines to process
 together (default: 1000)}
 }
 \value{
