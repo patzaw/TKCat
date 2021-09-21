@@ -1172,8 +1172,9 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       !any(duplicated(names(iFilter))),
       all(names(iFilter) %in% tableModel$fields$name)
    )
-   vfield <- dplyr::filter(tableModel$fields, !type %in% c("row", "column")) %>% 
-      dplyr::pull(name) %>% 
+   vfield <- tableModel$fields %>%
+      dplyr::filter(!.data$type %in% c("row", "column")) %>% 
+      dplyr::pull("name") %>% 
       intersect(names(iFilter))
    if(length(vfield)>0){
       stop("Cannot filter a matrix on values; only on row or column names")
@@ -1219,7 +1220,9 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
    sel <- NA
    frc <- c()
    for(f in names(iFilter)){
-      ft <- tableModel$fields %>% dplyr::filter(name==!!f) %>% dplyr::pull(type)
+      ft <- tableModel$fields %>%
+         dplyr::filter(.data$name==!!f) %>%
+         dplyr::pull("type")
       if(ft=="row"){
          fr <- iFilter[[f]]
          frc <- c(frc, "r")
@@ -1261,16 +1264,17 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          clause
       )
    }else{
+      totake <- chFields %>%
+         filter(.data$table==!!mtables[[i]]) %>%
+         pull("name") %>% 
+         intersect(sel)
+      totake <- c(dimcol, totake) %>% 
+         paste(collapse="`, `")
+      totake <- paste0("`", totake, "`")
       tquery <- paste(
          sprintf(
             queryTemplate,
-            chFields %>%
-               filter(table==!!mtables[[i]]) %>%
-               pull("name") %>% 
-               intersect(sel) %>% 
-               c(dimcol, .) %>% 
-               paste(collapse="`, `") %>% 
-               paste0("`", ., "`"),
+            totake,
             mtables[[i]]
          ),
          clause
@@ -1286,16 +1290,17 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             clause
          )
       }else{
+         totake <- chFields %>%
+            dplyr::filter(.data$table==!!mtables[[i]]) %>%
+            dplyr::pull("name") %>% 
+            intersect(sel)
+         totake <- c(dimcol, totake) %>% 
+            paste(collapse="`, `")
+         totake <- paste0("`", totake, "`")
          tquery <- paste(
             sprintf(
                queryTemplate,
-               chFields %>%
-                  dplyr::filter(table==!!mtables[[i]]) %>%
-                  dplyr::pull("name") %>% 
-                  intersect(sel) %>% 
-                  c(dimcol, .) %>% 
-                  paste(collapse="`, `") %>% 
-                  paste0("`", ., "`"),
+               totake,
                mtables[[i]]
             ),
             clause

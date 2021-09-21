@@ -1,10 +1,3 @@
--   [Installation](#installation)
-    -   [Dependencies](#dependencies)
-    -   [From github](#from-github)
--   [Documentation](#documentation)
--   [Alternatives](#alternatives)
--   [Acknowledgments](#acknowledgments)
-
 <img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px"/>
 
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)

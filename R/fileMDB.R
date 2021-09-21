@@ -1163,8 +1163,9 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by=10^5, ...){
       !any(duplicated(names(iFilter))),
       all(names(iFilter) %in% tableModel$fields$name)
    )
-   vfield <- dplyr::filter(tableModel$fields, !type %in% c("row", "column")) %>% 
-      dplyr::pull(name) %>% 
+   vfield <- tableModel$fields %>%
+      dplyr::filter(!.data$type %in% c("row", "column")) %>% 
+      dplyr::pull("name") %>% 
       intersect(names(iFilter))
    if(length(vfield)>0){
       stop("Cannot filter a matrix on values; only on row or column names")
@@ -1173,7 +1174,9 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by=10^5, ...){
    ## Select fields ----
    frc <- c()
    for(f in names(iFilter)){
-      ft <- tableModel$fields %>% dplyr::filter(name==!!f) %>% dplyr::pull(type)
+      ft <- tableModel$fields %>%
+         dplyr::filter(.data$name==!!f) %>%
+         dplyr::pull("type")
       if(ft=="row"){
          fr <- iFilter[[f]]
          frc <- c(frc, "r")
@@ -1201,7 +1204,7 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by=10^5, ...){
             callback=readr::DataFrameCallback$new(function(y, pos){
                if(frc=="r"){
                   toRet <- y %>%
-                     dplyr::filter(`___ROWNAMES___` %in% fr) %>% 
+                     dplyr::filter(.data$`___ROWNAMES___` %in% fr) %>% 
                      as.data.frame()
                }
                if(frc=="c"){
@@ -1222,7 +1225,7 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by=10^5, ...){
                            colnames(y)
                         ))
                      ) %>% 
-                     dplyr::filter(`___ROWNAMES___` %in% fr) %>% 
+                     dplyr::filter(.data$`___ROWNAMES___` %in% fr) %>% 
                      as.data.frame()
                }
                rownames(toRet) <- toRet$"___ROWNAMES___"
