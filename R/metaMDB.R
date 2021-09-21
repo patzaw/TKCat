@@ -131,6 +131,60 @@ MDBs <- function(x){
 
 
 ###############################################################################@
+#' 
+#' @rdname db_disconnect
+#' @method db_disconnect metaMDB
+#' 
+#' @export
+#'
+db_disconnect.metaMDB <- function(x){
+   mdbs <- MDBs(x)
+   for(i in 1:length(mdbs)){
+      if(is.chMDB(mdbs[[i]]) || is.metaMDB(mdbs[[i]])){
+         db_disconnect(mdbs[[i]])
+      }
+   }
+   invisible()
+}
+
+
+###############################################################################@
+#' 
+#' @rdname db_reconnect
+#' @method db_reconnect metaMDB
+#' 
+#' @export
+#'
+db_reconnect.metaMDB <- function(x, user, password, ntries=3, ...){
+   
+   xn <- deparse(substitute(x))
+   mdbs <- MDBs(x)
+   rtab <- relational_tables(x)
+   
+   mdbs <- lapply(mdbs, function(y){
+      if(is.chMDB(y) || is.metaMDB(y)){
+         toRet <- db_reconnect(y, ...)
+      }else{
+         toRet <- y
+      }
+      return(toRet)
+   })
+   
+   ## Object ----
+   toRet <- list(
+      MDBs=mdbs,
+      relationalTables=rtab,
+      dataModel=data_model(x),
+      dbInfo=db_info(x)
+   )
+   class(toRet) <- c("metaMDB", "MDB", class(toRet))
+   assign(xn, toRet, envir=parent.frame(n=1))
+   invisible(toRet)
+}
+
+
+
+###############################################################################@
 #' Get a list of relational tables
 #' 
 #' @param x a [metaMDB] object
@@ -888,6 +942,33 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE, ...){
    )
    return(toRet)
    
+}
+
+
+###############################################################################@
+#' 
+#' @rdname filter_mdb_matrix
+#' @method filter_mdb_matrix metaMDB
+#' 
+#' @export
+#'
+filter_mdb_matrix.metaMDB <- function(x, tableName, ...){
+   
+   ## Checks ----
+   stopifnot(
+      is.metaMDB(x),
+      tableName %in% names(x)
+   )
+   tableModel <- data_model(x)[[tableName]]
+   stopifnot(ReDaMoR::is.MatrixModel(tableModel))
+   
+   ## Get relevant MDB ----
+   mdbs <- MDBs(x)
+   tmdb <- lapply(mdbs, function(y) tableName %in% names(y)) %>%
+      unlist() %>% 
+      which()
+   print(tmdb)
+   return(filter_mdb_matrix(x=mdbs[[tmdb]], tableName=tableName, ...))
 }
 
 
