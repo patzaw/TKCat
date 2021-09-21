@@ -9,15 +9,15 @@
 \alias{filter_with_tables.metaMDB}
 \title{Filter an \link{MDB} object according to provided tables}
 \usage{
-\method{filter_with_tables}{chMDB}(x, tables, checkTables = TRUE)
+\method{filter_with_tables}{chMDB}(x, tables, checkTables = TRUE, by = 10^5, ...)
 
-\method{filter_with_tables}{fileMDB}(x, tables, checkTables = TRUE)
+\method{filter_with_tables}{fileMDB}(x, tables, checkTables = TRUE, by = 10^5, ...)
 
-filter_with_tables(x, tables, checkTables = TRUE)
+filter_with_tables(x, tables, checkTables = TRUE, ...)
 
-\method{filter_with_tables}{memoMDB}(x, tables, checkTables = TRUE)
+\method{filter_with_tables}{memoMDB}(x, tables, checkTables = TRUE, ...)
 
-\method{filter_with_tables}{metaMDB}(x, tables, checkTables = TRUE)
+\method{filter_with_tables}{metaMDB}(x, tables, checkTables = TRUE, ...)
 }
 \arguments{
 \item{x}{an \link{MDB} object}
@@ -28,6 +28,11 @@ data model.}
 
 \item{checkTables}{if TRUE, the tables are confronted to their model
 in the data model of x.}
+
+\item{by}{the size of the batch: number of lines to process
+together (default: 10000)}
+
+\item{...}{method specific parameters}
 }
 \value{
 a \link{memoMDB} object

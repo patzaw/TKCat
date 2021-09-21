@@ -718,7 +718,7 @@ slice.memoMDB <- function(.data, ..., .preserve=FALSE){
 #' 
 #' @export
 #'
-filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
+filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE, ...){
    
    ## Check the tables ----
    if(checkTables){

@@ -752,7 +752,7 @@ slice.metaMDB <- function(.data, ..., .preserve=FALSE){
 #' 
 #' @export
 #'
-filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
+filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE, ...){
    
    ## Check the tables ----
    if(checkTables){
@@ -774,7 +774,7 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
       function(y){
          mdbt <- intersect(names(tables), names(y))
          if(length(mdbt)>0){
-            toRet <- filter_with_tables(y, tables[mdbt], checkTables=FALSE)
+            toRet <- filter_with_tables(y, tables[mdbt], checkTables=FALSE, ...)
          }else{
             toRet <- NULL
          }
@@ -842,7 +842,7 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE){
       function(y){
          mdbt <- intersect(names(tables), names(y))
          if(length(mdbt)>0){
-            toRet <- filter_with_tables(y, tables[mdbt], checkTables=FALSE)
+            toRet <- filter_with_tables(y, tables[mdbt], checkTables=FALSE, ...)
          }else{
             toRet <- NULL
          }

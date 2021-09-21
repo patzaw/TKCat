@@ -1090,12 +1090,17 @@ slice.fileMDB <- function(.data, ..., .preserve=FALSE){
 
 ###############################################################################@
 #' 
+#' @param by the size of the batch: number of lines to process
+#' together (default: 10000)
+#' 
 #' @rdname filter_with_tables
 #' @method filter_with_tables fileMDB
 #' 
 #' @export
 #'
-filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
+filter_with_tables.fileMDB <- function(
+   x, tables, checkTables=TRUE, by=10^5, ...
+){
    
    ## Check the tables ----
    if(checkTables){
@@ -1112,7 +1117,7 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
    fk <- ReDaMoR::get_foreign_keys(dm)
    
    ## Filter by contamination ----
-   tables <- .file_filtByConta(tables, x, fk, dm)
+   tables <- .file_filtByConta(tables, x, fk, dm, by=by)
    dm <- dm[names(tables), rmForeignKeys=TRUE]
    tables <- .norm_data(tables,  dm)
    
@@ -1136,7 +1141,7 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
 ###############################################################################@
 #' 
 #' @param .by the size of the batch: number of lines to process
-#' together (default: 1000)
+#' together (default: 10000)
 #' 
 #' @rdname filter_mdb_matrix
 #' @method filter_mdb_matrix fileMDB
@@ -1427,7 +1432,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
 }
 
 
-.file_filtByConta <- function(d, fdb, fk, dm){
+.file_filtByConta <- function(d, fdb, fk, dm, by=10^5){
    nfk <- fk
    files <- data_files(fdb)
    rp <- files$readParameters
@@ -1480,7 +1485,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
                               tm1=dm[[ntn]], tm2=dm[[tn]]
                            )
                         }),
-                        chunk_size=10^5
+                        chunk_size=by
                      )
                   )
                )
@@ -1525,7 +1530,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
                            tm1=dm[[ntn]], tm2=dm[[tn]]
                         )
                      }),
-                     chunk_size=10^5
+                     chunk_size=by
                   )
                )
             )

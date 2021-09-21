@@ -1104,12 +1104,15 @@ slice.chMDB <- function(.data, ..., by=10^5, .preserve=FALSE){
 
 ###############################################################################@
 #' 
+#' @param by the size of the batch: number of records to process
+#' together (default: 10000)
+#' 
 #' @rdname filter_with_tables
 #' @method filter_with_tables chMDB
 #' 
 #' @export
 #'
-filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
+filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE, by=10^5, ...){
    
    ## Check the tables ----
    if(checkTables){
@@ -1126,7 +1129,7 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
    fk <- ReDaMoR::get_foreign_keys(dm)
    
    ## Filter by contamination ----
-   tables <- .ch_filtByConta(tables, x, fk)
+   tables <- .ch_filtByConta(tables, x, fk, by=by)
    dm <- dm[names(tables), rmForeignKeys=TRUE]
    tables <- .norm_data(tables,  dm)
    

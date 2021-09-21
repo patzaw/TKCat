@@ -188,12 +188,13 @@ heads <- function(x, ..., n=6L){
 #' data model.
 #' @param checkTables if TRUE, the tables are confronted to their model
 #' in the data model of x.
+#' @param ... method specific parameters
 #' 
 #' @return a [memoMDB] object
 #' 
 #' @export
 #'
-filter_with_tables <- function(x, tables, checkTables=TRUE){
+filter_with_tables <- function(x, tables, checkTables=TRUE, ...){
    UseMethod("filter_with_tables", x)
 }
 

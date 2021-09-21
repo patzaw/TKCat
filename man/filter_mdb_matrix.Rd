@@ -26,7 +26,7 @@ select. The names of the parameters must correspond to the name of the
 column and of the row fields (the matrix cannot be filtered from values).}
 
 \item{.by}{the size of the batch: number of lines to process
-together (default: 1000)}
+together (default: 10000)}
 }
 \value{
 A sub-matrix of tableName in x. Only existing elements are returned.
