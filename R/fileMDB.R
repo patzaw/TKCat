@@ -1135,7 +1135,7 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
 
 ###############################################################################@
 #' 
-#' @param by the size of the batch: number of lines to process
+#' @param .by the size of the batch: number of lines to process
 #' together (default: 1000)
 #' 
 #' @rdname filter_mdb_matrix
@@ -1143,7 +1143,7 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
 #' 
 #' @export
 #'
-filter_mdb_matrix.fileMDB <- function(x, tableName, by=10^5, ...){
+filter_mdb_matrix.fileMDB <- function(x, tableName, .by=10^5, ...){
    
    ## Checks ----
    stopifnot(
@@ -1228,7 +1228,7 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, by=10^5, ...){
                )
                return(toRet)
             }),
-            chunk_size=by
+            chunk_size=.by
          )
       )
    )
