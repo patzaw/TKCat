@@ -359,6 +359,32 @@ get_query <- function(x, query, ...){
    UseMethod("get_query", x)
 }
 
+###############################################################################@
+#' Filter a matrix stored in an MDB
+#' 
+#' @param x an [MDB] object
+#' @param tableName a character vector of length 1 corresponding to the name of
+#' the table to filter (must be a matrix)
+#' @param ... character vectors with the row names and/or columns names to
+#' select. The names of the parameters must correspond to the name of the
+#' column and of the row fields (the matrix cannot be filtered from values).
+#' 
+#' @return A sub-matrix of tableName in x. Only existing elements are returned.
+#' No error is raised if any element is missing. The result must be checked
+#' and adapted to user needs.
+#' 
+#' @examples
+#' \dontrun{
+#' ## Return the matrix of expression values focused on the selected genes
+#' filter_mdb_matrix(x=db, "Expression_value", gene=c("SNCA", "MAPT"))
+#' }
+#' 
+#' @export
+#' 
+filter_mdb_matrix <- function(x, tableName, ...){
+   UseMethod("filter_mdb_matrix", x)
+}
+
 
 ###############################################################################@
 #' Explore available [MDB] in a shiny web interface

@@ -477,25 +477,6 @@ data_tables.fileMDB <- function(x, ..., skip=0, n_max=Inf){
    toRet <- lapply(
       toTake,
       function(y){
-         # ht <- do.call(readr::read_delim, c(
-         #    list(
-         #       file=x$dataFiles[y],
-         #       col_types=ReDaMoR::col_types(m[[y]]),
-         #       skip=0, n_max=0
-         #    ),
-         #    x$readParameters
-         # ))
-         # toRet <- do.call(readr::read_delim, c(
-         #    list(
-         #       file=x$dataFiles[y],
-         #       col_names=colnames(ht),
-         #       col_types=ReDaMoR::col_types(m[[y]]),
-         #       skip=skip+1,
-         #       n_max=n_max
-         #    ),
-         #    x$readParameters
-         # ))
-         # attr(toRet, "spec") <- NULL
          toRet <- do.call(.read_td, c(
             list(
                tm=x$dataModel[[y]],
@@ -1150,6 +1131,123 @@ filter_with_tables.fileMDB <- function(x, tables, checkTables=TRUE){
    ))
    
 }
+
+
+###############################################################################@
+#' 
+#' @param by the size of the batch: number of lines to process
+#' together (default: 1000)
+#' 
+#' @rdname filter_mdb_matrix
+#' @method filter_mdb_matrix fileMDB
+#' 
+#' @export
+#'
+filter_mdb_matrix.fileMDB <- function(x, tableName, by=10^5, ...){
+   
+   ## Checks ----
+   stopifnot(
+      is.fileMDB(x),
+      tableName %in% names(x)
+   )
+   tableModel <- data_model(x)[[tableName]]
+   stopifnot(ReDaMoR::is.MatrixModel(tableModel))
+   iFilter <- list(...)
+   stopifnot(
+      length(names(iFilter)) > 0, length(iFilter) <= 2, 
+      !any(duplicated(names(iFilter))),
+      all(names(iFilter) %in% tableModel$fields$name)
+   )
+   vfield <- dplyr::filter(tableModel$fields, !type %in% c("row", "column")) %>% 
+      dplyr::pull(name) %>% 
+      intersect(names(iFilter))
+   if(length(vfield)>0){
+      stop("Cannot filter a matrix on values; only on row or column names")
+   }
+   
+   ## Select fields ----
+   frc <- c()
+   for(f in names(iFilter)){
+      ft <- tableModel$fields %>% dplyr::filter(name==!!f) %>% dplyr::pull(type)
+      if(ft=="row"){
+         fr <- iFilter[[f]]
+         frc <- c(frc, "r")
+      }else{
+         fc <- iFilter[[f]]
+         frc <- c(frc, "c")
+      }
+   }
+   frc <- paste(sort(frc), collapse="")
+   
+   ## Get the results ----
+   rp <- data_files(x)$readParameters
+   if(frc==""){
+      stop("Dev. error: review this part of the function")
+   }
+   toRet <- do.call(
+      .read_td_chunked,
+      c(
+         list(
+            tm=tableModel,
+            f=data_files(x)$dataFiles[tableName]
+         ),
+         rp,
+         list(
+            callback=readr::DataFrameCallback$new(function(y, pos){
+               if(frc=="r"){
+                  toRet <- y %>%
+                     dplyr::filter(`___ROWNAMES___` %in% fr) %>% 
+                     as.data.frame()
+               }
+               if(frc=="c"){
+                  toRet <-  y %>%
+                     dplyr::select(
+                        dplyr::all_of(intersect(
+                           c("___ROWNAMES___", fc),
+                           colnames(y)
+                        ))
+                     ) %>% 
+                     as.data.frame()
+               }
+               if(frc=="cr"){
+                  toRet <-  y %>%
+                     dplyr::select(
+                        dplyr::all_of(intersect(
+                           c("___ROWNAMES___", fc),
+                           colnames(y)
+                        ))
+                     ) %>% 
+                     dplyr::filter(`___ROWNAMES___` %in% fr) %>% 
+                     as.data.frame()
+               }
+               rownames(toRet) <- toRet$"___ROWNAMES___"
+               toRet <- as.matrix(
+                  toRet[
+                     , setdiff(colnames(toRet), "___ROWNAMES___"), drop=FALSE
+                  ]
+               )
+               return(toRet)
+            }),
+            chunk_size=by
+         )
+      )
+   )
+   if(frc=="r"){
+      toRet <- toRet[intersect(fr, rownames(toRet)),, drop=FALSE]
+   }
+   if(frc=="c"){
+      toRet <- toRet[,intersect(fc, colnames(toRet)), drop=FALSE]
+   }
+   if(frc=="cr"){
+      toRet <- toRet[
+         intersect(fr, rownames(toRet)),
+         intersect(fc, colnames(toRet)),
+         drop=FALSE
+      ]
+   }
+   return(toRet)
+}
+
 
 ###############################################################################@
 ## READ PARAMETERS -----

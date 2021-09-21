@@ -755,6 +755,69 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE){
    
 }
 
+
+###############################################################################@
+#' 
+#' @rdname filter_mdb_matrix
+#' @method filter_mdb_matrix memoMDB
+#' 
+#' @export
+#'
+filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
+   
+   ## Checks ----
+   stopifnot(
+      is.memoMDB(x),
+      tableName %in% names(x)
+   )
+   tableModel <- data_model(x)[[tableName]]
+   stopifnot(ReDaMoR::is.MatrixModel(tableModel))
+   iFilter <- list(...)
+   stopifnot(
+      length(names(iFilter)) > 0, length(iFilter) <= 2, 
+      !any(duplicated(names(iFilter))),
+      all(names(iFilter) %in% tableModel$fields$name)
+   )
+   vfield <- dplyr::filter(tableModel$fields, !type %in% c("row", "column")) %>% 
+      dplyr::pull(name) %>% 
+      intersect(names(iFilter))
+   if(length(vfield)>0){
+      stop("Cannot filter a matrix on values; only on row or column names")
+   }
+   
+   ## Select fields ----
+   frc <- c()
+   for(f in names(iFilter)){
+      ft <- tableModel$fields %>% dplyr::filter(name==!!f) %>% dplyr::pull(type)
+      if(ft=="row"){
+         fr <- intersect(iFilter[[f]], rownames(x[[tableName]]))
+         frc <- c(frc, "r")
+      }else{
+         fc <- intersect(iFilter[[f]], colnames(x[[tableName]]))
+         frc <- c(frc, "c")
+      }
+   }
+   frc <- paste(sort(frc), collapse="")
+   
+   ## Get the results ----
+   if(frc==""){
+      stop("Dev. error: review this part of the function")
+   }
+   if(frc=="r"){
+      toRet <- x[[tableName]][fr, , drop=FALSE]
+   }
+   if(frc=="c"){
+      toRet <- x[[tableName]][, fc, drop=FALSE]
+   }
+   if(frc=="cr"){
+      toRet <- x[[tableName]][fr, fc, drop=FALSE]
+   }
+   return(toRet)
+   
+}
+
+
+###############################################################################@
 ## Helpers ----
 .write_chTables.memoMDB <- function(x, con, dbName, by, ...){
    dm <- data_model(x)

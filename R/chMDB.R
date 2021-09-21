@@ -1148,26 +1148,13 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE){
 
 
 ###############################################################################@
-#' Filter a matrix stored in a chMDB
 #' 
-#' @param x a [chMDB] object
-#' @param tableName a character vector of length 1 corresponding to the name of
-#' the table to filter (must be a matrix)
-#' @param ... character vectors with the row names and/or columns names to
-#' select. The names of the parameters must correspond to the name of the
-#' column and of the row fields (the matrix cannot be filtered from values).
-#' 
-#' @return A sub-matrix of tableName in x
-#' 
-#' @examples
-#' \dontrun{
-#' ## Return the matrix of expression values focused on the selected genes
-#' filter_ch_matrix(x=db, "Expression_value", gene=c("SNCA", "MAPT"))
-#' }
+#' @rdname filter_mdb_matrix
+#' @method filter_mdb_matrix chMDB
 #' 
 #' @export
-#' 
-filter_ch_matrix <- function(x, tableName, ...){
+#'
+filter_mdb_matrix.chMDB <- function(x, tableName, ...){
    
    ## Checks ----
    stopifnot(
@@ -1175,15 +1162,15 @@ filter_ch_matrix <- function(x, tableName, ...){
       tableName %in% names(x)
    )
    tableModel <- data_model(x)[[tableName]]
-   stopifnot(is.MatrixModel(tableModel))
+   stopifnot(ReDaMoR::is.MatrixModel(tableModel))
    iFilter <- list(...)
    stopifnot(
       length(names(iFilter)) > 0, length(iFilter) <= 2, 
       !any(duplicated(names(iFilter))),
       all(names(iFilter) %in% tableModel$fields$name)
    )
-   vfield <- filter(tableModel$fields, !type %in% c("row", "column")) %>% 
-      pull(name) %>% 
+   vfield <- dplyr::filter(tableModel$fields, !type %in% c("row", "column")) %>% 
+      dplyr::pull(name) %>% 
       intersect(names(iFilter))
    if(length(vfield)>0){
       stop("Cannot filter a matrix on values; only on row or column names")
@@ -1227,9 +1214,12 @@ filter_ch_matrix <- function(x, tableName, ...){
    ## Create clause and selected fields ----
    clause <- ""
    sel <- NA
+   frc <- c()
    for(f in names(iFilter)){
-      ft <- tableModel$fields %>% filter(name==!!f) %>% pull(type)
+      ft <- tableModel$fields %>% dplyr::filter(name==!!f) %>% dplyr::pull(type)
       if(ft=="row"){
+         fr <- iFilter[[f]]
+         frc <- c(frc, "r")
          if(dimcol=="___ROWNAMES___"){
             clause <- sprintf(
                "WHERE `___ROWNAMES___` IN ('%s')",
@@ -1240,6 +1230,8 @@ filter_ch_matrix <- function(x, tableName, ...){
          }
       }
       if(ft=="column"){
+         fc <- iFilter[[f]]
+         frc <- c(frc, "c")
          if(dimcol=="___COLNAMES___"){
             clause <- sprintf(
                "WHERE `___COLNAMES___` IN ('%s')",
@@ -1250,6 +1242,7 @@ filter_ch_matrix <- function(x, tableName, ...){
          }
       }
    }
+   frc <- paste(sort(frc), collapse="")
    queryTemplate <- sprintf(
       "SELECT %s FROM `%s`.`%s`",
       "%s", dbn, "%s"
@@ -1294,8 +1287,8 @@ filter_ch_matrix <- function(x, tableName, ...){
             sprintf(
                queryTemplate,
                chFields %>%
-                  filter(table==!!mtables[[i]]) %>%
-                  pull("name") %>% 
+                  dplyr::filter(table==!!mtables[[i]]) %>%
+                  dplyr::pull("name") %>% 
                   intersect(sel) %>% 
                   c(dimcol, .) %>% 
                   paste(collapse="`, `") %>% 
@@ -1305,10 +1298,6 @@ filter_ch_matrix <- function(x, tableName, ...){
             clause
          )
       }
-      # query <- sprintf(
-      #    "SELECT * FROM (%s) FULL JOIN (%s) USING %s",
-      #    query, tquery, dimcol
-      # )
       query <- paste0(
          "SELECT * FROM (", query, ") FULL JOIN (", tquery, ') USING', dimcol
       )
@@ -1321,6 +1310,19 @@ filter_ch_matrix <- function(x, tableName, ...){
       as.matrix() %>% 
       magrittr::set_rownames(dimname) %>%
       magrittr::set_class(vtype)
+   if(frc=="r"){
+      toRet <- toRet[intersect(fr, rownames(toRet)),, drop=FALSE]
+   }
+   if(frc=="c"){
+      toRet <- toRet[,intersect(fc, colnames(toRet)), drop=FALSE]
+   }
+   if(frc=="cr"){
+      toRet <- toRet[
+         intersect(fr, rownames(toRet)),
+         intersect(fc, colnames(toRet)),
+         drop=FALSE
+      ]
+   }
    return(toRet)
    
 }

@@ -4,7 +4,7 @@
 
 ### New features
 
-- `filter_ch_matrix()`:  Filter a matrix stored in a chMDB 
+- `filter_mdb_matrix()`:  Filter a matrix stored in an MDB 
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
