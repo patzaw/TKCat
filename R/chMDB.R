@@ -445,7 +445,7 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE, by=10^5){
          }
       }
    }
-   names(x$dataModel) <- names(x$dbTables) <-value
+   names(x$dataModel) <- names(x$dbTables) <- value
    class(x) <- c("chMDB", class(x))
    collection_members(x) <- ncolMb
    return(x)
