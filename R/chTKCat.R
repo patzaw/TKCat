@@ -126,7 +126,7 @@ check_chTKCat <- function(x, verbose=FALSE){
       ui <- try(DBI::dbGetQuery(
          con,
          sprintf(
-            "SELECT admin, provider FROM Users WHERE login='%s'",
+            "SELECT admin, provider FROM default.Users WHERE login='%s'",
             con@user
          )
       ), silent=TRUE)
@@ -134,7 +134,7 @@ check_chTKCat <- function(x, verbose=FALSE){
          ui <- dbGetQuery(
             con,
             sprintf(
-               "SELECT admin FROM Users WHERE login='%s'",
+               "SELECT admin FROM default.Users WHERE login='%s'",
                con@user
             )
          )
@@ -1208,7 +1208,7 @@ drop_chMDB <- function(x, name){
                   "GRANT SELECT,",
                   " CREATE DATABASE, CREATE TABLE, DROP TABLE,",
                   " ALTER, INSERT",
-                  " ON %s.* TO %s WITH GRANT OPTION"
+                  " ON `%s`.* TO %s WITH GRANT OPTION"
                ),
                name,
                paste(pl, collapse=", ")

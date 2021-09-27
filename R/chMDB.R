@@ -59,7 +59,7 @@ chMDB <- function(
    )
    if(length(dbTables)>0){
       dbTables_t <- do.call(rbind, lapply(
-         strsplit(dbTables, split="[.]"),
+         strsplit(dbTables, split="`[.]`"),
          function(x) gsub("`", "", x)
       )) %>%
          magrittr::set_colnames(c("database", "name")) %>% 
@@ -78,7 +78,6 @@ chMDB <- function(
    }
    
    ## Confront data to model ----
-   query <- "SELECT * FROM %s"
    stopifnot(is.numeric(n_max), !is.na(n_max), length(n_max)==1)
    if(n_max>0){
       tmpk <- list(
@@ -1181,12 +1180,13 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
    }
    
    ## Table info ----
-   dbn <- db_info(x)$name
+   dbti <- db_tables(x)$dbTables[tableName]
+   dbn <- sub("^`", "", sub("`[.]`.*$", "", dbti))
    vtype <- setdiff(
       tableModel$fields$type,
       c("row", "column")
    )
-   mtables <- get_query(x, sprintf("SELECT * FROM `%s`", tableName))$table
+   mtables <- get_query(x, sprintf("SELECT * FROM %s", dbti))$table
    dimcol <- get_query(
       x,
       sprintf(
@@ -1546,7 +1546,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
 
 .dim_ch_mtable <- function(x, tablePath, tableModel){
    
-   tp <- gsub("`", "", strsplit(tablePath, split="[.]")[[1]])
+   tp <- gsub("`", "", strsplit(tablePath, split="`[.]`")[[1]])
    tdb <- tp[1]
    tn <- tp[2]
    chTables <- list_tables(
