@@ -68,6 +68,18 @@ db_reconnect.ClickhouseConnection <- function(
 
 
 ###############################################################################@
+#' 
+#' @rdname get_hosts
+#' @method get_hosts ClickhouseConnection
+#' 
+#' @export
+#'
+get_hosts.ClickhouseConnection <- function(x, ...){
+   paste(x@host, x@port, sep=":")
+}
+
+
+###############################################################################@
 #' List tables in a clickhouse database
 #' 
 #' @param con the clickhouse connection

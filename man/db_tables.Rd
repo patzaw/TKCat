@@ -2,17 +2,20 @@
 % Please edit documentation in R/chMDB.R
 \name{db_tables}
 \alias{db_tables}
-\title{Get the DB tables from a \link{chMDB} object}
+\title{Get the DB tables from a \link{chMDB} or \link{metaMDB} object}
 \usage{
-db_tables(x)
+db_tables(x, host)
 }
 \arguments{
-\item{x}{a \link{chMDB} object}
+\item{x}{a \link{chMDB} or a \link{metaMDB} object}
+
+\item{host}{the name of host (as returned by \verb{[get_hosts]}) to focus on.
+Only used with \link{metaMDB} objects.}
 }
 \value{
 a list with a chTKCat object (tkcon) and
 a named vector of DB table names (dbTables).
 }
 \description{
-Get the DB tables from a \link{chMDB} object
+Get the DB tables from a \link{chMDB} or \link{metaMDB} object
 }

@@ -323,6 +323,18 @@ db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
 
 ###############################################################################@
 #' 
+#' @rdname get_hosts
+#' @method get_hosts chTKCat
+#' 
+#' @export
+#'
+get_hosts.chTKCat <- function(x, ...){
+   get_hosts(x$chcon)
+}
+
+
+###############################################################################@
+#' 
 #' @rdname get_query
 #' @method get_query chTKCat
 #' 
@@ -955,18 +967,59 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
          mdbDesc <- DBI::dbGetQuery(
             con,
             paste(
-               sprintf(
-                  "SELECT * FROM `%s`.___MDB___ CROSS JOIN `%s`.___Public___",
-                  dbNames, dbNames
+               'SELECT * FROM (',
+               paste(
+                  sprintf(
+                     paste(
+                        "SELECT '%s' AS db, * FROM `%s`.___MDB___ ",
+                        " FULL JOIN ",
+                        " (SELECT '%s' AS db, * FROM `%s`.___Public___)",
+                        "USING db"
+                     ),
+                     dbNames, dbNames, dbNames, dbNames
+                  ),
+                  collapse=" UNION ALL "
                ),
-               collapse=" UNION ALL "
+               ") LEFT JOIN ",
+               " (SELECT database AS db, total_rows FROM system.tables ",
+               " WHERE name='___Timestamps___') USING db"
             )
          ) %>% 
             dplyr::as_tibble() %>% 
             dplyr::mutate(
                public=as.logical(.data$public),
-               populated=TRUE
+               populated=ifelse(
+                  is.na(.data$name), FALSE, .data$name==.data$db
+               ),
+               timestamps=ifelse(
+                  is.na(.data$total_rows), FALSE, .data$total_rows > 0
+               )
+            ) %>% 
+            dplyr::select(-"name", -"total_rows") %>% 
+            dplyr::rename("name"="db") %>% 
+            dplyr::arrange(.data$name)
+         
+         withTs <- mdbDesc$name[which(mdbDesc$timestamps)]
+         if(length(withTs)>0){
+            latestTS <- DBI::dbGetQuery(
+               con,
+               paste(
+                  sprintf(
+                     paste(
+                        "SELECT '%s' AS name, timestamp",
+                        " FROM `%s`.___Timestamps___",
+                        " ORDER BY timestamp DESC LIMIT 1"
+                     ),
+                     withTs, withTs
+                  ),
+                  collapse=" UNION ALL "
+               )
             )
+            mdbDesc <- left_join(mdbDesc, latestTS, by="name")
+         }else{
+            mdbDesc$latest <- NA
+         }
+         
          mdbUsers <- list_chMDB_users(x) %>% 
             dplyr::filter(.data$login==con@user)
          notInit <- setdiff(dbNames, mdbDesc$name)
@@ -1329,17 +1382,20 @@ update_chMDB_grants <- function(x, mdb){
    invisible()
 }
 
+
 ###############################################################################@
-#' Empty a chMDB in a [chTKCat]
+#' Get instance timestamps of an MDB in [chTKCat]
 #' 
 #' @param x a [chTKCat] object
-#' @param name the name of the database to empty
+#' @param name the name of the database
 #' 
-#' @return No return value, called for side effects
+#' @return A tibble with the instance of each table at each timestamp.
+#' The "current" attribute indicate the current timestamp instance.
+#' If there is no recorded timestamp, the function returns NULL.
 #' 
 #' @export
 #' 
-empty_chMDB <- function(x, name){
+get_chMDB_timestamps <- function(x, name){
    stopifnot(
       is.chTKCat(x),
       is.character(name), length(name)==1, !is.na(name)
@@ -1347,29 +1403,464 @@ empty_chMDB <- function(x, name){
    if(!name %in% list_MDBs(x, withInfo=FALSE)){
       stop("The database does not exist")
    }
-   con <- x$chcon
-   toDrop <- setdiff(
-      list_tables(con, name)$name,
-      names(CHMDB_DATA_MODEL)
+   allTables <- list_tables(x$chcon, dbNames=name)
+   if(!"___Timestamps___" %in% allTables$name){
+      return(NULL)
+   }
+   toRet <- get_query(x, sprintf("SELECT * FROM `%s`.`___Timestamps___`", name))
+   current <- toRet %>%
+      dplyr::filter(
+         .data$instance=="___MDB___" & .data$table=="___MDB___"
+      ) %>% 
+      dplyr::pull("timestamp")
+   if(length(current)==0){
+      current <- NA
+   }
+   attr(toRet, "current") <- current
+   return(toRet)
+}
+
+
+###############################################################################@
+#' Set timestamp of the current version of an MDB in [chTKCat]
+#' 
+#' @param x a [chTKCat] object
+#' @param name the name of the database to affect
+#' @param timestamp a single POSIXct value as a timestamp for
+#' the chMDB instance.
+#' 
+#' @return No return value, called for side effects
+#' 
+#' @export
+#' 
+set_chMDB_timestamp <- function(x, name, timestamp){
+   timestamp <- as.POSIXct(timestamp)
+   stopifnot(
+      is.chTKCat(x),
+      inherits(timestamp, "POSIXct"), length(timestamp)==1, !is.na(timestamp),
+      is.character(name), length(name)==1, !is.na(name)
    )
+   dbl <- list_MDBs(x) %>% 
+      dplyr::filter(.data$populated)
+   if(!is.data.frame(dbl) || !name %in% dbl$name){
+      stop(sprintf(
+         "%s does not exist in the provided chTKCat or is not populated",
+         name
+      ))
+   }
+   mdbTables <- c(
+      setdiff(
+         names(CHMDB_DATA_MODEL),
+         MGT_TABLES
+      ),
+      get_query(x, sprintf("SELECT name FROM `%s`.`___Tables___`", name))$name
+   )
+   ntst <- tibble(
+      timestamp=timestamp,
+      table=mdbTables,
+      instance=mdbTables
+   )
+   
+   ### Sub-tables ----
+   sdtables <- get_query(
+      x,
+      sprintf(
+         "SELECT table FROM `%s`.`___Fields___` WHERE type='row'",
+         name
+      )
+   )$table %>% 
+      unique()
+   if(length(sdtables)>0){
+      stables <- get_query(
+         x,
+         paste(
+            sprintf(
+               "SELECT '%s' as ref, table as subtab FROM `%s`.`%s`",
+               sdtables, name, sdtables
+            ),
+            collapse=" UNION ALL "
+         )
+      )$subtab
+      if(length(stables)>0){
+         ntst <- rbind(
+            ntst,
+            tibble(
+               timestamp=timestamp,
+               table=stables,
+               instance=stables
+            )
+         )
+      }
+   }
+   
+   tst <- get_chMDB_timestamps(x, name)
+   if(is.null(tst)){
+      mergeTree_from_RelTableModel(
+         con=x$chcon, dbName=name, tm=CHMDB_DATA_MODEL$"___Timestamps___"
+      )
+      tst <- get_chMDB_timestamps(x, name)
+   }
+   current <- attr(tst, "current")
+   if(!is.na(current)){
+      if(timestamp < current){
+         stop("Cannot set a timestamp earlier than the current one.")
+      }
+      toRm <- get_query(
+         x,
+         sprintf(
+            "SELECT * FROM `%s`.`___Timestamps___` WHERE timestamp=%s",
+            name, as.numeric(current)
+         )
+      )
+      if(nrow(toRm)==0){
+         stop("Error in timestamp encoding. Contact chTKCat admin.")
+      }
+      get_query(
+         x,
+         sprintf(
+            "ALTER TABLE `%s`.`___Timestamps___` DELETE WHERE timestamp=%s",
+            name, as.numeric(current)
+         )
+      )
+   }
+   ch_insert(
+      con=x$chcon, dbName=name,
+      tableName="___Timestamps___", value=ntst
+   )
+   
+   ## Update grants ----
+   update_chMDB_grants(x, name)
+}
+
+
+###############################################################################@
+#' Empty a chMDB in a [chTKCat]
+#' 
+#' @param x a [chTKCat] object
+#' @param name the name of the database to empty
+#' @param timestamp timestamp of the instance to empty. If NA (default)
+#' the current instance is emptied.
+#' @param .toKeep For internal use only. A character vector indicating
+#' the tables to not drop (default: `character()`)
+#' 
+#' @return No return value, called for side effects
+#' 
+#' @export
+#' 
+empty_chMDB <- function(x, name, timestamp=NA, .toKeep=character()){
+   timestamp <- as.POSIXct(timestamp)
+   stopifnot(
+      is.chTKCat(x),
+      is.character(name), length(name)==1, !is.na(name),
+      is.character(.toKeep),
+      is.na(timestamp) || inherits(timestamp, "POSIXct"), length(timestamp)==1
+   )
+   if(
+      length(.toKeep) > 0 &&
+      (
+         is.null(attr(.toKeep, "int")) ||
+         is.na(attr(.toKeep, "int")) ||
+         !attr(.toKeep, "int")
+      )
+   ){
+      stop(".toKeep param is for internal use only")
+   }
+   if(any(.toKeep %in% names(CHMDB_DATA_MODEL))){
+      stop("Cannot keep data model tables: don't put them in the .toKeep param")
+   }
+   if(!name %in% list_MDBs(x, withInfo=FALSE)){
+      stop("The database does not exist")
+   }
+   con <- x$chcon
+   
+   ## Identify tables to drop and tables to empty ----
+   allTabInstances <- list_tables(con, name)$name
+   tst <- get_chMDB_timestamps(x, name)
+   if(is.null(tst) || nrow(tst)==0){
+      if(!is.na(timestamp)){
+         stop("No timestamp available for this database")
+      }
+      toDrop <- setdiff(
+         allTabInstances,
+         MGT_TABLES
+      )
+      ### Keep tables to keep
+      toDrop <- setdiff(toDrop, .toKeep)
+      reinit <- TRUE
+   }else{
+      if(is.na(timestamp) && is.na(attr(tst, "current"))){
+         toDrop <- setdiff(
+            allTabInstances,
+            c(tst$instance, MGT_TABLES)
+         )
+         ### Keep tables to keep
+         toDrop <- setdiff(toDrop, .toKeep)
+         reinit <- TRUE
+      }else{
+         if(is.na(timestamp)){
+            timestamp <- attr(tst, "current")
+         }
+         if(!timestamp %in% tst$timestamp){
+            stop("The selected timestamp does not exist")
+         }
+         toDrop <- tst %>%
+            dplyr::filter(
+               .data$timestamp==!!timestamp
+            ) %>% 
+            dplyr::pull("instance")
+         toDrop <- setdiff(
+            toDrop,
+            tst$instance[which(tst$timestamp != timestamp)]
+         )
+         ### Keep tables to keep
+         toDrop <- setdiff(toDrop, .toKeep)
+         
+         ### Clean timestamps ----
+         get_query(
+            x,
+            sprintf(
+               "ALTER TABLE `%s`.`___Timestamps___` DELETE WHERE timestamp=%s",
+               name, as.numeric(timestamp)
+            )
+         )
+         
+         if(timestamp==attr(tst, "current")){
+            reinit <- TRUE
+         }else{
+            reinit <- FALSE
+         }
+         
+      }
+   }
+  
+   ## Remove tables and re-initialize if necessary ----
    for(tn in toDrop){
       RClickhouse::dbSendQuery(
          x$chcon,
          sprintf("DROP TABLE `%s`.`%s`", name, tn)
       )
    }
-   toEmpty <- setdiff(
-      names(CHMDB_DATA_MODEL),
-      c("___MDBUsers___", "___Public___")
-   )
-   for(tn in toEmpty){
-      RClickhouse::dbSendQuery(
-         x$chcon,
-         sprintf("ALTER TABLE `%s`.`%s` DELETE WHERE 1", name, tn)
+   if(reinit){
+      mergeTrees_from_RelDataModel(
+         con, name,
+         CHMDB_DATA_MODEL[setdiff(names(CHMDB_DATA_MODEL), MGT_TABLES)]
       )
    }
+   
+   ## Update grants ----
+   update_chMDB_grants(x, name)
+   
    Sys.sleep(5)
    invisible()
+}
+
+
+###############################################################################@
+#' Archive a chMDB in a [chTKCat]
+#' 
+#' @param x a [chTKCat] object
+#' @param name the name of the database to archive
+#' @param defaultTS a default timestamp value to use when not existing in
+#' the DB (default: `as.POSIXct("1970-01-01 00:00.0", tz="UTC")`)
+#' @param .toKeep For internal use only. A character vector indicating the
+#' tables to not archive (default: `character()`)
+#' 
+#' @return No return value, called for side effects
+#' 
+#' @export
+#' 
+archive_chMDB <- function(
+   x, name,
+   defaultTS=as.POSIXct("1970-01-01 00:00.0", tz="UTC"),
+   .toKeep=character()
+){
+   defaultTS <- as.POSIXct(defaultTS)
+   stopifnot(
+      is.chTKCat(x),
+      is.character(name), length(name)==1, !is.na(name),
+      is.character(.toKeep),
+      !is.na(defaultTS), inherits(defaultTS, "POSIXct"), length(defaultTS)==1
+   )
+   if(
+      length(.toKeep) > 0 &&
+      (
+         is.null(attr(.toKeep, "int")) ||
+         is.na(attr(.toKeep, "int")) ||
+         !attr(.toKeep, "int")
+      )
+   ){
+      stop(".toKeep param is for internal use only")
+   }
+   if(any(.toKeep %in% names(CHMDB_DATA_MODEL))){
+      stop("Cannot keep data model tables: don't put them in the .toKeep param")
+   }
+   mdbl <- list_MDBs(x, withInfo=TRUE)
+   if(!name %in% mdbl$name){
+      stop("The database does not exist")
+   }
+   con <- x$chcon
+   if(!name %in% dplyr::pull(dplyr::filter(mdbl, .data$populated), "name")){
+      stop(sprintf("%s is not filled or has no current state", name))
+   }
+   
+   ## Set timestamp when not existing ----
+   tst <- get_chMDB_timestamps(x, name)
+   if(is.null(tst) || is.na(attr(tst, "current"))){
+      set_chMDB_timestamp(x, name, defaultTS)
+      tst <- get_chMDB_timestamps(x, name)
+   }
+   
+   ## Archive tables ----
+   toArchive <- c(
+      names(CHMDB_DATA_MODEL),
+      get_query(
+         x,
+         sprintf("SELECT name FROM `%s`.`___Tables___`", name)
+      )$name
+   )
+   toArchive <- tst %>% 
+      dplyr::filter(
+         .data$timestamp==attr(tst, "current"),
+         .data$table %in% toArchive
+      )
+   toArchive$newInstance <- uuid::UUIDgenerate(n=nrow(toArchive))
+   toArchive$newInstance <- ifelse(
+      toArchive$table %in% .toKeep,
+      toArchive$instance,
+      toArchive$newInstance
+   )
+   toUpdate <- tst %>%
+      dplyr::filter(.data$instance %in% toArchive$instance) %>% 
+      dplyr::left_join(
+         toArchive[,c("instance", "newInstance")],
+         by="instance"
+      ) %>% 
+      dplyr::select("timestamp", "table", "instance"="newInstance")
+   if(nrow(toArchive) > 0){
+      get_query(
+         x,
+         sprintf(
+            "ALTER TABLE `%s`.`___Timestamps___` DELETE WHERE instance IN (%s)",
+            name,
+            paste0("'", paste(unique(toArchive$instance), collapse="', '"), "'")
+         )
+      )
+      ch_insert(
+         con=x$chcon, dbName=name,
+         tableName="___Timestamps___", value=toUpdate
+      )
+      for(i in 1:nrow(toArchive)){
+         if(toArchive$instance[i] != toArchive$newInstance[i]){
+            get_query(
+               x,
+               sprintf(
+                  "RENAME TABLE `%s`.`%s` TO `%s`.`%s`",
+                  name, toArchive$instance[i],
+                  name, toArchive$newInstance[i]
+               )
+            )
+         }
+      }
+   }
+   
+   ## Prepare new instance ----
+   mergeTrees_from_RelDataModel(
+      con, name,
+      CHMDB_DATA_MODEL[setdiff(
+         names(CHMDB_DATA_MODEL),
+         MGT_TABLES
+      )]
+   )
+   
+   ## Update grants ----
+   update_chMDB_grants(x, name)
+   
+   Sys.sleep(5)
+   invisible()
+}
+
+###############################################################################@
+#' Unarchive a chMDB in a [chTKCat]
+#' 
+#' @param x a [chTKCat] object
+#' @param name the name of the database to archive
+#' 
+#' @return No return value, called for side effects
+#' 
+#' @export
+#' 
+unarchive_chMDB <- function(x, name){
+   stopifnot(
+      is.chTKCat(x),
+      is.character(name), length(name)==1, !is.na(name)
+   )
+   mdbl <- list_MDBs(x, withInfo=TRUE)
+   if(!name %in% mdbl$name){
+      stop("The database does not exist")
+   }
+   con <- x$chcon
+   
+   if(name %in% dplyr::pull(dplyr::filter(mdbl, .data$populated), "name")){
+      stop(sprintf("%s is already unarchived", name))
+   }
+   tst <- get_chMDB_timestamps(x, name)
+   if(is.null(tst)){
+      stop(sprintf("There is no available archive for %s", name))
+   }
+   if(!is.na(attr(tst, "current"))){
+      stop(sprintf("%s is already unarchived", name))
+   }
+   
+   current <- max(tst$timestamp)
+   toUnarchive <- tst %>% 
+      dplyr::filter(.data$timestamp==current)
+   toUnarchive$newInstance <- toUnarchive$table
+   toUpdate <- tst %>%
+      dplyr::filter(.data$instance %in% toUnarchive$instance) %>% 
+      dplyr::left_join(
+         toUnarchive[,c("instance", "newInstance")],
+         by="instance"
+      ) %>% 
+      dplyr::select("timestamp", "table", "instance"="newInstance")
+   
+   if(nrow(toUnarchive) > 0){
+      get_query(
+         x,
+         sprintf(
+            "ALTER TABLE `%s`.`___Timestamps___` DELETE WHERE instance IN (%s)",
+            name,
+            paste0(
+               "'", paste(unique(toUnarchive$instance), collapse="', '"), "'"
+            )
+         )
+      )
+      ch_insert(
+         con=x$chcon, dbName=name,
+         tableName="___Timestamps___", value=toUpdate
+      )
+      for(tn in setdiff(names(CHMDB_DATA_MODEL), MGT_TABLES)){
+         get_query(x, sprintf("DROP TABLE `%s`.`%s`", name, tn))
+      }
+      for(i in 1:nrow(toUnarchive)){
+         if(toUnarchive$instance[i] != toUnarchive$newInstance[i]){
+            get_query(
+               x,
+               sprintf(
+                  "RENAME TABLE `%s`.`%s` TO `%s`.`%s`",
+                  name, toUnarchive$instance[i],
+                  name, toUnarchive$newInstance[i]
+               )
+            )
+         }
+      }
+   }
+   
+   ## Update grants ----
+   update_chMDB_grants(x, name)
+   
+   Sys.sleep(5)
+   invisible()
+   
 }
 
 

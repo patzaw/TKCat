@@ -183,6 +183,27 @@ db_reconnect.metaMDB <- function(x, user, password, ntries=3, ...){
 }
 
 
+###############################################################################@
+#' 
+#' @rdname get_hosts
+#' @method get_hosts metaMDB
+#' 
+#' @export
+#'
+get_hosts.metaMDB <- function(x, ...){
+   mdbs <- MDBs(x)
+   toRet <- lapply(mdbs, function(y){
+      if(is.chMDB(y) || is.metaMDB(y)){
+         toRet <- get_hosts(y, ...)
+      }else{
+         toRet <- NULL
+      }
+      return(toRet)
+   })
+   return(unique(unlist(toRet)))
+}
+
+
 
 ###############################################################################@
 #' Get a list of relational tables

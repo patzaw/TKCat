@@ -344,6 +344,22 @@ db_reconnect <- function(x, user, password, ntries=3, ...){
    UseMethod("db_reconnect", x)
 }
 
+###############################################################################@
+#' Get database hosts
+#' 
+#' @param x an object with database connection(s)
+#' @param ... additional parameters for methods.
+#' 
+#' @return A character vector with hosts information (generaly 1)
+#' in the following shape: "host:port"
+#' 
+#' @export
+#' 
+get_hosts <- function(x, ...){
+   UseMethod("get_hosts", x)
+}
+
+
 
 ###############################################################################@
 #' Get SQL query

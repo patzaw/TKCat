@@ -53,8 +53,8 @@
       }
     ],
     "display": {
-      "x": [-53],
-      "y": [-273],
+      "x": [-31],
+      "y": [-249],
       "color": ["#A9ECC9"],
       "comment": ["The modeled DataBase"]
     },
@@ -566,9 +566,9 @@
       }
     ],
     "display": {
-      "x": [-54],
-      "y": [-106],
-      "color": ["#9BC8FE"],
+      "x": [-662],
+      "y": [-140],
+      "color": ["#FAC6DC"],
       "comment": ["Users having access to the MDB"]
     },
     "primaryKey": ["login"]
@@ -587,10 +587,45 @@
     "foreignKeys": [],
     "indexes": [],
     "display": {
-      "x": [-57],
-      "y": [-190],
-      "color": ["#A9ECC9"],
+      "x": [-694],
+      "y": [-219],
+      "color": ["#FAC6DC"],
       "comment": ["If the resource data are available for anybody having access to the chTKCat instance"]
+    },
+    "primaryKey": []
+  },
+  "___Timestamps___": {
+    "tableName": ["___Timestamps___"],
+    "fields": [
+      {
+        "name": "timestamp",
+        "type": "POSIXct",
+        "nullable": false,
+        "unique": false,
+        "comment": "chMDB instance timestamp"
+      },
+      {
+        "name": "table",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Table name"
+      },
+      {
+        "name": "instance",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Table instance in Clickhouse"
+      }
+    ],
+    "foreignKeys": [],
+    "indexes": {},
+    "display": {
+      "x": [-671],
+      "y": [-300],
+      "color": ["#FAC6DC"],
+      "comment": ["Instance of each table at each timestamp. For each chMDB instance all the DB tables (including the model but not the \"___Public___\", the \"___Timestamps___\" nor the \"___MDBUsers___\" tables) are associated with an actual instance table in Clickouse. For the current instance, instance has the same value as table."]
     },
     "primaryKey": []
   }

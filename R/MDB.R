@@ -107,6 +107,8 @@ format.MDB <- function(x, ...){
          "",
          "%s",
          "%s",
+         "%s",
+         "",
          sep="\n"
       ),
       class(x)[1],
@@ -172,6 +174,11 @@ format.MDB <- function(x, ...){
          is.na(dbi$url) || dbi$url=="",
          '',
          sprintf('(%s)', dbi$url)
+      ),
+      ifelse(
+         is.na(dbi$timestamp),
+         '',
+         sprintf('\nTimesamp: %s', dbi$timestamp)
       )
    ))
 }
@@ -940,21 +947,32 @@ get_confrontation_report <- function(){
       }
    }
    optfields <- c(
-      "title", "description", "url",
-      "version", "maintainer"
+      "title"="character", "description"="character", "url"="character",
+      "version"="character", "maintainer"="character",
+      "timestamp"="POSIXct"
    )
-   for(f in optfields){
+   for(f in names(optfields)){
       fv <- dbInfo[[f]]
       if(length(fv)==0){
-         dbInfo[[f]] <- as.character(NA)
+         if(optfields[f]=="character"){
+            dbInfo[[f]] <- as.character(NA)
+         }
+         if(optfields[f]=="POSIXct"){
+            dbInfo[[f]] <- as.POSIXct(NA)
+         }
       }else{
          if(length(fv)>1 || !is.atomic(fv)){
             stop(sprintf("Invalid value for %s", f))
          }
-         dbInfo[[f]] <- as.character(fv)
+         if(optfields[f]=="character"){
+            dbInfo[[f]] <- as.character(fv)
+         }
+         if(optfields[f]=="POSIXct"){
+            dbInfo[[f]] <- as.POSIXct(fv)
+         }
       }
    }
-   dbInfo <- as.list(dbInfo[c(mandFields, optfields)])
+   dbInfo <- as.list(dbInfo[c(mandFields, names(optfields))])
    return(dbInfo)
 }
 

@@ -153,16 +153,52 @@ db_reconnect.chMDB <- function(x, user, password, ntries=3, ...){
 
 ###############################################################################@
 #' 
+#' @rdname get_hosts
+#' @method get_hosts chMDB
+#' 
+#' @export
+#'
+get_hosts.chMDB <- function(x, ...){
+   get_hosts(unclass(x)$tkcon)
+}
+
+
+###############################################################################@
+#' 
+#' @param autoalias Change this parameter only if you know what you're doing.
+#' if TRUE, make relevant alias to query the chMDB
+#' using the table names from the data model. If FALSE, the user must know the
+#' table instance name in the remote database. By default, autoalias is set
+#' to TRUE when using a non-current instance of the database.
+#' 
 #' @rdname get_query
 #' @method get_query chMDB
 #' 
 #' @export
 #'
-get_query.chMDB <- function(x, query, ...){
+get_query.chMDB <- function(x, query, autoalias=!is_current_chMDB(x), ...){
    con <- unclass(x)$tkcon$chcon
    n <- unclass(x)$dbInfo$name
    RClickhouse::dbSendQuery(con, sprintf("USE `%s`", n))
    on.exit(RClickhouse::dbSendQuery(con, "USE default"))
+   if(is.na(autoalias)){
+      autoalias <- FALSE
+   }
+   if(autoalias){
+      dbt <- db_tables(x)$dbTables
+      alias <- paste(
+         "WITH",
+         paste(
+            sprintf(
+               '`%s` AS (SELECT * FROM %s)',
+               names(dbt), dbt
+            ),
+            collapse=", "
+         ),
+         sep=" "
+      )
+      query <- paste(alias, query, sep=" ")
+   }
    DBI::dbGetQuery(con, query, ...) %>%
       as_tibble()
 }
@@ -170,6 +206,8 @@ get_query.chMDB <- function(x, query, ...){
 
 ###############################################################################@
 #'
+#' @param timestamp the timestamp of the instance to get.
+#' Default=NA: get the current version.
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
 #' 
@@ -178,15 +216,16 @@ get_query.chMDB <- function(x, query, ...){
 #' 
 #' @export
 #'
-get_MDB.chTKCat <- function(x, dbName, n_max=10, ...){
+get_MDB.chTKCat <- function(x, dbName, timestamp=NA, n_max=10, ...){
+   timestamp <- as.POSIXct(timestamp)
    stopifnot(
-      is.chTKCat(x)
+      is.chTKCat(x),
+      is.na(timestamp) || inherits(timestamp, "POSIXct"), length(timestamp)==1
    )
-   dbl <- list_MDBs(x) %>% 
-      dplyr::filter(.data$populated)
+   dbl <- list_MDBs(x)
    if(!is.data.frame(dbl) || !dbName %in% dbl$name){
       stop(sprintf(
-         "%s does not exist in the provided chTKCat or is not populated",
+         "%s does not exist in the provided chTKCat",
          dbName
       ))
    }
@@ -194,24 +233,61 @@ get_MDB.chTKCat <- function(x, dbName, n_max=10, ...){
       stop(sprintf("You don't have permission to access %s", dbName))
    }
    
+   tst <- get_chMDB_timestamps(x, dbName)
+   if(is.null(tst) || nrow(tst)==0){
+      tstToComplete <- TRUE
+      if(!is.na(timestamp)){
+         stop("This MDB is not timestamped: timestamp must be NA")
+      }else{
+         if(!dplyr::filter(dbl, .data$name==!!dbName)$populated){
+            stop(sprintf("The %s is not populated yet", dbName))
+         }
+         tst <- dplyr::tibble(
+            table=setdiff(names(CHMDB_DATA_MODEL), MGT_TABLES)
+         ) %>% 
+            dplyr::mutate(
+               instance=.data$table
+            )
+      }
+   }else{
+      tstToComplete <- FALSE
+      if(is.na(timestamp)){
+         if(is.na(attr(tst, "current"))){
+            stop("There is no current instance of the MDB: provide a timestamp")
+         }else{
+            timestamp <- attr(tst, "current")
+         }
+      }
+      if(!timestamp %in% tst$timestamp){
+         stop("The selected timestamp does not exist")
+      }
+      tst <- tst %>% 
+         dplyr::filter(.data$timestamp==!!timestamp)
+   }
+   
    ## Data model ----
+   tsSelect <- function(table){
+      sprintf(
+         "SELECT * FROM `%s`.`%s`",
+         dbName,
+         tst$instance[which(tst$table==table)]
+      )
+   }
    dbm <- list(
       tables=get_query(
-         x, sprintf("SELECT * FROM `%s`.`___Tables___`", dbName)
+         x, tsSelect("___Tables___")
       ),
       fields=get_query(
-         x, sprintf("SELECT * FROM `%s`.`___Fields___`", dbName)
+         x, tsSelect("___Fields___")
       ),
       primaryKeys=get_query(
-         x,
-         sprintf("SELECT * FROM `%s`.`___PrimaryKeys___`", dbName)
+         x, tsSelect("___PrimaryKeys___")
       ),
       foreignKeys=get_query(
-         x,
-         sprintf("SELECT * FROM `%s`.`___ForeignKeys___`", dbName)
+         x, tsSelect("___ForeignKeys___")
       ),
       indexes=get_query(
-         x, sprintf("SELECT * FROM `%s`.`___Indexes___`", dbName)
+         x, tsSelect("___Indexes___")
       )
    )
    dbm$fields$nullable <- as.logical(dbm$fields$nullable)
@@ -221,22 +297,26 @@ get_MDB.chTKCat <- function(x, dbName, n_max=10, ...){
    
    ## DB information ----
    dbInfo <- as.list(get_query(
-      x, sprintf("SELECT * FROM `%s`.`___MDB___`", dbName)
+      x, tsSelect("___MDB___")
    ))
-   
+   dbInfo <- c(dbInfo, list("timestamp"=as.POSIXct(timestamp)))
+
    ## DB tables ----
+   if(tstToComplete){
+      tst <- rbind(
+         tst,
+         dplyr::tibble(table=names(dataModel), instance=names(dataModel))
+      )
+   }
    dbTables <- sprintf(
-      "`%s`.`%s`", dbInfo$name, names(dataModel)
+      "`%s`.`%s`", dbName, tst$instance
    )
-   names(dbTables) <- names(dataModel)
+   names(dbTables) <- tst$table
+   dbTables <- dbTables[names(dataModel)]
    
    ## Collection members ----
    collectionMembers <- get_query(
-      x,
-      statement=sprintf(
-         "SELECT * FROM `%s`.`___CollectionMembers___`",
-         dbName
-      )
+      x, tsSelect("___CollectionMembers___")
    ) %>%
       dplyr::mutate(
          resource=dbName,
@@ -275,10 +355,52 @@ is.chMDB <- function(x){
 
 
 ###############################################################################@
+#' Check if the [chMDB] object refers to the current instance of the MDB
+#' 
+#' @param x a [chMDB] object
+#' 
+#' @return A single logical:
+#' TRUE if x refers to the current instance of the MDB.
+#' 
+#' @export
+#'
+is_current_chMDB <- function(x){
+   stopifnot(is.chMDB(x))
+   ots <- db_info(x)$timestamp
+   dts <- get_chMDB_timestamps(unclass(x)$tkcon, db_info(x)$name) %>% 
+      attr("current")
+   if(is.na(ots)){
+      if(is.null(dts) || is.na(dts)){
+         return(TRUE)
+      }else{
+         warning(
+            "This object is not timestamped but timestamps exist in",
+            " the chTKCat database"
+         )
+         return(NA)
+      }
+   }else{
+      if(is.null(dts) || is.na(dts)){
+         warning("The database in chTKCat is not timestamped")
+         return(NA)
+      }
+      return(dts==ots)
+   }
+}
+
+
+###############################################################################@
 #' Push an [MDB] object in a ClickHouse database
 #'
 #' @param x an [MDB] object
 #' @param tkcon a [chTKCat] object
+#' @param timestamp a single POSIXct value as a timestamp for
+#' the chMDB instance.
+#' The default value is the current system time.
+#' If this value is smaller or equal to the chMDB current value, an error is
+#' thrown. If NA, the current instance is overwritten
+#' (if the overwrite parameter is set to TRUE) without changing
+#' the existing timestamp.
 #' @param overwrite a logical indicating if existing data should be overwritten
 #' (default: FALSE)
 #' @param by the size of the batch: number of records to write
@@ -288,40 +410,172 @@ is.chMDB <- function(x){
 #' 
 #' @export
 #'
-as_chMDB <- function(x, tkcon, overwrite=FALSE, by=10^5){
-   stopifnot(is.MDB(x))
-   stopifnot(is.chTKCat(tkcon))
+as_chMDB <- function(x, tkcon, timestamp=Sys.time(), overwrite=FALSE, by=10^5){
+   
+   timestamp <- as.POSIXct(timestamp)
+   stopifnot(
+      is.MDB(x),
+      is.chTKCat(tkcon),
+      is.na(timestamp[1]) || inherits(timestamp, "POSIXct"),
+      length(timestamp)==1,
+      is.logical(overwrite), length(overwrite)==1, !is.na(overwrite)
+   )
    con <- tkcon$chcon
    dbInfo <- db_info(x)
+   dbInfo <- dbInfo[setdiff(names(dbInfo), "timestamp")]
    dbName <- dbInfo$name
    dataModel <- data_model(x)
    collectionMembers <- collection_members(x)
    
    ## Check existence and availability ----
-   if(!dbName %in% list_MDBs(tkcon, withInfo=FALSE)){
+   mdbl <- list_MDBs(tkcon, withInfo=TRUE)
+   if(!dbName %in% mdbl$name){
       stop(
          sprintf("%s does not exist in the chTKCat.", dbName),
-         "Create it or contact the administrator of the chTKCat."
+         "Create it first."
       )
    }
-   if(
-      dbName %in%
-         dplyr::pull(
-            dplyr::filter(list_MDBs(tkcon, withInfo=TRUE), .data$populated),
-            "name"
-         )
-   ){
-      if(!overwrite){
-         stop(
-            sprintf("%s is already used and filled.", dbName),
-            " Set overwrite to TRUE if you want to replace the content."
-         )
+   
+   ## Rules of update ----
+   tst <- get_chMDB_timestamps(tkcon, dbName)
+   maxTs <- suppressWarnings(max(tst$timestamp))
+   if(!is.na(timestamp) && !is.null(maxTs) && timestamp <= maxTs){
+      stop("Timestamp should be more recent than those already recorded")
+   }
+   makeEmpty <- makeArchive <- setTS <- FALSE
+   if(!dbName %in% mdbl$name[which(mdbl$populated)]){
+      ### Not Populated ----
+      if(is.null(tst) || nrow(tst)==0){
+         #### No ETS ----
+         if(is.na(timestamp)){
+            ###### No TS ----
+            ## ==> Fill
+         }else{
+            ###### TS ----
+            ## ==> Fill
+            setTS <- TRUE
+         }
       }else{
-         empty_chMDB(tkcon, dbName)
+         #### ETS ----
+         if(is.na(timestamp)){
+            ###### No TS ----
+            stop("This MDB is timestamped: a timestamp must be provided")
+         }else{
+            ###### TS ----
+            ## ==> Fill
+            setTS <- TRUE
+         }
+      }
+   }else{
+      ### Populated ----
+      if(is.null(tst) || nrow(tst)==0){
+         #### No ETS ----
+         if(overwrite){
+            ##### Overwrite ----
+            if(is.na(timestamp)){
+               ###### No TS ----
+               makeEmpty <- TRUE
+               ## ==> Fill
+            }else{
+               ###### TS ----
+               makeEmpty <- TRUE
+               ## ==> Fill
+               setTS <- TRUE
+            }
+         }else{
+            ##### Not overwrite ----
+            if(is.na(timestamp)){
+               ###### No TS ----
+               stop(
+                  sprintf("%s is already used and filled.", dbName),
+                  " Set overwrite to TRUE if you want to replace the content.",
+                  " Or provide a timestamp to push a new instance."
+               )
+            }else{
+               ###### TS ----
+               makeArchive <- TRUE
+               ## ==> Fill
+               setTS <- TRUE
+            }
+         }
+      }else{
+         #### ETS ----
+         if(overwrite){
+            ##### Overwrite ----
+            if(is.na(timestamp)){
+               ###### No TS ----
+               timestamp <- attr(tst, "current")
+               makeEmpty <- TRUE
+               ## ==> Fill
+               setTS <- TRUE
+            }else{
+               ###### TS ----
+               makeEmpty <- TRUE
+               ## ==> Fill
+               setTS <- TRUE
+            }
+         }else{
+            ##### Not overwrite ----
+            if(is.na(timestamp)){
+               ###### No TS ----
+               stop(
+                  sprintf("%s is already used and filled.", dbName),
+                  " Set overwrite to TRUE if you want to replace the content.",
+                  " Or provide a timestamp to push a new instance."
+               )
+            }else{
+               ###### TS ----
+               makeArchive <- TRUE
+               ## ==> Fill
+               setTS <- TRUE
+            }
+         }
       }
    }
    
-   ## Add relevant collections ----
+   ## Identify tables already recorded in CH ----
+   ## and that don't need to be rewritten
+   if(is.chMDB(x) | is.metaMDB(x)){
+      if(get_hosts(tkcon) %in% get_hosts(x)){
+         chTables <- db_tables(x, host=get_hosts(tkcon))$dbTables
+         if(is.null(tst) || nrow(tst)==0){
+            availableTables <- list_tables(tkcon$chcon, dbName) %>% 
+               dplyr::select("table"="name", "instance"="name")
+         }else{
+            availableTables <- tst %>% select("table", "instance")
+         }
+         availableTables$path <- sprintf(
+            "`%s`.`%s`", dbName, availableTables$instance
+         )
+         availableTables$inCh <- as.character(chTables[availableTables$table])
+         toKeep <- availableTables$table[which(
+            availableTables$table==availableTables$instance &
+            availableTables$path==availableTables$inCh
+         )] %>% 
+            as.character()
+      }else{
+         toKeep <- character()
+      }
+   }else{
+      toKeep <- character()
+   }
+   attr(toKeep, "int") <- TRUE
+   print(toKeep)
+   
+   ## Apply rules before filling ----
+   if(makeEmpty){
+      message("Make empty")
+      empty_chMDB(tkcon, dbName, .toKeep=toKeep)
+   }
+   if(makeArchive){
+      message("Make archive")
+      archive_chMDB(tkcon, dbName, .toKeep=toKeep)
+   }
+   
+   ## FILL ----
+   message("Fill")
+   
+   ### Add relevant collections ----
    if(!is.null(collectionMembers) && nrow(collectionMembers)>0){
       toAdd <- unique(collectionMembers$collection)
       toAdd <- setdiff(
@@ -332,12 +586,12 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE, by=10^5){
       }
    }
    
-   ## Write DB information ----
+   ### Write DB information ----
    ch_insert(
       con=con, dbName=dbName, tableName="___MDB___", value=as_tibble(dbInfo)
    )
    
-   ## Write data model ----
+   ### Write data model ----
    er <- try({
       dbm <- ReDaMoR::toDBM(dataModel)
       ch_insert(
@@ -376,7 +630,7 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE, by=10^5){
       stop(as.character(er))
    }
    
-   ## Write collection members ----
+   ### Write collection members ----
    if(!is.null(collectionMembers)){
       er <- try({
          ch_insert(
@@ -395,14 +649,25 @@ as_chMDB <- function(x, tkcon, overwrite=FALSE, by=10^5){
       }
    }
    
-   ## Write data ----
+   ### Write data ----
    er <- try({
-      mergeTrees_from_RelDataModel(con=con, dbName=dbName, dbm=dataModel)
-      .write_chTables(x, con, dbName, by=by)
+      toWrite <- setdiff(names(x), toKeep)
+      print(toWrite)
+      mergeTrees_from_RelDataModel(
+         con=con, dbName=dbName,
+         dbm=dataModel[toWrite, rmForeignKeys=TRUE]
+      )
+      .write_chTables(x[toWrite], con, dbName, by=by)
    }, silent=FALSE)
    if(inherits(er, "try-error")){
       empty_chMDB(tkcon, dbName)
       stop(as.character(er))
+   }
+   
+   ## Set TS if required ----
+   if(setTS){
+      message("Set TS")
+      set_chMDB_timestamp(tkcon, dbName, timestamp)
    }
    
    ## Update grants ----
@@ -729,21 +994,57 @@ dims.chMDB <- function(x, ...){
 
 
 ###############################################################################@
-#' Get the DB tables from a [chMDB] object
+#' Get the DB tables from a [chMDB] or [metaMDB] object
 #' 
-#' @param x a [chMDB] object
+#' @param x a [chMDB] or a [metaMDB] object
+#' @param host the name of host (as returned by `[get_hosts]`) to focus on.
+#' Only used with [metaMDB] objects.
 #' 
 #' @return a list with a chTKCat object (tkcon) and
 #' a named vector of DB table names (dbTables).
 #' 
 #' @export
 #'
-db_tables <- function(x){
-   stopifnot(is.chMDB(x))
-   x <- unclass(x)
-   toTake <- c("tkcon", "dbTables")
-   stopifnot(all(toTake %in% names(x)))
-   return(x[toTake])
+db_tables <- function(x, host){
+   stopifnot(is.chMDB(x) || is.metaMDB(x))
+   if(is.chMDB(x)){
+      x <- unclass(x)
+      toTake <- c("tkcon", "dbTables")
+      stopifnot(all(toTake %in% names(x)))
+      return(x[toTake])
+   }
+   if(is.metaMDB(x)){
+      hosts <- get_hosts(x)
+      if(missing(host)){
+         host <- hosts[1]
+         if(length(hosts)>1){
+            warning(
+               sprintf("No host provided ==> taking the first one: %s", host)
+            )
+         }
+      }
+      mdbs <- MDBs(x)
+      toRet <- lapply(mdbs, function(y){
+         if(is.metaMDB(y)){
+            toRet <- db_tables(y, host)
+         }else{
+            if(is.chMDB(y) && get_hosts(y)==host){
+               toRet <- db_tables(y)
+            }else{
+               toRet <- NULL
+            }
+         }
+         return(toRet)
+      })
+      toRet <- toRet[which(lengths(toRet)>0)] %>% magrittr::set_names(NULL)
+      if(length(toRet) > 0){
+         toRet <- list(
+            tkcon=toRet[[1]]$tkcon,
+            dbTables=do.call(c, lapply(toRet, function(z) z$dbTables))
+         )
+      }
+      return(toRet)
+   }
 }
 
 
@@ -1186,7 +1487,11 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       tableModel$fields$type,
       c("row", "column")
    )
-   mtables <- get_query(x, sprintf("SELECT * FROM %s", dbti))$table
+   mtables <- get_query(
+      x,
+      sprintf("SELECT * FROM %s", dbti),
+      autoalias=FALSE
+   )$table
    dimcol <- get_query(
       x,
       sprintf(
@@ -1195,7 +1500,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             " WHERE database='%s' AND table='%s'"
          ),
          dbn, mtables[1]
-      )
+      ),
+      autoalias=FALSE
    )
    dimcol <- intersect(
       dimcol$name, c("___COLNAMES___", "___ROWNAMES___")
@@ -1210,7 +1516,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          ),
          dbn,
          paste(unique(mtables), collapse="', '")
-      )
+      ),
+      autoalias=FALSE
    ) %>% 
       dplyr::filter(.data$name!=dimcol) %>% 
       dplyr::arrange(.data$name)
@@ -1318,7 +1625,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
    }
 
    ## Get the results ----
-   toRet <- get_query(x, query)
+   toRet <- get_query(x, query, autoalias=FALSE)
    dimname <- toRet[[dimcol]]
    toRet <- toRet[, -which(colnames(toRet)==dimcol), drop=FALSE] %>% 
       as.matrix() %>% 
@@ -1359,13 +1666,15 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             sprintf(
                "SELECT * FROM %s",
                tnpath
-            )
+            ),
+            autoalias=FALSE
          )
          ch_insert(con=con, dbName=dbName, tableName=tn, value=stl)
          for(stn in stl$table){
             toWrite <- get_query(
                x,
-               sprintf("SELECT * FROM `%s`.`%s` LIMIT 0, %s", tndb, stn, by)
+               sprintf("SELECT * FROM `%s`.`%s` LIMIT 0, %s", tndb, stn, by),
+               autoalias=FALSE
             )
             nulcol <- NULL
             if(nullable){
@@ -1387,7 +1696,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                sprintf(
                   "SELECT * FROM `%s`.`%s` LIMIT %s, %s",
                   tndb, stn, r, by
-               )
+               ),
+               autoalias=FALSE
             )
             while(nrow(toWrite)>0){
                ch_insert(con=con, dbName=dbName, tableName=stn, value=toWrite)
@@ -1397,7 +1707,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   sprintf(
                      "SELECT * FROM `%s`.`%s` LIMIT %s, %s",
                      tndb, stn, r, by
-                  )
+                  ),
+                  autoalias=FALSE
                )
             }
          }
@@ -1428,7 +1739,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       dbti <- tablePath
       tdb <- sub("^`", "", sub("`[.]`.*$", "", dbti))
       tquery <- sprintf(query, dbti)
-      qr <- get_query(x, tquery)
+      qr <- get_query(x, tquery, autoalias=FALSE)
       toRet <- list()
       vtype <- setdiff(
          tableModel$fields$type,
@@ -1442,7 +1753,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                " WHERE database='%s' AND table='%s'"
             ),
             tdb, qr$table[1]
-         )
+         ),
+         autoalias=FALSE
       )
       dimcol <- intersect(
          dimcol$name, c("___COLNAMES___", "___ROWNAMES___")
@@ -1457,7 +1769,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             ),
             tdb,
             paste(unique(qr$table), collapse="', '")
-         )
+         ),
+         autoalias=FALSE
       ) %>% 
          dplyr::filter(.data$name!=dimcol) %>% 
          dplyr::arrange(.data$name)
@@ -1472,7 +1785,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                stquery,
                sprintf("LIMIT %s, %s", skip, n_max)
             )
-            stqr <- get_query(x, stquery)
+            stqr <- get_query(x, stquery, autoalias=FALSE)
             dimname <- stqr[[dimcol]]
             stopifnot(
                !any(duplicated(dimname)),
@@ -1505,7 +1818,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                sprintf('`%s`.`%s`', tdb, st),
                dimcol
             )
-            stqr <- get_query(x, stquery)
+            stqr <- get_query(x, stquery, autoalias=FALSE)
             dimname <- stqr[[dimcol]]
             stopifnot(
                !any(duplicated(dimname)),
@@ -1530,7 +1843,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             tablePath,
             .get_tm_sortKey(tableModel, quoted=TRUE),
             skip, n_max
-         )
+         ),
+         autoalias=FALSE
       )
       attr(toRet, "data.type") <- NULL
       for (cn in colnames(toRet)) {
@@ -1560,14 +1874,15 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             " WHERE database='%s'"
          ),
          tdb
-      )
+      ),
+      autoalias=FALSE
    )
    
    if(ReDaMoR::is.MatrixModel(tableModel)){
       dbmt <- tablePath
       query <- "SELECT * FROM %s"
       tquery <- sprintf(query, dbmt)
-      qr <- get_query(x, tquery)
+      qr <- get_query(x, tquery, autoalias=FALSE)
       nr <- chTables %>% 
          dplyr::filter(
             .data$database==tdb & .data$name==qr$table[1]
@@ -1656,7 +1971,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       query <- "SELECT * FROM %s"
       tdb <- sub("^`", "", sub("`[.]`.*$", "", dbti))
       tquery <- sprintf(query, dbti)
-      qr <- get_query(x, tquery)
+      qr <- get_query(x, tquery, autoalias=FALSE)
       vtype <- setdiff(
          tableModel$fields$type,
          c("row", "column")
@@ -1671,7 +1986,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             ),
             tdb,
             paste(unique(qr$table), collapse="', '")
-         )
+         ),
+         autoalias=FALSE
       ) %>% 
          dplyr::filter(.data$name!=dimcol) %>% 
          arrange(.data$name)
@@ -1697,7 +2013,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             dimcol,
             lim
          )
-         stqr <- get_query(x, stquery)
+         stqr <- get_query(x, stquery, autoalias=FALSE)
          dimname <- stqr[[dimcol]]
          stopifnot(
             !any(duplicated(dimname)),
