@@ -86,7 +86,8 @@ metaMDB <- function(
    )
    assign("confrontationReport", cr, envir=tkcatEnv)
    if(!cr$success){
-      stop(ReDaMoR::format_confrontation_report(cr, title="Relational tables"))
+      cat(ReDaMoR::format_confrontation_report(cr, title="Relational tables"))
+      stop("Data do not fit the data model")
    }
    
    ## Object ----

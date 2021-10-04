@@ -80,7 +80,8 @@ fileMDB <- function(
       ))
       assign("confrontationReport", cr, envir=tkcatEnv)
       if(!cr$success){
-         stop(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+         cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+         stop("Data do not fit the data model")
       }
       if(verbose){
          cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
