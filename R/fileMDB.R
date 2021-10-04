@@ -947,6 +947,7 @@ as_fileMDB.fileMDB <- function(
                   callback=readr::DataFrameCallback$new(function(y, pos){
                      readr::write_delim(
                         y, file=dfiles[tn], delim=readParameters$delim,
+                        quote="all", escape="double",
                         append=file.exists(dfiles[tn])
                      )
                   }),
@@ -1273,10 +1274,19 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
       )
    }
    if("quoted_na" %in% names(readParameters)){
+      warning(
+         "The `quoted_na` argument of `read_delim()` is deprecated",
+         " as of readr 2.0.0."
+      )
       stopifnot(
          length(readParameters$quoted_na)==1,
          is.logical(readParameters$quoted_na),
          !is.na(readParameters$quoted_na)
+      )
+   }
+   if("na" %in% names(readParameters)){
+      stopifnot(
+         !is.character(readParameters$na)
       )
    }
    return(c(

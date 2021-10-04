@@ -621,7 +621,11 @@ as_fileMDB.memoMDB <- function(
       }else{
          tw <- x[[tn]]
       }
-      readr::write_delim(tw, file=dfiles[tn], delim=rp$delim)
+      readr::write_delim(
+         tw, file=dfiles[tn],
+         delim=rp$delim,
+         quote="all", escape="double"
+      )
    }
    
    ## Return fileMDB ----

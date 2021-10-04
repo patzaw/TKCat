@@ -1268,6 +1268,7 @@ as_fileMDB.chMDB <- function(
          readr::write_delim(
             toWrite, file=dfiles[tn],
             delim=rp$delim,
+            quote="all", escape="double",
             append=file.exists(dfiles[tn])
          )
          r <- r + nrow(toWrite)
