@@ -558,7 +558,7 @@ c.memoMDB <- function(...){
 #'
 as_fileMDB.memoMDB <- function(
    x, path,
-   readParameters=DEFAULT_READ_PARAMS,
+   readParameters=list(delim="\t", na="<NA>"),
    htmlModel=TRUE,
    compress=TRUE,
    by=10^5,
@@ -624,6 +624,7 @@ as_fileMDB.memoMDB <- function(
       readr::write_delim(
          tw, file=dfiles[tn],
          delim=rp$delim,
+         na=rp$na,
          quote="all", escape="double"
       )
    }

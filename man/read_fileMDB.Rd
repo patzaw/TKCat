@@ -31,9 +31,13 @@ in path. This file should also contains relevant parameters for the
 \itemize{
 \item \strong{delim delimiter} (default: '\\\\t')
 \item \strong{quoted_na}: Should missing values inside quotes be treated
-as missing values or as strings or strings (the default).
-Be aware that the default value here is different than the one for the
-original \code{\link[readr:read_delim]{readr::read_delim()}} function.
+as missing values or as strings or strings.
+WARNING: THIS PARAMETER IS NOT TAKEN INTO ACCOUNT WITH readr>=2.0.0.
+\item \strong{na}: String used for missing values. The default value for reading
+a fileMDB is "NA". But the default value for writing a fileMDB is
+"<NA>".
+This value is written in the DESCRIPTION.json file to avoid ambiguity
+when reading the fileMDB.
 }}
 
 \item{dataModel}{a \link[ReDaMoR:RelDataModel]{ReDaMoR::RelDataModel} object or json file.

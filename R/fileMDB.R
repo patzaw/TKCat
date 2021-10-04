@@ -118,9 +118,13 @@ fileMDB <- function(
 #' [readr::read_delim()] function. For example:
 #' - **delim delimiter** (default: '\\\\t')
 #' - **quoted_na**: Should missing values inside quotes be treated
-#' as missing values or as strings or strings (the default).
-#' Be aware that the default value here is different than the one for the
-#' original [readr::read_delim()] function.
+#' as missing values or as strings or strings.
+#' WARNING: THIS PARAMETER IS NOT TAKEN INTO ACCOUNT WITH readr>=2.0.0.
+#' - **na**: String used for missing values. The default value for reading
+#' a fileMDB is "NA". But the default value for writing a fileMDB is
+#' "&lt;NA&gt;".
+#' This value is written in the DESCRIPTION.json file to avoid ambiguity
+#' when reading the fileMDB.
 #' @param dataModel a [ReDaMoR::RelDataModel] object or json file.
 #' If NULL (default), the model json file found in path/model.
 #' @param collectionMembers the members of collections as provided to the
@@ -864,7 +868,7 @@ c.fileMDB <- function(...){
 #'
 as_fileMDB.fileMDB <- function(
    x, path,
-   readParameters=DEFAULT_READ_PARAMS,
+   readParameters=list(delim="\t", na="<NA>"),
    htmlModel=TRUE,
    compress=TRUE,
    by=10^5,
@@ -947,6 +951,7 @@ as_fileMDB.fileMDB <- function(
                   callback=readr::DataFrameCallback$new(function(y, pos){
                      readr::write_delim(
                         y, file=dfiles[tn], delim=readParameters$delim,
+                        na=readParameters$na,
                         quote="all", escape="double",
                         append=file.exists(dfiles[tn])
                      )
@@ -1260,11 +1265,11 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by=10^5, ...){
 
 ###############################################################################@
 ## READ PARAMETERS -----
-DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
+DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
 
 .check_read_params <- function(readParameters){
    readParameters <- readParameters[intersect(
-      names(readParameters), names(DEFAULT_READ_PARAMS)
+      names(readParameters), c(names(DEFAULT_READ_PARAMS), "quoted_na")
    )]
    if("delim" %in% names(readParameters)){
       stopifnot(
@@ -1286,7 +1291,9 @@ DEFAULT_READ_PARAMS <- list(delim='\t', quoted_na=FALSE)
    }
    if("na" %in% names(readParameters)){
       stopifnot(
-         !is.character(readParameters$na)
+         length(readParameters$na)==1,
+         is.character(readParameters$na),
+         !is.na(readParameters$na)
       )
    }
    return(c(

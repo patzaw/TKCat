@@ -1200,7 +1200,7 @@ c.chMDB <- function(...){
 #'
 as_fileMDB.chMDB <- function(
    x, path,
-   readParameters=DEFAULT_READ_PARAMS,
+   readParameters=list(delim="\t", na="<NA>"),
    htmlModel=TRUE,
    compress=TRUE,
    by=10^5,
@@ -1268,6 +1268,7 @@ as_fileMDB.chMDB <- function(
          readr::write_delim(
             toWrite, file=dfiles[tn],
             delim=rp$delim,
+            na=rp$na,
             quote="all", escape="double",
             append=file.exists(dfiles[tn])
          )

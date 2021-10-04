@@ -204,12 +204,17 @@ filter_with_tables <- function(x, tables, checkTables=TRUE, ...){
 #'
 #' @param x an MDB object
 #' @param path the path where the MDB should be written
-#' @param readParameters a list with 2 elements:
+#' @param readParameters The following parameters are currently supported:
 #' - **delim**: a single character used to separate fields within a record
 #' (default: '\\t')
 #' - **quoted_na**: a single logical indicating if missing values inside quotes
-#' should bbe treated as missing values or strings
-#' (FALSE: the default **different** from [readr::read_delim])
+#' should be treated as missing values or strings.
+#' WARNING: THIS PARAMETER IS NOT TAKEN INTO ACCOUNT WITH readr>=2.0.0.
+#' - **na**: String used for missing values. The default value for reading
+#' a fileMDB is "NA". But the default value for writing a fileMDB
+#' is ""&lt;NA&gt;"".
+#' This value is written in the DESCRIPTION.json file to avoid ambiguity
+#' when reading the fileMDB.
 #' @param htmlModel a logical. If TRUE (default) the model is also plotted in
 #' an html file.
 #' @param compress a logical specifying whether saving data
@@ -224,7 +229,7 @@ filter_with_tables <- function(x, tables, checkTables=TRUE, ...){
 #'
 as_fileMDB <- function(
    x, path,
-   readParameters=DEFAULT_READ_PARAMS,
+   readParameters=list(delim="\t", na="<NA>"),
    htmlModel=TRUE,
    compress=TRUE,
    by=10^5,

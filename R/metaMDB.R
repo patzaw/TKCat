@@ -634,7 +634,7 @@ c.metaMDB <- function(...){
 #'
 as_fileMDB.metaMDB <- function(
    x, path,
-   readParameters=DEFAULT_READ_PARAMS,
+   readParameters=list(delim="\t", na="<NA>"),
    htmlModel=TRUE,
    compress=TRUE,
    by=10^5,
@@ -703,7 +703,9 @@ as_fileMDB.metaMDB <- function(
       adfiles <- c(adfiles, dfiles)
    }
    frdb <- as_memoMDB(x[names(relational_tables(x))])
-   tmp <- as_fileMDB(frdb, path=dataPath, compress=compress, by=by)
+   tmp <- as_fileMDB(
+      frdb, path=dataPath, readParameters=rp, compress=compress, by=by
+   )
    ofiles <- data_files(tmp)$dataFiles
    dfiles <- file.path(dataPath, basename(ofiles)) %>%
       magrittr::set_names(names(ofiles))
