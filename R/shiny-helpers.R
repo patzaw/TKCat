@@ -1305,6 +1305,39 @@
       
       ########################@
       ## Bookmarks ----
+
+      dtbkmf <- c(
+         "state",
+         "search",
+         "search_columns",
+         "column_clicked",
+         "columns_current",
+         "columns_selected",
+         "columns_all",
+         "columns_last_clicked",
+         "row_clicked",
+         "rows_current",
+         "rows_selected",
+         "rows_all",
+         "row_last_clicked",
+         "cell_clicked",
+         "cells_current",
+         "cells_selected",
+         "cells_all",
+         "cell_last_clicked"
+      )
+      setBookmarkExclude(c(
+         "searchInput", "sidebarItemExpanded",
+         "silink", "disabledSoLink",
+         "solink",
+         paste("mdbList", dtbkmf, sep="_"),
+         paste("colMembers", dtbkmf, sep="_"),
+         paste("dataSample", dtbkmf, sep="_"),
+         paste("searchResRes", dtbkmf, sep="_"),
+         paste("searchTabRes", dtbkmf, sep="_"),
+         paste("searchFieldRes", dtbkmf, sep="_")
+      )) 
+      
       shiny::observe({
          # Trigger this observer every time an input changes
          shiny::reactiveValuesToList(input)
