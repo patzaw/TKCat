@@ -7,7 +7,6 @@
 \alias{[.memoMDB}
 \alias{[[.memoMDB}
 \alias{$.memoMDB}
-\alias{c.memoMDB}
 \title{An \link{MDB} (Modeled DataBase) in memory: memoMDB}
 \usage{
 memoMDB(
@@ -28,8 +27,6 @@ memoMDB(
 \method{[[}{memoMDB}(x, i)
 
 \method{$}{memoMDB}(x, i)
-
-\method{c}{memoMDB}(...)
 }
 \arguments{
 \item{dataTables}{a list of tibbles}
@@ -55,7 +52,7 @@ done (all of them c("unique", "not nullable", "foreign keys"))}
 
 \item{.data}{a \link{memoMDB} object}
 
-\item{...}{\link{memoMDB} objects}
+\item{...}{Use new_name = old_name to rename selected tables}
 
 \item{i}{the index or the name of the tables to take}
 }

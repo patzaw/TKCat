@@ -8,6 +8,7 @@
 \alias{as.list.MDB}
 \alias{select.MDB}
 \alias{pull.MDB}
+\alias{c.MDB}
 \alias{merge.MDB}
 \title{MDB}
 \usage{
@@ -22,6 +23,8 @@
 \method{select}{MDB}(.data, ...)
 
 \method{pull}{MDB}(.data, var = -1, name = NULL, ...)
+
+\method{c}{MDB}(...)
 
 \method{merge}{MDB}(
   x,

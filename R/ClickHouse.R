@@ -187,7 +187,7 @@ write_MergeTree <- function(
                "`%s` %s",
                cn,
                ifelse(
-                  cn %in% nullable,
+                  cn %in% nullable & chtypes[cn]!="Array(String)",
                   sprintf("Nullable(%s)", chtypes[cn]),
                   chtypes[cn]
                )
@@ -430,3 +430,7 @@ CH_RESERVED_DB <- c(
 ###############################################################################@
 ## Maximum number of column allowed in a ClikHouse table ----
 CH_MAX_COL <- 1000
+
+###############################################################################@
+## Maximum length of base64 data ----
+CH_DOC_CHUNK <- 10^6

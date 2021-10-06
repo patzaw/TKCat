@@ -567,7 +567,7 @@
     ],
     "display": {
       "x": [-662],
-      "y": [-140],
+      "y": [-267],
       "color": ["#FAC6DC"],
       "comment": ["Users having access to the MDB"]
     },
@@ -587,8 +587,8 @@
     "foreignKeys": [],
     "indexes": [],
     "display": {
-      "x": [-694],
-      "y": [-219],
+      "x": [-695],
+      "y": [-338],
       "color": ["#FAC6DC"],
       "comment": ["If the resource data are available for anybody having access to the chTKCat instance"]
     },
@@ -622,8 +622,8 @@
     "foreignKeys": [],
     "indexes": {},
     "display": {
-      "x": [-671],
-      "y": [-300],
+      "x": [-677],
+      "y": [-179],
       "color": ["#FAC6DC"],
       "comment": ["Instance of each table at each timestamp. For each chMDB instance all the DB tables (including the model but not the \"___Public___\", the \"___Timestamps___\" nor the \"___MDBUsers___\" tables) are associated with an actual instance table in Clickouse. For the current instance, instance has the same value as table."]
     },

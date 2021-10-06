@@ -619,14 +619,6 @@ dims.metaMDB <- function(x, ...){
 
 
 ###############################################################################@
-#' @export
-#'
-c.metaMDB <- function(...){
-   stop("c() not availble for metaMDB objects. Use join_mdb() instead.")
-}
-
-
-###############################################################################@
 #' 
 #' @rdname as_fileMDB
 #' @method as_fileMDB metaMDB

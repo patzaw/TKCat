@@ -1139,59 +1139,6 @@ db_tables <- function(x, host){
 
 
 ###############################################################################@
-#'
-#' @param ... [chMDB] objects
-#'
-#' @rdname chMDB
-#' 
-#' @export
-#'
-c.chMDB <- function(...){
-   alldb <- list(...)
-   if(length(alldb)==0){
-      stop("At least one chMDB should be provided as an input")
-   }
-   dbt <- db_tables(alldb[[1]])
-   tkcon <- dbt$tkcon
-   for(i in 1:length(alldb)){
-      if(!is.chMDB(alldb[[i]])){
-         stop("All objects should be chMDB")
-      }
-      tkconi <- db_tables(alldb[[i]])$tkcon
-      if(!all(c(
-         tkconi$chcon@host==tkcon$chcon@host,
-         tkconi$chcon@port==tkcon$chcon@port
-      ))){
-         stop(
-            "chMDB are not from the same chTKCat instance.",
-            " Check hosts and ports."
-         )
-      }
-   }
-   dbt <- dbt$dbTables
-   di <- db_info(alldb[[1]])
-   dm <- data_model(alldb[[1]])
-   dc <- collection_members(alldb[[1]])
-   if(length(alldb)>1) for(i in 2:length(alldb)){
-      dm <- c(dm, data_model(alldb[[i]]))
-      dbt <- c(dbt, db_tables(alldb[[i]])$dbTables)
-      dc <- dplyr::bind_rows(
-         dc,
-         collection_members(alldb[[i]]) %>%
-            dplyr::mutate(resource=di$name)
-      )
-   }
-   chMDB(
-      tkcon=tkcon,
-      dbTables=dbt,
-      dbInfo=di,
-      dataModel=dm,
-      collectionMembers=dc
-   )
-}
-
-
-###############################################################################@
 #' 
 #' 
 #' @rdname as_fileMDB
@@ -1735,12 +1682,12 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
 ){
    
    if(is.infinite(n_max)){
-      n_max <- .dim_ch_mtable(x, tablePath, tableModel)$records
+      n_max <- "18446744073709551615"
    }
+   dbti <- tablePath
+   tdb <- sub("^`", "", sub("`[.]`.*$", "", dbti))
    if(ReDaMoR::is.MatrixModel(tableModel)){
       query <- "SELECT * FROM %s"
-      dbti <- tablePath
-      tdb <- sub("^`", "", sub("`[.]`.*$", "", dbti))
       tquery <- sprintf(query, dbti)
       qr <- get_query(x, tquery, autoalias=FALSE)
       toRet <- list()

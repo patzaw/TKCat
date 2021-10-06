@@ -6,7 +6,6 @@
 \alias{rename.chMDB}
 \alias{[.chMDB}
 \alias{[[.chMDB}
-\alias{c.chMDB}
 \title{An \link{MDB} (Modeled DataBase) relying on ClickHouse: chMDB}
 \usage{
 chMDB(
@@ -26,8 +25,6 @@ chMDB(
 \method{[}{chMDB}(x, i)
 
 \method{[[}{chMDB}(x, i)
-
-\method{c}{chMDB}(...)
 }
 \arguments{
 \item{tkcon}{a \link{chTKCat} object}
@@ -56,7 +53,7 @@ See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}
 
 \item{.data}{a \link{chMDB} object}
 
-\item{...}{\link{chMDB} objects}
+\item{...}{Use new_name = old_name to rename selected tables}
 
 \item{i}{the index or the name of the tables to take}
 }

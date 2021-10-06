@@ -811,53 +811,6 @@ data_file_size <- function(x, hr=FALSE){
 
 
 ###############################################################################@
-#'
-#' @param ... [fileMDB] objects
-#'
-#' @rdname fileMDB
-#' 
-#' @export
-#'
-c.fileMDB <- function(...){
-   alldb <- list(...)
-   if(length(alldb)==0){
-      stop("At least one fileMDB should be provided as an input")
-   }
-   df <- data_files(alldb[[1]])
-   rp1 <- df$readParameters
-   for(i in 1:length(alldb)){
-      if(!is.fileMDB(alldb[[i]])){
-         stop("All objects should be fileMDB")
-      }
-      rpi <- data_files(alldb[[i]])$readParameters[names(rp1)]
-      if(!identical(rp1, rpi)){
-         stop("readParameters of all fileMDB should be identical")
-      }
-   }
-   di <- db_info(alldb[[1]])
-   dm <- data_model(alldb[[1]])
-   df <- data_files(alldb[[1]])
-   dc <- collection_members(alldb[[1]])
-   if(length(alldb)>1) for(i in 2:length(alldb)){
-      dm <- c(dm, data_model(alldb[[i]]))
-      df$dataFiles <- c(df$dataFiles, data_files(alldb[[i]])$dataFiles)
-      dc <- dplyr::bind_rows(
-         dc,
-         collection_members(alldb[[i]]) %>%
-            dplyr::mutate(resource=di$name)
-      )
-   }
-   fileMDB(
-      dataFiles=df$dataFiles,
-      dbInfo=di,
-      dataModel=dm,
-      readParameters=df$readParameters,
-      collectionMembers=dc
-   )
-}
-
-
-###############################################################################@
 #' 
 #' @rdname as_fileMDB
 #' @method as_fileMDB fileMDB
@@ -1442,7 +1395,27 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
                rp,
                list(
                   callback=readr::DataFrameCallback$new(function(y, pos){
-                     ch_insert(con=con, dbName=dbName, tableName=tn, value=y)
+                     toWrite <- y
+                     b64_fields <- dm[[tn]]$fields %>% 
+                        dplyr::filter(.data$type=="base64") %>% 
+                        dplyr::pull(name)
+                     for(b64f in b64_fields){
+                        toWrite[[b64f]] <- lapply(
+                           toWrite[[b64f]], function(v){
+                              if(is.na(v)){
+                                 return(character())
+                              }
+                              sl <- c(
+                                 seq(1, nchar(v), by=CH_DOC_CHUNK),
+                                 nchar(v) + 1
+                              )
+                              return(substring(v, sl[-length(sl)], sl[-1]-1))
+                           }
+                        )
+                     }
+                     ch_insert(
+                        con=con, dbName=dbName, tableName=tn, value=toWrite
+                     )
                   }),
                   chunk_size=by
                )
@@ -1631,7 +1604,8 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
                   "logical"=readr::col_logical(),
                   "character"=readr::col_character(),
                   "Date"=readr::col_date(),
-                  "POSIXct"=readr::col_datetime()
+                  "POSIXct"=readr::col_datetime(),
+                  "base64"=readr::col_character()
                )
             ),
             .Names=c("___ROWNAMES___", ".default")

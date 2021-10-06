@@ -13,4 +13,7 @@ CHMDB_DATA_MODEL <- ReDaMoR::read_json_data_model(
    )
 )
 
-MGT_TABLES <- c("___Timestamps___", "___Public___", "___MDBUsers___")
+MGT_TABLES <- c(
+   "___Timestamps___",
+   "___Public___", "___MDBUsers___"
+)

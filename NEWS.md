@@ -5,6 +5,7 @@
 ### New features
 
 - Support versioning of tables in chMDB using timestamps.
+- Support base64 data type.
 
 
 <!----------------------------------------------------------------------------->

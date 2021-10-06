@@ -381,6 +381,33 @@ compare_MDB <- function(former, new){
    stop("'$<-' is not supported for MDB")
 }
 
+
+###############################################################################@
+#'
+#' @param ... [MDB] objects
+#'
+#' @rdname MDB
+#' 
+#' @export
+#'
+c.MDB <- function(...){
+   MDBs <- list(...)
+   dbNames <- unlist(lapply(
+      MDBs, function(x) db_info(x)$name
+   ))
+   names(MDBs) <- dbNames
+   dbModels <- lapply(MDBs, data_model) %>% 
+      magrittr::set_names(NULL)
+   dataModel <- do.call(c, dbModels)
+   return(metaMDB(
+      MDBs=MDBs,
+      relationalTables=NULL,
+      dataModel=dataModel,
+      dbInfo=db_info(MDBs[[1]])
+   ))
+}
+
+
 ##############################################################################@
 #' Merge 2 MDBs
 #' 

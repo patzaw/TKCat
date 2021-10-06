@@ -511,46 +511,6 @@ dims.memoMDB <- function(x, ...){
 
 
 ###############################################################################@
-#'
-#' @param ... [memoMDB] objects
-#' 
-#' @rdname memoMDB
-#' 
-#' @export
-#'
-c.memoMDB <- function(...){
-   alldb <- list(...)
-   if(length(alldb)==0){
-      stop("At least one memoMDB should be provided as an input")
-   }
-   dt <- data_tables(alldb[[1]])
-   for(i in 1:length(alldb)){
-      if(!is.memoMDB(alldb[[i]])){
-         stop("All objects should be memoMDB")
-      }
-   }
-   dbi <- db_info(alldb[[1]])
-   dm <- data_model(alldb[[1]])
-   cm <- collection_members(alldb[[1]])
-   if(length(alldb)>1) for(i in 2:length(alldb)){
-      dm <- c(dm, data_model(alldb[[i]]))
-      dt <- c(dt, data_tables(alldb[[i]]))
-      cm <- dplyr::bind_rows(
-         cm,
-         collection_members(alldb[[i]]) %>%
-            dplyr::mutate(resource=dbi$name)
-      )
-   }
-   memoMDB(
-      dataTables=dt,
-      dataModel=dm,
-      dbInfo=dbi,
-      collectionMembers=cm
-   )
-}
-
-
-###############################################################################@
 #' 
 #' @rdname as_fileMDB
 #' @method as_fileMDB memoMDB
@@ -894,7 +854,25 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
             value=tibble(table=names(colList))
          )
       }else{
-         ch_insert(con=con, dbName=dbName, tableName=tn, value=x[[tn]])
+         toWrite <- x[[tn]]
+         b64_fields <- dm[[tn]]$fields %>% 
+            dplyr::filter(.data$type=="base64") %>% 
+            dplyr::pull(name)
+         for(b64f in b64_fields){
+            toWrite[[b64f]] <- lapply(
+               toWrite[[b64f]], function(v){
+                  if(is.na(v)){
+                     return(character())
+                  }
+                  sl <- c(
+                     seq(1, nchar(v), by=CH_DOC_CHUNK),
+                     nchar(v) + 1
+                  )
+                  return(substring(v, sl[-length(sl)], sl[-1]-1))
+               }
+            )
+         }
+         ch_insert(con=con, dbName=dbName, tableName=tn, value=toWrite)
       }
    }
 }

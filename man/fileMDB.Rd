@@ -8,7 +8,6 @@
 \alias{[.fileMDB}
 \alias{[[.fileMDB}
 \alias{$.fileMDB}
-\alias{c.fileMDB}
 \title{An \link{MDB} (Modeled DataBase) based on files: fileMDB}
 \usage{
 \method{$}{chMDB}(x, i)
@@ -32,8 +31,6 @@ fileMDB(
 \method{[[}{fileMDB}(x, i)
 
 \method{$}{fileMDB}(x, i)
-
-\method{c}{fileMDB}(...)
 }
 \arguments{
 \item{x}{a \link{fileMDB} object}
@@ -65,7 +62,7 @@ for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{Re
 
 \item{.data}{a \link{fileMDB} object}
 
-\item{...}{\link{fileMDB} objects}
+\item{...}{Use new_name = old_name to rename selected tables}
 }
 \value{
 A fileMDB object
