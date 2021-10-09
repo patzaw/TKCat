@@ -561,8 +561,7 @@ as_chMDB <- function(x, tkcon, timestamp=Sys.time(), overwrite=FALSE, by=10^5){
       toKeep <- character()
    }
    attr(toKeep, "int") <- TRUE
-   print(toKeep)
-   
+
    ## Apply rules before filling ----
    if(makeEmpty){
       message("Make empty")
@@ -653,7 +652,6 @@ as_chMDB <- function(x, tkcon, timestamp=Sys.time(), overwrite=FALSE, by=10^5){
    ### Write data ----
    er <- try({
       toWrite <- setdiff(names(x), toKeep)
-      print(toWrite)
       mergeTrees_from_RelDataModel(
          con=con, dbName=dbName,
          dbm=dataModel[toWrite, rmForeignKeys=TRUE]
@@ -667,7 +665,7 @@ as_chMDB <- function(x, tkcon, timestamp=Sys.time(), overwrite=FALSE, by=10^5){
    
    ## Set TS if required ----
    if(setTS){
-      message("Set TS")
+      message("Set timestamp")
       set_chMDB_timestamp(tkcon, dbName, timestamp)
    }
    

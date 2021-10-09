@@ -205,6 +205,11 @@ write_MergeTree <- function(
             paste(sortKey, collapse="`, `")
          )
       )
+   }else{
+      tst <- paste(
+         tst,
+         "ORDER BY tuple()"
+      )
    }
    
    RClickhouse::dbSendQuery(con, tst)

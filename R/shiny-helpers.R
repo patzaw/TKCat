@@ -468,7 +468,7 @@
                do.call(shiny::tags$ul, lapply(
                   setdiff(names(dbi), c("name")),
                   function(n){
-                     if(!is.na(dbi[[n]]) && dbi[[n]]!=""){
+                     if(!is.na(dbi[[n]]) && as.character(dbi[[n]])!=""){
                         if(n=="url"){
                            vt <- tags$a(
                               shiny::HTML(dbi[[n]]),
@@ -480,7 +480,7 @@
                         }else if(is.numeric(dbi[[n]])){
                            vt <- format(dbi[[n]], big.mark=",")
                         }else{
-                           vt <- dbi[[n]]
+                           vt <- as.character(dbi[[n]])
                         }
                         return(shiny::tags$li(
                            shiny::strong(n), ":",
@@ -706,10 +706,11 @@
       
       ########################@
       ## Table information ----
+      
       output$tableInfo <- shiny::renderUI({
          mdb <- selStatus$mdb
          shiny::req(mdb)
-         sel <- selStatus$tables %>% 
+         sel <- selStatus$tables %>%
             intersect(names(mdb))
          shiny::req(sel)
          shiny::req(length(sel)==1)
@@ -738,7 +739,7 @@
                }
             ),
             DT::DTOutput("dataSample"),
-            shiny::tags$br(),
+            shiny::uiOutput("b64Download"),
             shiny::uiOutput("tableDownload")
          )
       })
@@ -752,12 +753,20 @@
             intersect(names(mdb))
          shiny::req(sel)
          shiny::req(length(sel)==1)
+         tabMod <- data_model(mdb)[[sel]]
          toShow <- heads(mdb, dplyr::all_of(sel), n=subSetSize)[[1]]
-         attr(toShow, "mat") <- ReDaMoR::is.MatrixModel(data_model(mdb)[[sel]])
-         if(utils::object.size(toShow) > 2^19){
+         attr(toShow, "mat") <- ReDaMoR::is.MatrixModel(tabMod)
+         tmp <- dplyr::select(
+            toShow,
+            all_of(setdiff(
+               colnames(toShow),
+               tabMod$fields$name[which(tabMod$fields$type=="base64")]
+            ))
+         )
+         if(utils::object.size(tmp) > 2^19){
             toShow <- toShow[
                1:max(c(
-                  1, ceiling(nrow(toShow)*(2^19/utils::object.size(toShow)))
+                  1, ceiling(nrow(toShow)*(2^19/utils::object.size(tmp)))
                )),
             ]
          }
@@ -766,11 +775,53 @@
       output$dataSample <- DT::renderDT({
          toShow <- tabSubSet()
          shiny::req(toShow)
-         DT::datatable(
+         mdb <- isolate(selStatus$mdb)
+         shiny::req(mdb)
+         sel <- isolate(selStatus$tables) %>% 
+            intersect(names(mdb))
+         shiny::req(sel)
+         shiny::req(length(sel)==1)
+         tabMod <- data_model(mdb)[[sel]]
+         fields <- tabMod$fields$name
+         ##
+         b64_fields <- fields[which(tabMod$fields$type=="base64")]
+         for(b64f in b64_fields){
+            toShow[[b64f]] <- paste0(
+               '<div width="100%" height="100%" style="color:blue;"',
+               ' onmouseover="this.style.color=', "'orange'", ';"',
+               ' onmouseout="this.style.color=',"'blue'", ';">',
+               "file",
+               '</div>'
+            )
+         }
+         toShow <- toShow[, fields]
+         ##
+         char_fields <- fields[which(tabMod$fields$type=="character")]
+         for(charf in char_fields){
+            toShow[[charf]] <- ifelse(
+               nchar(toShow[[charf]]) > 100,
+               sprintf(
+                  '<span title="%s" style="%s">%s...</span>',
+                  htmltools::htmlEscape(gsub('"', '&quot;', toShow[[charf]])),
+                  'border-bottom: 1px dashed;',
+                  htmltools::htmlEscape(substr(toShow[[charf]], 1, 90))
+               ),
+               toShow[[charf]]
+            )
+         }
+         ##
+         toRet <- DT::datatable(
             toShow,
             rownames=attr(toShow, "mat"),
-            selection = 'single',
+            selection=if(length(b64_fields)>0){
+               list(
+                  mode='single', target='cell'
+               )
+            }else{
+               "none"
+            },
             extensions='Scroller',
+            escape=FALSE,
             options = list(
                deferRender = TRUE,
                scrollX=TRUE,
@@ -779,7 +830,71 @@
                dom=c("ti")
             )
          )
+         if(length(b64_fields)>0){
+            toRet <- toRet %>% 
+               DT::formatStyle(
+                  columns=b64_fields,
+                  "font-style"="italic"
+               )
+         }
+         return(toRet)
       })
+      
+      output$b64Download <- shiny::renderUI({
+         tabss <- tabSubSet()
+         shiny::req(tabss)
+         cs <- input$dataSample_cells_selected
+         shiny::req(cs)
+         shiny::req(!attr(tabss, "mat"))
+         mdb <- isolate(selStatus$mdb)
+         shiny::req(mdb)
+         sel <- isolate(selStatus$tables) %>%
+            intersect(names(mdb))
+         shiny::req(sel)
+         tabMod <- data_model(mdb)[[sel]]
+         b64_fields <- tabMod$fields %>%
+            dplyr::filter(.data$type=="base64") %>%
+            dplyr::pull("name")
+         cn <- intersect(colnames(tabss)[cs[2]+1], b64_fields)
+         if(length(cn)==1)
+         return(shiny::tagList(
+            shiny::br(),
+            shiny::downloadButton(
+               "downloadB64",
+               paste("Download", cn)
+            ) 
+         ))
+      })
+      
+      output$downloadB64 <- downloadHandler(
+         filename = function() {
+            tabss <- tabSubSet()
+            cs <- input$dataSample_cells_selected
+            mdb <- selStatus$mdb
+            sel <- selStatus$tables %>%
+               intersect(names(mdb))
+            f <- colnames(tabss)[cs[2]+1]
+            fd <- data_model(mdb)[[sel]]$fields %>%
+               dplyr::filter(.data$name==!!f) %>%
+               pull(comment)
+            extm <- regexpr("^ *[{][.]?[[:alnum:]]+[}]", fd)
+            if(extm==-1){
+               ext <- ""
+            }else{
+               ext <- substr(fd, extm, extm+attr(extm, "match.length")-1) 
+               ext <- sub("[}]", "", sub("^ *[{][.]?", "", ext))
+               ext <- paste0(".", ext)
+            }
+            paste(f, ext, sep="")
+         },
+         content = function(file) {
+            tabss <- tabSubSet()
+            cs <- input$dataSample_cells_selected
+            d <- tabss[cs[1], cs[2]+1, drop=TRUE]
+            writeBin(base64enc::base64decode(d), file)
+         }
+      )
+      
       
       if(dd){
          
@@ -812,6 +927,7 @@
             f <- file.path(tddir, fname)
             if(!file.exists(f)){
                return(
+                  shiny::tags$br(),
                   p(
                      strong("The file is being prepared", style="color:blue;"),
                      shiny::actionButton("refreshTabledown", "Check availability")
@@ -819,6 +935,7 @@
                )
             }
             return(
+               shiny::tags$br(),
                shiny::a(
                   list(icon("download"), sprintf("Download %s", sel)),
                   id="downloadTable",

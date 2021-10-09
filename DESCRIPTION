@@ -37,6 +37,7 @@ Imports:
    shiny,
    shinydashboard,
    DT,
+   htmltools,
    readr,
    jsonlite,
    jsonvalidate,
