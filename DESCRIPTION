@@ -28,7 +28,7 @@ Depends:
    magrittr,
    dplyr,
    DBI,
-   RClickhouse (>= 0.5.2)
+   RClickhouse (>= 0.6.0)
 Imports:
    rlang,
    tidyselect,

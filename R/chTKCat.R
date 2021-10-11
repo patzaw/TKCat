@@ -1921,8 +1921,7 @@ set_chMDB_access <- function(x, mdb, public){
       con, 
       sprintf(
          "ALTER TABLE `%s`.___Public___ DELETE WHERE 1",
-         mdb,
-         as.integer(public)
+         mdb
       )
    )
    ch_insert(
