@@ -754,7 +754,17 @@
          shiny::req(sel)
          shiny::req(length(sel)==1)
          tabMod <- data_model(mdb)[[sel]]
-         toShow <- heads(mdb, dplyr::all_of(sel), n=subSetSize)[[1]]
+         fields <- tabMod$fields$name
+         b64_fields <- fields[which(tabMod$fields$type=="base64")]
+         if(length(b64_fields)>0){
+            toShow <- heads(mdb, dplyr::all_of(sel), n=1)[[1]]
+            toTake <- ceiling((2^23)/object.size(toShow))
+            if(toTake > 1){
+               toShow <- heads(mdb, dplyr::all_of(sel), n=toTake)[[1]]
+            }
+         }else{
+            toShow <- heads(mdb, dplyr::all_of(sel), n=subSetSize)[[1]]
+         }
          attr(toShow, "mat") <- ReDaMoR::is.MatrixModel(tabMod)
          tmp <- dplyr::select(
             toShow,
