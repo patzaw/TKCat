@@ -1572,6 +1572,32 @@ empty_chMDB <- function(
    }
    con <- x$chcon
    
+   ## Matrix tables ----
+   matTables <- get_query(
+      x,
+      sprintf(
+         "SELECT DISTINCT table FROM `%s`.___Fields___ WHERE type='column'",
+         name
+      )
+   )$table
+   get_submat_tn <- function(n){
+      n <- intersect(n, matTables)
+      if(length(n)==0){
+         return(character())
+      }else{
+         return(get_query(
+            x,
+            paste(
+               sprintf(
+                  "SELECT DISTINCT table FROM `%s`.`%s`",
+                  name, n
+               ),
+               collapse=" UNION ALL "
+            )
+         )$table)
+      }
+   }
+   
    ## Identify tables to drop and tables to empty ----
    allTabInstances <- list_tables(con, name)$name
    tst <- get_chMDB_timestamps(x, name)
@@ -1584,6 +1610,7 @@ empty_chMDB <- function(
          MGT_TABLES
       )
       ### Keep tables to keep
+      .toKeep <- unique(c(.toKeep, get_submat_tn(.toKeep)))
       toDrop <- setdiff(toDrop, .toKeep)
       reinit <- TRUE
    }else{
@@ -1593,6 +1620,7 @@ empty_chMDB <- function(
             c(tst$instance, MGT_TABLES)
          )
          ### Keep tables to keep
+         .toKeep <- unique(c(.toKeep, get_submat_tn(.toKeep)))
          toDrop <- setdiff(toDrop, .toKeep)
          reinit <- TRUE
       }else{
@@ -1607,11 +1635,12 @@ empty_chMDB <- function(
                .data$timestamp==!!timestamp
             ) %>% 
             dplyr::pull("instance")
-         toDrop <- setdiff(
-            toDrop,
+         .toKeep <- unique(c(
+            .toKeep,
             tst$instance[which(tst$timestamp != timestamp)]
-         )
+         ))
          ### Keep tables to keep
+         .toKeep <- unique(c(.toKeep, get_submat_tn(.toKeep)))
          toDrop <- setdiff(toDrop, .toKeep)
          
          ### Clean timestamps ----
