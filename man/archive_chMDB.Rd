@@ -7,8 +7,7 @@
 archive_chMDB(
   x,
   name,
-  defaultTS = as.POSIXct("1970-01-01 00:00.0", tz = "UTC"),
-  .toKeep = character()
+  defaultTS = as.POSIXct("1970-01-01 00:00.0", tz = "UTC")
 )
 }
 \arguments{
@@ -18,9 +17,6 @@ archive_chMDB(
 
 \item{defaultTS}{a default timestamp value to use when not existing in
 the DB (default: \code{as.POSIXct("1970-01-01 00:00.0", tz="UTC")})}
-
-\item{.toKeep}{For internal use only. A character vector indicating the
-tables to not archive (default: \code{character()})}
 }
 \value{
 No return value, called for side effects

@@ -4,7 +4,7 @@
 \alias{empty_chMDB}
 \title{Empty a chMDB in a \link{chTKCat}}
 \usage{
-empty_chMDB(x, name, timestamp = NA, .toKeep = character())
+empty_chMDB(x, name, timestamp = NA)
 }
 \arguments{
 \item{x}{a \link{chTKCat} object}
@@ -13,9 +13,6 @@ empty_chMDB(x, name, timestamp = NA, .toKeep = character())
 
 \item{timestamp}{timestamp of the instance to empty. If NA (default)
 the current instance is emptied.}
-
-\item{.toKeep}{For internal use only. A character vector indicating
-the tables to not drop (default: \code{character()})}
 }
 \value{
 No return value, called for side effects

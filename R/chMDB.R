@@ -560,16 +560,15 @@ as_chMDB <- function(x, tkcon, timestamp=Sys.time(), overwrite=FALSE, by=10^5){
    }else{
       toKeep <- character()
    }
-   attr(toKeep, "int") <- TRUE
 
    ## Apply rules before filling ----
    if(makeEmpty){
       message("Make empty")
-      empty_chMDB(tkcon, dbName, .toKeep=toKeep)
+      .empty_chMDB(tkcon, dbName, .toKeep=toKeep)
    }
    if(makeArchive){
       message("Make archive")
-      archive_chMDB(tkcon, dbName, .toKeep=toKeep)
+      .archive_chMDB(tkcon, dbName, .toKeep=toKeep)
    }
    
    ## FILL ----

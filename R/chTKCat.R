@@ -1540,14 +1540,23 @@ set_chMDB_timestamp <- function(x, name, timestamp){
 #' @param name the name of the database to empty
 #' @param timestamp timestamp of the instance to empty. If NA (default)
 #' the current instance is emptied.
-#' @param .toKeep For internal use only. A character vector indicating
-#' the tables to not drop (default: `character()`)
 #' 
 #' @return No return value, called for side effects
 #' 
 #' @export
 #' 
-empty_chMDB <- function(x, name, timestamp=NA, .toKeep=character()){
+empty_chMDB <- function(
+   x, name, timestamp=NA
+){
+   .empty_chMDB(x=x, name=name, timestamp=timestamp)
+}
+
+.empty_chMDB <- function(
+   x, name, timestamp=NA,
+   .toKeep=character()    ## For internal use only. A character vector
+                          ## indicating the tables to not drop
+                          ## (default: `character()`)
+){
    timestamp <- as.POSIXct(timestamp)
    stopifnot(
       is.chTKCat(x),
@@ -1555,16 +1564,6 @@ empty_chMDB <- function(x, name, timestamp=NA, .toKeep=character()){
       is.character(.toKeep),
       is.na(timestamp) || inherits(timestamp, "POSIXct"), length(timestamp)==1
    )
-   if(
-      length(.toKeep) > 0 &&
-      (
-         is.null(attr(.toKeep, "int")) ||
-         is.na(attr(.toKeep, "int")) ||
-         !attr(.toKeep, "int")
-      )
-   ){
-      stop(".toKeep param is for internal use only")
-   }
    if(any(.toKeep %in% names(CHMDB_DATA_MODEL))){
       stop("Cannot keep data model tables: don't put them in the .toKeep param")
    }
@@ -1662,8 +1661,6 @@ empty_chMDB <- function(x, name, timestamp=NA, .toKeep=character()){
 #' @param name the name of the database to archive
 #' @param defaultTS a default timestamp value to use when not existing in
 #' the DB (default: `as.POSIXct("1970-01-01 00:00.0", tz="UTC")`)
-#' @param .toKeep For internal use only. A character vector indicating the
-#' tables to not archive (default: `character()`)
 #' 
 #' @return No return value, called for side effects
 #' 
@@ -1671,8 +1668,16 @@ empty_chMDB <- function(x, name, timestamp=NA, .toKeep=character()){
 #' 
 archive_chMDB <- function(
    x, name,
+   defaultTS=as.POSIXct("1970-01-01 00:00.0", tz="UTC")
+){
+   .archive_chMDB(x=x, name=name, defaultTS=defaultTS)
+}
+
+.archive_chMDB <- function(
+   x, name,
    defaultTS=as.POSIXct("1970-01-01 00:00.0", tz="UTC"),
-   .toKeep=character()
+   .toKeep=character() ## A character vector indicating the
+                       ## tables to not archive (default: `character()`)
 ){
    defaultTS <- as.POSIXct(defaultTS)
    stopifnot(
@@ -1681,16 +1686,6 @@ archive_chMDB <- function(
       is.character(.toKeep),
       !is.na(defaultTS), inherits(defaultTS, "POSIXct"), length(defaultTS)==1
    )
-   if(
-      length(.toKeep) > 0 &&
-      (
-         is.null(attr(.toKeep, "int")) ||
-         is.na(attr(.toKeep, "int")) ||
-         !attr(.toKeep, "int")
-      )
-   ){
-      stop(".toKeep param is for internal use only")
-   }
    if(any(.toKeep %in% names(CHMDB_DATA_MODEL))){
       stop("Cannot keep data model tables: don't put them in the .toKeep param")
    }
