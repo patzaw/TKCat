@@ -234,7 +234,7 @@ get_MDB.chTKCat <- function(x, dbName, timestamp=NA, n_max=10, ...){
       stop(sprintf("You don't have permission to access %s", dbName))
    }
    
-   tst <- get_chMDB_timestamps(x, dbName)
+   tst <- list_chMDB_timestamps(x, dbName)
    if(is.null(tst) || nrow(tst)==0){
       tstToComplete <- TRUE
       if(!is.na(timestamp)){
@@ -368,7 +368,7 @@ is.chMDB <- function(x){
 is_current_chMDB <- function(x){
    stopifnot(is.chMDB(x))
    ots <- db_info(x)$timestamp
-   dts <- get_chMDB_timestamps(unclass(x)$tkcon, db_info(x)$name) %>% 
+   dts <- list_chMDB_timestamps(unclass(x)$tkcon, db_info(x)$name) %>% 
       attr("current")
    if(is.na(ots)){
       if(is.null(dts) || is.na(dts)){
@@ -438,7 +438,7 @@ as_chMDB <- function(x, tkcon, timestamp=Sys.time(), overwrite=FALSE, by=10^5){
    }
    
    ## Rules of update ----
-   tst <- get_chMDB_timestamps(tkcon, dbName)
+   tst <- list_chMDB_timestamps(tkcon, dbName)
    maxTs <- suppressWarnings(max(tst$timestamp))
    if(!is.na(timestamp) && !is.null(maxTs) && timestamp <= maxTs){
       stop("Timestamp should be more recent than those already recorded")

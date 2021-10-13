@@ -1384,7 +1384,7 @@ update_chMDB_grants <- function(x, mdb){
 
 
 ###############################################################################@
-#' Get instance timestamps of an MDB in [chTKCat]
+#' List instance timestamps of an MDB in [chTKCat]
 #' 
 #' @param x a [chTKCat] object
 #' @param name the name of the database
@@ -1395,7 +1395,7 @@ update_chMDB_grants <- function(x, mdb){
 #' 
 #' @export
 #' 
-get_chMDB_timestamps <- function(x, name){
+list_chMDB_timestamps <- function(x, name){
    stopifnot(
       is.chTKCat(x),
       is.character(name), length(name)==1, !is.na(name)
@@ -1417,6 +1417,32 @@ get_chMDB_timestamps <- function(x, name){
       current <- NA
    }
    attr(toRet, "current") <- current
+   return(toRet)
+}
+
+###############################################################################@
+#' Get instance timestamps of an MDB in [chTKCat]
+#' 
+#' @param x a [chTKCat] object
+#' @param name the name of the database
+#' 
+#' @return A tibble with the instance "timestamp" and a logical indicating if
+#' it's the "current" one or not.
+#' 
+#' @export
+#' 
+get_chMDB_timestamps <- function(x, name){
+   ts <- list_chMDB_timestamps(x, name)
+   if(is.null(ts)){
+      return(NULL)
+   }
+   toRet <- dplyr::distinct(ts, timestamp)
+   if(is.na(attr(ts, "current"))){
+      toRet$current <- FALSE
+   }else{
+      toRet$current <- toRet$timestamp==attr(ts, "current")
+   }
+   toRet <- dplyr::arrange(toRet, dplyr::desc(.data$timestamp))
    return(toRet)
 }
 
@@ -1493,12 +1519,12 @@ set_chMDB_timestamp <- function(x, name, timestamp){
       }
    }
    
-   tst <- get_chMDB_timestamps(x, name)
+   tst <- list_chMDB_timestamps(x, name)
    if(is.null(tst)){
       mergeTree_from_RelTableModel(
          con=x$chcon, dbName=name, tm=CHMDB_DATA_MODEL$"___Timestamps___"
       )
-      tst <- get_chMDB_timestamps(x, name)
+      tst <- list_chMDB_timestamps(x, name)
    }
    current <- attr(tst, "current")
    if(!is.na(current)){
@@ -1600,7 +1626,7 @@ empty_chMDB <- function(
    
    ## Identify tables to drop and tables to empty ----
    allTabInstances <- list_tables(con, name)$name
-   tst <- get_chMDB_timestamps(x, name)
+   tst <- list_chMDB_timestamps(x, name)
    if(is.null(tst) || nrow(tst)==0){
       if(!is.na(timestamp)){
          stop("No timestamp available for this database")
@@ -1728,10 +1754,10 @@ archive_chMDB <- function(
    }
    
    ## Set timestamp when not existing ----
-   tst <- get_chMDB_timestamps(x, name)
+   tst <- list_chMDB_timestamps(x, name)
    if(is.null(tst) || is.na(attr(tst, "current"))){
       set_chMDB_timestamp(x, name, defaultTS)
-      tst <- get_chMDB_timestamps(x, name)
+      tst <- list_chMDB_timestamps(x, name)
    }
    
    ## Archive tables ----
@@ -1827,7 +1853,7 @@ unarchive_chMDB <- function(x, name){
    if(name %in% dplyr::pull(dplyr::filter(mdbl, .data$populated), "name")){
       stop(sprintf("%s is already unarchived", name))
    }
-   tst <- get_chMDB_timestamps(x, name)
+   tst <- list_chMDB_timestamps(x, name)
    if(is.null(tst)){
       stop(sprintf("There is no available archive for %s", name))
    }

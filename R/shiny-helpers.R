@@ -348,7 +348,7 @@
       output$mdbList <- DT::renderDT({
          shiny::req(mdbs$list)
          colToTake <- intersect(
-            c("name", "title", "access"),
+            c("name", "title", "access", "timestamp"),
             colnames(mdbs$list)
          )
          toShow <- mdbs$list %>%
@@ -461,6 +461,12 @@
             }else{
                if(!is.metaMDB(mdb)){
                   dbi$records <- sum(count_records(mdb))
+               }
+            }
+            if(is.chMDB(mdb)){
+               ts <- get_chMDB_timestamps(unclass(mdb)$tkcon, dbi$name)
+               if(!is.null(ts)){
+                  dbi$"other instances"=nrow(ts)-1
                }
             }
             shiny::tagList(

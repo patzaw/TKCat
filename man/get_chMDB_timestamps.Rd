@@ -12,9 +12,8 @@ get_chMDB_timestamps(x, name)
 \item{name}{the name of the database}
 }
 \value{
-A tibble with the instance of each table at each timestamp.
-The "current" attribute indicate the current timestamp instance.
-If there is no recorded timestamp, the function returns NULL.
+A tibble with the instance "timestamp" and a logical indicating if
+it's the "current" one or not.
 }
 \description{
 Get instance timestamps of an MDB in \link{chTKCat}
