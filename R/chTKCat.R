@@ -2364,6 +2364,18 @@ collection_members.chTKCat <- function(
 #' @param userManager URL for user management interface
 #' (see [manage_chTKCat_users()]). If NULL (default), the functionality
 #' is not added.
+#' @param title A title for the application. If NULL (default):
+#' the chTKCat instance name
+#' @param skinColors two colors for the application skin: one for default
+#' connection ("blue" by default) and one for user
+#' connection ("yellow" by default).
+#' Working values: "blue", "black", "purple", "green", "red", "yellow".
+#' @param logoDiv a [shiny::div] object with a logo to display in side bar.
+#' The default is the TKCat hex sticker with a link to TKCat github repository.
+#' @param rDirs a named character vector with resource path
+#' for [shiny::addResourcePath]
+#' @param tabIcon a path to an image
+#' (in available resource paths: "www", "doc" or in rDirs) to use as a tab icon.
 #' 
 #' @rdname explore_MDBs
 #' @method explore_MDBs chTKCat
@@ -2377,11 +2389,21 @@ explore_MDBs.chTKCat <- function(
    download=FALSE,
    workers=4,
    userManager=NULL,
+   title=NULL,
+   skinColors=c("blue", "yellow"),
+   logoDiv=TKCAT_LOGO_DIV,
+   tabIcon='www/TKCat-small.png',
+   rDirs=NULL,
    ...
 ){
    stopifnot(
-      is.logical(download), length(download)==1, !is.na(download)
+      is.logical(download), length(download)==1, !is.na(download),
+      is.character(skinColors), length(skinColors)>0, all(!is.na(skinColors))
    )
+   if(length(skinColors)==1){
+      skinColors <- rep(skinColors, 2)
+   }
+   skinColors <- skinColors[1:2]
    if(!is.null(userManager)){
       stopifnot(
          is.character(userManager), length(userManager)==1, !is.na(userManager)
@@ -2405,13 +2427,18 @@ explore_MDBs.chTKCat <- function(
       }
    }, add=TRUE)
    shiny::shinyApp(
-      ui=.build_etkc_ui(x=x, ddir=ddir, userManager=!is.null(userManager)),
+      ui=.build_etkc_ui(
+         x=x, ddir=ddir, userManager=!is.null(userManager),
+         logoDiv=logoDiv, rDirs=rDirs, tabIcon=tabIcon
+      ),
       server=.build_etkc_server(
          x=x,
          subSetSize=subSetSize,
          host=host,
          ddir=ddir,
-         userManager=userManager
+         userManager=userManager,
+         title=title,
+         skinColors=skinColors
       ),
       enableBookmarking="url",
       onStart=function(){
@@ -2426,9 +2453,14 @@ explore_MDBs.chTKCat <- function(
 }
 
 ###############################################################################@
-.build_etkc_ui.chTKCat <- function(x, ddir=NULL, userManager=FALSE, ...){
+.build_etkc_ui.chTKCat <- function(
+   x, ddir=NULL, userManager=FALSE,
+   logoDiv=TKCAT_LOGO_DIV, rDirs=NULL,
+   tabIcon='www/TKCat-small.png',
+   ...
+){
    
-   .etkc_add_resources(ddir=ddir)
+   .etkc_add_resources(ddir=ddir, rDirs=rDirs)
    
    function(req){
       shinydashboard::dashboardPage(
@@ -2449,12 +2481,13 @@ explore_MDBs.chTKCat <- function(
                "chTKCat user guide"="doc/chTKCat-User-guide.html",
                "General TKCat user guide"="doc/TKCat-User-guide.html",
                "chTKCat operations manual"="doc/chTKCat-Operations-manual.html"
-            )
+            ),
+            logoDiv=logoDiv
          ),
          
          ########################@
          ## Body ----
-         body=.etkc_sd_body(sysInterface=TRUE)
+         body=.etkc_sd_body(sysInterface=TRUE, tabIcon=tabIcon)
       )
    }
    
@@ -2467,12 +2500,16 @@ explore_MDBs.chTKCat <- function(
    subSetSize=100,
    host=x$chcon@host,
    ddir=NULL,
-   userManager=NULL
+   userManager=NULL,
+   title=NULL,
+   skinColors=c("blue", "yellow")
 ){
    .build_etkc_server_default(
       x=x, subSetSize=subSetSize, xparams=list(host=host),
       ddir=ddir,
-      userManager=userManager
+      userManager=userManager,
+      title=title,
+      skinColors=skinColors
    )
 }
 

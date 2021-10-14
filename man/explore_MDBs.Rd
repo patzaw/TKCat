@@ -6,7 +6,18 @@
 \alias{explore_MDBs}
 \title{Explore available \link{MDB} in a shiny web interface}
 \usage{
-\method{explore_MDBs}{TKCat}(x, subSetSize = 100, download = FALSE, workers = 4, ...)
+\method{explore_MDBs}{TKCat}(
+  x,
+  subSetSize = 100,
+  download = FALSE,
+  workers = 4,
+  title = NULL,
+  skinColors = "green",
+  logoDiv = TKCAT_LOGO_DIV,
+  rDirs = NULL,
+  tabIcon = "www/TKCat-small.png",
+  ...
+)
 
 \method{explore_MDBs}{chTKCat}(
   x,
@@ -15,6 +26,11 @@
   download = FALSE,
   workers = 4,
   userManager = NULL,
+  title = NULL,
+  skinColors = c("blue", "yellow"),
+  logoDiv = TKCAT_LOGO_DIV,
+  tabIcon = "www/TKCat-small.png",
+  rDirs = NULL,
   ...
 )
 
@@ -31,6 +47,23 @@ available for shiny.}
 
 \item{workers}{number of available workers when download is available
 (default: 4)}
+
+\item{title}{A title for the application. If NULL (default):
+the chTKCat instance name}
+
+\item{skinColors}{two colors for the application skin: one for default
+connection ("blue" by default) and one for user
+connection ("yellow" by default).
+Working values: "blue", "black", "purple", "green", "red", "yellow".}
+
+\item{logoDiv}{a \link[shiny:reexports]{shiny::div} object with a logo to display in side bar.
+The default is the TKCat hex sticker with a link to TKCat github repository.}
+
+\item{rDirs}{a named character vector with resource path
+for \link[shiny:resourcePaths]{shiny::addResourcePath}}
+
+\item{tabIcon}{a path to an image
+(in available resource paths: "www", "doc" or in rDirs) to use as a tab icon.}
 
 \item{...}{method specific parameters}
 

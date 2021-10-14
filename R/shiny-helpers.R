@@ -2,9 +2,27 @@
 ## UI Helpers ####
 ###############################################################################@
 
+TKCAT_LOGO_DIV <- shiny::div(
+   shiny::a(
+      shiny::img(
+         src="www/TKCat-small.png",
+         height="120px",
+         id="mainLogo"
+      ),
+      href="https://github.com/patzaw/TKCat",
+      target="_blank"
+   ),
+   style=paste(
+      "width:150px;",
+      "margin-left:auto; margin-right:auto;",
+      "margin-top:15px;",
+      "margin-bottom:15px;",
+      "text-align:center;"
+   )
+)
 
 ###############################################################################@
-.etkc_add_resources <- function(ddir=NULL){
+.etkc_add_resources <- function(ddir=NULL, rDirs=NULL){
    pckn <- utils::packageName()
    shiny::addResourcePath(
       "www",
@@ -18,6 +36,12 @@
       shiny::addResourcePath(
          "data",
          ddir
+      )
+   }
+   if(length(rDirs)>0) for(i in 1:length(rDirs)){
+      shiny::addResourcePath(
+         names(rDirs)[i],
+         as.character(rDirs[i])
       )
    }
    return(invisible(NULL))
@@ -49,7 +73,8 @@
 .etkc_sd_sidebar <- function(
    sysInterface,
    userManager=FALSE,
-   manList
+   manList,
+   logoDiv=TKCAT_LOGO_DIV
 ){
    
    ## Resources ----
@@ -127,24 +152,7 @@
    
    return(shinydashboard::dashboardSidebar(
       ## Logo ----
-      div(
-         shiny::a(
-            shiny::img(
-               src="www/TKCat-small.png",
-               height="120px",
-               id="mainLogo"
-            ),
-            href="https://github.com/patzaw/TKCat",
-            target="_blank"
-         ),
-         style=paste(
-            "width:150px;",
-            "margin-left:auto; margin-right:auto;",
-            "margin-top:15px;",
-            "margin-bottom:15px;",
-            "text-align:center;"
-         )
-      ),
+      logoDiv,
       shiny::tags$hr(),
       ## Menu ----
       do.call(shinydashboard::sidebarMenu, sbelts)
@@ -152,7 +160,7 @@
 }
 
 ###############################################################################@
-.etkc_sd_body <- function(sysInterface){
+.etkc_sd_body <- function(sysInterface, tabIcon='www/TKCat-small.png'){
    
    belts <- list(
       
@@ -235,7 +243,7 @@
       shiny::tags$head(
          shiny::tags$link(
             rel="icon",
-            href='www/TKCat-small.png'
+            href=tabIcon
          ),
          shiny::tags$script(src='www/interactions.js')
       ),
@@ -257,23 +265,38 @@
    subSetSize=100,
    xparams=list(),
    ddir=NULL,
-   userManager=NULL
+   userManager=NULL,
+   skinColors=c("blue", "yellow"),
+   title=NULL
 ){
    
    function(input, output, session) {
+      
+      
+      ########################@
+      ## TKCat instance ----
+      
+      if(length(title)==1 && !is.na(title)){
+         customTitle <- TRUE
+         output$instance <- shiny::renderUI({
+            title
+         })
+      }else{
+         customTitle <- FALSE
+      }
       
       if(is.TKCat(x)){
          instance <- shiny::reactiveValues(
             tkcat=x
          )
-         output$instance <- shiny::renderUI({
-            "Local TKCat"
-         })
+         if(!customTitle){
+            output$instance <- shiny::renderUI({
+               "Local TKCat"
+            })
+         }
       }
       
       if(is.chTKCat(x)){
-         ########################@
-         ## TKCat instance ----
          instance <- shiny::reactiveValues(
             tkcat=db_reconnect(x, user="default"),
             valid=DBI::dbIsValid(x$chcon)
@@ -286,14 +309,16 @@
                instance$valid <- TRUE
             }
          })
-         output$instance <- shiny::renderUI({
-            paste("chTKCat :", instance$tkcat$instance)
-         })
+         if(!customTitle){
+            output$instance <- shiny::renderUI({
+               paste("chTKCat :", instance$tkcat$instance)
+            })
+         }
          shiny::observe({
             if(instance$tkcat$chcon@user=="default"){
-               sc <- "blue"
+               sc <- skinColors[1]
             }else{
-               sc <- "yellow"
+               sc <- skinColors[2]
             }
             session$sendCustomMessage(
                "change_skin",

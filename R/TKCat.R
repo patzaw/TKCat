@@ -327,6 +327,16 @@ collection_members.TKCat <- function(
 #' available for shiny.
 #' @param workers number of available workers when download is available
 #' (default: 4)
+#' @param skinColors one color for the application skin.
+#' Working values: "blue", "black", "purple", "green", "red", "yellow".
+#' @param title A title for the application. If NULL (default):
+#' the chTKCat instance name
+#' @param logoDiv a [shiny::div] object with a logo to display in side bar.
+#' The default is the TKCat hex sticker with a link to TKCat github repository.
+#' @param rDirs a named character vector with resource path
+#' for [shiny::addResourcePath]
+#' @param tabIcon a path to an image
+#' (in available resource paths: "www", "doc" or in rDirs) to use as a tab icon.
 #' 
 #' @rdname explore_MDBs
 #' @method explore_MDBs TKCat
@@ -338,11 +348,18 @@ explore_MDBs.TKCat <- function(
    subSetSize=100,
    download=FALSE,
    workers=4,
+   title=NULL,
+   skinColors="green",
+   logoDiv=TKCAT_LOGO_DIV,
+   rDirs=NULL,
+   tabIcon='www/TKCat-small.png',
    ...
 ){
    stopifnot(
-      is.logical(download), length(download)==1, !is.na(download)
+      is.logical(download), length(download)==1, !is.na(download),
+      is.character(skinColors), length(skinColors)>0, all(!is.na(skinColors))
    )
+   skinColors <- skinColors[1]
    if(download){
       ddir <- tempfile()
       dir.create(ddir)
@@ -353,11 +370,15 @@ explore_MDBs.TKCat <- function(
       ddir <- NULL
    }
    shiny::shinyApp(
-      ui=.build_etkc_ui(x=x, ddir=ddir),
+      ui=.build_etkc_ui(
+         x=x, ddir=ddir, skinColors=skinColors,
+         logoDiv=logoDiv, rDirs=rDirs, tabIcon=tabIcon,
+      ),
       server=.build_etkc_server(
          x=x,
          subSetSize=subSetSize,
-         ddir=ddir
+         ddir=ddir,
+         title=title
       ),
       enableBookmarking="url",
       onStart=function(){
@@ -372,14 +393,19 @@ explore_MDBs.TKCat <- function(
 }
 
 ###############################################################################@
-.build_etkc_ui.TKCat <- function(x, ddir=NULL, ...){
+.build_etkc_ui.TKCat <- function(
+   x, ddir=NULL, skinColors="green",
+   logoDiv=TKCAT_LOGO_DIV, rDirs=NULL,
+   tabIcon='www/TKCat-small.png',
+   ...
+){
    
-   .etkc_add_resources(ddir=ddir)
+   .etkc_add_resources(ddir=ddir, rDirs=rDirs)
    
    function(req){
       shinydashboard::dashboardPage(
          title="chTKCat",
-         skin="green",
+         skin=skinColors[1],
          
          ########################@
          ## Dashboard header ----
@@ -393,12 +419,13 @@ explore_MDBs.TKCat <- function(
             sysInterface=FALSE,
             manList=c(
                "General TKCat user guide"="doc/TKCat-User-guide.html"
-            )
+            ),
+            logoDiv=logoDiv
          ),
          
          ########################@
          ## Body ----
-         body=.etkc_sd_body(sysInterface=FALSE)
+         body=.etkc_sd_body(sysInterface=FALSE, tabIcon=tabIcon)
       )
    }
    
@@ -409,11 +436,13 @@ explore_MDBs.TKCat <- function(
 .build_etkc_server.TKCat <- function(
    x,
    subSetSize=100,
-   ddir=NULL
+   ddir=NULL,
+   title=NULL
 ){
    .build_etkc_server_default(
       x=x, subSetSize=subSetSize,
-      ddir=ddir
+      ddir=ddir,
+      title=title
    )
 }
 
