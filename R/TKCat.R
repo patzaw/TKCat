@@ -306,7 +306,11 @@ collection_members.TKCat <- function(
    return(do.call(dplyr::bind_rows, lapply(
       x,
       function(y){
-         collection_members(y) %>% 
+         cm <- collection_members(y)
+         if(is.null(cm)){
+            return(NULL)
+         }
+         cm %>% 
             dplyr::select("resource", "collection", "table") %>% 
             dplyr::distinct()
       }

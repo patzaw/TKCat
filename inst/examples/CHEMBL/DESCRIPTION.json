@@ -5,6 +5,5 @@
   "url": "https://www.ebi.ac.uk/chembl/",
   "version": "0.2",
   "maintainer": "Liesbeth François <liesbeth.francois@ucb.com>",
-  "delim": "\t",
-  "quoted_na": false
+  "delim": "\t"
 }

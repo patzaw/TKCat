@@ -643,7 +643,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       )
       shiny::observe({
          mdb <- selStatus$mdb
-         if(is.chMDB(mdb)){
+         if(is.MDB(mdb)){
             dbdm$model <- data_model(mdb)
             dbdm$collections <- collection_members(mdb)
          }else{
@@ -700,9 +700,8 @@ TKCAT_LOGO_DIV <- shiny::div(
          )
       })
       output$colMembers <- DT::renderDT({
-         mdb <- selStatus$mdb
-         shiny::req(mdb)
-         cm <- collection_members(mdb)
+         cm <- dbdm$collections
+         shiny::req(cm)
          cm %>%
             dplyr::select(
                "collection", "id"="mid",
@@ -726,9 +725,9 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::observe({
          cs <- input$colMembers_rows_selected
          shiny::req(cs)
-         mdb <- shiny::isolate(selStatus$mdb)
-         shiny::req(mdb)
-         cmt <- collection_members(mdb) %>%
+         cm <- shiny::isolate(dbdm$collections)
+         shiny::req(cm)
+         cmt <- cm %>% 
             dplyr::slice(cs) %>%
             dplyr::pull(table)
          visNetwork::visNetworkProxy("dataModel") %>%
@@ -754,7 +753,10 @@ TKCAT_LOGO_DIV <- shiny::div(
                   shiny::tags$li(
                      shiny::tags$strong("File size"),
                      ":",
-                     .format_file_size(data_file_size(mdb)[sel]),
+                     data_file_size(mdb) %>% 
+                        filter(table==!!sel) %>% 
+                        pull(size) %>% 
+                        .format_file_size(),
                      sprintf("(showing %s records)", nr)
                   )
                }else{
