@@ -208,7 +208,10 @@ read_fileMDB <- function(
    dataFiles <- lapply(
       names(dataModel),
       function(x){
-         f <- list.files(dp, pattern=paste0(x, "(\\.[[:alnum:]]+)(\\.gz)?$"))
+         f <- list.files(
+            dp,
+            pattern=paste0("^", x, "(\\.[[:alnum:]]+)(\\.gz)?$")
+         )
          if(length(f)>1){
             stop(sprintf("There are several files for %s", x))
          }
