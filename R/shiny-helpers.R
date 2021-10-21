@@ -643,7 +643,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       )
       shiny::observe({
          mdb <- selStatus$mdb
-         if(is.chMDB(mdb)){
+         if(is.MDB(mdb)){
             dbdm$model <- data_model(mdb)
             dbdm$collections <- collection_members(mdb)
          }else{
@@ -700,9 +700,8 @@ TKCAT_LOGO_DIV <- shiny::div(
          )
       })
       output$colMembers <- DT::renderDT({
-         mdb <- selStatus$mdb
-         shiny::req(mdb)
-         cm <- collection_members(mdb)
+         cm <- dbdm$collections
+         shiny::req(cm)
          cm %>%
             dplyr::select(
                "collection", "id"="mid",
@@ -726,9 +725,9 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::observe({
          cs <- input$colMembers_rows_selected
          shiny::req(cs)
-         mdb <- shiny::isolate(selStatus$mdb)
-         shiny::req(mdb)
-         cmt <- collection_members(mdb) %>%
+         cm <- shiny::isolate(dbdm$collections)
+         shiny::req(cm)
+         cmt <- cm %>% 
             dplyr::slice(cs) %>%
             dplyr::pull(table)
          visNetwork::visNetworkProxy("dataModel") %>%
@@ -754,7 +753,10 @@ TKCAT_LOGO_DIV <- shiny::div(
                   shiny::tags$li(
                      shiny::tags$strong("File size"),
                      ":",
-                     .format_file_size(data_file_size(mdb)[sel]),
+                     data_file_size(mdb) %>% 
+                        filter(table==!!sel) %>% 
+                        pull(size) %>% 
+                        .format_file_size(),
                      sprintf("(showing %s records)", nr)
                   )
                }else{
@@ -793,17 +795,17 @@ TKCAT_LOGO_DIV <- shiny::div(
             if(toTake > 1){
                toShow <- heads(mdb, dplyr::all_of(sel), n=toTake)[[1]]
             }
+            tmp <- dplyr::select(
+               toShow,
+               all_of(setdiff(
+                  colnames(toShow),
+                  tabMod$fields$name[which(tabMod$fields$type=="base64")]
+               ))
+            )
          }else{
-            toShow <- heads(mdb, dplyr::all_of(sel), n=subSetSize)[[1]]
+            toShow <- tmp <- heads(mdb, dplyr::all_of(sel), n=subSetSize)[[1]]
          }
          attr(toShow, "mat") <- ReDaMoR::is.MatrixModel(tabMod)
-         tmp <- dplyr::select(
-            toShow,
-            all_of(setdiff(
-               colnames(toShow),
-               tabMod$fields$name[which(tabMod$fields$type=="base64")]
-            ))
-         )
          if(utils::object.size(tmp) > 2^19){
             toShow <- toShow[
                1:max(c(
@@ -816,67 +818,84 @@ TKCAT_LOGO_DIV <- shiny::div(
       output$dataSample <- DT::renderDT({
          toShow <- tabSubSet()
          shiny::req(toShow)
-         mdb <- isolate(selStatus$mdb)
-         shiny::req(mdb)
-         sel <- isolate(selStatus$tables) %>% 
-            intersect(names(mdb))
-         shiny::req(sel)
-         shiny::req(length(sel)==1)
-         tabMod <- data_model(mdb)[[sel]]
-         fields <- tabMod$fields$name
-         ##
-         b64_fields <- fields[which(tabMod$fields$type=="base64")]
-         for(b64f in b64_fields){
-            toShow[[b64f]] <- paste0(
-               '<div width="100%" height="100%" style="color:blue;"',
-               ' onmouseover="this.style.color=', "'orange'", ';"',
-               ' onmouseout="this.style.color=',"'blue'", ';">',
-               "file",
-               '</div>'
-            )
-         }
-         toShow <- toShow[, fields]
-         ##
-         char_fields <- fields[which(tabMod$fields$type=="character")]
-         for(charf in char_fields){
-            toShow[[charf]] <- ifelse(
-               nchar(toShow[[charf]]) > 100,
-               sprintf(
-                  '<span title="%s" style="%s">%s...</span>',
-                  htmltools::htmlEscape(gsub('"', '&quot;', toShow[[charf]])),
-                  'border-bottom: 1px dashed;',
-                  htmltools::htmlEscape(substr(toShow[[charf]], 1, 90))
-               ),
-               toShow[[charf]]
-            )
-         }
-         ##
-         toRet <- DT::datatable(
-            toShow,
-            rownames=attr(toShow, "mat"),
-            selection=if(length(b64_fields)>0){
-               list(
-                  mode='single', target='cell'
+         if(!attr(toShow, "mat")){
+            mdb <- isolate(selStatus$mdb)
+            shiny::req(mdb)
+            sel <- isolate(selStatus$tables) %>% 
+               intersect(names(mdb))
+            shiny::req(sel)
+            shiny::req(length(sel)==1)
+            tabMod <- data_model(mdb)[[sel]]
+            fields <- tabMod$fields$name
+            ##
+            b64_fields <- fields[which(tabMod$fields$type=="base64")]
+            for(b64f in b64_fields){
+               toShow[[b64f]] <- paste0(
+                  '<div width="100%" height="100%" style="color:blue;"',
+                  ' onmouseover="this.style.color=', "'orange'", ';"',
+                  ' onmouseout="this.style.color=',"'blue'", ';">',
+                  "file",
+                  '</div>'
                )
-            }else{
-               "none"
-            },
-            extensions='Scroller',
-            escape=FALSE,
-            options = list(
-               deferRender = TRUE,
-               scrollX=TRUE,
-               scrollY = 250,
-               scroller = TRUE,
-               dom=c("ti")
-            )
-         )
-         if(length(b64_fields)>0){
-            toRet <- toRet %>% 
-               DT::formatStyle(
-                  columns=b64_fields,
-                  "font-style"="italic"
+            }
+            toShow <- toShow[, fields]
+            ##
+            char_fields <- fields[which(tabMod$fields$type=="character")]
+            for(charf in char_fields){
+               toShow[[charf]] <- ifelse(
+                  nchar(toShow[[charf]]) > 100,
+                  sprintf(
+                     '<span title="%s" style="%s">%s...</span>',
+                     htmltools::htmlEscape(gsub('"', '&quot;', toShow[[charf]])),
+                     'border-bottom: 1px dashed;',
+                     htmltools::htmlEscape(substr(toShow[[charf]], 1, 90))
+                  ),
+                  toShow[[charf]]
                )
+            }
+            ##
+            toRet <- DT::datatable(
+               toShow,
+               rownames=attr(toShow, "mat"),
+               selection=if(length(b64_fields)>0){
+                  list(
+                     mode='single', target='cell'
+                  )
+               }else{
+                  "none"
+               },
+               extensions='Scroller',
+               escape=FALSE,
+               options = list(
+                  deferRender = TRUE,
+                  scrollX=TRUE,
+                  scrollY = 250,
+                  scroller = TRUE,
+                  dom=c("ti")
+               )
+            )
+            if(length(b64_fields)>0){
+               toRet <- toRet %>% 
+                  DT::formatStyle(
+                     columns=b64_fields,
+                     "font-style"="italic"
+                  )
+            }
+         }else{
+            toRet <- DT::datatable(
+               toShow,
+               rownames=TRUE,
+               selection="none",
+               extensions='Scroller',
+               escape=FALSE,
+               options = list(
+                  deferRender = TRUE,
+                  scrollX=TRUE,
+                  scrollY = 250,
+                  scroller = TRUE,
+                  dom=c("ti")
+               )
+            )
          }
          return(toRet)
       })

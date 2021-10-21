@@ -5,6 +5,5 @@
   "url": "https://www.ncbi.nlm.nih.gov/clinvar/",
   "version": "0.9",
   "maintainer": "Patrice Godard <patrice.godard@ucb.com>",
-  "delim": "\t",
-  "quoted_na": false
+  "delim": "\t"
 }

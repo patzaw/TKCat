@@ -251,6 +251,90 @@ pull.MDB <- function(.data, var=-1, name=NULL, ...){
    return(.data[[var]])
 }
 
+
+
+###############################################################################@
+#' Add a collection member to an MDB
+#' 
+#' @param x an [MDB] object
+#' @param collection a collection title in [list_local_collections()]
+#' @param table the table providing the collection member
+#' @param ... definition of the collection fields as lists
+#' (e.g. `be=list(static=TRUE, value="Gene")`
+#' or
+#' `organism=list(static=TRUE, value="Homo sapiens", type="Scientific name")`
+#' )
+#' 
+#' @export
+#' 
+add_collection_member <- function(
+   x,
+   collection,
+   table,
+   ...
+){
+   fd <- list(...)
+   stopifnot(
+      is.MDB(x),
+      is.character(collection), length(collection)==1, !is.na(collection),
+      collection %in% list_local_collections()$title,
+      is.character(table), length(table)==1, !is.na(table),
+      table %in% names(x),
+      length(fd) > 0, length(names(fd))==length(fd),
+      all(unlist(lapply(
+         fd, function(y){
+            all(names(y) %in% c("static", "value", "type")) &&
+               all(c("value", "static") %in% names(y))
+         }
+      )))
+   )
+   resource <- db_info(x)$name
+   cm <- collection_members(x)
+   if(!is.null(cm) && nrow(cm)>0){
+      if(collection %in% cm$collection){
+         cid <- cm$cid[which(cm$collection==collection)][1]
+         mid <- max(cm$mid[which(cm$collection==collection)])+1
+      }else{
+         cid <- paste(resource, collection, "1.0", sep="_")
+         mid <- 1
+      }
+   }else{
+      cid <- paste(resource, collection, "1.0", sep="_")
+      mid <- 1
+   }
+   toAdd <- c()
+   for(field in names(fd)){
+      def <- fd[[field]]
+      toAdd <- rbind(
+         toAdd,
+         tibble(
+            field=field, static=def[["static"]], value=def[["value"]],
+            type=ifelse(
+               length(def[["type"]])!=1,
+               as.character(NA),
+               def[["type"]]
+            )
+         )
+      )
+   }
+   toAdd$collection <- collection
+   toAdd$cid <- cid
+   toAdd$resource <- resource
+   toAdd$mid <- as.integer(mid)
+   toAdd$table <- table
+   cm <- rbind(
+      cm,
+      select(
+         toAdd,
+         "collection", "cid", "resource", "mid", "table",
+         "field", "static", "value", "type"
+      )
+   )
+   toRet <- x
+   collection_members(toRet) <- cm
+   return(toRet)
+}
+
 ###############################################################################@
 #' Compare two MDB objects
 #' 
