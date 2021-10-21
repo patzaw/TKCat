@@ -1,6 +1,6 @@
 <img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px"/>
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
 [![](http://cranlogs.r-pkg.org/badges/TKCat)](https://cran.r-project.org/package=TKCat)
 
 The aim of TKCat (Tailored Knowledge Catalog) is to facilitate the

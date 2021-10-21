@@ -857,7 +857,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
          toWrite <- x[[tn]]
          b64_fields <- dm[[tn]]$fields %>% 
             dplyr::filter(.data$type=="base64") %>% 
-            dplyr::pull(name)
+            dplyr::pull("name")
          for(b64f in b64_fields){
             toWrite[[b64f]] <- lapply(
                toWrite[[b64f]], function(v){

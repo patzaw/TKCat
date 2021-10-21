@@ -3,7 +3,7 @@
 \name{write_MergeTree}
 \alias{write_MergeTree}
 \title{Write a Clickhouse
-\href{https://clickhouse.tech/docs/en/engines/table-engines/mergetree-family/mergetree/}{MergeTree}
+\href{https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/mergetree/}{MergeTree}
 table}
 \usage{
 write_MergeTree(
@@ -40,6 +40,6 @@ No return value, called for side effects
 }
 \description{
 Write a Clickhouse
-\href{https://clickhouse.tech/docs/en/engines/table-engines/mergetree-family/mergetree/}{MergeTree}
+\href{https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/mergetree/}{MergeTree}
 table
 }

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2021-09-21" />
+<meta name="date" content="2021-10-21" />
 
 <title>chTKCat user guide</title>
 
@@ -243,7 +243,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">chTKCat user guide</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">September 21, 2021</h4>
+<h4 class="date">October 21, 2021</h4>
 
 </div>
 
@@ -252,13 +252,13 @@ div.tocify {
 <p><img src="libs/figs/TKCat.png" style="width:100.0%" /></p>
 </div>
 <div id="introduction" class="section level1" number="1">
-<h1 number="1"><span class="header-section-number">1</span> Introduction</h1>
+<h1><span class="header-section-number">1</span> Introduction</h1>
 <p>The aim of TKCat (Tailored Knowledge Catalog) is to facilitate the management of data from knowledge resources that are frequently used alone or together in research environments. In TKCat, knowledge resources are manipulated as modeled database (MDB) objects. These objects provide access to the data tables along with a general description of the resource and a detail data model generated with <a href="https://github.com/patzaw/ReDaMoR">ReDaMoR</a> documenting the tables, their fields and their relationships. These MDB are then gathered in catalogs that can be easily explored an shared. TKCat provides tools to easily subset, filter and combine MDBs and create new catalogs suited for specific needs.</p>
 <p>The TKCat R package is licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPL-3</a>.</p>
-<p>This vignette describes how TKCat can be used with a <a href="https://clickhouse.tech/">ClickHouse</a> database. Users should also refer to the <a href="TKCat-User-guide.html">general TKCat user guide</a>. Finally, a <a href="chTKCat-Operations-manual.html">specific vignette</a> describes how to create and administrate a TKCat ClickHouse instance, and another is dedicated to an <a href="TKCat-Collections.html">extended documentation of collections</a>.</p>
+<p>This vignette describes how TKCat can be used with a <a href="https://clickhouse.com/">ClickHouse</a> database. Users should also refer to the <a href="TKCat-User-guide.html">general TKCat user guide</a>. Finally, a <a href="chTKCat-Operations-manual.html">specific vignette</a> describes how to create and administrate a TKCat ClickHouse instance, and another is dedicated to an <a href="TKCat-Collections.html">extended documentation of collections</a>.</p>
 </div>
 <div id="connection" class="section level1" number="2">
-<h1 number="2"><span class="header-section-number">2</span> Connection</h1>
+<h1><span class="header-section-number">2</span> Connection</h1>
 <p>The connection to a chTKCat database is achieved by instantiating <em>chTKCat</em> object.</p>
 <pre class="r"><code>k &lt;- chTKCat(
    host=&quot;localhost&quot;, # default parameter
@@ -269,7 +269,7 @@ div.tocify {
 <p>Connection parameters should be adapted according to the ClickHouse database setup which is documented in the web exploration interface (in the “System” tab).</p>
 </div>
 <div id="use" class="section level1" number="3">
-<h1 number="3"><span class="header-section-number">3</span> Use</h1>
+<h1><span class="header-section-number">3</span> Use</h1>
 <p>The <em>chTKCat</em> object can be used as a <a href="TKCat-User-guide.html#local-tkcat"><em>TKCat</em> object</a>.</p>
 <pre class="r"><code>list_MDBs(k)                     # list all the MDBs in a TKCat object
 khpo &lt;- get_MDB(k, &quot;HPO&quot;)        # get a specific MDBs from the catalog
@@ -286,11 +286,11 @@ collection_members(k)            # Get collection members of the different MDBs<
 <p>The user is able to access only <em>chMDB</em> allowed according to his rights (see the <a href="chTKCat-Operations-manual.html">operation manual</a>).</p>
 </div>
 <div id="reconnecting" class="section level1" number="4">
-<h1 number="4"><span class="header-section-number">4</span> Reconnecting</h1>
+<h1><span class="header-section-number">4</span> Reconnecting</h1>
 <p>If the connection to the database is lost the user can reactivate it by using the <code>db_reconnect()</code> function which works with <em>chTKCat</em> objects but also with <em>chMDB</em> objects.</p>
 </div>
 <div id="pushing-an-mdb-in-a-chtkcat-instance" class="section level1" number="5">
-<h1 number="5"><span class="header-section-number">5</span> Pushing an MDB in a chTKCat instance</h1>
+<h1><span class="header-section-number">5</span> Pushing an MDB in a chTKCat instance</h1>
 <p>MDB can be add to the ClickHouse database of a <em>chTKCat</em> object with the <code>as_chMDB()</code> function.</p>
 <pre class="r"><code>lk &lt;- TKCat(read_fileMDB(
    path=system.file(&quot;examples/ClinVar&quot;, package=&quot;TKCat&quot;)
@@ -304,7 +304,7 @@ as_chMDB(lk$ClinVar, k, overwrite=FALSE)</code></pre>
 </ul>
 </div>
 <div id="acknowledgments" class="section level1" number="6">
-<h1 number="6"><span class="header-section-number">6</span> Acknowledgments</h1>
+<h1><span class="header-section-number">6</span> Acknowledgments</h1>
 <p>This work was entirely supported by <a href="https://www.ucb.com/">UCB Pharma</a> (Early Solutions department).</p>
 </div>
 

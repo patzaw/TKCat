@@ -32,7 +32,7 @@ user to provide a password.}
 (default: 3)}
 
 \item{settings}{list of
-\href{https://clickhouse.tech/docs/en/operations/settings/settings/}{Clickhouse settings}}
+\href{https://clickhouse.com/docs/en/operations/settings/settings/}{Clickhouse settings}}
 
 \item{...}{additional parameters for methods}
 }

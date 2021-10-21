@@ -15,7 +15,7 @@
 #' @param http an integer specifying the HTTP port of the 
 #' ClickHouse database (default: NULL). Used for documentation only.
 #' @param settings list of
-#' [Clickhouse settings](https://clickhouse.tech/docs/en/operations/settings/settings/)
+#' [Clickhouse settings](https://clickhouse.com/docs/en/operations/settings/settings/)
 #'
 #' @return a chTKCat object
 #'
@@ -1436,7 +1436,7 @@ get_chMDB_timestamps <- function(x, name){
    if(is.null(ts)){
       return(NULL)
    }
-   toRet <- dplyr::distinct(ts, timestamp)
+   toRet <- dplyr::distinct(ts, .data$timestamp)
    if(is.na(attr(ts, "current"))){
       toRet$current <- FALSE
    }else{

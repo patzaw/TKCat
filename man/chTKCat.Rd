@@ -30,7 +30,7 @@ database is listening (default: 9101)}
 ClickHouse database (default: NULL). Used for documentation only.}
 
 \item{settings}{list of
-\href{https://clickhouse.tech/docs/en/operations/settings/settings/}{Clickhouse settings}}
+\href{https://clickhouse.com/docs/en/operations/settings/settings/}{Clickhouse settings}}
 }
 \value{
 a chTKCat object

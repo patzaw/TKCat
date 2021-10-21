@@ -14,7 +14,7 @@ db_disconnect.ClickhouseConnection <- function(x){
 #' @method db_reconnect ClickhouseConnection
 #' 
 #' @param settings list of
-#' [Clickhouse settings](https://clickhouse.tech/docs/en/operations/settings/settings/)
+#' [Clickhouse settings](https://clickhouse.com/docs/en/operations/settings/settings/)
 #'
 #' @export
 #'
@@ -121,7 +121,7 @@ list_tables <- function(
 
 ###############################################################################@
 #' Write a Clickhouse
-#' [MergeTree](https://clickhouse.tech/docs/en/engines/table-engines/mergetree-family/mergetree/)
+#' [MergeTree](https://clickhouse.com/docs/en/engines/table-engines/mergetree-family/mergetree/)
 #' table
 #' 
 #' @param con the clickhouse connection

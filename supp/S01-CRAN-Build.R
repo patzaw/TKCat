@@ -9,6 +9,11 @@ unlink(
    file.path(cssToClean, setdiff(list.files(cssToClean), "cerulean.min.css")),
    recursive=TRUE
 )
+toClean <- c(
+   here("vignettes/libs/vis-9.1.0/img"),
+   here("vignettes/libs/vis-9.1.0/vis-network.min.css")
+)
+unlink(toClean, recursive=TRUE)
 dir.create(here("inst/doc"), showWarnings=FALSE)
 file.copy(
    here("vignettes/libs"),

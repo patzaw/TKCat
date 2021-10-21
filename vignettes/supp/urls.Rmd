@@ -4,7 +4,7 @@
 [collections]: TKCat-Collections.html
 
 [redamor]: https://github.com/patzaw/ReDaMoR
-[clickhouse]: https://clickhouse.tech/
+[clickhouse]: https://clickhouse.com/
 [hpo]: https://hpo.jax.org/app/
 [clinvar]: https://www.ncbi.nlm.nih.gov/clinvar/
 [chembl]: https://www.ebi.ac.uk/chembl/
