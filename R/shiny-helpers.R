@@ -755,7 +755,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                      ":",
                      data_file_size(mdb) %>% 
                         filter(table==!!sel) %>% 
-                        pull(size) %>% 
+                        pull("size") %>% 
                         .format_file_size(),
                      sprintf("(showing %s records)", nr)
                   )
