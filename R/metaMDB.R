@@ -221,7 +221,7 @@ relational_tables <- function(x, recursive=FALSE){
    stopifnot(is.metaMDB(x))
    toRet <- unclass(x)$relationalTables
    if(recursive){
-      toRet <- c(toRet, do.call(c, set_names(lapply(
+      toRet <- c(toRet, do.call(c, magrittr::set_names(lapply(
          MDBs(x),
          function(y){
             if(is.metaMDB(y)){
@@ -284,7 +284,7 @@ relational_tables <- function(x, recursive=FALSE){
 #' @export
 #' 
 rename.metaMDB <- function(.data, ...){
-   loc <- tidyselect::eval_rename(expr(c(...)), .data)
+   loc <- tidyselect::eval_rename(rlang::expr(c(...)), .data)
    names <- names(.data)
    names[loc] <- names(loc)
    magrittr::set_names(.data, names)
@@ -390,7 +390,7 @@ data_tables.metaMDB <- function(x, ..., skip=0, n_max=Inf){
    if(length(x)==0){
       return(list())
    }
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -443,7 +443,7 @@ heads.metaMDB <- function(x, ..., n=6L){
    if(length(x)==0){
       return(list())
    }
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -484,7 +484,7 @@ dims.metaMDB <- function(x, ...){
          transposed=logical()
       ))
    }
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -655,7 +655,7 @@ as_fileMDB.metaMDB <- function(
    dir.create(modelPath)
    jModelPath <- file.path(modelPath, paste0(dbName, ".json"))
    hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
-   write_json_data_model(dm, jModelPath)
+   ReDaMoR::write_json_data_model(dm, jModelPath)
    if(htmlModel){
       plot(dm) %>%
          visNetwork::visSave(hModelPath)
@@ -739,7 +739,7 @@ filter.metaMDB <- function(.data, ..., .preserve=FALSE){
    rtNames <- names(oriRT)
    
    ## Filter each MDB ----
-   dots <- enquos(...)
+   dots <- rlang::enquos(...)
    fdt <- lapply(
       MDBs(x),
       function(y){
@@ -876,7 +876,9 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE, ...){
       return(metaMDB(
          MDBs=fmdbs,
          relationalTables=list(),
-         dataModel=do.call(c, set_names(lapply(fmdbs, data_model), NULL)),
+         dataModel=do.call(
+            c, magrittr::set_names(lapply(fmdbs, data_model), NULL)
+         ),
          dbInfo=db_info(x)
       ))
    }
@@ -887,7 +889,7 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE, ...){
       x=frdb,
       tables=c(
          tables[intersect(toTake, rtNames)],
-         do.call(c, set_names(lapply(
+         do.call(c, magrittr::set_names(lapply(
             fmdbs,
             function(y){
                data_tables(y, dplyr::all_of(intersect(names(y), toTake)))
@@ -903,7 +905,7 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE, ...){
    )
    tables <- c(
       tables,
-      do.call(c, set_names(lapply(fmdbs, function(y){
+      do.call(c, magrittr::set_names(lapply(fmdbs, function(y){
          data_tables(y, dplyr::all_of(setdiff(names(y), names(tables))))
       }), NULL))
    )

@@ -377,9 +377,9 @@ TKCAT_LOGO_DIV <- shiny::div(
             colnames(mdbs$list)
          )
          toShow <- mdbs$list %>%
-            dplyr::select(all_of(colToTake)) %>%
+            dplyr::select(dplyr::all_of(colToTake)) %>%
             dplyr::rename("Resource"="name") %>% 
-            rename_all(function(x){
+            dplyr::rename_all(function(x){
                paste0(
                   toupper(substr(x, 1, 1)),
                   substr(x, 2, nchar(x))
@@ -501,7 +501,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                   function(n){
                      if(!is.na(dbi[[n]]) && as.character(dbi[[n]])!=""){
                         if(n=="url"){
-                           vt <- tags$a(
+                           vt <- shiny::tags$a(
                               shiny::HTML(dbi[[n]]),
                               href=dbi[[n]], target="_blank"
                            ) %>% as.character()
@@ -530,7 +530,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          reqDbs <- shiny::reactiveVal(character(0))
          dbdone <- shiny::reactiveVal(character(0))
          
-         output$dbDownload <- renderUI({
+         output$dbDownload <- shiny::renderUI({
             dbdone()
             input$refreshDbdown
             mdb <- selStatus$mdb
@@ -564,9 +564,11 @@ TKCAT_LOGO_DIV <- shiny::div(
             }
             return(
                shiny::a(
-                  list(icon("download"), sprintf("Download %s", n)),
+                  list(shiny::icon("download"), sprintf("Download %s", n)),
                   id="downloadTable",
-                  class="btn btn-default shiny-download-link shiny-bound-output",
+                  class=paste(
+                     "btn btn-default shiny-download-link shiny-bound-output"
+                  ),
                   href=file.path("data", session$token, fname),
                   target="_blank",
                   download=""
@@ -574,7 +576,7 @@ TKCAT_LOGO_DIV <- shiny::div(
             )
          })
          
-         observeEvent(input$prepDbdown, {
+         shiny::observeEvent(input$prepDbdown, {
             mdb <- shiny::isolate(selStatus$mdb)
             shiny::req(mdb)
             n <- shiny::isolate(selStatus$resource)
@@ -685,8 +687,8 @@ TKCAT_LOGO_DIV <- shiny::div(
       
       shiny::observe({
          selTables <- selStatus$tables
-         visNetworkProxy("dataModel") %>%
-            visSelectNodes(selTables)
+         visNetwork::visNetworkProxy("dataModel") %>%
+            visNetwork::visSelectNodes(selTables)
       })
       
       ########################@
@@ -754,8 +756,8 @@ TKCAT_LOGO_DIV <- shiny::div(
                      shiny::tags$strong("File size"),
                      ":",
                      data_file_size(mdb) %>% 
-                        filter(table==!!sel) %>% 
-                        pull("size") %>% 
+                        dplyr::filter(table==!!sel) %>% 
+                        dplyr::pull("size") %>% 
                         .format_file_size(),
                      sprintf("(showing %s records)", nr)
                   )
@@ -777,7 +779,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          )
       })
       
-      tabSubSet <- reactiveVal(NULL)
+      tabSubSet <- shiny::reactiveVal(NULL)
       shiny::observe({
          tabSubSet(NULL)
          mdb <- selStatus$mdb
@@ -797,7 +799,7 @@ TKCAT_LOGO_DIV <- shiny::div(
             }
             tmp <- dplyr::select(
                toShow,
-               all_of(setdiff(
+               dplyr::all_of(setdiff(
                   colnames(toShow),
                   tabMod$fields$name[which(tabMod$fields$type=="base64")]
                ))
@@ -819,9 +821,9 @@ TKCAT_LOGO_DIV <- shiny::div(
          toShow <- tabSubSet()
          shiny::req(toShow)
          if(!attr(toShow, "mat")){
-            mdb <- isolate(selStatus$mdb)
+            mdb <- shiny::isolate(selStatus$mdb)
             shiny::req(mdb)
-            sel <- isolate(selStatus$tables) %>% 
+            sel <- shiny::isolate(selStatus$tables) %>% 
                intersect(names(mdb))
             shiny::req(sel)
             shiny::req(length(sel)==1)
@@ -846,7 +848,9 @@ TKCAT_LOGO_DIV <- shiny::div(
                   nchar(toShow[[charf]]) > 100,
                   sprintf(
                      '<span title="%s" style="%s">%s...</span>',
-                     htmltools::htmlEscape(gsub('"', '&quot;', toShow[[charf]])),
+                     htmltools::htmlEscape(gsub(
+                        '"', '&quot;', toShow[[charf]]
+                     )),
                      'border-bottom: 1px dashed;',
                      htmltools::htmlEscape(substr(toShow[[charf]], 1, 90))
                   ),
@@ -906,9 +910,9 @@ TKCAT_LOGO_DIV <- shiny::div(
          cs <- input$dataSample_cells_selected
          shiny::req(cs)
          shiny::req(!attr(tabss, "mat"))
-         mdb <- isolate(selStatus$mdb)
+         mdb <- shiny::isolate(selStatus$mdb)
          shiny::req(mdb)
-         sel <- isolate(selStatus$tables) %>%
+         sel <- shiny::isolate(selStatus$tables) %>%
             intersect(names(mdb))
          shiny::req(sel)
          tabMod <- data_model(mdb)[[sel]]
@@ -926,7 +930,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          ))
       })
       
-      output$downloadB64 <- downloadHandler(
+      output$downloadB64 <- shiny::downloadHandler(
          filename = function() {
             tabss <- tabSubSet()
             cs <- input$dataSample_cells_selected
@@ -936,7 +940,7 @@ TKCAT_LOGO_DIV <- shiny::div(
             f <- colnames(tabss)[cs[2]+1]
             fd <- data_model(mdb)[[sel]]$fields %>%
                dplyr::filter(.data$name==!!f) %>%
-               pull(comment)
+               dplyr::pull("comment")
             extm <- regexpr("^ *[{][.]?[[:alnum:]]+[}]", fd)
             if(extm==-1){
                ext <- ""
@@ -961,7 +965,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          reqtables <- shiny::reactiveVal(character(0))
          tabledone <- shiny::reactiveVal(character(0))
          
-         output$tableDownload <- renderUI({
+         output$tableDownload <- shiny::renderUI({
             tabledone()
             input$refreshTabledown
             mdb <- selStatus$mdb
@@ -990,16 +994,20 @@ TKCAT_LOGO_DIV <- shiny::div(
                   shiny::tags$br(),
                   p(
                      strong("The file is being prepared", style="color:blue;"),
-                     shiny::actionButton("refreshTabledown", "Check availability")
+                     shiny::actionButton(
+                        "refreshTabledown", "Check availability"
+                     )
                   )
                )
             }
             return(
                shiny::tags$br(),
                shiny::a(
-                  list(icon("download"), sprintf("Download %s", sel)),
+                  list(shiny::icon("download"), sprintf("Download %s", sel)),
                   id="downloadTable",
-                  class="btn btn-default shiny-download-link shiny-bound-output",
+                  class=paste(
+                     "btn btn-default shiny-download-link shiny-bound-output"
+                  ),
                   href=file.path("data", session$token, fname),
                   target="_blank",
                   download=""
@@ -1007,7 +1015,7 @@ TKCAT_LOGO_DIV <- shiny::div(
             )
          })
          
-         observeEvent(input$prepTabledown, {
+         shiny::observeEvent(input$prepTabledown, {
             mdb <- shiny::isolate(selStatus$mdb)
             shiny::req(mdb)
             sel <- shiny::isolate(selStatus$tables) %>% 
@@ -1291,7 +1299,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       ###############################################@
       if(is.chTKCat(x)){
          
-         upwd <- reactiveVal(value="")
+         upwd <- shiny::reactiveVal(value="")
             
          ########################@
          ## System information ----
@@ -1503,7 +1511,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          "cells_all",
          "cell_last_clicked"
       )
-      setBookmarkExclude(c(
+      shiny::setBookmarkExclude(c(
          "searchInput", "sidebarItemExpanded",
          "silink", "disabledSoLink",
          "solink",

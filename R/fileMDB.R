@@ -317,10 +317,10 @@ is.fileMDB <- function(x){
 #' @export
 #' 
 rename.fileMDB <- function(.data, ...){
-   loc <- tidyselect::eval_rename(expr(c(...)), .data)
+   loc <- tidyselect::eval_rename(rlang::expr(c(...)), .data)
    names <- names(.data)
    names[loc] <- names(loc)
-   set_names(.data, names)
+   magrittr::set_names(.data, names)
 }
 
 
@@ -476,7 +476,7 @@ data_tables.fileMDB <- function(x, ..., skip=0, n_max=Inf){
       return(list())
    }
    m <- data_model(x)
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -517,7 +517,7 @@ heads.fileMDB <- function(x, ..., n=6L){
       return(list())
    }
    m <- data_model(x)
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -527,7 +527,7 @@ heads.fileMDB <- function(x, ..., n=6L){
       names(toTake),
       function(name){
          
-         if(is.MatrixModel(m[[name]])){
+         if(ReDaMoR::is.MatrixModel(m[[name]])){
             if(is.infinite(n)){
                return(data_tables(x, dplyr::all_of(name))[[1]])
             }
@@ -631,7 +631,7 @@ dims.fileMDB <- function(
       nr <- round(fs * (rsamp + 1) / sfs)
       return(c(nr, nc))
    }
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -742,7 +742,7 @@ data_file_size <- function(x, hr=FALSE){
       return(fileMDB(
          dataFiles=as.character(),
          dbInfo=dbi,
-         dataModel=RelDataModel(l=list()),
+         dataModel=ReDaMoR::RelDataModel(l=list()),
          readParameters=data_files(x)$readParameters
       ))
    }
@@ -865,7 +865,7 @@ as_fileMDB.fileMDB <- function(
    dir.create(modelPath)
    jModelPath <- file.path(modelPath, paste0(dbName, ".json"))
    hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
-   write_json_data_model(dm, jModelPath)
+   ReDaMoR::write_json_data_model(dm, jModelPath)
    if(htmlModel){
       plot(dm) %>%
          visNetwork::visSave(hModelPath)
@@ -953,7 +953,7 @@ filter.fileMDB <- function(.data, ..., .preserve=FALSE){
    
    ## Apply rules
    toRet <- list()
-   dots <- enquos(...)
+   dots <- rlang::enquos(...)
    files <- data_files(x)
    rp <- files$readParameters
    files <- files$dataFiles
@@ -1291,7 +1291,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
                         rn <- y$"___ROWNAMES___"
                         y <- t(y[, -1]) %>%
                            magrittr::set_colnames(rn) %>% 
-                           as_tibble(rownames="___COLNAMES___")
+                           dplyr::as_tibble(rownames="___COLNAMES___")
                         tname <- uuid::UUIDgenerate(n=1)
                         nulcol <- NULL
                         if(nullable){
@@ -1315,7 +1315,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
             ) %>% as.character()
             ch_insert(
                con=con, dbName=dbName, tableName=tn,
-               value=tibble(table=tlist)
+               value=dplyr::tibble(table=tlist)
             )
             
          }else{
@@ -1385,7 +1385,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
             )
             ch_insert(
                con=con, dbName=dbName, tableName=tn,
-               value=tibble(table=names(colList))
+               value=dplyr::tibble(table=names(colList))
             )
             
          }
@@ -1449,7 +1449,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
       ) %>% 
-         distinct()
+         dplyr::distinct()
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
@@ -1503,7 +1503,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
       ) %>% 
-         distinct()
+         dplyr::distinct()
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
@@ -1634,7 +1634,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
       td <- readr::read_delim(
          f,
          delim=delim, skip=skip, n_max=n_max,
-         col_types=col_types(tm),
+         col_types=ReDaMoR::col_types(tm),
          ...
       )
       
@@ -1694,7 +1694,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
       td <- readr::read_delim_chunked(
          f,
          delim=delim, skip=skip,
-         col_types=col_types(tm),
+         col_types=ReDaMoR::col_types(tm),
          ...
       )
       

@@ -142,10 +142,10 @@ print.TKCat <- function(x, ...){
 #' @export
 #' 
 rename.TKCat <- function(.data, ...){
-   loc <- tidyselect::eval_rename(expr(c(...)), .data)
+   loc <- tidyselect::eval_rename(rlang::expr(c(...)), .data)
    names <- names(.data)
    names[loc] <- names(loc)
-   set_names(.data, names)
+   magrittr::set_names(.data, names)
 }
 
 ###############################################################################@

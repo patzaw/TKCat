@@ -201,7 +201,7 @@ get_query.chMDB <- function(x, query, autoalias=!is_current_chMDB(x), ...){
       query <- paste(alias, query, sep=" ")
    }
    DBI::dbGetQuery(con, query, ...) %>%
-      as_tibble()
+      dplyr::as_tibble()
 }
 
 
@@ -543,7 +543,7 @@ as_chMDB <- function(x, tkcon, timestamp=Sys.time(), overwrite=FALSE, by=10^5){
             availableTables <- list_tables(tkcon$chcon, dbName) %>% 
                dplyr::select("table"="name", "instance"="name")
          }else{
-            availableTables <- tst %>% select("table", "instance")
+            availableTables <- tst %>% dplyr::select("table", "instance")
          }
          availableTables$path <- sprintf(
             "`%s`.`%s`", dbName, availableTables$instance
@@ -587,7 +587,8 @@ as_chMDB <- function(x, tkcon, timestamp=Sys.time(), overwrite=FALSE, by=10^5){
    
    ### Write DB information ----
    ch_insert(
-      con=con, dbName=dbName, tableName="___MDB___", value=as_tibble(dbInfo)
+      con=con, dbName=dbName, tableName="___MDB___",
+      value=dplyr::as_tibble(dbInfo)
    )
    
    ### Write data model ----
@@ -725,10 +726,10 @@ as_chMDB <- function(x, tkcon, timestamp=Sys.time(), overwrite=FALSE, by=10^5){
 #' @export
 #' 
 rename.chMDB <- function(.data, ...){
-   loc <- tidyselect::eval_rename(expr(c(...)), .data)
+   loc <- tidyselect::eval_rename(rlang::expr(c(...)), .data)
    names <- names(.data)
    names[loc] <- names(loc)
-   set_names(.data, names)
+   magrittr::set_names(.data, names)
 }
 
 
@@ -887,7 +888,7 @@ data_tables.chMDB <- function(x, ..., skip=0, n_max=Inf){
       n_max <- max(count_records(x, ...))
    }
    m <- data_model(x)
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -924,7 +925,7 @@ heads.chMDB <- function(x, ..., n=6L){
       return(list())
    }
    m <- data_model(x)
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -964,7 +965,7 @@ dims.chMDB <- function(x, ...){
          transposed=logical()
       ))
    }
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -1065,7 +1066,7 @@ db_tables <- function(x, host){
          tkcon=db_tables(x)$tkcon,
          dbTables=as.character(),
          dbInfo=dbi,
-         dataModel=RelDataModel(l=list())
+         dataModel=ReDaMoR::RelDataModel(l=list())
       ))
    }
    stopifnot(
@@ -1173,7 +1174,7 @@ as_fileMDB.chMDB <- function(
    dir.create(modelPath)
    jModelPath <- file.path(modelPath, paste0(dbName, ".json"))
    hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
-   write_json_data_model(dm, jModelPath)
+   ReDaMoR::write_json_data_model(dm, jModelPath)
    if(htmlModel){
       plot(dm) %>%
          visNetwork::visSave(hModelPath)
@@ -1256,7 +1257,7 @@ filter.chMDB <- function(.data, ..., by=10^5, .preserve=FALSE){
    
    ## Apply rules
    toRet <- list()
-   dots <- enquos(...)
+   dots <- rlang::enquos(...)
    for(tn in names(dots)){
       if(!tn %in% names(x)){
          stop(sprintf("%s table does not exist", tn))
@@ -1328,7 +1329,7 @@ slice.chMDB <- function(.data, ..., by=10^5, .preserve=FALSE){
       )
    }
    r <- s+by
-   while(r <= count_records(x, all_of(tn))){
+   while(r <= count_records(x, dplyr::all_of(tn))){
       s <- r
       j <- i-s
       j <- j[j>0 & j <=by]
@@ -1519,8 +1520,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       )
    }else{
       totake <- chFields %>%
-         filter(.data$table==!!mtables[[i]]) %>%
-         pull("name") %>% 
+         dplyr::filter(.data$table==!!mtables[[i]]) %>%
+         dplyr::pull("name") %>% 
          intersect(sel)
       totake <- c(dimcol, totake) %>% 
          paste(collapse="`, `")
@@ -1795,7 +1796,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       )
       attr(toRet, "data.type") <- NULL
       for (cn in colnames(toRet)) {
-         toRet[, cn] <- as_type(
+         toRet[, cn] <- ReDaMoR::as_type(
             dplyr::pull(toRet, !!cn),
             dplyr::filter(tableModel$fields, .data$name==!!cn) %>%
                dplyr::pull("type")
@@ -1890,7 +1891,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
    tableModel,
    n=6L
 ){
-   if(is.MatrixModel(tableModel)){
+   if(ReDaMoR::is.MatrixModel(tableModel)){
       dd <- .dim_ch_mtable(x, tablePath, tableModel)
       
       if(is.infinite(n)){
@@ -1937,7 +1938,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          autoalias=FALSE
       ) %>% 
          dplyr::filter(.data$name!=dimcol) %>% 
-         arrange(.data$name)
+         dplyr::arrange(.data$name)
       if(!dd$transposed){
          chFields <- chFields[1:nc,]
          lim <- nr
@@ -2005,7 +2006,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
       ) %>% 
-         distinct()
+         dplyr::distinct()
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
@@ -2054,7 +2055,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
       ) %>% 
-         distinct()
+         dplyr::distinct()
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]

@@ -227,7 +227,7 @@ str.MDB <- function(object, ...){
 #' @export
 #'
 select.MDB <- function(.data, ...){
-   i <- tidyselect::eval_select(expr(c(...)), .data)
+   i <- tidyselect::eval_select(rlang::expr(c(...)), .data)
    .data[i]
 }
 
@@ -307,7 +307,7 @@ add_collection_member <- function(
       def <- fd[[field]]
       toAdd <- rbind(
          toAdd,
-         tibble(
+         dplyr::tibble(
             field=field, static=def[["static"]], value=def[["value"]],
             type=ifelse(
                length(def[["type"]])!=1,
@@ -324,7 +324,7 @@ add_collection_member <- function(
    toAdd$table <- table
    cm <- rbind(
       cm,
-      select(
+      dplyr::select(
          toAdd,
          "collection", "cid", "resource", "mid", "table",
          "field", "static", "value", "type"
@@ -741,7 +741,7 @@ merge.MDB <- function(
             ...
          )
          for(cn in colnames(nrt)){
-            nrt[,cn] <- as_type(
+            nrt[,cn] <- ReDaMoR::as_type(
                dplyr::pull(nrt, !!cn),
                tm$fields$type[which(tm$fields$name==cn)]
             )
@@ -1024,7 +1024,7 @@ join_mdb_tables <- function(
       type=type,
       jtName=techname
    ) %>% 
-      rename(dplyr::all_of(magrittr::set_names(techname,jtName)))
+      dplyr::rename(dplyr::all_of(magrittr::set_names(techname,jtName)))
    return(toRet)
 }
 

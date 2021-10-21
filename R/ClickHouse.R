@@ -259,8 +259,10 @@ ch_insert <- function(
    on.exit(RClickhouse::dbSendQuery(con, "USE default"))
    
    if(nrow(value)>0){
-      fo <- DBI::dbGetQuery(con, sprintf("SELECT * FROM %s LIMIT 1", qname)) %>% 
-         colnames
+      fo <- DBI::dbGetQuery(
+         con, sprintf("SELECT * FROM %s LIMIT 1", qname)
+      ) %>% 
+         colnames()
       if(!all(colnames(value) %in% fo)){
          stop(
             "Some fields in value are not available in the table: ",
@@ -380,15 +382,14 @@ mergeTree_from_RelTableModel <- function(
 
 .get_tm_sortKey <- function(
    tm, # a [ReDaMoR::RelTableModel] object
-   quoted=FALSE # if TRUE, returns a single character value ClickHouse compatible
-               # if FALSE, returns a vector of character
+   quoted=FALSE # if TRUE, returns a single character value CH compatible
+                # if FALSE, returns a vector of character
 ){
    # By default: sort by primary key
    if(length(tm$primaryKey)>0){
       toRet <- tm$primaryKey
-      
    }else{
-      it <- index_table(tm)
+      it <- ReDaMoR::index_table(tm)
       if(!is.null(it) && nrow(it)>0){
          uit <- dplyr::filter(it, .data$uniqueIndex)
          

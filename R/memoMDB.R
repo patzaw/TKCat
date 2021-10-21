@@ -159,7 +159,7 @@ as_memoMDB <- function(x, ...){
 #' @export
 #' 
 rename.memoMDB <- function(.data, ...){
-   loc <- tidyselect::eval_rename(expr(c(...)), .data)
+   loc <- tidyselect::eval_rename(rlang::expr(c(...)), .data)
    names <- names(.data)
    names[loc] <- names(loc)
    magrittr::set_names(.data, names)
@@ -319,7 +319,7 @@ data_tables.memoMDB <- function(x, ..., skip=0, n_max=Inf){
       return(list())
    }
    m <- data_model(x)
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -357,7 +357,7 @@ heads.memoMDB <- function(x, ..., n=6L){
       return(list())
    }
    m <- data_model(x)
-   toTake <- tidyselect::eval_select(expr(c(...)), x)
+   toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
       toTake <- 1:length(x)
       names(toTake) <- names(x)
@@ -455,7 +455,7 @@ dims.memoMDB <- function(x, ...){
       dbi <- db_info(x)
       return(memoMDB(
          dataTables=list(),
-         dataModel=RelDataModel(l=list()),
+         dataModel=ReDaMoR::RelDataModel(l=list()),
          dbInfo=dbi
       ))
    }
@@ -547,7 +547,7 @@ as_fileMDB.memoMDB <- function(
    dir.create(modelPath)
    jModelPath <- file.path(modelPath, paste0(dbName, ".json"))
    hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
-   write_json_data_model(dm, jModelPath)
+   ReDaMoR::write_json_data_model(dm, jModelPath)
    if(htmlModel){
       plot(dm) %>%
          visNetwork::visSave(hModelPath)
@@ -620,7 +620,7 @@ filter.memoMDB <- function(.data, ..., .preserve=FALSE){
    
    ## Apply rules
    toRet <- list()
-   dots <- enquos(...)
+   dots <- rlang::enquos(...)
    for(tn in names(dots)){
       if(!tn %in% names(x)){
          stop(sprintf("%s table does not exist", tn))
@@ -827,10 +827,10 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
             if(transposed){
                stw <- tw[colList[[stn]], , drop=FALSE] %>% 
                   t() %>% 
-                  as_tibble(rownames="___COLNAMES___")
+                  dplyr::as_tibble(rownames="___COLNAMES___")
             }else{
                stw <- tw[, colList[[stn]], drop=FALSE] %>% 
-                  as_tibble(rownames="___ROWNAMES___")
+                  dplyr::as_tibble(rownames="___ROWNAMES___")
             }
             nulcol <- NULL
             if(nullable){
@@ -851,7 +851,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
          }
          ch_insert(
             con=con, dbName=dbName, tableName=tn,
-            value=tibble(table=names(colList))
+            value=dplyr::tibble(table=names(colList))
          )
       }else{
          toWrite <- x[[tn]]
@@ -895,7 +895,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
       ) %>% 
-         distinct()
+         dplyr::distinct()
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
@@ -928,7 +928,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
          fkf,
          fkt %>% dplyr::rename("from"="to", "ff"="tf", "to"="from", "tf"="ff")
       ) %>% 
-         distinct()
+         dplyr::distinct()
       if(nrow(fkl)>0){
          for(i in 1:nrow(fkl)){
             

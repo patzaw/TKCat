@@ -36,7 +36,7 @@ read_collection_members <- function(txt){
       mb <- mbl$tables[[i]]
       toAdd <- do.call(dplyr::bind_rows, lapply(
          mb$fields,
-         as_tibble
+         dplyr::as_tibble
       ))
       toAdd$field <- names(mb$fields)
       toAdd$table <- mb$name

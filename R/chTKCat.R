@@ -15,7 +15,8 @@
 #' @param http an integer specifying the HTTP port of the 
 #' ClickHouse database (default: NULL). Used for documentation only.
 #' @param settings list of
-#' [Clickhouse settings](https://clickhouse.com/docs/en/operations/settings/settings/)
+#' [Clickhouse 
+#' settings](https://clickhouse.com/docs/en/operations/settings/settings/)
 #'
 #' @return a chTKCat object
 #'
@@ -131,7 +132,7 @@ check_chTKCat <- function(x, verbose=FALSE){
          )
       ), silent=TRUE)
       if(inherits(ui, "try-error")){
-         ui <- dbGetQuery(
+         ui <- DBI::dbGetQuery(
             con,
             sprintf(
                "SELECT admin FROM default.Users WHERE login='%s'",
@@ -342,7 +343,7 @@ get_hosts.chTKCat <- function(x, ...){
 #'
 get_query.chTKCat <- function(x, query, ...){
    DBI::dbGetQuery(x$chcon, query, ...) %>%
-      as_tibble()
+      dplyr::as_tibble()
 }
 
 
@@ -952,7 +953,7 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
    }else{
       accessLevels <- c("none", "read only", "write and read")
       if(length(dbNames)==0){
-         toRet <- tibble(
+         toRet <- dplyr::tibble(
             name=character(),
             title=character(),
             description=character(),
@@ -1015,7 +1016,7 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
                   collapse=" UNION ALL "
                )
             )
-            mdbDesc <- left_join(mdbDesc, latestTS, by="name")
+            mdbDesc <- dplyr::left_join(mdbDesc, latestTS, by="name")
          }else{
             mdbDesc$latest <- NA
          }
@@ -1109,7 +1110,7 @@ search_MDB_tables.chTKCat <- function(x, searchTerm){
    )
    query <- paste(selQueries, collapse=" UNION ALL ")
    toRet <- get_query(x, query) %>% 
-      dplyr::arrange(desc(.data$ms)) %>%
+      dplyr::arrange(dplyr::desc(.data$ms)) %>%
       dplyr::select("resource", "name", "comment")
    return(toRet)
 }
@@ -1170,7 +1171,7 @@ search_MDB_fields.chTKCat <- function(x, searchTerm){
    )
    query <- paste(selQueries, collapse=" UNION ALL ")
    toRet <- get_query(x, query) %>%
-      dplyr::arrange(desc(.data$ms)) %>%
+      dplyr::arrange(dplyr::desc(.data$ms)) %>%
       dplyr::select(
          "resource", "table", "name", "comment",
          "type", "nullable", "unique"
@@ -1481,7 +1482,7 @@ set_chMDB_timestamp <- function(x, name, timestamp){
       ),
       get_query(x, sprintf("SELECT name FROM `%s`.`___Tables___`", name))$name
    )
-   ntst <- tibble(
+   ntst <- dplyr::tibble(
       timestamp=timestamp,
       table=mdbTables,
       instance=mdbTables
@@ -1510,7 +1511,7 @@ set_chMDB_timestamp <- function(x, name, timestamp){
       if(length(stables)>0){
          ntst <- rbind(
             ntst,
-            tibble(
+            dplyr::tibble(
                timestamp=timestamp,
                table=stables,
                instance=stables
@@ -1976,7 +1977,7 @@ set_chMDB_access <- function(x, mdb, public){
    )
    ch_insert(
       con, dbName=mdb, tableName="___Public___",
-      value=tibble(public=public)
+      value=dplyr::tibble(public=public)
    )
    update_chMDB_grants(x, mdb)
    invisible()
@@ -2031,7 +2032,9 @@ list_chMDB_users <- function(x, mdbs=NULL){
       }
    }
    if(length(mdbs)==0){
-      toRet <- tibble(db=character(), login=character(), admin=logical())
+      toRet <- dplyr::tibble(
+         db=character(), login=character(), admin=logical()
+      )
    }else{
       toRet <-  DBI::dbGetQuery(
          con,
@@ -2081,7 +2084,7 @@ add_chMDB_user <- function(x, mdb, login, admin=FALSE){
    con <- x$chcon
    ch_insert(
       con, dbName=mdb, tableName="___MDBUsers___",
-      value=tibble(login=login, admin=admin)
+      value=dplyr::tibble(login=login, admin=admin)
    )
    update_chMDB_grants(x, mdb)
    invisible()
@@ -2141,16 +2144,16 @@ remove_chMDB_user <- function(x, mdb, login){
 list_chTKCat_collections <- function(x, withJson=FALSE){
    stopifnot(is.chTKCat(x))
    if("Collections" %in% list_tables(x$chcon, "default")$name){
-      toRet <- dbGetQuery(
+      toRet <- DBI::dbGetQuery(
          conn=x$chcon,
          statement=sprintf(
             "SELECT title, description %s FROM default.Collections",
             ifelse(withJson, ", json", "")
          )
       ) %>%
-         as_tibble()
+         dplyr::as_tibble()
    }else{
-      toRet <- tibble("title"=character(), "description"=character())
+      toRet <- dplyr::tibble("title"=character(), "description"=character())
    }
    return(toRet)
 }
@@ -2173,7 +2176,7 @@ get_chTKCat_collection <- function(x, title){
    if(!title %in% list_chTKCat_collections(x)$title){
       stop("This collection is not available")
    }
-   dbGetQuery(
+   DBI::dbGetQuery(
       conn=x$chcon,
       statement=sprintf(
          "SELECT json FROM default.Collections WHERE title='%s'",
@@ -2593,7 +2596,7 @@ manage_chTKCat_users <- function(x, pwdFile=NULL){
          userInstance <- shiny::reactiveVal()
          
          ## Connect as user ----
-         observeEvent(input$connect, {
+         shiny::observeEvent(input$connect, {
             l <- shiny::isolate(input$login)
             p <- shiny::isolate(input$current_password)
             shiny::req(l)
@@ -2618,13 +2621,13 @@ manage_chTKCat_users <- function(x, pwdFile=NULL){
             ui <- userInstance()
             shiny::req(!is.null(ui))
             if(inherits(ui, "try-error")){
-               return(shiny::fluidRow(column(
+               return(shiny::fluidRow(shiny::column(
                   12,
                   shiny::p(shiny::strong("Bad credentials", style="color:red;"))
                )))
             }
             if(ui$chcon@user=="default"){
-               return(shiny::fluidRow(column(
+               return(shiny::fluidRow(shiny::column(
                   12,
                   shiny::p(shiny::strong(
                      "The default user cannot be modified",
@@ -2633,7 +2636,7 @@ manage_chTKCat_users <- function(x, pwdFile=NULL){
                )))
             }
             if(ui$chcon@user==x$chcon@user){
-               return(shiny::fluidRow(column(
+               return(shiny::fluidRow(shiny::column(
                   12,
                   shiny::p(shiny::strong(
                      sprintf("The %s user cannot be modified", x$chcon@user),
@@ -2645,7 +2648,7 @@ manage_chTKCat_users <- function(x, pwdFile=NULL){
             cur_cont <- ut %>%
                dplyr::filter(.data$login==ui$chcon@user) %>%
                dplyr::pull("contact")
-            toRet <- shiny::fluidRow(column(
+            toRet <- shiny::fluidRow(shiny::column(
                12,
                shiny::textInput(
                   "contact", "Contact", placeholder=cur_cont

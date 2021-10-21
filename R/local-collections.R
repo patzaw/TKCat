@@ -231,7 +231,7 @@ map_collection_members <- function(
          paste0(xm$field, "_x")[which(!xm$static)],
          paste0(ym$field, "_y")[which(!ym$static)]
       ))
-   toRet <- dplyr::select(toRet, all_of(names(toKeep)))
+   toRet <- dplyr::select(toRet, dplyr::all_of(names(toKeep)))
    colnames(toRet) <- toKeep[colnames(toRet)]
    
    return(toRet)

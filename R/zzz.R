@@ -2,7 +2,7 @@
 tkcatEnv <- new.env(hash=TRUE, parent=emptyenv())
 assign(
    x="COLLECTIONS",
-   value=tibble(
+   value=dplyr::tibble(
       title=character(), description=character(), json=character()
    ),
    envir=tkcatEnv
