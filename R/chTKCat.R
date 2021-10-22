@@ -2377,6 +2377,7 @@ collection_members.chTKCat <- function(
 #' The default is the TKCat hex sticker with a link to TKCat github repository.
 #' @param rDirs a named character vector with resource path
 #' for [shiny::addResourcePath]
+#' @param tabTitle a title to display in tab (default: "chTKCat")
 #' @param tabIcon a path to an image
 #' (in available resource paths: "www", "doc" or in rDirs) to use as a tab icon.
 #' 
@@ -2395,6 +2396,7 @@ explore_MDBs.chTKCat <- function(
    title=NULL,
    skinColors=c("blue", "yellow"),
    logoDiv=TKCAT_LOGO_DIV,
+   tabTitle="chTKCat",
    tabIcon='www/TKCat-small.png',
    rDirs=NULL,
    ...
@@ -2432,7 +2434,8 @@ explore_MDBs.chTKCat <- function(
    shiny::shinyApp(
       ui=.build_etkc_ui(
          x=x, ddir=ddir, userManager=!is.null(userManager),
-         logoDiv=logoDiv, rDirs=rDirs, tabIcon=tabIcon
+         logoDiv=logoDiv, rDirs=rDirs,
+         tabTitle=tabTitle, tabIcon=tabIcon
       ),
       server=.build_etkc_server(
          x=x,
@@ -2459,6 +2462,7 @@ explore_MDBs.chTKCat <- function(
 .build_etkc_ui.chTKCat <- function(
    x, ddir=NULL, userManager=FALSE,
    logoDiv=TKCAT_LOGO_DIV, rDirs=NULL,
+   tabTitle="chTKCat",
    tabIcon='www/TKCat-small.png',
    ...
 ){
@@ -2467,7 +2471,7 @@ explore_MDBs.chTKCat <- function(
    
    function(req){
       shinydashboard::dashboardPage(
-         title="chTKCat",
+         title=tabTitle,
          
          ########################@
          ## Dashboard header ----

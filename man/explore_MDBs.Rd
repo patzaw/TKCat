@@ -15,6 +15,7 @@
   skinColors = "green",
   logoDiv = TKCAT_LOGO_DIV,
   rDirs = NULL,
+  tabTitle = "TKCat",
   tabIcon = "www/TKCat-small.png",
   ...
 )
@@ -29,6 +30,7 @@
   title = NULL,
   skinColors = c("blue", "yellow"),
   logoDiv = TKCAT_LOGO_DIV,
+  tabTitle = "chTKCat",
   tabIcon = "www/TKCat-small.png",
   rDirs = NULL,
   ...
@@ -61,6 +63,8 @@ The default is the TKCat hex sticker with a link to TKCat github repository.}
 
 \item{rDirs}{a named character vector with resource path
 for \link[shiny:resourcePaths]{shiny::addResourcePath}}
+
+\item{tabTitle}{a title to display in tab (default: "chTKCat")}
 
 \item{tabIcon}{a path to an image
 (in available resource paths: "www", "doc" or in rDirs) to use as a tab icon.}
