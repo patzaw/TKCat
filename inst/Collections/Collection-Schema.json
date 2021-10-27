@@ -5,7 +5,7 @@
 	"type": "object",
 	"description": "Schema for defining collections of concepts",
 	"properties": {
-      "$schema": {"enum": ["TKCat_collections_1.0"]},
+      "$schema": {"enum": ["https://json-schema.org/draft/2019-09/schema"]},
       "$id": {"type": "string"},
 		"title": {"type": "string"},
 		"type": {"enum":["object"]},

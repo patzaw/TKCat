@@ -53,7 +53,7 @@ The following R packages available on CRAN are required:
 -   [jsonlite](https://CRAN.R-project.org/package=jsonlite): A Simple
     and Robust JSON Parser and Generator for R
 -   [jsonvalidate](https://CRAN.R-project.org/package=jsonvalidate):
-    Validate ‘JSON’
+    Validate ‘JSON’ Schema
 -   [base64enc](https://CRAN.R-project.org/package=base64enc): Tools for
     base64 encoding
 -   [markdown](https://CRAN.R-project.org/package=markdown): Render

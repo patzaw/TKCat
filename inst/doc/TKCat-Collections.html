@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2021-10-21" />
+<meta name="date" content="2021-10-27" />
 
 <title>TKCat Collections</title>
 
@@ -243,7 +243,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">TKCat Collections</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">October 21, 2021</h4>
+<h4 class="date">October 27, 2021</h4>
 
 </div>
 
@@ -271,7 +271,7 @@ div.tocify {
 <pre class="r"><code>get_local_collection(&quot;BE&quot;) %&gt;%
    paste(&#39;```json&#39;, ., &#39;```&#39;, sep=&quot;\n&quot;) %&gt;% cat()</code></pre>
 <pre class="json"><code>{
-   &quot;$schema&quot;: &quot;TKCat_collections_1.0&quot;,
+   &quot;$schema&quot;: &quot;https://json-schema.org/draft/2019-09/schema&quot;,
    &quot;$id&quot;:&quot;TKCat_BE_collection_1.0&quot;,
     &quot;title&quot;: &quot;BE collection&quot;,
     &quot;type&quot;: &quot;object&quot;,
@@ -410,7 +410,8 @@ div.tocify {
       &quot;examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json&quot;,
       package=&quot;TKCat&quot;
    ),
-   schema=get_local_collection(&quot;BE&quot;)
+   schema=get_local_collection(&quot;BE&quot;),
+   engine=&quot;ajv&quot;
 )</code></pre>
 <pre><code>## [1] TRUE</code></pre>
 <p>This validation is done automatically when reading a <em>fileMDB</em> object or when setting collection members with the <code>collection_members()</code> function.</p>

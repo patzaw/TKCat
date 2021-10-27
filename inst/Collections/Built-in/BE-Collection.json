@@ -1,5 +1,5 @@
 {
-   "$schema": "TKCat_collections_1.0",
+   "$schema": "https://json-schema.org/draft/2019-09/schema",
    "$id":"TKCat_BE_collection_1.0",
 	"title": "BE collection",
 	"type": "object",

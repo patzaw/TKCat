@@ -157,7 +157,8 @@ jsonvalidate::json_validate(
       "examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json",
       package="TKCat"
    ),
-   schema=get_local_collection("BE")
+   schema=get_local_collection("BE"),
+   engine="ajv"
 )
 ```
 
