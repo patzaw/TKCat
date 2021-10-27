@@ -2217,7 +2217,9 @@ add_chTKCat_collection <- function(x, json, overwrite=FALSE){
    }else{
       raw <- json
    }
-   if(!jsonvalidate::json_validate(raw, tkcatEnv$COL_SCHEMA, verbose=TRUE)){
+   if(!jsonvalidate::json_validate(
+      raw, tkcatEnv$COL_SCHEMA, verbose=TRUE, engine="ajv"
+   )){
       stop("Not a valid collection")
    }
    def <- jsonlite::fromJSON(raw)

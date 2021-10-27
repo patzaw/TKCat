@@ -18,7 +18,9 @@ import_local_collection <- function(txt, overwrite=FALSE){
       raw <- txt
    }
    
-   if(!jsonvalidate::json_validate(raw, tkcatEnv$COL_SCHEMA, verbose=TRUE)){
+   if(!jsonvalidate::json_validate(
+      raw, tkcatEnv$COL_SCHEMA, verbose=TRUE, engine="ajv"
+   )){
       stop("Not a valid collection")
    }
    def <- jsonlite::fromJSON(raw)
