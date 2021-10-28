@@ -45,6 +45,13 @@ for(f in list.files(here("doc"))){
 file.remove("doc")
 
 ##############################@
+## Copy introduction ----
+file.copy(
+   here("supp/introduction/Introduction-to-TKCat.html"),
+   here("docs/Introduction-to-TKCat.html")
+)
+
+##############################@
 ## Build and check package ----
 pv <- desc::desc_get_version(here())
 system(paste(
