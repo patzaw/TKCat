@@ -8,7 +8,7 @@
 \usage{
 \method{get_MDB}{TKCat}(x, dbName, ...)
 
-\method{get_MDB}{chTKCat}(x, dbName, timestamp = NA, n_max = 10, ...)
+\method{get_MDB}{chTKCat}(x, dbName, timestamp = NA, check = TRUE, n_max = 10, ...)
 
 get_MDB(x, dbName, ...)
 }
@@ -21,6 +21,9 @@ get_MDB(x, dbName, ...)
 
 \item{timestamp}{the timestamp of the instance to get.
 Default=NA: get the current version.}
+
+\item{check}{logical: if TRUE (default) the data are confronted to the
+data model}
 
 \item{n_max}{maximum number of records to read
 for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}

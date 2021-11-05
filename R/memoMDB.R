@@ -8,6 +8,8 @@
 #' "version", "maintainer".
 #' @param collectionMembers the members of collections as provided to the
 #' [collection_members<-] function (default: NULL ==> no member).
+#' @param check logical: if TRUE (default) the data are confronted to the
+#' data model
 #' @param checks a character vector with the name of optional checks to be
 #' done (all of them c("unique", "not nullable", "foreign keys"))
 #' @param verbose if TRUE display the data confrontation report
@@ -31,24 +33,27 @@ memoMDB <- function(
    dataModel,
    dbInfo,
    collectionMembers=NULL,
+   check=TRUE,
    checks=c("unique", "not nullable", "foreign keys"),
    verbose=FALSE
 ){
-   ## DB information ----
-   dbInfo <- .check_dbInfo(dbInfo)
-   
-   ## Confront data tables to the model ----
-   cr <- ReDaMoR::confront_data(
-      dataModel, data=dataTables, checks=checks, verbose=FALSE,
-      returnData=FALSE
-   )
-   assign("confrontationReport", cr, envir=tkcatEnv)
-   if(!cr$success){
-      cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
-      stop("Data do not fit the data model")
-   }
-   if(verbose){
-      cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+   if(check){
+      ## DB information ----
+      dbInfo <- .check_dbInfo(dbInfo)
+      
+      ## Confront data tables to the model ----
+      cr <- ReDaMoR::confront_data(
+         dataModel, data=dataTables, checks=checks, verbose=FALSE,
+         returnData=FALSE
+      )
+      assign("confrontationReport", cr, envir=tkcatEnv)
+      if(!cr$success){
+         cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+         stop("Data do not fit the data model")
+      }
+      if(verbose){
+         cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+      }
    }
    
    ## Object ----
@@ -456,7 +461,8 @@ dims.memoMDB <- function(x, ...){
       return(memoMDB(
          dataTables=list(),
          dataModel=ReDaMoR::RelDataModel(l=list()),
-         dbInfo=dbi
+         dbInfo=dbi,
+         check=FALSE
       ))
    }
    stopifnot(
@@ -483,7 +489,8 @@ dims.memoMDB <- function(x, ...){
       dataTables=dt,
       dataModel=dm,
       dbInfo=dbi,
-      collectionMembers=cm
+      collectionMembers=cm,
+      check=FALSE
    )
    return(toRet)
 }
@@ -716,7 +723,8 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables=TRUE, ...){
       dataTables=tables,
       dataModel=dm,
       dbInfo=db_info(x),
-      collectionMembers=cm
+      collectionMembers=cm,
+      check=FALSE
    ))
    
 }

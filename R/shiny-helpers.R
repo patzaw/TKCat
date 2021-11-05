@@ -444,7 +444,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::observe({
          n <- selStatus$resource
          shiny::req(n)
-         mdb <- try(get_MDB(instance$tkcat, n, n_max=1), silent=TRUE)
+         mdb <- try(get_MDB(instance$tkcat, n, check=FALSE), silent=TRUE)
          selStatus$mdb <- mdb
          if(
             inherits(mdb, "try-error") ||

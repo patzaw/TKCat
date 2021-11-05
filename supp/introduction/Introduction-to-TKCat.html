@@ -288,7 +288,7 @@ div.tocify {
 <h1 class="title toc-ignore">An introduction to TKCat</h1>
 <h3 class="subtitle">Using Tailored Knowledge Catalogs for improving data accessibility</h3>
 <h4 class="author"><a href="mailto:patrice.godard@gmail.com?Subject=TKCat">Patrice Godard</a></h4>
-<h4 class="date">October 21 2021</h4>
+<h4 class="date">November 05 2021</h4>
 
 </div>
 
@@ -547,7 +547,7 @@ db_info(f_mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2021-10-21 09:56:19
+## Timesamp: 2021-11-05 10:11:31
 ## </code></pre>
 <p>The <em>“No collection member”</em> statement will be addressed later in this document.</p>
 </div>
@@ -582,7 +582,7 @@ as_fileMDB(f_mhpo_db, path=tmpDir, htmlModel=FALSE)</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2021-10-21 09:56:19
+## Timesamp: 2021-11-05 10:11:31
 ## </code></pre>
 </div>
 </div>
@@ -749,7 +749,7 @@ collection_members(file_hpo)</code></pre>
 </div>
 <div id="tkcat-and-clickhouse" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> TKCat and ClickHouse</h1>
-<p>An MDB catalog can also be implemented in a <a href="https://clickhouse.tech/">Clickhouse</a> database (thanks to the <a href="https://github.com/IMSMWU/RClickhouse">RClickhouse</a> package). The creation and the management of such a database is described <a href="https://patzaw.github.io/TKCat/chTKCat-Operations-manual.html">here</a>.</p>
+<p>An MDB catalog can also be implemented in a <a href="https://clickhouse.com/">Clickhouse</a> database (thanks to the <a href="https://github.com/IMSMWU/RClickhouse">RClickhouse</a> package). The creation and the management of such a database is described <a href="https://patzaw.github.io/TKCat/chTKCat-Operations-manual.html">here</a>.</p>
 <p>After connection, <code>chTKCat</code> can be used like other <code>TKCat</code> objects described above.</p>
 <pre class="r"><code>k &lt;- chTKCat(host=&quot;localhost&quot;, user=&quot;pgodard&quot;)
 list_MDBs(k)

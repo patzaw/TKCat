@@ -37,6 +37,8 @@ TKCat <- function(..., list=NULL){
 #' @param path directory from which all the [fileMDB] should be read
 #' @param subdirs the sub directories (relative to path) to take into account.
 #' If NULL (default) all the sub directories are considered.
+#' @param check logical: if TRUE (default) the data are confronted to the
+#' data model
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
 #'
@@ -46,7 +48,7 @@ TKCat <- function(..., list=NULL){
 #' 
 #' @export
 #'
-scan_fileMDBs <- function(path, subdirs=NULL, n_max=10){
+scan_fileMDBs <- function(path, subdirs=NULL, check=TRUE, n_max=10){
    if(is.null(subdirs)){
       files <- list.files(path=path, full.names=TRUE)
    }else{
@@ -55,7 +57,7 @@ scan_fileMDBs <- function(path, subdirs=NULL, n_max=10){
    toRet <- list()
    for(f in files){
       toAdd <- suppressWarnings(try(read_fileMDB(
-         path=f, n_max=n_max
+         path=f, check=check, n_max=n_max
       ), silent=TRUE))
       if(!inherits(toAdd, "try-error")){
          toRet <- c(toRet, list(toAdd))

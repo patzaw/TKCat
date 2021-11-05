@@ -4,13 +4,16 @@
 \alias{scan_fileMDBs}
 \title{Scan a catalog of \link{fileMDB}}
 \usage{
-scan_fileMDBs(path, subdirs = NULL, n_max = 10)
+scan_fileMDBs(path, subdirs = NULL, check = TRUE, n_max = 10)
 }
 \arguments{
 \item{path}{directory from which all the \link{fileMDB} should be read}
 
 \item{subdirs}{the sub directories (relative to path) to take into account.
 If NULL (default) all the sub directories are considered.}
+
+\item{check}{logical: if TRUE (default) the data are confronted to the
+data model}
 
 \item{n_max}{maximum number of records to read
 for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}

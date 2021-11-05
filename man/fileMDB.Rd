@@ -18,6 +18,7 @@ fileMDB(
   dataModel,
   readParameters = DEFAULT_READ_PARAMS,
   collectionMembers = NULL,
+  check = TRUE,
   n_max = 10,
   verbose = FALSE
 )
@@ -51,6 +52,9 @@ fileMDB(
 
 \item{collectionMembers}{the members of collections as provided to the
 \link{collection_members<-} function (default: NULL ==> no member).}
+
+\item{check}{logical: if TRUE (default) the data are confronted to the
+data model}
 
 \item{n_max}{maximum number of records to read
 for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}

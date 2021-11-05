@@ -14,6 +14,8 @@
 #' @param dbInfo a list with DB information:
 #' **"name"** (only mandatory field), "title", "description", "url",
 #' "version", "maintainer".
+#' @param check logical: if TRUE (default) the data are confronted to the
+#' data model
 #'
 #' @return A metaMDB object
 #' 
@@ -33,11 +35,14 @@ metaMDB <- function(
    MDBs,
    relationalTables,
    dataModel,
-   dbInfo
+   dbInfo,
+   check=TRUE
 ){
    
    ## DB information ----
-   dbInfo <- .check_dbInfo(dbInfo)
+   if(check){
+      dbInfo <- .check_dbInfo(dbInfo)
+   }
    
    ## Ambiguous or inconsistent information ----
    udbn <- unique(names(MDBs))
@@ -61,15 +66,17 @@ metaMDB <- function(
    }
    
    ## Data models ----
-   for(mdb in names(MDBs)){
-      if(
-         !ReDaMoR::identical_RelDataModel(
-            data_model(MDBs[[mdb]]),
-            dataModel[names(MDBs[[mdb]]), rmForeignKeys=TRUE],
-            includeDisplay=FALSE
-         )
-      ){
-         stop("Incompatible datamodels")
+   if(check){
+      for(mdb in names(MDBs)){
+         if(
+            !ReDaMoR::identical_RelDataModel(
+               data_model(MDBs[[mdb]]),
+               dataModel[names(MDBs[[mdb]]), rmForeignKeys=TRUE],
+               includeDisplay=FALSE
+            )
+         ){
+            stop("Incompatible datamodels")
+         }
       }
    }
    
@@ -78,16 +85,19 @@ metaMDB <- function(
    if(!all(names(dataModel) %in% atn)){
       stop("Inconsistent data model")
    }
-   cr <- ReDaMoR::confront_data(
-      dataModel[names(relationalTables), rmForeignKeys=TRUE],
-      data=relationalTables,
-      verbose=FALSE,
-      returnData=FALSE
-   )
-   assign("confrontationReport", cr, envir=tkcatEnv)
-   if(!cr$success){
-      cat(ReDaMoR::format_confrontation_report(cr, title="Relational tables"))
-      stop("Data do not fit the data model")
+   
+   if(check){
+      cr <- ReDaMoR::confront_data(
+         dataModel[names(relationalTables), rmForeignKeys=TRUE],
+         data=relationalTables,
+         verbose=FALSE,
+         returnData=FALSE
+      )
+      assign("confrontationReport", cr, envir=tkcatEnv)
+      if(!cr$success){
+         cat(ReDaMoR::format_confrontation_report(cr, title="Relational tables"))
+         stop("Data do not fit the data model")
+      }
    }
    
    ## Object ----
@@ -545,7 +555,8 @@ dims.metaMDB <- function(x, ...){
          MDBs=list(),
          relationalTables=list(),
          dataModel=ReDaMoR::RelDataModel(l=list()),
-         dbInfo=dbi
+         dbInfo=dbi,
+         check=FALSE
       ))
    }
    stopifnot(
@@ -577,7 +588,8 @@ dims.metaMDB <- function(x, ...){
       MDBs=fmdbs,
       relationalTables=frt,
       dataModel=dm,
-      dbInfo=dbi
+      dbInfo=dbi,
+      check=FALSE
    )
    return(toRet)
 }
@@ -761,7 +773,7 @@ filter.metaMDB <- function(.data, ..., .preserve=FALSE){
          dataTables=oriRT,
          dataModel=data_model(x)[rtNames, rmForeignKeys=TRUE],
          dbInfo=list(name="reltables"),
-         checks=c()
+         check=FALSE
       ) %>%
          dplyr::filter(dots[mdbt]) %>% 
          data_tables()
@@ -879,12 +891,13 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE, ...){
          dataModel=do.call(
             c, magrittr::set_names(lapply(fmdbs, data_model), NULL)
          ),
-         dbInfo=db_info(x)
+         dbInfo=db_info(x),
+         check=FALSE
       ))
    }
    
    ## Filter relational tables ----
-   frdb <- as_memoMDB(x[names(data_model(x, rtOnly=TRUE))])
+   frdb <- as_memoMDB(x[names(data_model(x, rtOnly=TRUE))], check=FALSE)
    frdb <- filter_with_tables(
       x=frdb,
       tables=c(
@@ -937,7 +950,7 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE, ...){
    #          dplyr::pull("from")
    #    ) %>% 
    #    intersect(unlist(lapply(fmdbs, names)))
-   # frdb <- as_memoMDB(x[names(data_model(x, rtOnly=TRUE))])
+   # frdb <- as_memoMDB(x[names(data_model(x, rtOnly=TRUE))], check=FALSE)
    # frdb <- filter_with_tables(
    #    x=frdb,
    #    tables=do.call(c, set_names(lapply(
@@ -956,7 +969,8 @@ filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE, ...){
          union(unlist(lapply(fmdbs, names)), names(frdb)),
          rmForeignKeys=TRUE
       ],
-      dbInfo=db_info(x)
+      dbInfo=db_info(x),
+      check=FALSE
    )
    return(toRet)
    

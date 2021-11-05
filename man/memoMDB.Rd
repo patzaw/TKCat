@@ -14,6 +14,7 @@ memoMDB(
   dataModel,
   dbInfo,
   collectionMembers = NULL,
+  check = TRUE,
   checks = c("unique", "not nullable", "foreign keys"),
   verbose = FALSE
 )
@@ -39,6 +40,9 @@ memoMDB(
 
 \item{collectionMembers}{the members of collections as provided to the
 \link{collection_members<-} function (default: NULL ==> no member).}
+
+\item{check}{logical: if TRUE (default) the data are confronted to the
+data model}
 
 \item{checks}{a character vector with the name of optional checks to be
 done (all of them c("unique", "not nullable", "foreign keys"))}

@@ -479,6 +479,9 @@ c.MDB <- function(...){
    dbNames <- unlist(lapply(
       MDBs, function(x) db_info(x)$name
    ))
+   if(any(duplicated(dbNames))){
+      "MDBs to combine cannot have the same names"
+   }
    names(MDBs) <- dbNames
    dbModels <- lapply(MDBs, data_model) %>% 
       magrittr::set_names(NULL)
@@ -487,7 +490,8 @@ c.MDB <- function(...){
       MDBs=MDBs,
       relationalTables=NULL,
       dataModel=dataModel,
-      dbInfo=db_info(MDBs[[1]])
+      dbInfo=db_info(MDBs[[1]]),
+      check=FALSE
    ))
 }
 

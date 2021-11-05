@@ -11,6 +11,8 @@
 #' (e.g. `list(delim='\t', quoted_na=FALSE,)`)
 #' @param collectionMembers the members of collections as provided to the
 #' [collection_members<-] function (default: NULL ==> no member).
+#' @param check logical: if TRUE (default) the data are confronted to the
+#' data model
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
 #' @param verbose if TRUE display the data confrontation report
@@ -35,6 +37,7 @@ fileMDB <- function(
    dataModel,
    readParameters=DEFAULT_READ_PARAMS,
    collectionMembers=NULL,
+   check=TRUE,
    n_max=10,
    verbose=FALSE
 ){
@@ -49,7 +52,9 @@ fileMDB <- function(
    names(dataFiles) <- names(dataModel)
    
    ## DB information ----
-   dbInfo <- .check_dbInfo(dbInfo)
+   if(check){
+      dbInfo <- .check_dbInfo(dbInfo)
+   }
    
    ## Data model ----
    if(!ReDaMoR::is.RelDataModel(dataModel)){
@@ -59,32 +64,36 @@ fileMDB <- function(
    }
    
    ## Read parameters ----
-   readParameters <- .check_read_params(readParameters)
+   if(check){
+      readParameters <- .check_read_params(readParameters)
+   }
    
    ## Confront data to model ----
-   rnDataModel <- dataModel
-   if(length(dataModel)>0){
-      names(rnDataModel) <- sub(
-         pattern="(\\.[[:alnum:]]+)(\\.gz)?$", replacement="",
-         x=basename(dataFiles)
-      )
-      cr <- do.call(ReDaMoR::confront_data, c(
-         list(
-            rnDataModel,
-            paths=dataFiles,
-            returnData=FALSE,
-            verbose=FALSE,
-            n_max=n_max
-         ),
-         readParameters
-      ))
-      assign("confrontationReport", cr, envir=tkcatEnv)
-      if(!cr$success){
-         cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
-         stop("Data do not fit the data model")
-      }
-      if(verbose){
-         cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+   if(check){
+      rnDataModel <- dataModel
+      if(length(dataModel)>0){
+         names(rnDataModel) <- sub(
+            pattern="(\\.[[:alnum:]]+)(\\.gz)?$", replacement="",
+            x=basename(dataFiles)
+         )
+         cr <- do.call(ReDaMoR::confront_data, c(
+            list(
+               rnDataModel,
+               paths=dataFiles,
+               returnData=FALSE,
+               verbose=FALSE,
+               n_max=n_max
+            ),
+            readParameters
+         ))
+         assign("confrontationReport", cr, envir=tkcatEnv)
+         if(!cr$success){
+            cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+            stop("Data do not fit the data model")
+         }
+         if(verbose){
+            cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+         }
       }
    }
    
@@ -131,6 +140,8 @@ fileMDB <- function(
 #' @param collectionMembers the members of collections as provided to the
 #' [collection_members<-] function. If NULL (default), the members
 #' are taken from json files found in path/model/Collections
+#' @param check logical: if TRUE (default) the data are confronted to the
+#' data model
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
 #' @param verbose if TRUE (default) display the data confrontation report
@@ -148,6 +159,7 @@ read_fileMDB <- function(
    dbInfo=NULL,
    dataModel=NULL,
    collectionMembers=NULL,
+   check=TRUE,
    n_max=10,
    verbose=TRUE
 ){
@@ -248,6 +260,7 @@ read_fileMDB <- function(
       dataModel=dataModel,
       readParameters=readParameters,
       collectionMembers=collectionMembers,
+      check=check,
       n_max=n_max,
       verbose=verbose
    ))
@@ -743,7 +756,8 @@ data_file_size <- function(x, hr=FALSE){
          dataFiles=as.character(),
          dbInfo=dbi,
          dataModel=ReDaMoR::RelDataModel(l=list()),
-         readParameters=data_files(x)$readParameters
+         readParameters=data_files(x)$readParameters,
+         check=FALSE
       ))
    }
    stopifnot(
@@ -773,7 +787,8 @@ data_file_size <- function(x, hr=FALSE){
       dbInfo=dbi,
       dataModel=dm,
       readParameters=rp,
-      collectionMembers=cm
+      collectionMembers=cm,
+      check=FALSE
    )
    return(toRet)
 }
@@ -1095,7 +1110,8 @@ filter_with_tables.fileMDB <- function(
       dataTables=tables,
       dataModel=dm,
       dbInfo=db_info(x),
-      collectionMembers=cm
+      collectionMembers=cm,
+      check=FALSE
    ))
    
 }

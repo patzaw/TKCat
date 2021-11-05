@@ -75,6 +75,7 @@ devtools::install_github("patzaw/TKCat")
 
 Documentation is available in the following vignettes
 
+-   [Introduction](https://patzaw.github.io/TKCat/Introduction-to-TKCat.html)
 -   [General
     documentation](https://patzaw.github.io/TKCat/TKCat-User-guide.html)
 -   [Using TKCat with

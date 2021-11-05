@@ -1,5 +1,15 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
+## Version 0.7.1
+
+### New features
+
+- Checks can be bypassed when creating memoMDB, fileMDB, chMDB and metaMDB
+(check=FALSE): it make the creation of the object faster but it should be used
+only when the user knows what she/he is doing with the data and the model.
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 ## Version 0.7.0
 
 ### New features

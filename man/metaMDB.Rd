@@ -9,7 +9,7 @@
 \alias{$.metaMDB}
 \title{A metaMDB object}
 \usage{
-metaMDB(MDBs, relationalTables, dataModel, dbInfo)
+metaMDB(MDBs, relationalTables, dataModel, dbInfo, check = TRUE)
 
 \method{names}{metaMDB}(x) <- value
 
@@ -33,6 +33,9 @@ data model of all the MDBs plus the relational tables}
 \item{dbInfo}{a list with DB information:
 \strong{"name"} (only mandatory field), "title", "description", "url",
 "version", "maintainer".}
+
+\item{check}{logical: if TRUE (default) the data are confronted to the
+data model}
 
 \item{x}{a \link{metaMDB} object}
 

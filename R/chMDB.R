@@ -10,6 +10,8 @@
 #' @param dataModel a [ReDaMoR::RelDataModel] object
 #' @param collectionMembers the members of collections as provided to the
 #' [collection_members<-] function (default: NULL ==> no member).
+#' @param check logical: if TRUE (default) the data are confronted to the
+#' data model
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). If 0, the data are not checked.
 #' See also [ReDaMoR::confront_data()].
@@ -33,6 +35,7 @@ chMDB <- function(
    dbInfo,
    dataModel,
    collectionMembers=NULL,
+   check=TRUE,
    n_max=10,
    verbose=FALSE
 ){
@@ -43,7 +46,9 @@ chMDB <- function(
    )
    
    ## DB information ----
-   dbInfo <- .check_dbInfo(dbInfo)
+   if(check){
+      dbInfo <- .check_dbInfo(dbInfo)
+   }
    
    ## Data model ----
    if(!ReDaMoR::is.RelDataModel(dataModel)){
@@ -57,49 +62,57 @@ chMDB <- function(
       all(names(dbTables) %in% names(dataModel)),
       all(names(dataModel) %in% names(dbTables))
    )
-   if(length(dbTables)>0){
-      dbTables_t <- do.call(rbind, lapply(
-         strsplit(dbTables, split="`[.]`"),
-         function(x) gsub("`", "", x)
-      )) %>%
-         magrittr::set_colnames(c("database", "name")) %>% 
-         dplyr::as_tibble()
-      chTables <- list_tables(tkcon$chcon, dbNames=unique(dbTables_t$database))
-      missTab <- dplyr::anti_join(
-         dbTables_t, chTables, by=c("database", "name")
-      )
-      if(nrow(missTab)>0){
-         stop(
-            "The following tables are not in the clickhouse database: ",
-            sprintf("`%s`.`%s`", missTab$database, missTab$name) %>% 
-               paste(collapse=", ")
+   if(check){
+      if(length(dbTables)>0){
+         dbTables_t <- do.call(rbind, lapply(
+            strsplit(dbTables, split="`[.]`"),
+            function(x) gsub("`", "", x)
+         )) %>%
+            magrittr::set_colnames(c("database", "name")) %>% 
+            dplyr::as_tibble()
+         chTables <- list_tables(tkcon$chcon, dbNames=unique(dbTables_t$database))
+         missTab <- dplyr::anti_join(
+            dbTables_t, chTables, by=c("database", "name")
          )
+         if(nrow(missTab)>0){
+            stop(
+               "The following tables are not in the clickhouse database: ",
+               sprintf("`%s`.`%s`", missTab$database, missTab$name) %>% 
+                  paste(collapse=", ")
+            )
+         }
       }
    }
    
    ## Confront data to model ----
-   stopifnot(is.numeric(n_max), !is.na(n_max), length(n_max)==1)
-   if(n_max>0){
-      tmpk <- list(
-         tkcon=tkcon,
-         dbTables=dbTables[names(dataModel)],
-         dataModel=dataModel,
-         dbInfo=dbInfo
-      )
-      class(tmpk) <- c("chMDB", "MDB", class(tmpk))
-      dataTables <- heads(tmpk, n=n_max)
-      names(dataTables) <- names(dbTables)
-      cr <- ReDaMoR::confront_data(
-         dataModel, data=dataTables, n_max=n_max, verbose=FALSE,
-         returnData=FALSE
-      )
-      assign("confrontationReport", cr, envir=tkcatEnv)
-      if(!cr$success){
-         cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
-         stop("Data do not fit the data model")
-      }
-      if(verbose){
-         cat(ReDaMoR::format_confrontation_report(cr, title=dbInfo[["name"]]))
+   if(check){
+      stopifnot(is.numeric(n_max), !is.na(n_max), length(n_max)==1)
+      if(n_max>0){
+         tmpk <- list(
+            tkcon=tkcon,
+            dbTables=dbTables[names(dataModel)],
+            dataModel=dataModel,
+            dbInfo=dbInfo
+         )
+         class(tmpk) <- c("chMDB", "MDB", class(tmpk))
+         dataTables <- heads(tmpk, n=n_max)
+         names(dataTables) <- names(dbTables)
+         cr <- ReDaMoR::confront_data(
+            dataModel, data=dataTables, n_max=n_max, verbose=FALSE,
+            returnData=FALSE
+         )
+         assign("confrontationReport", cr, envir=tkcatEnv)
+         if(!cr$success){
+            cat(ReDaMoR::format_confrontation_report(
+               cr, title=dbInfo[["name"]]
+            ))
+            stop("Data do not fit the data model")
+         }
+         if(verbose){
+            cat(ReDaMoR::format_confrontation_report(
+               cr, title=dbInfo[["name"]]
+            ))
+         }
       }
    }
    
@@ -209,6 +222,8 @@ get_query.chMDB <- function(x, query, autoalias=!is_current_chMDB(x), ...){
 #'
 #' @param timestamp the timestamp of the instance to get.
 #' Default=NA: get the current version.
+#' @param check logical: if TRUE (default) the data are confronted to the
+#' data model
 #' @param n_max maximum number of records to read
 #' for checks purpose (default: 10). See also [ReDaMoR::confront_data()].
 #' 
@@ -217,7 +232,7 @@ get_query.chMDB <- function(x, query, autoalias=!is_current_chMDB(x), ...){
 #' 
 #' @export
 #'
-get_MDB.chTKCat <- function(x, dbName, timestamp=NA, n_max=10, ...){
+get_MDB.chTKCat <- function(x, dbName, timestamp=NA, check=TRUE, n_max=10, ...){
    timestamp <- as.POSIXct(timestamp)
    stopifnot(
       is.chTKCat(x),
@@ -335,6 +350,7 @@ get_MDB.chTKCat <- function(x, dbName, timestamp=NA, n_max=10, ...){
       dbInfo=dbInfo,
       dataModel=dataModel,
       collectionMembers=collectionMembers,
+      check=check,
       n_max=n_max,
       verbose=FALSE
    ))
@@ -1066,7 +1082,8 @@ db_tables <- function(x, host){
          tkcon=db_tables(x)$tkcon,
          dbTables=as.character(),
          dbInfo=dbi,
-         dataModel=ReDaMoR::RelDataModel(l=list())
+         dataModel=ReDaMoR::RelDataModel(l=list()),
+         check=FALSE
       ))
    }
    stopifnot(
@@ -1096,7 +1113,8 @@ db_tables <- function(x, host){
       dbTables=dbt,
       dbInfo=dbi,
       dataModel=dm,
-      collectionMembers=cm
+      collectionMembers=cm,
+      check=FALSE
    )
    return(toRet)
 }
@@ -1392,7 +1410,8 @@ filter_with_tables.chMDB <- function(x, tables, checkTables=TRUE, by=10^5, ...){
       dataTables=tables,
       dataModel=dm,
       dbInfo=db_info(x),
-      collectionMembers=cm
+      collectionMembers=cm,
+      check=FALSE
    ))
    
 }
