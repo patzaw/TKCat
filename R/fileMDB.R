@@ -52,9 +52,7 @@ fileMDB <- function(
    names(dataFiles) <- names(dataModel)
    
    ## DB information ----
-   if(check){
-      dbInfo <- .check_dbInfo(dbInfo)
-   }
+   dbInfo <- .check_dbInfo(dbInfo)
    
    ## Data model ----
    if(!ReDaMoR::is.RelDataModel(dataModel)){
@@ -64,9 +62,7 @@ fileMDB <- function(
    }
    
    ## Read parameters ----
-   if(check){
-      readParameters <- .check_read_params(readParameters)
-   }
+   readParameters <- .check_read_params(readParameters)
    
    ## Confront data to model ----
    if(check){

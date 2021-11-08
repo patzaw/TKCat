@@ -40,9 +40,7 @@ metaMDB <- function(
 ){
    
    ## DB information ----
-   if(check){
-      dbInfo <- .check_dbInfo(dbInfo)
-   }
+   dbInfo <- .check_dbInfo(dbInfo)
    
    ## Ambiguous or inconsistent information ----
    udbn <- unique(names(MDBs))
@@ -836,143 +834,9 @@ slice.metaMDB <- function(.data, ..., .preserve=FALSE){
 #'
 filter_with_tables.metaMDB <- function(x, tables, checkTables=TRUE, ...){
    
-   ## Check the tables ----
-   if(checkTables){
-      for(tn in names(tables)){
-         cr <- ReDaMoR::confront_table_data(data_model(x)[[tn]], tables[[tn]])
-         if(!cr$success){
-            stop(sprintf("The %s table does not fit the data model"), tn)
-         }
-      }
-   }
-   
-   ## Useful information ----
-   oriRT <- relational_tables(x)
-   rtNames <- names(oriRT)
-   
-   ## Filter the MDBs ----
-   fmdbs <- lapply(
-      MDBs(x),
-      function(y){
-         mdbt <- intersect(names(tables), names(y))
-         if(length(mdbt)>0){
-            toRet <- filter_with_tables(y, tables[mdbt], checkTables=FALSE, ...)
-         }else{
-            toRet <- NULL
-         }
-         return(toRet)
-      }
-   )
-   fmdbs <- fmdbs[which(unlist(lapply(fmdbs, is.MDB)))]
-   
-   ## Get relevant relational tables ----
-   dm <- data_model(x)
-   fk <- ReDaMoR::get_foreign_keys(dm)
-   toTake <- fk %>%
-      dplyr::filter(
-         .data$from %in% rtNames
-      ) %>%
-      dplyr::pull("to") %>% 
-      c(
-         fk %>%
-            dplyr::filter(
-               .data$to %in% rtNames
-            ) %>%
-            dplyr::pull("from")
-      ) %>% 
-      intersect(unlist(lapply(fmdbs, names))) %>% 
-      union(intersect(names(tables), rtNames))
-
-   ## No relational table to filter on ----
-   if(length(toTake)==0){
-      return(metaMDB(
-         MDBs=fmdbs,
-         relationalTables=list(),
-         dataModel=do.call(
-            c, magrittr::set_names(lapply(fmdbs, data_model), NULL)
-         ),
-         dbInfo=db_info(x),
-         check=FALSE
-      ))
-   }
-   
-   ## Filter relational tables ----
-   frdb <- as_memoMDB(x[names(data_model(x, rtOnly=TRUE))], check=FALSE)
-   frdb <- filter_with_tables(
-      x=frdb,
-      tables=c(
-         tables[intersect(toTake, rtNames)],
-         do.call(c, magrittr::set_names(lapply(
-            fmdbs,
-            function(y){
-               data_tables(y, dplyr::all_of(intersect(names(y), toTake)))
-            }
-         ), NULL))
-      )
-   )
-
-   ## Propagate filter -----
-   tables <- data_tables(
-      frdb,
-      dplyr::all_of(intersect(names(frdb), unlist(lapply(MDBs(x), names))))
-   )
-   tables <- c(
-      tables,
-      do.call(c, magrittr::set_names(lapply(fmdbs, function(y){
-         data_tables(y, dplyr::all_of(setdiff(names(y), names(tables))))
-      }), NULL))
-   )
-   fmdbs <- lapply(
-      MDBs(x),
-      function(y){
-         mdbt <- intersect(names(tables), names(y))
-         if(length(mdbt)>0){
-            toRet <- filter_with_tables(y, tables[mdbt], checkTables=FALSE, ...)
-         }else{
-            toRet <- NULL
-         }
-         return(toRet)
-      }
-   )
-   fmdbs <- fmdbs[which(unlist(lapply(fmdbs, is.MDB)))]
-   
-   ## Final filter of relational tables ----
-   # toTake <- fk %>%
-   #    dplyr::filter(
-   #       .data$from %in% rtNames
-   #    ) %>%
-   #    dplyr::pull("to") %>% 
-   #    c(
-   #       fk %>%
-   #          dplyr::filter(
-   #             .data$to %in% rtNames
-   #          ) %>%
-   #          dplyr::pull("from")
-   #    ) %>% 
-   #    intersect(unlist(lapply(fmdbs, names)))
-   # frdb <- as_memoMDB(x[names(data_model(x, rtOnly=TRUE))], check=FALSE)
-   # frdb <- filter_with_tables(
-   #    x=frdb,
-   #    tables=do.call(c, set_names(lapply(
-   #       fmdbs, function(y) data_tables(y, intersect(names(y), toTake))
-   #    ), NULL))
-   # )
-
-   ## Final object ----
-   toRet <- metaMDB(
-      MDBs=fmdbs,
-      relationalTables=data_tables(
-         frdb,
-         dplyr::all_of(setdiff(names(frdb), unlist(lapply(MDBs(x), names))))
-      ),
-      dataModel=data_model(x)[
-         union(unlist(lapply(fmdbs, names)), names(frdb)),
-         rmForeignKeys=TRUE
-      ],
-      dbInfo=db_info(x),
-      check=FALSE
-   )
-   return(toRet)
+   ## Dump all the data in memory for filtering
+   ##    ==> not efficient ==> dedicated usage
+   filter_with_tables(as_memoMDB(x), tables, checkTables=checkTables, ...)
    
 }
 

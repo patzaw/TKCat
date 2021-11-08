@@ -37,10 +37,10 @@ memoMDB <- function(
    checks=c("unique", "not nullable", "foreign keys"),
    verbose=FALSE
 ){
+   ## DB information ----
+   dbInfo <- .check_dbInfo(dbInfo)
+   
    if(check){
-      ## DB information ----
-      dbInfo <- .check_dbInfo(dbInfo)
-      
       ## Confront data tables to the model ----
       cr <- ReDaMoR::confront_data(
          dataModel, data=dataTables, checks=checks, verbose=FALSE,

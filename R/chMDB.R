@@ -46,9 +46,7 @@ chMDB <- function(
    )
    
    ## DB information ----
-   if(check){
-      dbInfo <- .check_dbInfo(dbInfo)
-   }
+   dbInfo <- .check_dbInfo(dbInfo)
    
    ## Data model ----
    if(!ReDaMoR::is.RelDataModel(dataModel)){
