@@ -373,7 +373,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       output$mdbList <- DT::renderDT({
          shiny::req(mdbs$list)
          colToTake <- intersect(
-            c("name", "title", "access", "timestamp"),
+            c("name", "title", "access", "maintainer", "timestamp"),
             colnames(mdbs$list)
          )
          toShow <- mdbs$list %>%
@@ -397,21 +397,29 @@ TKCAT_LOGO_DIV <- shiny::div(
          toShow <- dplyr::left_join(toShow, cm, by=c("Resource"="resource"))
          mdbs$validInput <- TRUE
          toRet <- DT::datatable(
-            toShow,
+            dplyr::mutate(
+               toShow,
+               Title=unlist(lapply(
+                  .data$Title,
+                  shiny::markdown
+               )),
+               Maintainer=unlist(lapply(
+                  .data$Maintainer,
+                  shiny::markdown
+               ))
+            ),
             rownames=FALSE,
             filter="top",
+            escape=FALSE,
             selection = list(
                mode="single",
                selected=which(
                   toShow$Resource==shiny::isolate(selStatus$resource)
                )
             ),
-            extensions='Scroller',
             options = list(
-               deferRender = TRUE,
-               scrollY = "70vh",
-               scroller = TRUE,
-               dom=c("ti"),
+               pageLength=10,
+               dom=c("ltip"),
                order=list(list(0, 'asc'))
             )
          )
@@ -472,9 +480,7 @@ TKCAT_LOGO_DIV <- shiny::div(
             n <- shiny::isolate(selStatus$resource)
             shiny::tagList(
                shiny::tags$p(
-                  "You don't have access to",
-                  shiny::strong(n),
-                  '(You can sign in with different credentials)',
+                  attr(mdb, "condition")$message,
                   style="color:red;"
                )
             )

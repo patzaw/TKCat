@@ -945,8 +945,18 @@ drop_chTKCat_user <- function(x, login){
 list_MDBs.chTKCat <- function(x, withInfo=TRUE){
    stopifnot(is.chTKCat(x))
    con <- x$chcon
-   dbNames <- DBI::dbGetQuery(con, "SELECT * FROM system.databases") %>% 
-      dplyr::pull("name") %>% 
+   dbNames <- DBI::dbGetQuery(
+      con,
+      sprintf(
+         "SELECT name, database FROM system.tables WHERE name IN ('%s')",
+         paste(c("___MDB___", "___Public___"), collapse="', '")
+      )
+   ) %>%
+      dplyr::group_by(.data$database) %>% 
+      dplyr::summarise(n=n()) %>% 
+      dplyr::ungroup() %>% 
+      dplyr::filter(.data$n==2) %>% 
+      dplyr::pull("database") %>% 
       setdiff(CH_RESERVED_DB)
    if(!withInfo){
       return(dbNames)

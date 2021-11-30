@@ -8,6 +8,15 @@
 (check=FALSE): it make the creation of the object faster but it should be used
 only when the user knows what she/he is doing with the data and the model.
 
+### Implementation hanges
+
+- Display in `explore_MDBs()`:
+
+   - maintainer is displayed in MDB table
+   - markdown tags maintainer and title are rendered in MDB table
+
+- `list_MDB.chTKCat()` filters DB based on *___MDB___* and *___Public___* tables
+
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 ## Version 0.7.0
@@ -16,7 +25,6 @@ only when the user knows what she/he is doing with the data and the model.
 
 - Support versioning of tables in chMDB using timestamps.
 - Support base64 data type.
-
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
