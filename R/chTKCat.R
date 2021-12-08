@@ -760,6 +760,8 @@ update_chTKCat_user <- function(
          x,
          sprintf("SELECT * FROM default.Users WHERE login='%s'", login)
       )
+      new_val$admin <- as.logical(new_val$admin)
+      new_val$provider <- as.logical(new_val$provider)
       
       ## Contact information ----
       if(!missing(contact)){
@@ -770,22 +772,21 @@ update_chTKCat_user <- function(
       
       ## Admin right ----
       updateGrants <- FALSE
+      if(!missing(provider)){
+         stopifnot(is.logical(provider), length(provider)==1, !is.na(provider))
+         new_val$provider <- provider
+         updateGrants <- TRUE
+      }
       if(!missing(admin)){
          stopifnot(is.logical(admin), length(admin)==1, !is.na(admin))
          new_val$admin <- admin
          if(admin){
-            provider <- TRUE
-         }else{
-            provider <- new_val$provider
+            new_val$provider <- TRUE
          }
          updateGrants <- TRUE
       }
-      if(!missing(provider)){
-         stopifnot(is.logical(provider), length(provider)==1, !is.na(provider))
-         new_val$provider <- provider
-         admin <- new_val$admin
-         updateGrants <- TRUE
-      }
+      provider <- new_val$provider
+      admin <- new_val$admin
 
       ## Update the value in 2 steps because of issues with Clickhouse UPDATE 
       RClickhouse::dbSendQuery(
