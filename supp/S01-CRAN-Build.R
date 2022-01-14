@@ -60,4 +60,4 @@ system(paste(
    sprintf("R CMD check --as-cran TKCat_%s.tar.gz", pv),
    sep=" ; "
 ))
-install.packages(here(sprintf("../TKCat_%s.tar.gz", pv)), repos=NULL)
+# install.packages(here(sprintf("../TKCat_%s.tar.gz", pv)), repos=NULL)

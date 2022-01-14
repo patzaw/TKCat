@@ -68,7 +68,10 @@ chMDB <- function(
          )) %>%
             magrittr::set_colnames(c("database", "name")) %>% 
             dplyr::as_tibble()
-         chTables <- list_tables(tkcon$chcon, dbNames=unique(dbTables_t$database))
+         chTables <- list_tables(
+            tkcon$chcon,
+            dbNames=unique(dbTables_t$database)
+         )
          missTab <- dplyr::anti_join(
             dbTables_t, chTables, by=c("database", "name")
          )
