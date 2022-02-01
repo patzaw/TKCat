@@ -588,15 +588,17 @@ as_fileMDB.memoMDB <- function(
          rntw <- rownames(x[[tn]])
          cntw <- colnames(x[[tn]])
          tw <- as_tibble(Matrix::summary(x[[tn]]))
-         writeLines(
-            c(
+         readr::write_delim(
+            tibble(h=c(
                "%%MatrixMarket matrix coordinate real general",
                paste0("%%Rownames: ", paste(rntw, collapse="\t")),
                paste0("%%Colnames: ", paste(cntw, collapse="\t")),
                paste(length(rntw), length(cntw), nrow(tw), sep=" ")
-            ),
-            sep="\n",
-            con=dfiles[tn]
+            )),
+            file=dfiles[tn],
+            delim="\t",
+            quote="none",
+            col_names=FALSE
          )
          readr::write_delim(
             tw, file=dfiles[tn],
