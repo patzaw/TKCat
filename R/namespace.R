@@ -26,4 +26,7 @@
 #' 
 #' @importFrom uuid UUIDgenerate
 #' 
+#' 
+#' @importFrom Matrix summary sparseMatrix
+#' 
 NULL

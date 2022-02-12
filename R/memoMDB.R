@@ -334,7 +334,7 @@ data_tables.memoMDB <- function(x, ..., skip=0, n_max=Inf){
       x$dataTables[toTake],
       function(d){
          if(skip >= nrow(d)){
-            return(d[c(),])
+            return(d[c(),, drop=FALSE])
          }
          n <- skip+1
          m <- min(nrow(d), n_max+skip)
@@ -587,9 +587,9 @@ as_fileMDB.memoMDB <- function(
       if(inherits(x[[tn]], c("dgCMatrix", "dgTMatrix"))){
          rntw <- rownames(x[[tn]])
          cntw <- colnames(x[[tn]])
-         tw <- as_tibble(Matrix::summary(x[[tn]]))
+         tw <- dplyr::as_tibble(Matrix::summary(x[[tn]]))
          readr::write_delim(
-            tibble(h=c(
+            dplyr::tibble(h=c(
                "%%MatrixMarket matrix coordinate real general",
                paste0("%%Rownames: ", paste(rntw, collapse="\t")),
                paste0("%%Colnames: ", paste(cntw, collapse="\t")),
