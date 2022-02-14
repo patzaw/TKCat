@@ -280,7 +280,7 @@ ch_insert <- function(
             DBI::dbAppendTable(
                conn=con,
                name=tableName, #qname,
-               value=dplyr::slice(value, s[i]:e[i]),
+               value=dplyr::slice(value, s[!!i]:e[!!i]),
                row.names=FALSE
                # append=TRUE
             ),
@@ -346,9 +346,10 @@ mergeTree_from_RelTableModel <- function(
          dbName=dbName,
          tableName=tm$tableName,
          value=dplyr::tibble(
-            table=character()
+            table=character(),
+            info=character()
          ),
-         rtypes=c("table"="character"),
+         rtypes=c("table"="character", "info"="character"),
          nullable=NULL,
          sortKey="table"
       )

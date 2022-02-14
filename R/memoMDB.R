@@ -334,7 +334,7 @@ data_tables.memoMDB <- function(x, ..., skip=0, n_max=Inf){
       x$dataTables[toTake],
       function(d){
          if(skip >= nrow(d)){
-            return(d[c(),, drop=FALSE])
+            return(d[integer(0),, drop=FALSE])
          }
          n <- skip+1
          m <- min(nrow(d), n_max+skip)
@@ -826,68 +826,133 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
    dm <- data_model(x)
    for(tn in names(x)){
       if(ReDaMoR::is.MatrixModel(dm[[tn]])){
-         if(ncol(x[[tn]]) > CH_MAX_COL && nrow(x[[tn]]) < ncol(x[[tn]])){
-            tw <- x[[tn]]
-            gc()
-            transposed <- TRUE
-            scn <- sort(rownames(tw))
-            colList <- seq(1, nrow(tw), by=CH_MAX_COL)
-            colList <- lapply(
-               colList,
-               function(i){
-                  scn[i:min(i+CH_MAX_COL-1, nrow(tw))]
-               }
+         
+         if(inherits(x[[tn]], c("dgCMatrix", "dgTMatrix"))){
+
+            ## Sparse matrix ----
+            
+            ## Rownames and colnames
+            rowTable <- dplyr::tibble(
+               i=1:nrow(x[[tn]]),
+               name=rownames(x[[tn]])
             )
-         }else{
-            tw <- x[[tn]]
-            transposed <- FALSE
-            scn <- sort(colnames(tw))
-            colList <- seq(1, ncol(tw), by=CH_MAX_COL)
-            colList <- lapply(
-               colList,
-               function(i){
-                  scn[i:min(i+CH_MAX_COL-1, ncol(tw))]
-               }
+            colTable <- dplyr::tibble(
+               j=1:ncol(x[[tn]]),
+               name=colnames(x[[tn]])
             )
-         }
-         names(colList) <- uuid::UUIDgenerate(n=length(colList))
-         nullable <- dm[[tn]]$fields %>% 
-            dplyr::filter(!.data$type %in% c("column", "row")) %>% 
-            dplyr::pull("nullable")
-         vtype <- dm[[tn]]$fields %>% 
-            dplyr::filter(!.data$type %in% c("column", "row")) %>% 
-            dplyr::pull("type")
-         for(stn in names(colList)){
-            if(transposed){
-               stw <- tw[colList[[stn]], , drop=FALSE] %>% 
-                  t() %>% 
-                  dplyr::as_tibble(rownames="___COLNAMES___")
-            }else{
-               stw <- tw[, colList[[stn]], drop=FALSE] %>% 
-                  dplyr::as_tibble(rownames="___ROWNAMES___")
-            }
-            nulcol <- NULL
-            if(nullable){
-               nulcol <- colList[[stn]]
-            }
+            modTable <- dplyr::tibble(
+               table=uuid::UUIDgenerate(n=3),
+               info=c("rows", "columns", "values")
+            )
             write_MergeTree(
                con=con,
                dbName=dbName,
-               tableName=stn,
-               value=stw,
-               rtypes=c("character", rep(vtype, ncol(stw) - 1)) %>% 
-                  magrittr::set_names(colnames(stw)),
-               nullable=nulcol,
-               sortKey=colnames(stw)[1]
+               tableName=modTable$table[which(modTable$info=="rows")],
+               value=rowTable,
+               rtypes=c("i"="integer", name="character"),
+               nullable=NULL,
+               sortKey="i"
             )
-            rm(stw)
-            gc()
+            write_MergeTree(
+               con=con,
+               dbName=dbName,
+               tableName=modTable$table[which(modTable$info=="columns")],
+               value=colTable,
+               rtypes=c("j"="integer", name="character"),
+               nullable=NULL,
+               sortKey="j"
+            )
+            
+            ## Values
+            valTable <- modTable$table[which(modTable$info=="values")]
+            tw <- dplyr::as_tibble(Matrix::summary(x[[tn]]))
+            write_MergeTree(
+               con=con,
+               dbName=dbName,
+               tableName=valTable,
+               value=tw,
+               rtypes=c("i"="integer", "j"="integer", "x"="numeric"),
+               nullable=NULL,
+               sortKey=c("i", "j")
+            )
+            
+            ## Reference table
+            ch_insert(
+               con=con, dbName=dbName, tableName=tn,
+               value=modTable
+            )
+            
+         }else{
+            
+            ## Matrix ----
+         
+            if(ncol(x[[tn]]) > CH_MAX_COL && nrow(x[[tn]]) < ncol(x[[tn]])){
+               tw <- x[[tn]]
+               gc()
+               transposed <- TRUE
+               scn <- sort(rownames(tw))
+               colList <- seq(1, nrow(tw), by=CH_MAX_COL)
+               colList <- lapply(
+                  colList,
+                  function(i){
+                     scn[i:min(i+CH_MAX_COL-1, nrow(tw))]
+                  }
+               )
+            }else{
+               tw <- x[[tn]]
+               transposed <- FALSE
+               scn <- sort(colnames(tw))
+               colList <- seq(1, ncol(tw), by=CH_MAX_COL)
+               colList <- lapply(
+                  colList,
+                  function(i){
+                     scn[i:min(i+CH_MAX_COL-1, ncol(tw))]
+                  }
+               )
+            }
+            names(colList) <- uuid::UUIDgenerate(n=length(colList))
+            nullable <- dm[[tn]]$fields %>% 
+               dplyr::filter(!.data$type %in% c("column", "row")) %>% 
+               dplyr::pull("nullable")
+            vtype <- dm[[tn]]$fields %>% 
+               dplyr::filter(!.data$type %in% c("column", "row")) %>% 
+               dplyr::pull("type")
+            for(stn in names(colList)){
+               if(transposed){
+                  stw <- tw[colList[[stn]], , drop=FALSE] %>% 
+                     t() %>% 
+                     dplyr::as_tibble(rownames="___COLNAMES___")
+               }else{
+                  stw <- tw[, colList[[stn]], drop=FALSE] %>% 
+                     dplyr::as_tibble(rownames="___ROWNAMES___")
+               }
+               nulcol <- NULL
+               if(nullable){
+                  nulcol <- colList[[stn]]
+               }
+               write_MergeTree(
+                  con=con,
+                  dbName=dbName,
+                  tableName=stn,
+                  value=stw,
+                  rtypes=c("character", rep(vtype, ncol(stw) - 1)) %>% 
+                     magrittr::set_names(colnames(stw)),
+                  nullable=nulcol,
+                  sortKey=colnames(stw)[1]
+               )
+               rm(stw)
+               gc()
+            }
+            ch_insert(
+               con=con, dbName=dbName, tableName=tn,
+               value=dplyr::tibble(table=names(colList), info="values")
+            )
+            
          }
-         ch_insert(
-            con=con, dbName=dbName, tableName=tn,
-            value=dplyr::tibble(table=names(colList))
-         )
-      }else{
+      }else{{
+         
+         ## Table ----
+         
          toWrite <- x[[tn]]
          b64_fields <- dm[[tn]]$fields %>% 
             dplyr::filter(.data$type=="base64") %>% 
@@ -907,7 +972,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
             )
          }
          ch_insert(con=con, dbName=dbName, tableName=tn, value=toWrite)
-      }
+      }}
    }
 }
 
@@ -1109,14 +1174,14 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
             if(nrow(d1)>0){
                rowToTake <- 1:nrow(d1)
             }else{
-               rowToTake <- c()
+               rowToTake <- interger(0)
             }
          }
          if(attr(d1val[[fi]], "f")=="row"){
             if(ncol(d1)>0){
                colToTake <- 1:ncol(d1)
             }else{
-               colToTake <- c()
+               colToTake <- integer(0)
             }
             rowToTake <- toTake
          }
