@@ -901,9 +901,9 @@ data_tables.chMDB <- function(x, ..., skip=0, n_max=Inf){
    if(length(x)==0){
       return(list())
    }
-   if(is.infinite(n_max)){
-      n_max <- max(count_records(x, ...))
-   }
+   # if(is.infinite(n_max)){
+   #    n_max <- max(count_records(x, ...))
+   # }
    m <- data_model(x)
    toTake <- tidyselect::eval_select(rlang::expr(c(...)), x)
    if(length(toTake)==0){
@@ -2403,6 +2403,15 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             nc
          )
          colNames <- get_query(x, cquery, autoalias=FALSE)
+         
+         mi <- max(rowNames$i)
+         mj <- max(colNames$j)
+         if(!mi %in% values$i || !mj %in% values$j){
+            values <- rbind(
+               values,
+               dplyr::tibble(i=mi, j=mj, x=0)
+            )
+         }
          
          toRet <- Matrix::sparseMatrix(
             i=as.integer(values$i), j=as.integer(values$j), x=values$x,

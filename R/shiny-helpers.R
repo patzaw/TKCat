@@ -385,16 +385,20 @@ TKCAT_LOGO_DIV <- shiny::div(
                   substr(x, 2, nchar(x))
                )
             })
-         cm <- mdbs$collections %>%
-            dplyr::select("collection", "resource") %>%
-            dplyr::distinct() %>%
-            dplyr::group_by(.data$resource) %>% 
-            dplyr::summarize(
-               collection=paste(.data$collection, collapse=", ")
-            ) %>%
-            dplyr::ungroup() %>%
-            dplyr::rename("Collections"="collection")
-         toShow <- dplyr::left_join(toShow, cm, by=c("Resource"="resource"))
+         if(nrow(mdbs$collections)>0){
+            cm <- mdbs$collections %>%
+               dplyr::select("collection", "resource") %>%
+               dplyr::distinct() %>%
+               dplyr::group_by(.data$resource) %>% 
+               dplyr::summarize(
+                  collection=paste(.data$collection, collapse=", ")
+               ) %>%
+               dplyr::ungroup() %>%
+               dplyr::rename("Collections"="collection")
+            toShow <- dplyr::left_join(toShow, cm, by=c("Resource"="resource"))
+         }else{
+            toShow <- dplyr::mutate(toShow, Collection=NA)
+         }
          mdbs$validInput <- TRUE
          toRet <- DT::datatable(
             dplyr::mutate(
@@ -893,7 +897,7 @@ TKCAT_LOGO_DIV <- shiny::div(
             }
          }else{
             toRet <- DT::datatable(
-               toShow,
+               as.matrix(toShow),
                rownames=TRUE,
                selection="none",
                extensions='Scroller',
