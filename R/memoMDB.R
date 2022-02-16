@@ -434,7 +434,10 @@ dims.memoMDB <- function(x, ...){
                format=ifelse(is.data.frame(y), "table", class(y)[1]),
                ncol=ncol(y),
                nrow=nrow(y),
-               records=ifelse(is.data.frame(y), nrow(y), ncol(y)*nrow(y)),
+               records=ifelse(
+                  is.data.frame(y), nrow(y),
+                  as.numeric(ncol(y)) * as.numeric(nrow(y))
+               ),
                transposed=FALSE
             )
          )

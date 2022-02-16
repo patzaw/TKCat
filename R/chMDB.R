@@ -2269,7 +2269,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             format="MatrixMarket",
             ncol=nc,
             nrow=nr,
-            records=nc*nr,
+            records=as.numeric(nc) * as.numeric(nr),
             transposed=FALSE
          )
          
@@ -2306,7 +2306,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             format="matrix",
             ncol=ifelse(transposed, nr, nc),
             nrow=ifelse(transposed, nc, nr),
-            records=nc*nr,
+            records=as.numeric(nc) * as.numeric(nr),
             transposed=transposed
          )
       

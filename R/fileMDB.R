@@ -698,7 +698,7 @@ dims.fileMDB <- function(
             dplyr::mutate(
                records=ifelse(
                   .data$format!="table",
-                  .data$ncol*.data$nrow,
+                  as.numeric(.data$ncol) * as.numeric(.data$nrow),
                   .data$nrow
                ),
                transposed=FALSE
