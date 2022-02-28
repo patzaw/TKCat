@@ -744,7 +744,12 @@ merge.MDB <- function(
             },
             ...
          )
-         for(cn in colnames(nrt)){
+         
+         cc <- unlist(lapply(nrt, function(x) class(x)[1]))
+         fcc <- dplyr::mutate(tm$fields, cc=cc[.data$name])
+         wc <- dplyr::filter(fcc, .data$type!=.data$cc) %>% dplyr::pull("name")
+         
+         for(cn in wc){
             nrt[,cn] <- ReDaMoR::as_type(
                dplyr::pull(nrt, !!cn),
                tm$fields$type[which(tm$fields$name==cn)]

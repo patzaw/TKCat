@@ -1826,8 +1826,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       dimname <- toRet[[dimcol]]
       toRet <- toRet[, -which(colnames(toRet)==dimcol), drop=FALSE] %>% 
          as.matrix() %>% 
-         magrittr::set_rownames(dimname) %>%
-         magrittr::set_class(vtype)
+         magrittr::set_rownames(dimname)
+      if(!vtype %in% c("Date", "POSIXct")){
+         toRet <- toRet %>% magrittr::set_class(vtype)
+      }
       if(frc=="r"){
          toRet <- toRet[intersect(fr, rownames(toRet)),, drop=FALSE]
       }
@@ -2157,8 +2159,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   magrittr::set_rownames(dimname)
                toRet <- c(toRet, list(toAdd))
             }
-            toRet <- do.call(cbind, toRet) %>%
-               magrittr::set_class(vtype)
+            toRet <- do.call(cbind, toRet)
+            if(!vtype %in% c("Date", "POSIXct")){
+               toRet <- magrittr::set_class(toRet, vtype)
+            }
             toRet <- toRet[, sort(colnames(toRet))]
          }else{
             if(skip >= nrow(chFields)){
@@ -2191,8 +2195,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                toRet <- c(toRet, list(toAdd))
             }
             toRet <- do.call(cbind, toRet) %>%
-               t() %>%
-               magrittr::set_class(vtype)
+               t()
+            if(!vtype %in% c("Date", "POSIXct")){
+               toRet <- magrittr::set_class(toRet, vtype)
+            }
             toRet <- toRet[sort(rownames(toRet)),]
          }
       }
@@ -2212,7 +2218,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          autoalias=FALSE
       )
       attr(toRet, "data.type") <- NULL
-      for (cn in colnames(toRet)) {
+      cc <- unlist(lapply(toRet, function(x) class(x)[1]))
+      fcc <- dplyr::mutate(tableModel$fields, cc=cc[.data$name])
+      wc <- dplyr::filter(fcc, .data$type!=.data$cc) %>% dplyr::pull("name")
+      for (cn in wc) {
          toRet[, cn] <- ReDaMoR::as_type(
             dplyr::pull(toRet, !!cn),
             dplyr::filter(tableModel$fields, .data$name==!!cn) %>%
@@ -2472,9 +2481,11 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                ncol(stqr) > 1
             )
             toAdd <- stqr[, -1, drop=FALSE] %>% 
-               as.matrix() %>% 
-               magrittr::set_class(vtype) %>% 
-               magrittr::set_rownames(dimname)
+               as.matrix()
+            if(!vtype %in% c("Date", "POSIXct")){
+               toAdd <- toAdd %>% magrittr::set_class(vtype)
+            }
+            toAdd <- toAdd %>% magrittr::set_rownames(dimname)
             toRet <- cbind(toRet, toAdd)
          }
          

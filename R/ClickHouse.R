@@ -383,8 +383,10 @@ mergeTree_from_RelTableModel <- function(
 
 .get_tm_sortKey <- function(
    tm, # a [ReDaMoR::RelTableModel] object
-   quoted=FALSE # if TRUE, returns a single character value CH compatible
-                # if FALSE, returns a vector of character
+   quoted=FALSE, # if TRUE, returns a single character value CH compatible
+                 # if FALSE, returns a vector of character
+   nsc=5         # Maximum number of columns to use for sorting if no index
+                 # is available
 ){
    # By default: sort by primary key
    if(length(tm$primaryKey)>0){
@@ -405,8 +407,8 @@ mergeTree_from_RelTableModel <- function(
          }
       }else{
          
-         # If no index, sort by all columns
-         toRet <- tm$fields$name
+         # If no index, sort by nsc first columns
+         toRet <- tm$fields$name[1:min(nsc, nrow(tm$fields))]
       }
    }
    if(quoted){
