@@ -194,8 +194,8 @@ get_hosts.chMDB <- function(x, ...){
 get_query.chMDB <- function(x, query, autoalias=!is_current_chMDB(x), ...){
    con <- unclass(x)$tkcon$chcon
    n <- unclass(x)$dbInfo$name
-   RClickhouse::dbSendQuery(con, sprintf("USE `%s`", n))
-   on.exit(RClickhouse::dbSendQuery(con, "USE default"))
+   DBI::dbSendQuery(con, sprintf("USE `%s`", n))
+   on.exit(DBI::dbSendQuery(con, "USE default"))
    if(is.na(autoalias)){
       autoalias <- FALSE
    }

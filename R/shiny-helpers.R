@@ -1320,12 +1320,18 @@ TKCAT_LOGO_DIV <- shiny::div(
                   shiny::tags$li(
                      shiny::tags$strong("Host"), ":", xparams$host
                   ),
-                  shiny::tags$li(
-                     shiny::tags$strong("Native port"), ":", k$chcon@port
-                  ),
-                  shiny::tags$li(
-                     shiny::tags$strong("HTTP port"), ":", k$http
-                  ),
+                  if(length(k$ports) > 0 ){
+                     shiny::tags$li(
+                        shiny::tags$strong("Available ports"), ":",
+                        do.call(shiny::tags$ul, lapply(names(k$ports), function(n){
+                           shiny::tags$li(
+                              shiny::tags$strong(n), ":", k$ports[n]
+                           )
+                        }))
+                     )
+                  }else{
+                     NULL
+                  },
                   shiny::tags$li(
                      shiny::tags$strong("Current user"), ":", k$chcon@user
                   ),

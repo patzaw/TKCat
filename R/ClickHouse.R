@@ -2,79 +2,20 @@
 #'
 #' @export
 #'
-db_disconnect.ClickhouseConnection <- function(x){
-   RClickhouse::dbDisconnect(x)
+db_disconnect.DBIConnection <- function(x){
+   DBI::dbDisconnect(x)
    invisible()
-}
-
-
-###############################################################################@
-#'
-#' @rdname db_reconnect
-#' @method db_reconnect ClickhouseConnection
-#' 
-#' @param settings list of
-#' [Clickhouse settings](https://clickhouse.com/docs/en/operations/settings/settings/)
-#'
-#' @export
-#'
-db_reconnect.ClickhouseConnection <- function(
-   x, user, password, ntries=3, settings=list(), ...
-){
-   xn <- deparse(substitute(x))
-   if(missing(user)){
-      user <- x@user
-   }
-   suppressWarnings(try(RClickhouse::dbDisconnect(x), silent=TRUE))
-   if(missing(password)){
-      nv <- try(RClickhouse::dbConnect(
-         drv=RClickhouse::clickhouse(),
-         host=x@host,
-         port=x@port,
-         user=user
-      ), silent=TRUE)
-      n <- 0
-      while(inherits(nv, "try-error") & n < ntries){
-         password <- getPass::getPass(
-            msg=paste0(user, " password on ", x@host, ":", x@port)
-         )
-         if(is.null(password)){
-            stop("Canceled by the user")
-         }
-         nv <- try(RClickhouse::dbConnect(
-            drv=RClickhouse::clickhouse(),
-            host=x@host,
-            port=x@port,
-            user=user, password=password
-         ), silent=TRUE)
-         n <- n+1
-      }
-      if(inherits(nv, "try-error")){
-         stop(as.character(nv))
-      }
-   }else{
-      nv <- RClickhouse::dbConnect(
-         drv=RClickhouse::clickhouse(),
-         host=x@host,
-         port=x@port,
-         user=user, password=password
-      )
-   }
-   for(s in names(settings)){
-      RClickhouse::dbSendQuery(nv, sprintf("SET %s='%s'", s, settings[[s]]))
-   }
-   assign(xn, nv, envir=parent.frame(n=1))
 }
 
 
 ###############################################################################@
 #' 
 #' @rdname get_hosts
-#' @method get_hosts ClickhouseConnection
+#' @method get_hosts DBIConnection
 #' 
 #' @export
 #'
-get_hosts.ClickhouseConnection <- function(x, ...){
+get_hosts.DBIConnection <- function(x, ...){
    paste(x@host, x@port, sep=":")
 }
 
@@ -97,7 +38,7 @@ list_tables <- function(
    con, dbNames=NULL
 ){
    stopifnot(
-      inherits(con, "ClickhouseConnection"),
+      inherits(con, "DBIConnection"),
       length(dbNames)==0 || is.character(dbNames) & all(!is.na(dbNames))
    )
    query <- paste(
@@ -150,7 +91,7 @@ write_MergeTree <- function(
    sortKey=NULL
 ){
    stopifnot(
-      inherits(con, "ClickhouseConnection"),
+      inherits(con, "DBIConnection"),
       is.character(dbName), length(dbName)==1, !is.na(dbName),
       is.character(tableName), length(tableName)==1, !is.na(tableName),
       is.data.frame(value),
@@ -212,7 +153,7 @@ write_MergeTree <- function(
       )
    }
    
-   RClickhouse::dbSendQuery(con, tst)
+   DBI::dbSendQuery(con, tst)
    
    ch_insert(con, dbName, tableName, value)
    
@@ -243,7 +184,7 @@ ch_insert <- function(
 ){
    
    stopifnot(
-      inherits(con, "ClickhouseConnection"),
+      inherits(con, "DBIConnection"),
       is.character(dbName), length(dbName)==1,
       is.character(tableName), length(tableName)==1,
       is.data.frame(value),
@@ -251,12 +192,12 @@ ch_insert <- function(
    )
    
    qname <- DBI::SQL(paste(
-      RClickhouse::dbQuoteIdentifier(con, dbName),
-      RClickhouse::dbQuoteIdentifier(con, tableName),
+      DBI::dbQuoteIdentifier(con, dbName),
+      DBI::dbQuoteIdentifier(con, tableName),
       sep="."
    ))
-   RClickhouse::dbSendQuery(con, sprintf("USE `%s`", dbName))
-   on.exit(RClickhouse::dbSendQuery(con, "USE default"))
+   DBI::dbSendQuery(con, sprintf("USE `%s`", dbName))
+   on.exit(DBI::dbSendQuery(con, "USE default"))
    
    if(nrow(value)>0){
       fo <- DBI::dbGetQuery(
@@ -311,7 +252,7 @@ mergeTrees_from_RelDataModel <- function(
    con, dbName, dbm
 ){
    stopifnot(
-      inherits(con, "ClickhouseConnection"),
+      inherits(con, "DBIConnection"),
       is.character(dbName), length(dbName)==1, !is.na(dbName),
       ReDaMoR::is.RelDataModel(dbm)
    )
@@ -336,7 +277,7 @@ mergeTree_from_RelTableModel <- function(
    con, dbName, tm
 ){
    stopifnot(
-      inherits(con, "ClickhouseConnection"),
+      inherits(con, "DBIConnection"),
       is.character(dbName), length(dbName)==1, !is.na(dbName),
       ReDaMoR::is.RelTableModel(tm)
    )

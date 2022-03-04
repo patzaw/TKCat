@@ -1,5 +1,24 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
+## Version 1.0.0
+
+### New features
+
+- Change default DBI backend to ClickhouseHTTP.
+- Allow selecting alternative driver.
+The 2 following are supported: `ClickhouseHTTP::ClickhouseHTTP()`
+and `RClickhouse::clickhouse()`
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+## Version 0.8.1
+
+### Implementation hanges
+
+- Avoid unnecessary data type conversions
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 ## Version 0.8.0
 
 ### New features

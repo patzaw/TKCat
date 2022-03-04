@@ -6,13 +6,15 @@
 \usage{
 chTKCat(
   host = "localhost",
-  port = 9101L,
+  port = 9111L,
   user = "default",
   password,
-  http = NULL,
   settings = list(max_query_size = 1073741824, use_uncompressed_cache = 0,
     load_balancing = "random", max_memory_usage = 0, allow_introspection_functions = 1,
-    joined_subquery_requires_alias = 0)
+    joined_subquery_requires_alias = 0),
+  ports = NULL,
+  drv = ClickHouseHTTP::ClickHouseHTTP(),
+  ...
 )
 }
 \arguments{
@@ -20,17 +22,25 @@ chTKCat(
 database (default: localhost)}
 
 \item{port}{an integer specifying the port on which the
-database is listening (default: 9101)}
+database is listening (default: 9111)}
 
 \item{user}{user name}
 
 \item{password}{user password}
 
-\item{http}{an integer specifying the HTTP port of the
-ClickHouse database (default: NULL). Used for documentation only.}
-
 \item{settings}{list of
 \href{https://clickhouse.com/docs/en/operations/settings/settings/}{Clickhouse settings}}
+
+\item{ports}{a named list of available ports for accessing ClickHouse
+(default: NULL; example: \code{c(Native=9101, HTTP=9111)})}
+
+\item{drv}{a DBI driver for connecting to ClickHouse
+(default: \code{\link[ClickHouseHTTP:ClickHouseHTTP]{ClickHouseHTTP::ClickHouseHTTP()}};
+other supported driver: \code{\link[RClickhouse:ClickhouseDriver-class]{RClickhouse::clickhouse()}})}
+
+\item{...}{additional parameters for connection
+(see \link[ClickHouseHTTP:ClickHouseHTTPDriver-class]{ClickHouseHTTP::dbConnect,ClickHouseHTTPDriver-method}
+for the default driver)}
 }
 \value{
 a chTKCat object

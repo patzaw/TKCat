@@ -1,7 +1,7 @@
-Package: TKCat
+Package: devTKCat
 Type: Package
 Title: Tailored Knowledge Catalog
-Version: 0.8.1
+Version: 1.0.0
 Authors@R: c(
     person(
         "Patrice", "Godard",
@@ -26,10 +26,10 @@ Depends:
    R (>= 3.6),
    ReDaMoR (>= 0.6.0),
    magrittr,
-   dplyr,
    DBI,
-   RClickhouse (>= 0.6.0)
+   dplyr
 Imports:
+   ClickHouseHTTP,
    rlang,
    tidyselect,
    visNetwork,
@@ -55,6 +55,5 @@ Suggests:
 License: GPL-3
 Encoding: UTF-8
 VignetteBuilder: knitr
-LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.2
