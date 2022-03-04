@@ -1031,13 +1031,18 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
          "SELECT name, database FROM system.tables WHERE name IN ('%s')",
          paste(c("___MDB___", "___Public___"), collapse="', '")
       )
-   ) %>%
-      dplyr::group_by(.data$database) %>% 
-      dplyr::summarise(n=n()) %>% 
-      dplyr::ungroup() %>% 
-      dplyr::filter(.data$n==2) %>% 
-      dplyr::pull("database") %>% 
-      setdiff(CH_RESERVED_DB)
+   )
+   if(nrow(dbNames) > 0){
+      dbNames <- dbNames %>%
+         dplyr::group_by(.data$database) %>% 
+         dplyr::summarise(n=n()) %>% 
+         dplyr::ungroup() %>% 
+         dplyr::filter(.data$n==2) %>% 
+         dplyr::pull("database") %>% 
+         setdiff(CH_RESERVED_DB)
+   }else{
+      dbNames <- character(0)
+   }
    if(!withInfo){
       return(dbNames)
    }else{
