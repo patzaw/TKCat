@@ -125,7 +125,8 @@ check_chTKCat <- function(x, verbose=FALSE){
    ## Available tables in the default database ----
    defaultTables <- DBI::dbGetQuery(
       con,
-      "SELECT name FROM system.tables WHERE database='default'"
+      "SELECT name FROM system.tables WHERE database='default'",
+      format="TabSeparatedWithNamesAndTypes"
    )$name
    
    ## Available databases ----
@@ -152,7 +153,8 @@ check_chTKCat <- function(x, verbose=FALSE){
          sprintf(
             "SELECT admin, provider FROM default.Users WHERE login='%s'",
             con@user
-         )
+         ),
+         format="TabSeparatedWithNamesAndTypes"
       ), silent=TRUE)
       if(inherits(ui, "try-error")){
          ui <- DBI::dbGetQuery(
@@ -160,7 +162,8 @@ check_chTKCat <- function(x, verbose=FALSE){
             sprintf(
                "SELECT admin FROM default.Users WHERE login='%s'",
                con@user
-            )
+            ),
+            format="TabSeparatedWithNamesAndTypes"
          )
       }
       admin <- as.logical(ui$admin)
@@ -179,7 +182,8 @@ check_chTKCat <- function(x, verbose=FALSE){
                admin, "*",
                "name, instance, version, contact"
             )
-         )
+         ),
+         format="Arrow"
       )
       if(
          any(
@@ -280,20 +284,38 @@ format.chTKCat <- function(x, ...){
             paste(
                "SELECT value FROM system.build_options ",
                "WHERE name='VERSION_DESCRIBE'"
-            )
+            ),
+            format="TabSeparatedWithNamesAndTypes"
          )$value
       ),
       sep="\n"
    )
    if(x$init){
-      toRet <- paste(
-         toRet,
-         sprintf("   - Instance: %s", x$instance),
-         sprintf("   - Version: %s", x$version),
-         sprintf("   - Instance contact: %s", x$contact),
-         sprintf("   - User: %s", x$chcon@user),
-         sep="\n"
-      )
+      toRet <- do.call(paste, c(
+         list(
+            toRet,
+            sprintf("   - Instance: %s", x$instance),
+            sprintf("   - Version: %s", x$version),
+            sprintf("   - Instance contact: %s", x$contact),
+            sprintf("   - User: %s", x$chcon@user),
+            "",
+            sprintf(
+                    "   - R DBI Driver: %s%s",
+               class(x$drv),
+               ifelse(
+                  is.null(attr(class(x$drv), "package")),
+                  "",
+                  sprintf(" (%s package)", attr(class(x$drv), "package"))
+               )
+            )
+         ),
+         lapply(names(x$cpar), function(p){
+            sprintf("      + %s: %s", p, x$cpar[[p]])
+         }),
+         list(
+            sep="\n"
+         )
+      ))
       if(x$admin){
          toRet <- paste(toRet, "ADMIN MODE", sep="\n")
       }
@@ -410,6 +432,11 @@ get_hosts.chTKCat <- function(x, ...){
 
 ###############################################################################@
 #' 
+#' @param ... Additional parameters for [dbGetQuery()] function.
+#' For the ClickHouseHTTP DBI, `format` can be set to "Arrow" (default) or
+#' "TabSeparatedWithNamesAndTypes"
+#' (see [ClickHouseHTTP::dbSendQuery,ClickHouseHTTPConnection,character-method])
+#' 
 #' @rdname get_query
 #' @method get_query chTKCat
 #' 
@@ -471,7 +498,8 @@ init_chTKCat <- function(
    }
    defaultTables <- DBI::dbGetQuery(
       con,
-      "SELECT name from system.tables WHERE database='default'"
+      "SELECT name from system.tables WHERE database='default'",
+      format="TabSeparatedWithNamesAndTypes"
    )$name
    if("System" %in% defaultTables){
       stop("chTKCat already initialized")
@@ -574,7 +602,8 @@ list_chTKCat_users <- function(x){
       paste(
          "SELECT name FROM system.columns",
          "WHERE database='default' AND table='Users'"
-      )
+      ),
+      format="TabSeparatedWithNamesAndTypes"
    ) %>%
       dplyr::pull("name")
    toRet <- DBI::dbGetQuery(
@@ -584,7 +613,8 @@ list_chTKCat_users <- function(x){
          ifelse(
             x$admin, "*",
             paste(intersect(uf, c("login", "admin", "provider")), collapse=", ")
-         )
+         ),
+         format="Arrow"
       )
    ) %>% 
       dplyr::as_tibble()
@@ -837,7 +867,8 @@ update_chTKCat_user <- function(
       
       new_val <- get_query(
          x,
-         sprintf("SELECT * FROM default.Users WHERE login='%s'", login)
+         sprintf("SELECT * FROM default.Users WHERE login='%s'", login),
+         format="Arrow"
       )
       new_val$admin <- as.logical(new_val$admin)
       new_val$provider <- as.logical(new_val$provider)
@@ -1030,7 +1061,8 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
       sprintf(
          "SELECT name, database FROM system.tables WHERE name IN ('%s')",
          paste(c("___MDB___", "___Public___"), collapse="', '")
-      )
+      ),
+      format="TabSeparatedWithNamesAndTypes"
    )
    if(nrow(dbNames) > 0){
       dbNames <- dbNames %>%
@@ -1079,7 +1111,8 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
                ") LEFT JOIN ",
                " (SELECT database AS db, total_rows FROM system.tables ",
                " WHERE name='___Timestamps___') USING db"
-            )
+            ),
+            format="Arrow"
          ) %>% 
             dplyr::as_tibble() %>% 
             dplyr::mutate(
@@ -1109,7 +1142,8 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
                      withTs, withTs
                   ),
                   collapse=" UNION ALL "
-               )
+               ),
+               format="TabSeparatedWithNamesAndTypes"
             )
             mdbDesc <- dplyr::left_join(mdbDesc, latestTS, by="name")
          }else{
@@ -1204,7 +1238,7 @@ search_MDB_tables.chTKCat <- function(x, searchTerm){
       "WHERE ms > 0"
    )
    query <- paste(selQueries, collapse=" UNION ALL ")
-   toRet <- get_query(x, query) %>% 
+   toRet <- get_query(x, query, format="Arrow") %>% 
       dplyr::arrange(dplyr::desc(.data$ms)) %>%
       dplyr::select("resource", "name", "comment")
    return(toRet)
@@ -1265,7 +1299,7 @@ search_MDB_fields.chTKCat <- function(x, searchTerm){
       "WHERE ms > 0"
    )
    query <- paste(selQueries, collapse=" UNION ALL ")
-   toRet <- get_query(x, query) %>%
+   toRet <- get_query(x, query, format="Arrow") %>%
       dplyr::arrange(dplyr::desc(.data$ms)) %>%
       dplyr::select(
          "resource", "table", "name", "comment",
@@ -1503,7 +1537,10 @@ list_chMDB_timestamps <- function(x, name){
    if(!"___Timestamps___" %in% allTables$name){
       return(NULL)
    }
-   toRet <- get_query(x, sprintf("SELECT * FROM `%s`.`___Timestamps___`", name))
+   toRet <- get_query(
+      x, sprintf("SELECT * FROM `%s`.`___Timestamps___`", name),
+      format="TabSeparatedWithNamesAndTypes"
+   )
    current <- toRet %>%
       dplyr::filter(
          .data$instance=="___MDB___" & .data$table=="___MDB___"
@@ -1575,7 +1612,10 @@ set_chMDB_timestamp <- function(x, name, timestamp){
          names(CHMDB_DATA_MODEL),
          MGT_TABLES
       ),
-      get_query(x, sprintf("SELECT name FROM `%s`.`___Tables___`", name))$name
+      get_query(
+         x, sprintf("SELECT name FROM `%s`.`___Tables___`", name),
+         format="TabSeparatedWithNamesAndTypes"
+      )$name
    )
    ntst <- dplyr::tibble(
       timestamp=timestamp,
@@ -1589,7 +1629,8 @@ set_chMDB_timestamp <- function(x, name, timestamp){
       sprintf(
          "SELECT table FROM `%s`.`___Fields___` WHERE type='row'",
          name
-      )
+      ),
+      format="TabSeparatedWithNamesAndTypes"
    )$table %>% 
       unique()
    if(length(sdtables)>0){
@@ -1601,7 +1642,8 @@ set_chMDB_timestamp <- function(x, name, timestamp){
                sdtables, name, sdtables
             ),
             collapse=" UNION ALL "
-         )
+         ),
+         format="TabSeparatedWithNamesAndTypes"
       )$subtab
       if(length(stables)>0){
          ntst <- rbind(
@@ -1632,7 +1674,8 @@ set_chMDB_timestamp <- function(x, name, timestamp){
          sprintf(
             "SELECT * FROM `%s`.`___Timestamps___` WHERE timestamp=%s",
             name, as.numeric(current)
-         )
+         ),
+         format="TabSeparatedWithNamesAndTypes"
       )
       if(nrow(toRm)==0){
          stop("Error in timestamp encoding. Contact chTKCat admin.")
@@ -1700,7 +1743,8 @@ empty_chMDB <- function(
       sprintf(
          "SELECT DISTINCT table FROM `%s`.___Fields___ WHERE type='column'",
          name
-      )
+      ),
+      format="TabSeparatedWithNamesAndTypes"
    )$table
    get_submat_tn <- function(n){
       n <- intersect(n, matTables)
@@ -1715,7 +1759,8 @@ empty_chMDB <- function(
                   name, n
                ),
                collapse=" UNION ALL "
-            )
+            ),
+            format="TabSeparatedWithNamesAndTypes"
          )$table)
       }
    }
@@ -1861,7 +1906,8 @@ archive_chMDB <- function(
       names(CHMDB_DATA_MODEL),
       get_query(
          x,
-         sprintf("SELECT name FROM `%s`.`___Tables___`", name)
+         sprintf("SELECT name FROM `%s`.`___Tables___`", name),
+         format="TabSeparatedWithNamesAndTypes"
       )$name
    )
    toArchive <- tst %>% 
@@ -2031,7 +2077,8 @@ is_chMDB_public <- function(x, mdb){
    con <- x$chcon
    toRet <- DBI::dbGetQuery(
       con, 
-      sprintf("SELECT public from `%s`.___Public___", mdb)
+      sprintf("SELECT public from `%s`.___Public___", mdb),
+      format="TabSeparatedWithNamesAndTypes"
    ) %>%
       dplyr::pull("public") %>% 
       as.logical()
@@ -2102,7 +2149,8 @@ list_chMDB_users <- function(x, mdbs=NULL){
    allMdbs <- list_MDBs(x, withInfo=FALSE)
    mdbWithUsers <- DBI::dbGetQuery(
       con,
-      "SELECT database FROM system.tables WHERE name='___MDBUsers___'"
+      "SELECT database FROM system.tables WHERE name='___MDBUsers___'",
+      format="TabSeparatedWithNamesAndTypes"
    ) %>%
       dplyr::pull("database")
    if(is.null(mdbs)){
@@ -2139,7 +2187,8 @@ list_chMDB_users <- function(x, mdbs=NULL){
                mdbs, mdbs
             ),
             collapse=" UNION ALL "
-         )
+         ),
+         format="TabSeparatedWithNamesAndTypes"
       ) %>%
          dplyr::as_tibble() %>% 
          dplyr::mutate(admin=as.logical(.data$admin)) %>% 
@@ -2244,7 +2293,8 @@ list_chTKCat_collections <- function(x, withJson=FALSE){
          statement=sprintf(
             "SELECT title, description %s FROM default.Collections",
             ifelse(withJson, ", json", "")
-         )
+         ),
+         format="Arrow"
       ) %>%
          dplyr::as_tibble()
    }else{
@@ -2276,7 +2326,8 @@ get_chTKCat_collection <- function(x, title){
       statement=sprintf(
          "SELECT json FROM default.Collections WHERE title='%s'",
          title
-      )
+      ),
+      format="Arrow"
    )$json
 }
 
@@ -2411,7 +2462,10 @@ collection_members.chTKCat <- function(
 ){
    
    con <- x$chcon
-   dbNames <- DBI::dbGetQuery(con, "SELECT name FROM system.databases") %>% 
+   dbNames <- DBI::dbGetQuery(
+      con, "SELECT name FROM system.databases",
+      format="TabSeparatedWithNamesAndTypes"
+   ) %>% 
       dplyr::pull("name") %>% 
       setdiff(CH_RESERVED_DB)
    
@@ -2420,7 +2474,8 @@ collection_members.chTKCat <- function(
    for(dbName in dbNames){
       dbTables <- DBI::dbGetQuery(
          con,
-         sprintf("SHOW TABLES FROM `%s`", dbName)
+         sprintf("SHOW TABLES FROM `%s`", dbName),
+         format="TabSeparatedWithNamesAndTypes"
       )
       if("___CollectionMembers___" %in% dbTables$name){
          toRet <- dplyr::bind_rows(
@@ -2433,7 +2488,8 @@ collection_members.chTKCat <- function(
                      "FROM `%s`.___CollectionMembers___"
                   ),
                   dbName
-               )
+               ),
+               format="TabSeparatedWithNamesAndTypes"
             ) %>%
                dplyr::as_tibble() %>%
                dplyr::mutate(resource=dbName) %>% 

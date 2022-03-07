@@ -185,6 +185,10 @@ get_hosts.chMDB <- function(x, ...){
 #' using the table names from the data model. If FALSE, the user must know the
 #' table instance name in the remote database. By default, autoalias is set
 #' to TRUE when using a non-current instance of the database.
+#' @param ... Additional parameters for [dbGetQuery()] function.
+#' For the ClickHouseHTTP DBI, `format` can be set to "Arrow" (default) or
+#' "TabSeparatedWithNamesAndTypes"
+#' (see [ClickHouseHTTP::dbSendQuery,ClickHouseHTTPConnection,character-method])
 #' 
 #' @rdname get_query
 #' @method get_query chMDB
@@ -292,19 +296,24 @@ get_MDB.chTKCat <- function(x, dbName, timestamp=NA, check=TRUE, n_max=10, ...){
    }
    dbm <- list(
       tables=get_query(
-         x, tsSelect("___Tables___")
+         x, tsSelect("___Tables___"),
+         format="Arrow"
       ),
       fields=get_query(
-         x, tsSelect("___Fields___")
+         x, tsSelect("___Fields___"),
+         format="Arrow"
       ),
       primaryKeys=get_query(
-         x, tsSelect("___PrimaryKeys___")
+         x, tsSelect("___PrimaryKeys___"),
+         format="TabSeparatedWithNamesAndTypes"
       ),
       foreignKeys=get_query(
-         x, tsSelect("___ForeignKeys___")
+         x, tsSelect("___ForeignKeys___"),
+         format="TabSeparatedWithNamesAndTypes"
       ),
       indexes=get_query(
-         x, tsSelect("___Indexes___")
+         x, tsSelect("___Indexes___"),
+         format="TabSeparatedWithNamesAndTypes"
       )
    )
    dbm$fields$nullable <- as.logical(dbm$fields$nullable)
@@ -314,7 +323,8 @@ get_MDB.chTKCat <- function(x, dbName, timestamp=NA, check=TRUE, n_max=10, ...){
    
    ## DB information ----
    dbInfo <- as.list(get_query(
-      x, tsSelect("___MDB___")
+      x, tsSelect("___MDB___"),
+      format="Arrow"
    ))
    dbInfo <- c(dbInfo, list("timestamp"=as.POSIXct(timestamp)))
 
@@ -333,7 +343,8 @@ get_MDB.chTKCat <- function(x, dbName, timestamp=NA, check=TRUE, n_max=10, ...){
    
    ## Collection members ----
    collectionMembers <- get_query(
-      x, tsSelect("___CollectionMembers___")
+      x, tsSelect("___CollectionMembers___"),
+      format="TabSeparatedWithNamesAndTypes"
    ) %>%
       dplyr::mutate(
          resource=dbName,
@@ -1229,19 +1240,28 @@ as_fileMDB.chMDB <- function(
          tdb <- sub("^`", "", sub("`[.]`.*$", "", dbti))
          
          tquery <- sprintf("SELECT * FROM %s", dbti)
-         qr <- get_query(x, tquery, autoalias=FALSE)
+         qr <- get_query(
+            x, tquery, autoalias=FALSE,
+            format="TabSeparatedWithNamesAndTypes"
+         )
          
          rquery <- sprintf(
             "SELECT i, name FROM %s ORDER BY i",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="rows")])
          )
-         rowNames <- get_query(x, rquery, autoalias=FALSE)
+         rowNames <- get_query(
+            x, rquery, autoalias=FALSE,
+            format="Arrow"
+         )
          
          cquery <- sprintf(
             "SELECT j, name FROM %s ORDER BY j",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="columns")])
          )
-         colNames <- get_query(x, cquery, autoalias=FALSE)
+         colNames <- get_query(
+            x, cquery, autoalias=FALSE,
+            format="Arrow"
+         )
          
          chTables <- list_tables(
             unclass(x)$tkcon$chcon, dbNames=tdb
@@ -1275,7 +1295,10 @@ as_fileMDB.chMDB <- function(
             vtquery,
             sprintf("LIMIT %s, %s", r, by)
          )
-         toWrite <- get_query(x, vquery, autoalias=FALSE)
+         toWrite <- get_query(
+            x, vquery, autoalias=FALSE,
+            format="Arrow"
+         )
          while(!is.null(toWrite) && nrow(toWrite)>0){
             readr::write_delim(
                toWrite, file=dfiles[tn],
@@ -1290,7 +1313,10 @@ as_fileMDB.chMDB <- function(
                vtquery,
                sprintf("LIMIT %s, %s", r, by)
             )
-            toWrite <- get_query(x, vquery, autoalias=FALSE)
+            toWrite <- get_query(
+               x, vquery, autoalias=FALSE,
+               format="Arrow"
+            )
          }
 
       }else{
@@ -1527,7 +1553,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
    qr <- get_query(
       x,
       sprintf("SELECT * FROM %s", dbti),
-      autoalias=FALSE
+      autoalias=FALSE,
+      format="TabSeparatedWithNamesAndTypes"
    )
    
    if(.is_chMM(qr)){
@@ -1557,7 +1584,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                      ),
                      dbn, rt, paste(frn, collapse="', '")
                   ),
-                  autoalias=FALSE
+                  autoalias=FALSE,
+                  format="Arrow"
                )
             }
          }
@@ -1575,7 +1603,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                      ),
                      dbn, ct, paste(fcn, collapse="', '")
                   ),
-                  autoalias=FALSE
+                  autoalias=FALSE,
+                  format="Arrow"
                )
             }
          }
@@ -1588,7 +1617,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                "SELECT i, name FROM `%s`.`%s` ORDER BY i",
                dbn, rt
             ),
-            autoalias=FALSE
+            autoalias=FALSE,
+            format="Arrow"
          )
          frn <- fri$name
       }else(
@@ -1601,7 +1631,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                "SELECT j, name FROM `%s`.`%s` ORDER BY j",
                dbn, ct
             ),
-            autoalias=FALSE
+            autoalias=FALSE,
+            format="Arrow"
          )
          fcn <- fcj$name
       }else{
@@ -1646,7 +1677,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             sprintf('j in (%s)', paste(fc$j, collapse=", "))
          )
       )
-      toRet <- get_query(x, query, autoalias=FALSE)
+      toRet <- get_query(x, query, autoalias=FALSE, format="Arrow")
       mi <- max(fri$i)
       mj <- max(fcj$j)
       if(!mi %in% toRet$i || !mj %in% toRet$j){
@@ -1698,7 +1729,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             ),
             dbn, mtables[1]
          ),
-         autoalias=FALSE
+         autoalias=FALSE,
+         format="TabSeparatedWithNamesAndTypes"
       )
       dimcol <- intersect(
          dimcol$name, c("___COLNAMES___", "___ROWNAMES___")
@@ -1714,7 +1746,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             dbn,
             paste(unique(mtables), collapse="', '")
          ),
-         autoalias=FALSE
+         autoalias=FALSE,
+         format="TabSeparatedWithNamesAndTypes"
       ) %>% 
          dplyr::filter(.data$name!=dimcol) %>% 
          dplyr::arrange(.data$name)
@@ -1822,7 +1855,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       }
    
       ## Get the results ----
-      toRet <- get_query(x, query, autoalias=FALSE)
+      toRet <- get_query(
+         x, query, autoalias=FALSE,
+         format="TabSeparatedWithNamesAndTypes"
+      )
       dimname <- toRet[[dimcol]]
       toRet <- toRet[, -which(colnames(toRet)==dimcol), drop=FALSE] %>% 
          as.matrix() %>% 
@@ -1867,20 +1903,29 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             tdb <- sub("^`", "", sub("`[.]`.*$", "", dbti))
             
             tquery <- sprintf("SELECT * FROM %s", dbti)
-            qr <- get_query(x, tquery, autoalias=FALSE)
+            qr <- get_query(
+               x, tquery, autoalias=FALSE,
+               format="TabSeparatedWithNamesAndTypes"
+            )
             
             ## Columns and rows
             rquery <- sprintf(
                "SELECT i, name FROM %s ORDER BY i",
                sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="rows")])
             )
-            rowNames <- get_query(x, rquery, autoalias=FALSE)
+            rowNames <- get_query(
+               x, rquery, autoalias=FALSE,
+               format="Arrow"
+            )
             
             cquery <- sprintf(
                "SELECT j, name FROM %s ORDER BY j",
                sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="columns")])
             )
-            colNames <- get_query(x, cquery, autoalias=FALSE)
+            colNames <- get_query(
+               x, cquery, autoalias=FALSE,
+               format="Arrow"
+            )
             
             write_MergeTree(
                con=con,
@@ -1935,7 +1980,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                vtquery,
                sprintf("LIMIT %s, %s", r, by)
             )
-            toWrite <- get_query(x, vquery, autoalias=FALSE)
+            toWrite <- get_query(
+               x, vquery, autoalias=FALSE,
+               format="Arrow"
+            )
             while(!is.null(toWrite) && nrow(toWrite)>0){
                ch_insert(
                   con=con, dbName=dbName, tableName=valTable, value=toWrite
@@ -1946,7 +1994,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   vtquery,
                   sprintf("LIMIT %s, %s", r, by)
                )
-               toWrite <- get_query(x, vquery, autoalias=FALSE)
+               toWrite <- get_query(
+                  x, vquery, autoalias=FALSE,
+                  format="Arrow"
+               )
             }
             
             ## Reference table
@@ -1971,14 +2022,16 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   "SELECT * FROM %s",
                   tnpath
                ),
-               autoalias=FALSE
+               autoalias=FALSE,
+               format="TabSeparatedWithNamesAndTypes"
             )
             ch_insert(con=con, dbName=dbName, tableName=tn, value=stl)
             for(stn in stl$table){
                toWrite <- get_query(
                   x,
                   sprintf("SELECT * FROM `%s`.`%s` LIMIT 0, %s", tndb, stn, by),
-                  autoalias=FALSE
+                  autoalias=FALSE,
+                  format="TabSeparatedWithNamesAndTypes"
                )
                nulcol <- NULL
                if(nullable){
@@ -2001,7 +2054,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                      "SELECT * FROM `%s`.`%s` LIMIT %s, %s",
                      tndb, stn, r, by
                   ),
-                  autoalias=FALSE
+                  autoalias=FALSE,
+                  format="TabSeparatedWithNamesAndTypes"
                )
                while(nrow(toWrite)>0){
                   ch_insert(
@@ -2014,7 +2068,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                         "SELECT * FROM `%s`.`%s` LIMIT %s, %s",
                         tndb, stn, r, by
                      ),
-                     autoalias=FALSE
+                     autoalias=FALSE,
+                     format="TabSeparatedWithNamesAndTypes"
                   )
                }
             }
@@ -2055,7 +2110,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
    if(ReDaMoR::is.MatrixModel(tableModel)){
       query <- "SELECT * FROM %s"
       tquery <- sprintf(query, dbti)
-      qr <- get_query(x, tquery, autoalias=FALSE)
+      qr <- get_query(
+         x, tquery, autoalias=FALSE,
+         format="TabSeparatedWithNamesAndTypes"
+      )
       
       if(.is_chMM(qr)){
          
@@ -2076,7 +2134,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             vquery,
             sprintf("LIMIT %s, %s", skip, n_max)
          )
-         values <- get_query(x, vquery, autoalias=FALSE)
+         values <- get_query(
+            x, vquery, autoalias=FALSE,
+            format="Arrow"
+         )
          
          rToTake <- max(values$i)
          rquery <- sprintf(
@@ -2084,7 +2145,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="rows")]),
             rToTake
          )
-         rowNames <- get_query(x, rquery, autoalias=FALSE)
+         rowNames <- get_query(
+            x, rquery, autoalias=FALSE,
+            format="Arrow"
+         )
          
          cToTake <- max(values$j)
          cquery <- sprintf(
@@ -2092,7 +2156,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="columns")]),
             cToTake
          )
-         colNames <- get_query(x, cquery, autoalias=FALSE)
+         colNames <- get_query(
+            x, cquery, autoalias=FALSE,
+            format="Arrow"
+         )
          
          toRet <- Matrix::sparseMatrix(
             i=as.integer(values$i), j=as.integer(values$j), x=values$x,
@@ -2117,7 +2184,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                ),
                tdb, qr$table[1]
             ),
-            autoalias=FALSE
+            autoalias=FALSE,
+            format="TabSeparatedWithNamesAndTypes"
          )
          dimcol <- intersect(
             dimcol$name, c("___COLNAMES___", "___ROWNAMES___")
@@ -2133,7 +2201,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                tdb,
                paste(unique(qr$table), collapse="', '")
             ),
-            autoalias=FALSE
+            autoalias=FALSE,
+            format="TabSeparatedWithNamesAndTypes"
          ) %>% 
             dplyr::filter(.data$name!=dimcol) %>% 
             dplyr::arrange(.data$name)
@@ -2148,7 +2217,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   stquery,
                   sprintf("LIMIT %s, %s", skip, n_max)
                )
-               stqr <- get_query(x, stquery, autoalias=FALSE)
+               stqr <- get_query(
+                  x, stquery, autoalias=FALSE,
+                  format="TabSeparatedWithNamesAndTypes"
+               )
                dimname <- stqr[[dimcol]]
                stopifnot(
                   !any(duplicated(dimname)),
@@ -2183,7 +2255,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   sprintf('`%s`.`%s`', tdb, st),
                   dimcol
                )
-               stqr <- get_query(x, stquery, autoalias=FALSE)
+               stqr <- get_query(
+                  x, stquery, autoalias=FALSE,
+                  format="TabSeparatedWithNamesAndTypes"
+               )
                dimname <- stqr[[dimcol]]
                stopifnot(
                   !any(duplicated(dimname)),
@@ -2215,7 +2290,12 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             .get_tm_sortKey(tableModel, quoted=TRUE),
             skip, n_max
          ),
-         autoalias=FALSE
+         autoalias=FALSE,
+         format=ifelse(
+            "base64" %in% tableModel$fields$type | nrow(tableModel$fields) < 50,
+            "Arrow",
+            "TabSeparatedWithNamesAndTypes"
+         )
       )
       attr(toRet, "data.type") <- NULL
       cc <- unlist(lapply(toRet, function(x) class(x)[1]))
@@ -2249,14 +2329,18 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          ),
          tdb
       ),
-      autoalias=FALSE
+      autoalias=FALSE,
+      format="TabSeparatedWithNamesAndTypes"
    )
    
    if(ReDaMoR::is.MatrixModel(tableModel)){
       dbmt <- tablePath
       query <- "SELECT * FROM %s"
       tquery <- sprintf(query, dbmt)
-      qr <- get_query(x, tquery, autoalias=FALSE)
+      qr <- get_query(
+         x, tquery, autoalias=FALSE,
+         format="TabSeparatedWithNamesAndTypes"
+      )
       
       if(.is_chMM(qr)){
          
@@ -2378,7 +2462,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       query <- "SELECT * FROM %s"
       tdb <- sub("^`", "", sub("`[.]`.*$", "", dbti))
       tquery <- sprintf(query, dbti)
-      qr <- get_query(x, tquery, autoalias=FALSE)
+      qr <- get_query(
+         x, tquery, autoalias=FALSE,
+         format="TabSeparatedWithNamesAndTypes"
+      )
       
       if(.is_chMM(qr)){
          
@@ -2389,7 +2476,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="values")]),
             nr, nc
          )
-         values <- get_query(x, vquery, autoalias=FALSE)
+         values <- get_query(
+            x, vquery, autoalias=FALSE,
+            format="Arrow"
+         )
          ## Sparse ==> all values may be missing
          if(nrow(values)==0){
             values <- dplyr::tibble(
@@ -2404,14 +2494,20 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="rows")]),
             nr
          )
-         rowNames <- get_query(x, rquery, autoalias=FALSE)
+         rowNames <- get_query(
+            x, rquery, autoalias=FALSE,
+            format="Arrow"
+         )
          
          cquery <- sprintf(
             "SELECT j, name FROM %s WHERE j <= %s ORDER BY j",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="columns")]),
             nc
          )
-         colNames <- get_query(x, cquery, autoalias=FALSE)
+         colNames <- get_query(
+            x, cquery, autoalias=FALSE,
+            format="Arrow"
+         )
          
          mi <- max(rowNames$i)
          mj <- max(colNames$j)
@@ -2448,7 +2544,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                tdb,
                paste(unique(qr$table), collapse="', '")
             ),
-            autoalias=FALSE
+            autoalias=FALSE,
+            format="TabSeparatedWithNamesAndTypes"
          ) %>% 
             dplyr::filter(.data$name!=dimcol) %>% 
             dplyr::arrange(.data$name)
@@ -2474,7 +2571,10 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                dimcol,
                lim
             )
-            stqr <- get_query(x, stquery, autoalias=FALSE)
+            stqr <- get_query(
+               x, stquery, autoalias=FALSE,
+               format="TabSeparatedWithNamesAndTypes"
+            )
             dimname <- stqr[[dimcol]]
             stopifnot(
                !any(duplicated(dimname)),
@@ -2543,7 +2643,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   qr <- get_query(
                      fdb,
                      sprintf("SELECT * from %s", dbti),
-                     autoalias=FALSE
+                     autoalias=FALSE,
+                     format="TabSeparatedWithNamesAndTypes"
                   )
                }else{
                   qr <- NULL

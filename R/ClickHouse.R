@@ -51,7 +51,9 @@ list_tables <- function(
          sprintf("WHERE database IN ('%s')", paste(dbNames, collapse="', '"))
       )
    }
-   toRet <- dplyr::as_tibble(DBI::dbGetQuery(con, query)) %>% 
+   toRet <- dplyr::as_tibble(DBI::dbGetQuery(
+      con, query, format="TabSeparatedWithNamesAndTypes"
+   )) %>% 
       dplyr::mutate(
          total_rows=as.numeric(.data$total_rows),
          total_bytes=as.numeric(.data$total_bytes)
@@ -114,6 +116,9 @@ write_MergeTree <- function(
       sortKey <- setdiff(colnames(value), nullable)[1]
    }else{
       sortKey <- setdiff(sortKey, nullable)
+   }
+   if(length(sortKey) > 5){
+      sortKey <- sortKey[1:5]
    }
    
    chtypes <- ReDaMoR::conv_type_ref(rtypes, to="ClickHouse")
@@ -201,7 +206,8 @@ ch_insert <- function(
    
    if(nrow(value)>0){
       fo <- DBI::dbGetQuery(
-         con, sprintf("SELECT * FROM %s LIMIT 1", qname)
+         con, sprintf("SELECT * FROM %s LIMIT 0", qname),
+         format="TabSeparatedWithNamesAndTypes"
       ) %>% 
          colnames()
       if(!all(colnames(value) %in% fo)){
