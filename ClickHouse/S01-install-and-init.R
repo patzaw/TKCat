@@ -1,15 +1,15 @@
-library(devTKCat)
+library(TKCat)
 
 ###############################################################################@
 ## Configuration ----
 
 USERFILE <- system.file(
    "ClickHouse/users.xml",
-   package="devTKCat"
+   package="TKCat"
 )
 CONFIGFILE <- system.file(
    "ClickHouse/config.xml",
-   package="devTKCat"
+   package="TKCat"
 )
 
 CH_VERSION <- "22.2.3.5"
@@ -112,7 +112,7 @@ k <- chTKCat(
    port=TKCAT_HTTP_PORT,
    password=NA
 )
-k <- devTKCat:::init_chTKCat(
+k <- TKCat:::init_chTKCat(
    k,
    instance=INSTANCE_NAME,
    version=as.character(Sys.Date()),

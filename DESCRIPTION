@@ -1,4 +1,4 @@
-Package: devTKCat
+Package: TKCat
 Type: Package
 Title: Tailored Knowledge Catalog
 Version: 1.0.0
@@ -51,7 +51,8 @@ Imports:
 Suggests:
    knitr,
    rmarkdown,
-   stringr
+   stringr,
+   RClickhouse
 License: GPL-3
 Encoding: UTF-8
 VignetteBuilder: knitr
