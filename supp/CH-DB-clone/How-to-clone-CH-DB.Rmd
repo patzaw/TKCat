@@ -1,0 +1,65 @@
+---
+title: "How To Clone TKCat"
+author: "Patrice Godard"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Copy data
+
+```{sh, eval=FALSE}
+docker stop current_container
+sudo rsync -a path/to/current/ path/to/new/clone
+docker start current_container
+```
+
+# Run new container
+
+```{r, eval=FALSE}
+CH_VERSION <- "22.2.3.5"
+
+TKCAT_HOME <- "path/to/new/clone"
+TKCAT_NAT_PORT <- 9401
+TKCAT_HTTP_PORT <- 9411
+TKCAT_NATS_PORT <- 9421
+TKCAT_HTTPS_PORT <- 9431
+CONTAINER <- "clone_container"
+
+TKCAT_DATA <- file.path(TKCAT_HOME, "data")
+TKCAT_LOG <- file.path(TKCAT_HOME, "log")
+TKCAT_CONF <- file.path(TKCAT_HOME, "conf")
+TKCAT_USERS <- file.path(TKCAT_CONF, "users.xml")
+TKCAT_CONFIG <- file.path(TKCAT_CONF, "config.xml")
+
+TKCAT_KEY <- file.path(TKCAT_CONF, "server.key")
+TKCAT_CRT <- file.path(TKCAT_CONF, "server.crt")
+TKCAT_PEM <- file.path(TKCAT_CONF, "dhparam.pem")
+
+###############################################################################@
+## Run the docker container ----
+system(paste(
+   'docker run -d',
+   sprintf('--name %s', CONTAINER),
+   '--ulimit nofile=262144:262144',
+   sprintf('--volume %s:/var/lib/clickhouse', TKCAT_DATA),
+   sprintf('--publish=%s:9000', TKCAT_NAT_PORT),
+   sprintf('--publish=%s:8123', TKCAT_HTTP_PORT),
+   sprintf('--publish=%s:9440', TKCAT_NATS_PORT),
+   sprintf('--publish=%s:8443', TKCAT_HTTPS_PORT),
+   sprintf('--volume %s:/etc/clickhouse-server/users.xml', TKCAT_USERS),
+   sprintf('--volume %s:/etc/clickhouse-server/config.xml', TKCAT_CONFIG),
+   sprintf('--volume %s:/etc/clickhouse-server/server.key', TKCAT_KEY),
+   sprintf('--volume %s:/etc/clickhouse-server/server.crt', TKCAT_CRT),
+   sprintf('--volume %s:/etc/clickhouse-server/dhparam.pem', TKCAT_PEM),
+   sprintf('--volume %s:/var/log/clickhouse-server', TKCAT_LOG),
+   '--restart=always',
+   sprintf('clickhouse/clickhouse-server:%s', CH_VERSION)
+))
+```
+
+
+
+

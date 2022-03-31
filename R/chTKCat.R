@@ -613,9 +613,9 @@ list_chTKCat_users <- function(x){
          ifelse(
             x$admin, "*",
             paste(intersect(uf, c("login", "admin", "provider")), collapse=", ")
-         ),
-         format="Arrow"
-      )
+         )
+      ),
+      format="Arrow"
    ) %>% 
       dplyr::as_tibble()
    if("admin" %in% colnames(toRet)){
