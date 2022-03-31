@@ -1,3 +1,13 @@
+README
+================
+
+-   [Installation](#installation)
+    -   [Dependencies](#dependencies)
+    -   [From github](#from-github)
+-   [Documentation](#documentation)
+-   [Alternatives](#alternatives)
+-   [Acknowledgments](#acknowledgments)
+
 <img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px"/>
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
@@ -28,12 +38,11 @@ The following R packages available on CRAN are required:
     Data Modeler
 -   [magrittr](https://CRAN.R-project.org/package=magrittr): A
     Forward-Pipe Operator for R
+-   [DBI](https://CRAN.R-project.org/package=DBI): R Database Interface
 -   [dplyr](https://CRAN.R-project.org/package=dplyr): A Grammar of Data
     Manipulation
--   [DBI](https://CRAN.R-project.org/package=DBI): R Database Interface
--   [RClickhouse](https://CRAN.R-project.org/package=RClickhouse): A
-    ‘DBI’ Interface to the ‘Yandex Clickhouse’ Database Providing Basic
-    ‘dplyr’ Support
+-   [ClickHouseHTTP](https://CRAN.R-project.org/package=ClickHouseHTTP):
+    A Simple HTTP Database Interface to ‘ClickHouse’
 -   [rlang](https://CRAN.R-project.org/package=rlang): Functions for
     Base Types and Core R and ‘Tidyverse’ Features
 -   [tidyselect](https://CRAN.R-project.org/package=tidyselect): Select
@@ -48,6 +57,8 @@ The following R packages available on CRAN are required:
     Create Dashboards with ‘Shiny’
 -   [DT](https://CRAN.R-project.org/package=DT): A Wrapper of the
     JavaScript Library ‘DataTables’
+-   [htmltools](https://CRAN.R-project.org/package=htmltools): Tools for
+    HTML
 -   [readr](https://CRAN.R-project.org/package=readr): Read Rectangular
     Text Data
 -   [jsonlite](https://CRAN.R-project.org/package=jsonlite): A Simple
@@ -63,6 +74,21 @@ The following R packages available on CRAN are required:
 -   [future](https://CRAN.R-project.org/package=future): Unified
     Parallel and Distributed Processing in R for Everyone
 -   [xml2](https://CRAN.R-project.org/package=xml2): Parse XML
+-   [Matrix](https://CRAN.R-project.org/package=Matrix): Sparse and
+    Dense Matrix Classes and Methods
+-   [uuid](https://CRAN.R-project.org/package=uuid): Tools for
+    Generating and Handling of UUIDs
+
+And those are suggested:
+
+-   [knitr](https://CRAN.R-project.org/package=knitr): A General-Purpose
+    Package for Dynamic Report Generation in R
+-   [rmarkdown](https://CRAN.R-project.org/package=rmarkdown): Dynamic
+    Documents for R
+-   [stringr](https://CRAN.R-project.org/package=stringr): Simple,
+    Consistent Wrappers for Common String Operations
+-   [RClickhouse](https://CRAN.R-project.org/package=RClickhouse):
+    ‘Yandex Clickhouse’ Interface for R with Basic ‘dplyr’ Support
 
 ## From github
 
