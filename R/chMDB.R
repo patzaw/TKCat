@@ -926,13 +926,21 @@ data_tables.chMDB <- function(x, ..., skip=0, n_max=Inf){
    toRet <- lapply(
       names(toTake),
       function(tn){
-         .get_ch_mtable(
+         d <- .get_ch_mtable(
             x,
             tablePath=toTake[tn], tableModel=m[[tn]],
             skip=skip, n_max=n_max
          )
+         return(d)
       }
    )
+   toRet <- lapply(toRet, function(d){
+      if(nrow(d)==0){
+         d
+      }else{
+         d[1:nrow(d),]
+      }
+   })
    names(toRet) <- names(toTake)
    return(toRet)
 }

@@ -64,6 +64,7 @@ memoMDB <- function(
    )
    class(toRet) <- c("memoMDB", "MDB", class(toRet))
    
+   
    ## Collection members ----
    collection_members(toRet) <- collectionMembers
    
@@ -512,7 +513,22 @@ dims.memoMDB <- function(x, ...){
    stopifnot(
       length(i)==1
    )
-   return(data_tables(x, dplyr::all_of(i))[[1]])
+   ## Rstudio hack to avoid DB call when just looking for names
+   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
+   if(length(cc)!=0){
+      invisible(NULL)
+   }else{
+      cc <- c(
+         grep('.rs.valueContents', deparse(sys.calls()), value=FALSE),
+         grep('.rs.explorer.inspectObject', deparse(sys.calls()), value=FALSE)
+      )
+      if(length(cc)!=0){
+         invisible()
+      }else{
+         return(data_tables(x, dplyr::all_of(i))[[1]])
+      }
+   }
+   # return(data_tables(x, dplyr::all_of(i))[[1]])
 }
 #' @rdname memoMDB
 #' 

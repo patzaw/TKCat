@@ -1,5 +1,13 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
+## Version 1.0.1
+
+### Implementation changes
+
+- Post-process data from ClickHouseHTTP to speed-up a little their access
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 ## Version 1.0.0
 
 ### New features
@@ -36,7 +44,7 @@ support sparse matrices.
 (check=FALSE): it make the creation of the object faster but it should be used
 only when the user knows what she/he is doing with the data and the model.
 
-### Implementation hanges
+### Implementation changes
 
 - Display in `explore_MDBs()`:
 
