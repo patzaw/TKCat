@@ -58,6 +58,7 @@ opts_chunk$set(
 )
 library(TKCat)
 library(readr)
+library(data.tree)
 ```
 
 ```{r child = 'supp/urls.Rmd'}
@@ -74,23 +75,6 @@ by binding the data model to the dataset after their confrontation/validation;
 - document concept collections that can be used to integrate different MDBs;
 - load MDBs into a Clickhouse database to make them easily FAIR
 (Findable, Accessible, Interoperable, Reusable).
-
-# Requirements
-
-The following libraries must be installed:
-
-```{r}
-## The following packages are required by TKCat
-library(magrittr)
-library(dplyr)
-library(readr)
-library(RClickhouse) # >= 0.6.0
-library(ReDaMoR)     # >= 0.5.2
-library(TKCat)       # >= 0.7.0
-## The following packages are used in this vignette but not required by TKCat
-library(data.tree)
-```
-
 
 # A minimal example
 
@@ -511,8 +495,7 @@ collection_members(file_hpo)
 
 # TKCat and ClickHouse
 
-An MDB catalog can also be implemented in a [Clickhouse][clickhouse] database
-(thanks to the [RClickhouse][rclickhouse] package).
+An MDB catalog can also be implemented in a [Clickhouse][clickhouse] database.
 The creation and the management of such a database is described 
 [here](https://patzaw.github.io/TKCat/chTKCat-Operations-manual.html).
 

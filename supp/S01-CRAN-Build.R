@@ -48,7 +48,8 @@ file.remove("doc")
 ## Copy introduction ----
 file.copy(
    here("supp/introduction/Introduction-to-TKCat.html"),
-   here("docs/Introduction-to-TKCat.html")
+   here("docs/Introduction-to-TKCat.html"),
+   overwrite=TRUE
 )
 
 ##############################@

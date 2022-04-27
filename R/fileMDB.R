@@ -613,7 +613,7 @@ dims.fileMDB <- function(
       ismm <- ReDaMoR::is_MM(f)
       if(ismm){
          
-         td <- ReDaMoR:::read_named_MM_header(f)
+         td <- ReDaMoR::read_named_MM_header(f)
          nr <- td$rows
          nc <- td$columns
          
@@ -1246,8 +1246,8 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by=10^5, ...){
                function(y, pos){
                   dplyr::filter(
                      y,
-                     i %in% fv$rows,
-                     j %in% fv$columns
+                     .data$i %in% fv$rows,
+                     .data$j %in% fv$columns
                   )
                }
             )
@@ -1774,7 +1774,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
             
-            if(ReDaMoR::is.MatrixModel(dm[ntn])){
+            if(ReDaMoR::is.MatrixModel(dm[[ntn]])){
                
                fv <- lapply(1:length(fkl$tf[[i]]), function(j){
                   ntm <- dm[[ntn]]
@@ -1810,9 +1810,9 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
                      ntm$fields$type[which(ntm$fields$name==ntf)] ==
                      "row"
                   ){
-                     tv <- union(tv, rownames(d[[dtn]]))
+                     tv <- union(tv, rownames(d[[ntn]]))
                   }else{
-                     tv <- union(tv, colnames(d[[dtn]]))
+                     tv <- union(tv, colnames(d[[ntn]]))
                   }
                   toRet <- list(tv)
                   names(toRet) <- ntf

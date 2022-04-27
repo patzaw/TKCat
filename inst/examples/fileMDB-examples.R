@@ -13,6 +13,9 @@ hpof <- read_fileMDB(
 )
 count_records(hpof)
 
+## The following commands take time on fileMDB object
+\dontrun{
+
 select(hpof, HPO_hp:HPO_diseases)
 toTake <- "HPO_altId"
 select(hpof, all_of(toTake))
@@ -34,4 +37,6 @@ if(requireNamespace("stringr", quietly = TRUE)){
       hpof,
       HPO_diseases=!!cn==!!label
    )
+}
+
 }

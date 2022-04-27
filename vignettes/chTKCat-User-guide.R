@@ -14,10 +14,12 @@ library(TKCat)
 
 ## -----------------------------------------------------------------------------
 k <- chTKCat(
-   host="localhost", # default parameter
-   port=9101L,       # default parameter
-   user="default",   # default parameter
-   password=""       # if not provided the password is requested interactively 
+   host="localhost",                     # default parameter
+   port=9111L,                           # default parameter
+   drv=ClickHouseHTTP::ClickHouseHTTP(), # default parameter
+   user="default",                       # default parameter
+   password=""                           # if not provided the
+                                         # password is requested interactively 
 )
 
 ## ---- eval=FALSE--------------------------------------------------------------

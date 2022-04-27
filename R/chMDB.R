@@ -2743,7 +2743,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          for(i in 1:nrow(fkl)){
             ntn <- fkl$to[i]
 
-            if(ReDaMoR::is.MatrixModel(dm[ntn])){
+            if(ReDaMoR::is.MatrixModel(dm[[ntn]])){
                
                fv <- lapply(1:length(fkl$tf[[i]]), function(j){
                   ntm <- dm[[ntn]]
@@ -2779,9 +2779,9 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                      ntm$fields$type[which(ntm$fields$name==ntf)] ==
                      "row"
                   ){
-                     tv <- union(tv, rownames(d[[dtn]]))
+                     tv <- union(tv, rownames(d[[ntn]]))
                   }else{
-                     tv <- union(tv, colnames(d[[dtn]]))
+                     tv <- union(tv, colnames(d[[ntn]]))
                   }
                   toRet <- list(tv)
                   names(toRet) <- ntf

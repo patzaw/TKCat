@@ -11,11 +11,11 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2022-01-14" />
+<meta name="date" content="2022-04-27" />
 
 <title>TKCat Collections</title>
 
-<script src="libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="libs/header-attrs-2.14/header-attrs.js"></script>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="libs/bootstrap-3.3.5/css/cerulean.min.css" rel="stylesheet" />
@@ -65,6 +65,7 @@ if (window.hljs) {
 
 
 
+
 <style type = "text/css">
 .main-container {
   max-width: 940px;
@@ -85,6 +86,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -243,7 +247,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">TKCat Collections</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">January 14, 2022</h4>
+<h4 class="date">April 27, 2022</h4>
 
 </div>
 
@@ -253,14 +257,39 @@ div.tocify {
 </div>
 <div id="introduction" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Introduction</h1>
-<p>The aim of TKCat (Tailored Knowledge Catalog) is to facilitate the management of data from knowledge resources that are frequently used alone or together in research environments. In TKCat, knowledge resources are manipulated as modeled database (MDB) objects. These objects provide access to the data tables along with a general description of the resource and a detail data model generated with <a href="https://github.com/patzaw/ReDaMoR">ReDaMoR</a> documenting the tables, their fields and their relationships. These MDB are then gathered in catalogs that can be easily explored an shared. TKCat provides tools to easily subset, filter and combine MDBs and create new catalogs suited for specific needs.</p>
-<p>The TKCat R package is licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPL-3</a>.</p>
-<p>Some MDBs refer to the same concepts and could be merged accordingly. However they often use different vocabularies or scopes. Collections are a used to identify such concepts and to define a way to document formally the scope used by the different members of these collections. Thanks to this formal description, tools can be used to automatically combine MDBs refering to the same collection but using different scopes.</p>
-<p>This vignette describes how to create TKCat Collections, document collection members and create functions to support the merging of MDBs. The advantages and uses of Collections are presented in the <a href="TKCat-User-guide.html#merging-with-collections">general user guide</a>.</p>
+<p>The aim of TKCat (Tailored Knowledge Catalog) is to facilitate the
+management of data from knowledge resources that are frequently used
+alone or together in research environments. In TKCat, knowledge
+resources are manipulated as modeled database (MDB) objects. These
+objects provide access to the data tables along with a general
+description of the resource and a detail data model generated with <a
+href="https://github.com/patzaw/ReDaMoR">ReDaMoR</a> documenting the
+tables, their fields and their relationships. These MDB are then
+gathered in catalogs that can be easily explored an shared. TKCat
+provides tools to easily subset, filter and combine MDBs and create new
+catalogs suited for specific needs.</p>
+<p>The TKCat R package is licensed under <a
+href="https://www.gnu.org/licenses/gpl-3.0.en.html">GPL-3</a>.</p>
+<p>Some MDBs refer to the same concepts and could be merged accordingly.
+However they often use different vocabularies or scopes. Collections are
+a used to identify such concepts and to define a way to document
+formally the scope used by the different members of these collections.
+Thanks to this formal description, tools can be used to automatically
+combine MDBs refering to the same collection but using different
+scopes.</p>
+<p>This vignette describes how to create TKCat Collections, document
+collection members and create functions to support the merging of MDBs.
+The advantages and uses of Collections are presented in the <a
+href="TKCat-User-guide.html#merging-with-collections">general user
+guide</a>.</p>
 </div>
 <div id="creating-a-collection" class="section level1" number="2">
-<h1><span class="header-section-number">2</span> Creating a collection</h1>
-<p>A collection is defined by a JSON document. This document should fulfill the requirements defined by the <a href="https://github.com/patzaw/TKCat/blob/master/inst/Collections/Collection-Schema.json">Collection-Schema.json</a>. Two collection are available by default in the TKCat package.</p>
+<h1><span class="header-section-number">2</span> Creating a
+collection</h1>
+<p>A collection is defined by a JSON document. This document should
+fulfill the requirements defined by the <a
+href="https://github.com/patzaw/TKCat/blob/master/inst/Collections/Collection-Schema.json">Collection-Schema.json</a>.
+Two collection are available by default in the TKCat package.</p>
 <pre class="r"><code>list_local_collections()</code></pre>
 <pre><code>## # A tibble: 2 × 2
 ##   title     description                                  
@@ -341,34 +370,60 @@ div.tocify {
     &quot;required&quot;: [&quot;$schema&quot;, &quot;$id&quot;, &quot;collection&quot;, &quot;resource&quot;, &quot;tables&quot;],
     &quot;additionalProperties&quot;: false
 }</code></pre>
-<p>A collection should refer to the <code>"TKCat_collections_1.0"</code> <strong>$schema</strong>. It should then have the following properties:</p>
+<p>A collection should refer to the <code>"TKCat_collections_1.0"</code>
+<strong>$schema</strong>. It should then have the following
+properties:</p>
 <ul>
 <li><p><strong>$id</strong>: the identifier of the collection</p></li>
 <li><p><strong>title</strong>: the title of the collection</p></li>
 <li><p><strong>type</strong>: always <code>object</code></p></li>
-<li><p><strong>description</strong>: a short description of the collection</p></li>
-<li><p><strong>properties</strong>: the properties that should be provided by collection members. In this case:</p>
+<li><p><strong>description</strong>: a short description of the
+collection</p></li>
+<li><p><strong>properties</strong>: the properties that should be
+provided by collection members. In this case:</p>
 <ul>
-<li><p><strong>$schema</strong>: should be the <em>$id</em> of the collection</p></li>
-<li><p><strong>$id</strong>: the identifier of the collection member: a string</p></li>
+<li><p><strong>$schema</strong>: should be the <em>$id</em> of the
+collection</p></li>
+<li><p><strong>$id</strong>: the identifier of the collection member: a
+string</p></li>
 <li><p><strong>collection</strong>: should be “BE”</p></li>
-<li><p><strong>resource</strong>: the name of the resource having collection members: a string</p></li>
-<li><p><strong>tables</strong>: an array of tables corresponding to collection members. Each item being a table with the following features:</p>
+<li><p><strong>resource</strong>: the name of the resource having
+collection members: a string</p></li>
+<li><p><strong>tables</strong>: an array of tables corresponding to
+collection members. Each item being a table with the following
+features:</p>
 <ul>
 <li><p><strong>name</strong>: the name of the table</p></li>
 <li><p><strong>fields</strong>: the required fields</p>
 <ul>
-<li><strong>be</strong>: if <strong>static</strong> is true then <strong>value</strong> correspond to the be value valid for all the records. If not <strong>value</strong> correspond to the table column with the be value for each record.</li>
-<li><strong>source</strong>: if <strong>static</strong> is true then <strong>value</strong> correspond to the source value valid for all the records. If not <strong>value</strong> correspond to the table column with the source value for each record.</li>
-<li><strong>organism</strong>: if <strong>static</strong> is true then <strong>value</strong> correspond to the organism value valid for all the records. If not <strong>value</strong> correspond to the table column with the organism value for each record. <strong>type</strong> indicate how organisms are identified: <code>"Scientific name"</code> or <code>"NCBI taxon identifier"</code>.</li>
+<li><strong>be</strong>: if <strong>static</strong> is true then
+<strong>value</strong> correspond to the be value valid for all the
+records. If not <strong>value</strong> correspond to the table column
+with the be value for each record.</li>
+<li><strong>source</strong>: if <strong>static</strong> is true then
+<strong>value</strong> correspond to the source value valid for all the
+records. If not <strong>value</strong> correspond to the table column
+with the source value for each record.</li>
+<li><strong>organism</strong>: if <strong>static</strong> is true then
+<strong>value</strong> correspond to the organism value valid for all
+the records. If not <strong>value</strong> correspond to the table
+column with the organism value for each record. <strong>type</strong>
+indicate how organisms are identified: <code>"Scientific name"</code> or
+<code>"NCBI taxon identifier"</code>.</li>
 </ul></li>
 </ul></li>
 </ul></li>
 </ul>
 </div>
-<div id="identifying-collection-members" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> Identifying collection members</h1>
-<p>Identifying collection members of an <em>MDB</em> can be done by providing a table as shown in the <a href="TKCat-User-guide.html#hpo">general user guide</a> or by writing a JSON file like the following one which correspond to BE members of the CHEMBL MDB.</p>
+<div id="identifying-collection-members" class="section level1"
+number="3">
+<h1><span class="header-section-number">3</span> Identifying collection
+members</h1>
+<p>Identifying collection members of an <em>MDB</em> can be done by
+providing a table as shown in the <a
+href="TKCat-User-guide.html#hpo">general user guide</a> or by writing a
+JSON file like the following one which correspond to BE members of the
+CHEMBL MDB.</p>
 <pre class="r"><code>system.file(
    &quot;examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json&quot;,
    package=&quot;TKCat&quot;
@@ -404,7 +459,9 @@ div.tocify {
     }
   ]
 }</code></pre>
-<p>The identification of collection members should fulfill the requirements defined by the collection JSON document, and therefore pass the following validation.</p>
+<p>The identification of collection members should fulfill the
+requirements defined by the collection JSON document, and therefore pass
+the following validation.</p>
 <pre class="r"><code>jsonvalidate::json_validate(
    json=system.file(
       &quot;examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json&quot;,
@@ -414,11 +471,24 @@ div.tocify {
    engine=&quot;ajv&quot;
 )</code></pre>
 <pre><code>## [1] TRUE</code></pre>
-<p>This validation is done automatically when reading a <em>fileMDB</em> object or when setting collection members with the <code>collection_members()</code> function.</p>
+<p>This validation is done automatically when reading a <em>fileMDB</em>
+object or when setting collection members with the
+<code>collection_members()</code> function.</p>
 </div>
 <div id="collection-mapper-functions" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Collection mapper functions</h1>
-<p>The <code>merge.MDB()</code> and the <code>map_collection_members()</code> functions rely on functions to map members of the same collection. When recorded (using the <code>import_collection_mapper()</code> function), these function can be automatically identified by TKCat, otherwise or according to user needs, these functions could be provided using the <code>funs</code> (for <code>merge.MDB()</code>) or the <code>fun</code> (for <code>map_collection_members()</code>) parameters. Two mappers are pre-recorded in TKCat, one for the <em>BE</em> collection and one for the <em>Condition</em> collection. They can be retrieved with the <code>get_collection_mapper()</code> function.</p>
+<h1><span class="header-section-number">4</span> Collection mapper
+functions</h1>
+<p>The <code>merge.MDB()</code> and the
+<code>map_collection_members()</code> functions rely on functions to map
+members of the same collection. When recorded (using the
+<code>import_collection_mapper()</code> function), these function can be
+automatically identified by TKCat, otherwise or according to user needs,
+these functions could be provided using the <code>funs</code> (for
+<code>merge.MDB()</code>) or the <code>fun</code> (for
+<code>map_collection_members()</code>) parameters. Two mappers are
+pre-recorded in TKCat, one for the <em>BE</em> collection and one for
+the <em>Condition</em> collection. They can be retrieved with the
+<code>get_collection_mapper()</code> function.</p>
 <pre class="r"><code>get_collection_mapper(&quot;BE&quot;)</code></pre>
 <pre class="r"><code>function (x, y, orthologs = FALSE, restricted = FALSE, ...) 
 {
@@ -514,11 +584,18 @@ div.tocify {
     toRet &lt;- dplyr::distinct(toRet)
     return(toRet)
 }</code></pre>
-<p>A mapper function must have at least an x and a y parameters. Each of them should be a data.frame with all the field values corresponding to the fields defined in the collection. Additional parameters can be defined and will be forwarded using <code>...</code>. This function should return a data frame with all the fields values followed by “_x” and “_y” suffix accordingly.</p>
+<p>A mapper function must have at least an x and a y parameters. Each of
+them should be a data.frame with all the field values corresponding to
+the fields defined in the collection. Additional parameters can be
+defined and will be forwarded using <code>...</code>. This function
+should return a data frame with all the fields values followed by “_x”
+and “_y” suffix accordingly.</p>
 </div>
 <div id="acknowledgments" class="section level1" number="5">
 <h1><span class="header-section-number">5</span> Acknowledgments</h1>
-<p>This work was entirely supported by <a href="https://www.ucb.com/">UCB Pharma</a> (Early Solutions department).</p>
+<p>This work was entirely supported by <a
+href="https://www.ucb.com/">UCB Pharma</a> (Early Solutions
+department).</p>
 </div>
 
 

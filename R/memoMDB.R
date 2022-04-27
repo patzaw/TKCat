@@ -1193,7 +1193,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
             if(nrow(d1)>0){
                rowToTake <- 1:nrow(d1)
             }else{
-               rowToTake <- interger(0)
+               rowToTake <- integer(0)
             }
          }
          if(attr(d1val[[fi]], "f")=="row"){

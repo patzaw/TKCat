@@ -6,6 +6,7 @@
 ^Meta$
 ^ClickHouse$
 ^LICENSE$
+^NEWS.md$
 ^NEWS.html$
 ^README.Rmd$
 ^README.md$
