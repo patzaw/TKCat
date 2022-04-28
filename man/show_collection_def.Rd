@@ -28,7 +28,9 @@ of elements with:
 }
 \description{
 This function prints details regarding a collection: title, description
-and arguments information.
+and arguments information. These arguments are those that can be
+used to document collection members within an \link{MDB} using
+the \code{\link[=add_collection_member]{add_collection_member()}} function.
 }
 \examples{
 get_local_collection("BE") \%>\% show_collection_def()
