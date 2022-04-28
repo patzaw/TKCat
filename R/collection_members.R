@@ -126,3 +126,97 @@ write_collection_members <- function(colMembers, path=NA, collection=NULL){
       return(toWrite)
    }
 }
+
+###############################################################################@
+#' Show the definition of a collection
+#' 
+#' This function prints details regarding a collection: title, description
+#' and arguments information. These arguments are those that can be
+#' used to document collection members within an [MDB] using 
+#' the [add_collection_member()] function.
+#' 
+#' @param collection a json string with the collection definition as returned
+#' by [get_local_collection()]
+#' @param silent a logical indicating if the definition should be written
+#' (TRUE by default) or not.
+#' 
+#' @return A list with:
+#' - collection **title**
+#' - collection **description**
+#' - a list of **arguments** for defining collection members as a list
+#' of elements with:
+#'    - the **type** of the argument element
+#'    - **allowed** values if any
+#'    
+#' @examples 
+#' get_local_collection("BE") %>% show_collection_def()
+#' 
+#' @export
+#' 
+show_collection_def <- function(collection, silent=FALSE){
+   collection <- jsonlite::fromJSON(collection)
+   p <- collection$properties$tables$items$properties$fields$properties %>% 
+      lapply(function(x){
+         toRet <- lapply(
+            x$properties,
+            function(y){
+               type <- y$type
+               if(is.null(type) && "enum" %in% names(y)){
+                  type <- "enum"
+                  allowed <- y$enum
+               }else{
+                  allowed <- NULL
+               }
+               if(is.null(type)){
+                  stop("Unsupported type?")
+               }
+               type <- ifelse(
+                  type=="boolean", "logical",
+                  ifelse(
+                     type %in% c("string", "enum"),
+                     "character",
+                     NA
+                  )
+               )
+               return(list(type=type, allowed=allowed))
+            }
+         )
+         return(list(elements=toRet, mandatory=FALSE))
+      })
+   for(mp in collection$properties$tables$items$properties$fields$required){
+      p[[mp]]$mandatory <- TRUE
+   }
+   
+   if(!silent){
+      cat(paste0(collection$title, ": ", collection$description), sep="\n")
+      cat(
+         "Arguments (non-mandatory arguments are between parentheses):",
+         sep="\n"
+      )
+      z <- lapply(names(p), function(pn){
+         x <- p[[pn]]
+         if(x$mandatory){
+            cat(sprintf("   - %s:", pn), sep="\n")
+         }else{
+            cat(sprintf("   - (%s):", pn), sep="\n")
+         }
+         lapply(names(x$elements), function(en){
+            y <- x$elements[[en]]
+            cat(sprintf(
+               "      + %s: %s%s",
+               en, y$type,
+               ifelse(
+                  is.null(y$allowed), "",
+                  sprintf(" in '%s'", paste(y$allowed, collapse="', '"))
+               )
+            ), sep="\n")
+         })
+      })
+   }
+   
+   invisible(list(
+      title=collection$title,
+      descripiton=collection$description,
+      arguments=p
+   ))
+}
