@@ -1309,6 +1309,7 @@ search_MDB_fields.chTKCat <- function(x, searchTerm){
          nullable=as.logical(.data$nullable),
          unique=as.logical(.data$unique)
       )
+   return(toRet)
 }
 
 
