@@ -1047,7 +1047,7 @@ connection can be achieved through HTTPS with or without SSL peer verification
 for further information).
 Also, the `RClickhouse::clickhouse()` driver from the [RClickhouse][rclickhouse]
 package can be used (`drv` parameter of the `chTKCat()` function) to leverage
-the native [TCP interface](https://clickhouse.com/docs/en/interfaces/tcp) of
+the native [TCP interface](https://clickhouse.com/docs/en/interfaces/tcp/) of
 ClickHouse which has the strong advantage of having less overhead.
 But TLS wrapping is not supported yet by the RClickhouse package.
 
