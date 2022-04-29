@@ -89,6 +89,10 @@ And those are suggested:
     Consistent Wrappers for Common String Operations
 -   [RClickhouse](https://CRAN.R-project.org/package=RClickhouse):
     ‘Yandex Clickhouse’ Interface for R with Basic ‘dplyr’ Support
+-   [data.tree](https://CRAN.R-project.org/package=data.tree): General
+    Purpose Hierarchical Data Structure
+-   [BED](https://CRAN.R-project.org/package=BED): Biological Entity
+    Dictionary (BED)
 
 ## From github
 
@@ -98,17 +102,8 @@ devtools::install_github("patzaw/TKCat")
 
 # Documentation
 
-Documentation is available in the following vignettes
-
--   [Introduction](https://patzaw.github.io/TKCat/Introduction-to-TKCat.html)
--   [General
-    documentation](https://patzaw.github.io/TKCat/TKCat-User-guide.html)
--   [Using TKCat with
-    ClickHouse](https://patzaw.github.io/TKCat/chTKCat-User-guide.html)
--   [TKCat ClickHouse operation
-    manual](https://patzaw.github.io/TKCat/chTKCat-Operations-manual.html)
--   [TKCat
-    collections](https://patzaw.github.io/TKCat/TKCat-Collections.html)
+Documentation is available in the following vignette: [TKCat user
+guide](https://patzaw.github.io/TKCat/TKCat-User-guide.html)
 
 # Alternatives
 

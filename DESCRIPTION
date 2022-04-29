@@ -52,7 +52,9 @@ Suggests:
    knitr,
    rmarkdown,
    stringr,
-   RClickhouse
+   RClickhouse,
+   data.tree,
+   BED
 License: GPL-3
 Encoding: UTF-8
 VignetteBuilder: knitr
