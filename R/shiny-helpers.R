@@ -1000,17 +1000,17 @@ TKCAT_LOGO_DIV <- shiny::div(
             }
             f <- file.path(tddir, fname)
             if(!file.exists(f)){
-               return(
+               return(shiny::tagList(
                   shiny::tags$br(),
-                  p(
+                  shiny::p(
                      strong("The file is being prepared", style="color:blue;"),
                      shiny::actionButton(
                         "refreshTabledown", "Check availability"
                      )
                   )
-               )
+               ))
             }
-            return(
+            return(shiny::tagList(
                shiny::tags$br(),
                shiny::a(
                   list(shiny::icon("download"), sprintf("Download %s", sel)),
@@ -1022,7 +1022,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                   target="_blank",
                   download=""
                )
-            )
+            ))
          })
          
          shiny::observeEvent(input$prepTabledown, {
