@@ -2,6 +2,7 @@ README
 ================
 
 -   [Installation](#installation)
+    -   [From CRAN](#from-cran)
     -   [Dependencies](#dependencies)
     -   [From github](#from-github)
 -   [Documentation](#documentation)
@@ -29,6 +30,12 @@ The TKCat R package is licensed under
 [GPL-3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
 # Installation
+
+## From CRAN
+
+``` r
+install.packages("TKCat")
+```
 
 ## Dependencies
 
