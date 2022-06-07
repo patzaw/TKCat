@@ -16,7 +16,7 @@ Description: Facilitate the management of data from knowledge
    objects. These objects provide access to the data tables along with a general
    description of the resource and a detail data model documenting the
    tables, their fields and their relationships.
-   These MDB are then gathered in catalogs that can be easily
+   These MDBs are then gathered in catalogs that can be easily
    explored an shared.
    Finally, 'TKCat' provides tools to easily subset, filter and combine MDBs and
    create new catalogs suited for specific needs.
