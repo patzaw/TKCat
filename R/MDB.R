@@ -322,13 +322,26 @@ add_collection_member <- function(
    toAdd$resource <- resource
    toAdd$mid <- as.integer(mid)
    toAdd$table <- table
+   toAdd <- dplyr::select(
+      toAdd,
+      "collection", "cid", "resource", "mid", "table",
+      "field", "static", "value", "type"
+   )
+   if(!is.null(cm)){
+      toAddf <- dplyr::anti_join(
+         toAdd, cm,
+         by=c("collection", "table", "field", "value")
+      )
+      if(nrow(toAddf)==0){
+         warning(
+            "This member is already recorded: it won't be added nor modified"
+         )
+         toAdd <- NULL
+      }
+   }
    cm <- rbind(
       cm,
-      dplyr::select(
-         toAdd,
-         "collection", "cid", "resource", "mid", "table",
-         "field", "static", "value", "type"
-      )
+      toAdd
    )
    toRet <- x
    collection_members(toRet) <- cm

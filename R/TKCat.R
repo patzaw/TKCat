@@ -428,7 +428,7 @@ explore_MDBs.TKCat <- function(
          sidebar=.etkc_sd_sidebar(
             sysInterface=FALSE,
             manList=c(
-               "General TKCat user guide"="doc/TKCat-User-guide.html"
+               "TKCat user guide"="doc/TKCat-User-guide.html"
             ),
             logoDiv=logoDiv
          ),

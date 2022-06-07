@@ -2639,9 +2639,7 @@ explore_MDBs.chTKCat <- function(
             sysInterface=TRUE,
             userManager=userManager,
             manList=c(
-               "chTKCat user guide"="doc/chTKCat-User-guide.html",
-               "General TKCat user guide"="doc/TKCat-User-guide.html",
-               "chTKCat operations manual"="doc/chTKCat-Operations-manual.html"
+               "TKCat user guide"="doc/TKCat-User-guide.html"
             ),
             logoDiv=logoDiv
          ),
