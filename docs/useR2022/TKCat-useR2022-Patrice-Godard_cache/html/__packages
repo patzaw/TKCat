@@ -1,0 +1,10 @@
+knitr
+htmlwidgets
+magrittr
+xaringanthemer
+readr
+dplyr
+visNetwork
+ReDaMoR
+DBI
+TKCat

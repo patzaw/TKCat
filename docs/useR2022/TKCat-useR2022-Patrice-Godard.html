@@ -1,24 +1,1575 @@
-<html>
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Managing and leveraging knowledge catalogs with TKCat</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Patrice Gdoard" />
+    <script src="TKCat-useR2022-Patrice-Godard_files/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
 
-<head>
-<title>Managing and leveraging knowledge catalogs with TKCat</title>
-</head>
 
-<body>
+
+
+class: title-slide, inverse, left, middle
+background-image: url("UCB-theme/UCB-Cover.jpg")
+background-size: cover
+
+
+&lt;div class="pull-left" style="width:40%; color:white;"&gt;
+
+&lt;h3 style="color:white;"&gt;Managing and leveraging knowledge catalogs with TKCat&lt;/h3&gt;
+
+&lt;a href="https://github.com/patzaw/" target="_blank"&gt;Patrice Godard&lt;/a&gt; | &lt;a href="https://user2022.r-project.org/" target="_blank"&gt;useR!2022&lt;/a&gt; | 23 Jun 2022
+
+&lt;span role="img" aria-label="Slide background shows tagline: UCB: Inspired by patient. Driven by science."&gt;&lt;/span&gt;
+
+&lt;/div&gt;
+
+???
+
+My name is Patrice Godard. I am a biochemist by training but I turned to
+bioinformatics during my PhD thesis. I have worked in the biotech and
+biopharmaceutical industry for 12 years and my main area of expertise is
+in omics data analysis.
+
+I'm going to present you the *TKCat* package which has been
+developed to manage and leverage, in R, knowledge that has been extracted
+from external resources or generated from internal research projects.
+
+And to this aim,
+I will discuss specific examples related to the role and the activities
+of my team within the UCB company.
+
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+
+
+&lt;style&gt;
+.title-slide a {
+   color:white;
+   text-decoration:underline;
+}
+.title-slide a:hover {
+   background:white;
+   color:black;
+}
+.remark-notes-area .remark-bottom-area .remark-notes-current-area {
+   height:100%;
+}
+.remark-notes-preview-area {
+   display:none;
+}
+.left-column {
+   width:25%;
+}
+.right-column {
+   width:74%;
+}
+.comp-title &gt; h2 {
+   margin-bottom:2px;
+}
+.code-marg-0 pre {
+   margin:0px;
+}
+.code-marg-3 pre {
+   margin:3px;
+}
+.code-marg-5 pre {
+   margin:5px;
+}
+.full-left &gt; .pull-left {
+   width:100%
+}
+.l64 &gt; .pull-left {
+   width:61%;
+}
+.l64 &gt; .pull-right {
+   width:37%;
+}
+.r70 &gt; .pull-left {
+   width:30%;
+}
+.r70 &gt; .pull-right {
+   width:67%;
+}
+.confReport &gt; * {
+  margin:0px;
+}
+.confReport &gt; h1 {
+  font-size:14px;
+}
+.confReport &gt; h2 {
+  font-size:12px;
+}
+.confReport &gt; h3 {
+  font-size:10px;
+}
+.confReport &gt; p {
+  font-size:8px;
+}
+.confReport &gt; ul {
+  font-size:8px;
+}
+&lt;/style&gt;
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+layout: true
+background-image: url("UCB-theme/UCB-logo-foot.png"), url("UCB-theme/UCB-top-left.png"), url("UCB-theme/UCB-bottom-right-grey.png"), url("media/user2022-logo.png")
+background-position: 3% 97%, 3% 3%, 98% 90%, 98% 3%
+background-size: 15%, 6%, 6%, 6%
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+## Translational Bioinformatics at UCB
+
+???
+
+**UCB** is a biopharmaceutical company focused on creating value for people
+living with severe diseases, mainly in immunology and neurology.
+
+In this context, the translational bioinformatics team participates
+in **3 main research missions**:
+
+***
+
+- The first one is about getting a better understanding of *disease mechanisms*
+and how they can be experimentally studied
+
+
+
+
+***
+
+- The second mission is to identify new relevant *therapeutic approaches*
+
+
+
+
+***
+
+- And the third one is to identify *therapeutic opportunities*
+in patient populations
+
+
+
+
+The examples I'll will show today are related to these activities, but the
+*TKCat* package is also applicable to many other knowledge areas.
+
+--
+
+&lt;img src="media/TBN-UCB-1.png" style="position: absolute; top:150px; left:25%; height:450px;" alt="Understanding disease at the cellular and molecular level to identify relevant therapeutic approaches for patient populations"&gt;
+
+--
+
+&lt;img src="media/TBN-UCB-2.png" style="position: absolute; top:150px; left:25%; height:450px;" alt="Understanding disease at the cellular and molecular level to identify relevant therapeutic approaches for patient populations"&gt;
+
+--
+
+&lt;img src="media/TBN-UCB-3.png" style="position: absolute; top:150px; left:25%; height:450px;" alt="Understanding disease at the cellular and molecular level to identify relevant therapeutic approaches for patient populations"&gt;
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+## From data to wisdom
+
+&lt;img src="media/Data-to-Wisdom-part.png" style="position: absolute; top:200px; left:80px; width:823px;" alt="Relationships between data (empty dots), information (colored dots), knowledge (connected colored dots), insight (dots of interest) and wisdom (path between dots of interest)" /&gt;
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;strong&gt;Credit&lt;/strong&gt;: from twitter (unknown author)
+&lt;/p&gt;
+
+???
+
+Now, let's clarify what I mean by knowledge,
+using this image I've seen floating around in social networks.
+
+It depicts quite well, among other things, the different kind of assets
+used or produced in the frame of data analysis projects.
+
+On one hand,
+original **data** is often the output of
+devices such as an image, a signal or a DNA sequence.
+
+**Information** is interpreted data, such as a genetic variant observed
+in an individual compared to a reference,
+or the level of expression of one gene in one sample.
+
+And **knowledge** can be seen as consistent information which has been
+combined with relationships identified between the different elements.
+
+On the other hand,
+**insights** correspond to key elements of the knowledge which are
+of particular importance in a given context.
+For example, the understanding of a molecular mechanism involved in a condition
+of interest.
+
+And finally, **wisdom** can be seen as relevant paths for leveraging knowledge
+insights,
+such as the identification of a new therapeutic approach targeting a relevant
+molecular pathway.
+
+***
+
+Unfortunately, wisdom is not a given,
+whatever the quality of the upstream assets,
+and we need to be careful not to take our fantasy for it.
+
+***
+
+Anyway, in this presentation, I'm not going to address this point,
+and I'll focus *wisely* on the knowledge itself:
+how it can be structured, documented and efficiently leveraged.
+
+--
+
+&lt;img src="media/Data-to-Wisdom-full.png" style="position: absolute; top:200px; left:80px; width:999px;" alt="Adding conspiracy theory to the figure (dots connected for drawing a unicorn)"/&gt;
+
+--
+
+&lt;svg style="position: absolute; top:198px; left:410px; width:170px; height:260px"&gt;
+  &lt;rect width="170px" height="260px" style="fill:transparent;stroke-width:10;stroke:orange;"&gt;&lt;/rect&gt;
+  Rectangle highlighting the knowledge related drawing
+&lt;/svg&gt;
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+## Expected features of the knowledge to manage
+
+???
+
+More precisely, what are the expected features of the knowledge we propose to
+manage with *TKCat*?
+
+***
+
+First, we deal with many different concepts. In our case it can be:
+disease, phenotypes, genes,
+proteins, tissues, organs, cells, organelles, molecular pathways, drugs,
+gene expression, protein abundance and so on.
+
+And these concepts are related to each other in a way which highly depends
+on the context.
+
+That's why documenting the knowledge with a data model is very valuable and the
+*ReDaMoR* R package is dedicated to this task.
+
+***
+
+We also make the hypothesis that most of the data underlying the knowledge
+can be organized in tables or in matrices.
+
+We want to use them in R, of course. But, we also want them to be accessible
+and reusable in other environments as much as possible.
+
+That's why structured folders and text files have been chosen to archive
+the knowledge and also as one solution to exchange it, especially with
+external collaborators.
+
+***
+
+Developing a system integrating all pieces of knowledge is a very difficult
+task and highly risky.
+
+That's why we prefer to keep the different pieces of knowledge independent but
+still ready for integration.
+
+Indeed, the different pieces of knowledge often refer to similar concepts, like
+genes or diseases in our case.
+And those concepts can be used to build bridges across information areas.
+
+But these concepts are also often implemented using different scopes and
+references. For example, some of the resources we manipulate refer to proteins
+whereas others refer to their coding genes.
+
+That's why we have developed dictionaries of concepts which are used to
+combine and integrate information when needed: *BED* focuses on biological
+entities, such as genes and proteins, whereas *DODO* focuses on conditions like
+diseases and phenotypes.
+
+***
+
+Data supporting the knowledge can be quite large depending on the scope.
+
+And we want, depending on the context, either to use the corresponding tables
+as a whole or by subsets.
+
+Also, the knowledge information is not supposed to be updated very frequently.
+
+
+
+
+But it can still be valuable to keep track of the different versions
+of this knowledge which, by nature, tends to evolve.
+
+Finally, some data are more sensitive than the others, or come with license
+restriction which can limit their use to a set of users.
+
+All these different features led to the choice of the *ClickHouse* Database
+Management System for spreading the knowledge internally.
+
+--
+
+- Diverse concepts
+- Connected concepts
+&lt;li style="visibility:hidden;"&gt;&lt;/li&gt;
+
+&lt;img src="media/ReDaMoR.png" style="position: absolute; top:130px; left:900px; height:90px;" alt="Logo of the ReDaMoR R package"&gt;
+
+--
+
+- Tabular data
+- To use in R and beyond
+&lt;li style="visibility:hidden;"&gt;&lt;/li&gt;
+
+&lt;img src="media/folder.png" style="position: absolute; top:230px; left:800px; height:80px;" alt="Logo of a folder"&gt;
+&lt;img src="media/csv.png" style="position: absolute; top:235px; left:900px; height:70px;" alt="Logo of a csv file"&gt;
+&lt;img src="media/json.jpg" style="position: absolute; top:235px; left:1000px; height:70px;" alt="Logo of json file"&gt;
+
+--
+
+- Non monolytic knowledge: management of independent pieces
+- Ready for integration on the basis of shared concepts
+- Diverse implementation of shared concepts
+&lt;li style="visibility:hidden;"&gt;&lt;/li&gt;
+
+&lt;img src="media/BED.png" style="position: absolute; top:345px; left:850px; height:90px;" alt="BED dictionary icon"&gt;
+&lt;img src="media/DODO.png" style="position: absolute; top:345px; left:950px; height:90px;" alt="DODO dictionary icon"&gt;
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://f1000research.com/articles/7-195" target="_blank"&gt;
+BED: a Biological Entity Dictionary
+&lt;/a&gt;
+ | 
+&lt;a href="https://f1000research.com/articles/9-942" target="_blank"&gt;
+DODO: Dictionary Of Disease Ontologies
+&lt;/a&gt;
+&lt;span style="visibility:hidden;"&gt; | &lt;/span&gt;
+&lt;a href="https://clickhouse.com/" target="_blank" style="visibility:hidden;"&gt;
+https://clickhouse.com/
+&lt;/a&gt;
+&lt;/p&gt;
+
+--
+
+- Potentially billions of records
+- Tables to be used entirely or by subset
+- No frequent updates but to be versioned
+- Potential restriction of use
+
+&lt;img src="media/ClickHouse.png" style="position: absolute; top:485px; left:865px; height:90px;" alt="Logo of the ClickHouse DBMS"&gt;
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://f1000research.com/articles/7-195" target="_blank"&gt;
+BED: a Biological Entity Dictionary
+&lt;/a&gt;
+ | 
+&lt;a href="https://f1000research.com/articles/9-942" target="_blank"&gt;
+DODO: Dictionary Of Disease Ontologies
+&lt;/a&gt;
+&lt;span&gt; | &lt;/span&gt;
+&lt;a href="https://clickhouse.com/" target="_blank"&gt;
+https://clickhouse.com/
+&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+## MDB: a Modeled Database for each knowledge resource
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://github.com/patzaw/ReDaMoR"&gt;
+https://github.com/patzaw/ReDaMoR
+&lt;/a&gt;
+ | 
+&lt;a href="https://github.com/patzaw/TKCat"&gt;
+https://github.com/patzaw/TKCat
+&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;img src="media/MDB.png" style="position: absolute; top:200px; left:850px; width:250px;" alt="MDB icon"&gt;
+
+#### Features
+
+???
+
+Now, I would like to spend time on a key and central type of object in *TKCat*
+called **MDB**.
+
+*MDB* stands for Modeled Database and it is
+used to organize a specific knowledge resource relying on the following
+organization.
+
+***
+
+First, an *MDB* gathers the **data** themselves, which can be tables
+or matrices.
+
+***
+
+Those data are documented by a **data model** produced using *ReDaMoR*.
+
+***
+
+**General information** or metadata are also added to the object: they provide
+a title, a short description and some references.
+
+***
+
+Finally, some tables are annotated as **collection members**.
+
+It means that those
+tables refer to key concepts that can be used to build bridges across
+different knowledge resources.
+
+
+
+
+***
+
+*TKCat* supports different **implementations** of *MDBs* which differ in the way
+the data are made accessible: either in memory, in files or in the ClickHouse
+DBMS.
+
+***
+
+Finally, *TKCat* stands for **Tailored Knowledge Catalog**
+
+And, indeed, it is an R package providing
+a set of tools for managing and using knowledge resources made available
+in *MDBs*.
+
+Now, I'm going to exemplify how to build and manipulate an *MDB*.
+
+--
+
+- **Data**: tables and matrices
+
+&lt;img src="media/MDB-t.png" style="position: absolute; top:200px; left:850px; width:250px;" alt="MDB icon"&gt;
+
+--
+
+- **Data model**: Formal description of the data
+
+&lt;img src="media/ReDaMoR.png" style="position: absolute; top:205px; left:580px; width:90px;" alt="Logo of the ReDaMoR R package"&gt;
+
+&lt;img src="media/MDB-m.png" style="position: absolute; top:200px; left:850px; width:250px;" alt="MDB icon"&gt;
+
+--
+
+- **Description**: general information about the data
+
+&lt;img src="media/MDB-l.png" style="position: absolute; top:200px; left:850px; width:250px;" alt="MDB icon"&gt;
+
+--
+
+- **Collections**: tables referring to key concepts
+
+&lt;img src="media/MDB-c.png" style="position: absolute; top:200px; left:850px; width:250px;" alt="MDB icon"&gt;
+
+&lt;img src="media/MDBs-col.png" style="position: absolute; top:380px; left:750px; width:250px;" alt="Two MDBs with collections"&gt;
+
+--
+
+- **Implementation**: in memory, in files, in ClickHouse
+
+&lt;img src="media/MDB.png" style="position: absolute; top:200px; left:850px; width:250px;" alt="MDB icon"&gt;
+
+&lt;img src="media/hide-mdbs-col.png" style="position: absolute; top:380px; left:749px; width:255px;" alt="White rectangle"&gt;
+
+--
+
+#### TKCat
+
+- **Tailored Knowledge Catalog**: a package for managing and using MDBs
+
+&lt;img src="media/TKCat.png" style="position: absolute; top:450px; left:890px; width:90px;" alt="Logo of the TKCat R package"&gt;
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+## Drafting a data model in R with ReDaMoR
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://doi.org/10.1093/nar/gky1105" target="_blank"&gt;
+HPO: &lt;strong&gt;Köhler et al. (2019)&lt;/strong&gt;
+&lt;/a&gt;
+ |
+&lt;a href="https://patzaw.github.io/ReDaMoR/ReDaMoR.html#41_Drafting_a_data_model_from_data_frames" target="_blank"&gt;
+&lt;strong&gt;ReDaMoR user guide&lt;/strong&gt; &amp;gt; Drafting a data model
+&lt;/a&gt;
+&lt;/p&gt;
+
+
+```r
+library(readr)
+hpo_data_dir &lt;- system.file("examples/HPO-subset", package="ReDaMoR")
+*HPO_hp &lt;- read_tsv(file.path(hpo_data_dir, "HPO_hp.txt"))
+*HPO_diseases &lt;- read_tsv(file.path(hpo_data_dir, "HPO_diseases.txt"))
+*HPO_diseaseHP &lt;- read_tsv(file.path(hpo_data_dir, "HPO_diseaseHP.txt"))
+```
+
+???
+
+For that purpose, I'm going to use some data made available within the *ReDaMoR*
+package.
+
+For this simple example, I'm going to use 3 tables describing the phenotypes
+associated to different human diseases.
+
+This information comes from the **Human Phenotype Ontology project** or *HPO*.
+
+As a remember, a phenotype is an individual's observable traits, such as height,
+eye color or blood type.
+
+For example the occurrence of seizures is a strong phenotype of patients
+suffering of epilepsy.
+
+***
+
+Using the *ReDaMoR* package, we can draft a very simple data model of these
+three tables.
+
+Each rectangle represents a table and the bullet points the fields in each
+of them.
+
+So far, excepted the data type, there is no constraint associated to the fields
+and no relationship identified between the tables.
+
+--
+
+
+```r
+library(ReDaMoR)
+*hpo_model &lt;- df_to_model(HPO_hp, HPO_diseases, HPO_diseaseHP)
+plot(hpo_model)
+```
+
+&lt;iframe src="TKCat-useR2022-Patrice-Godard_files/htmlwidgets_plots/unnamed-chunk-9.html" style="height:200px; width:100%; border-style:none; background-color:transparent;"&gt;&lt;/iframe&gt;
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+## Creating a data model in R with ReDaMoR
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href=" https://pgodard.shinyapps.io/ReDaMoR/" target="_blank"&gt;
+Try the GUI in shinyapps.io
+&lt;/a&gt;
+ | 
+&lt;a href="https://patzaw.github.io/ReDaMoR/ReDaMoR.html#3_Creating_and_modifying_relational_data_using_the_graphical_user_interface" target="_blank"&gt;
+&lt;strong&gt;ReDaMoR user guide&lt;/strong&gt; &amp;gt; Creating a data model
+&lt;/a&gt;
+&lt;/p&gt;
+
+
+```r
+hpo_model &lt;- model_relational_data(hpo_model)
+```
+
+&lt;img src="media/model_relational_data.png" style="position:absolute; width:1000px; top:200px; left:64px; z-index:1; border:solid 3px black" alt="The model_relational_data() graphical user interface"&gt;
+
+&lt;img src="media/model_relational_data-top.png" style="width:1000px; position:absolute; top:203px; left:67px; z-index:3;" alt="The model_relational_data() graphical user interface"&gt;
+
+&lt;iframe src="TKCat-useR2022-Patrice-Godard_files/htmlwidgets_plots/unnamed-chunk-11.html" style="position:absolute; top:250px; left:80px; height:355px; width:550px; border-style:none; background-color:transparent; z-index:2;"&gt;&lt;/iframe&gt;
+
+???
+
+To add such information, we can use the `model_relational_data()` function
+which will launch a graphical user interface developed for creating
+and manipulating relational data models.
+
+In this case for example, we have made all the fields of all tables
+non nullable. Excepted the *description* field of the hp table
+which remains between brackets in this graphical representation.
+
+The fields in bold correspond to primary keys of the tables.
+
+We have also changed the type of a few fields and
+added relevant relationships between the tables.
+
+To summarize, the phenotypes are described in the *hp* table whereas the
+diseases are described in the *disease* table.
+
+The *diseaseHP* table is an association table between diseases
+and phenotypes, each disease potentially presenting several phenotypes,
+and each phenotype being potentially presented by several diseases, as
+indicated by the cardinalities associated to the relationships.
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+## Confronting data to the model
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://patzaw.github.io/ReDaMoR/ReDaMoR.html#4_Confronting_data" target="_blank"&gt;
+&lt;strong&gt;ReDaMoR user guide&lt;/strong&gt; &amp;gt; Confronting data
+&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;div class="l64 code-marg-0"&gt;
+
+.pull-left[
+
+
+```r
+confront_data(hpo_model, data=list(
+   "HPO_hp"=HPO_hp,
+   "HPO_diseaseHP"=HPO_diseaseHP,
+   "HPO_diseases"=HPO_diseases
+))
+```
+
+&lt;p style="text-align:center;"&gt;
+&lt;img src="media/hpo_model-3tables.png" style="width:500px;" alt="HPO model limited to 3 tables"&gt;
+&lt;/p&gt;
+
+]
+
+.pull-right[
+
+&lt;div class="confReport" style="height:240px; overflow: auto; background-color:#FFFACD; border-top:5px solid black; border-bottom:5px solid black;"&gt;
+
+&lt;h1&gt;Confrontation with original data&lt;/h1&gt;
+
+&lt;p&gt;&lt;span style="background-color:red; color:white; padding:2px;"&gt;FAILURE&lt;/span&gt;&lt;/p&gt;
+
+&lt;h2&gt;Check configuration&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Optional checks&lt;/strong&gt;: unique, not nullable, foreign keys&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Maximum number of records&lt;/strong&gt;: Inf&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;HPO_hp&lt;/h2&gt;
+
+&lt;p&gt;&lt;span style="background-color:red; color:white; padding:2px;"&gt;FAILURE&lt;/span&gt;&lt;/p&gt;
+
+&lt;h3&gt;Field issues or warnings&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;description: &lt;span style="background-color:green; color:black; padding:2px;"&gt;SUCCESS&lt;/span&gt; &lt;span style="background-color:#FFBB33; color:white; padding:2px;"&gt;Missing values 117/500 = 23%&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;level: &lt;span style="background-color:red; color:white; padding:2px;"&gt;FAILURE&lt;/span&gt; &lt;span style="background-color:#FFBB33; color:white; padding:2px;"&gt;Unexpected &amp;ldquo;numeric&amp;rdquo;&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;HPO_diseases&lt;/h2&gt;
+
+&lt;p&gt;&lt;span style="background-color:red; color:white; padding:2px;"&gt;FAILURE&lt;/span&gt;&lt;/p&gt;
+
+&lt;h3&gt;Field issues or warnings&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;id: &lt;span style="background-color:red; color:white; padding:2px;"&gt;FAILURE&lt;/span&gt; &lt;span style="background-color:#FFBB33; color:white; padding:2px;"&gt;Unexpected &amp;ldquo;numeric&amp;rdquo;&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;HPO_diseaseHP&lt;/h2&gt;
+
+&lt;p&gt;&lt;span style="background-color:red; color:white; padding:2px;"&gt;FAILURE&lt;/span&gt;&lt;/p&gt;
+
+&lt;h3&gt;Field issues or warnings&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;id: &lt;span style="background-color:red; color:white; padding:2px;"&gt;FAILURE&lt;/span&gt; &lt;span style="background-color:#FFBB33; color:white; padding:2px;"&gt;Unexpected &amp;ldquo;numeric&amp;rdquo;&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/div&gt;
+
+]
+
+.pull-left[
+
+
+```r
+HPO_hp &lt;- mutate(HPO_hp, level=`as.integer(level)`)
+HPO_diseases &lt;- mutate(HPO_diseases, id=`as.character(id)`)
+HPO_diseaseHP &lt;- mutate(HPO_diseaseHP, id=`as.character(id)`)
+confront_data(hpo_model, data=list(
+   "HPO_hp"=HPO_hp,
+   "HPO_diseaseHP"=HPO_diseaseHP,
+   "HPO_diseases"=HPO_diseases
+))
+```
+
+]
+
+.pull-right[
+
+&lt;div class="confReport" style="height:150px; overflow: auto; background-color:#FFFACD; border-top:5px solid black; border-bottom:5px solid black; margin-top:20px;"&gt;
+
+&lt;h1&gt;Confrontation with corrected data&lt;/h1&gt;
+
+&lt;p&gt;&lt;span style="background-color:green; color:black; padding:2px;"&gt;SUCCESS&lt;/span&gt;&lt;/p&gt;
+
+&lt;h2&gt;Check configuration&lt;/h2&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Optional checks&lt;/strong&gt;: unique, not nullable, foreign keys&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Maximum number of records&lt;/strong&gt;: Inf&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2&gt;HPO_hp&lt;/h2&gt;
+
+&lt;p&gt;&lt;span style="background-color:green; color:black; padding:2px;"&gt;SUCCESS&lt;/span&gt;&lt;/p&gt;
+
+&lt;h3&gt;Field issues or warnings&lt;/h3&gt;
+
+&lt;ul&gt;
+&lt;li&gt;description: &lt;span style="background-color:green; color:black; padding:2px;"&gt;SUCCESS&lt;/span&gt; &lt;span style="background-color:#FFBB33; color:white; padding:2px;"&gt;Missing values 117/500 = 23%&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;/div&gt;
+
+]
+
+&lt;/div&gt;
+
+???
+
+Once the data model is created it can be confronted to the data using
+the `confront_data()` function.
+
+This function returns a report that helps to efficiently correct the data or
+the model when needed.
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+class: comp-title
+
+## Creating and using an MDB with TKCat
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#2_Create_an_MDB:_a_minimal_example" target="_blank"&gt;
+&lt;strong&gt;TKCat user guide&lt;/strong&gt; &amp;gt; Create an MDB
+&lt;/a&gt;
+ | 
+&lt;a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#3_Leveraging_MDB" target="_blank"&gt;
+&lt;strong&gt;TKCat user guide&lt;/strong&gt; &amp;gt; Leveraging MDB
+&lt;/a&gt;
+&lt;/p&gt;
+
+.pull-left[
+
+#### MDB creation
+
+
+```r
+library(TKCat)
+hpo &lt;- `memoMDB`(
+   `dataTables`=list(
+      "HPO_hp"=HPO_hp,
+      "HPO_diseases"=HPO_diseases,
+      "HPO_diseaseHP"=HPO_diseaseHP
+   ),
+   `dataModel`=hpo_model,
+   `dbInfo`=list(
+      name="miniHPO",
+      title="Very small extract of the human phenotype ontology",
+      description="For demonstrating ReDaMoR and TKCat capabilities...",
+      url="https://hpo.jax.org/app/",
+      version="0.1",
+      maintainer="Patrice Godard &lt;patrice.godard@gmail.com&gt;"
+   )
+)
+```
+
+
+
+]
+
+???
+
+The confrontation of the data model to the data also occurs when creating
+an *MDB*, which is achieved as shown on the left.
+
+The process of creation of an *MDB* follows the main feature of this type of
+object I've described before. It takes the data tables, the data model,
+and some general information.
+
+***
+
+The content of an *MDB* can then be easily explored and retrieved as exemplified
+on the right.
+
+Intuitively, the `db_info()` function returns general information, and
+the `data_model()` function returns the data model.
+
+The `select()` function is used to focus the *MDB* on a few tables and
+the `pull()` function to extract a specific table.
+
+--
+
+.pull-right[
+
+#### Explore and retrieve information
+
+
+
+```r
+db_info(hpo)
+data_model(hpo)
+```
+
+
+```r
+hpo %&gt;% select(HPO_diseases, HPO_diseaseHP)
+hpo %&gt;% pull(HPO_diseases) %&gt;% 
+   head(3)
+```
+
+
+```
+## # A tibble: 3 × 3
+##   db       id    label                     
+##   &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;                     
+## 1 DECIPHER 15    NF1-microdeletion syndrome
+## 2 DECIPHER 45    Xq28 (MECP2) duplication  
+## 3 DECIPHER 65    ATR-16 syndrome
+```
+
+]
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+class: code-marg-5
+
+## Leverage the MDB data model: `filter`
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#35_Filtering_and_joining" target="_blank"&gt;
+&lt;strong&gt;TKCat user guide&lt;/strong&gt; &amp;gt; Filtering and joining
+&lt;/a&gt;
+&lt;/p&gt;
+
+.pull-left[
+
+
+```r
+dims(hpo) %&gt;% select(name, nrow)
+```
+
+```
+## # A tibble: 3 × 2
+##   name           nrow
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 HPO_hp          500
+## 2 HPO_diseases   1903
+## 3 HPO_diseaseHP  2594
+```
+
+]
+
+.pull-right[
+
+
+```r
+data_model(hpo) %&gt;% plot()
+```
+
+&lt;iframe src="TKCat-useR2022-Patrice-Godard_files/htmlwidgets_plots/unnamed-chunk-26.html" style="height:120px; width:100%; border-style:none; background-color:transparent;"&gt;&lt;/iframe&gt;
+
+]
+
+&lt;p style="margin:5px; visibility:hidden;"&gt;_&lt;/p&gt;
+
+
+```r
+fhpo &lt;- hpo %&gt;% `filter(HPO_hp=stringr::str_detect(description, "eye"))`
+```
+
+
+
+
+???
+
+More interestingly, the data model can be used to filter the data
+**transitively** through all tables.
+
+On the right you have the original data model of the *MDB* we have just
+constructed.
+
+And on the left you have the number of rows in each table.
+
+The aim of the highlighted command is to filter the *hp* table to keep rows
+with the word "eye" found in the description field.
+
+The idea is to get all the phenotypes regarding the *eyes*.
+
+***
+
+After applying this filter, the data model did not change.
+
+However, on the bottom left you can see that the number of rows
+of the *hp* table
+decreased but also the number of rows of the two other tables which
+were filtered accordingly.
+
+--
+
+.pull-left[
+
+
+```r
+fhpo %&gt;% dims() %&gt;% select(name, nrow)
+```
+
+```
+## # A tibble: 3 × 2
+##   name           nrow
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 HPO_hp           21
+## 2 HPO_diseaseHP   109
+## 3 HPO_diseases     99
+```
+
+]
+
+.pull-right[
+
+
+```r
+data_model(fhpo) %&gt;% plot()
+```
+
+&lt;iframe src="TKCat-useR2022-Patrice-Godard_files/htmlwidgets_plots/unnamed-chunk-32.html" style="height:120px; width:100%; border-style:none; background-color:transparent;"&gt;&lt;/iframe&gt;
+
+]
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+class: code-marg-5
+
+## Leverage the MDB data model: `join`
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#35_Filtering_and_joining" target="_blank"&gt;
+&lt;strong&gt;TKCat user guide&lt;/strong&gt; &amp;gt; Filtering and joining
+&lt;/a&gt;
+&lt;/p&gt;
+
+.pull-left[
+
+
+```r
+dims(fhpo) %&gt;% select(name, nrow)
+```
+
+```
+## # A tibble: 3 × 2
+##   name           nrow
+##   &lt;chr&gt;         &lt;int&gt;
+## 1 HPO_hp           21
+## 2 HPO_diseaseHP   109
+## 3 HPO_diseases     99
+```
+
+]
+
+.pull-right[
+
+
+```r
+data_model(fhpo) %&gt;% plot()
+```
+
+&lt;iframe src="TKCat-useR2022-Patrice-Godard_files/htmlwidgets_plots/unnamed-chunk-35.html" style="height:120px; width:100%; border-style:none; background-color:transparent;"&gt;&lt;/iframe&gt;
+
+]
+
+&lt;p style="margin:5px; visibility:hidden;"&gt;_&lt;/p&gt;
+
+
+```r
+jhpo &lt;- fhpo %&gt;% `join_mdb_tables(c("HPO_hp", "HPO_diseaseHP", "HPO_diseases"))`
+```
+
+
+
+???
+
+The data model can also be used to automatically join tables of interest.
+
+For example, after having focused the HPO *MDB* on *eyes* related phenotypes,
+it can be useful to put diseases directly in front of their corresponding
+phenotypes.
+
+This is achieved by the highlighted command.
+
+***
+
+This command alters the data model as shown at the bottom right while keeping
+all the records as you can see at the bottom left.
+
+--
+
+
+.pull-left[
+
+
+```r
+jhpo %&gt;% dims() %&gt;% select(name, nrow)
+```
+
+```
+## # A tibble: 1 × 2
+##   name    nrow
+##   &lt;chr&gt;  &lt;int&gt;
+## 1 HPO_hp   109
+```
+
+]
+
+.pull-right[
+
+
+```r
+data_model(jhpo) %&gt;% plot()
+```
+
+&lt;iframe src="TKCat-useR2022-Patrice-Godard_files/htmlwidgets_plots/unnamed-chunk-41.html" style="height:120px; width:100%; border-style:none; background-color:transparent;"&gt;&lt;/iframe&gt;
+
+]
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+## MDB implementations
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#26_Writing_an_MDB_in_files" target="_blank"&gt;
+&lt;strong&gt;TKCat user guide&lt;/strong&gt; &amp;gt; MDB in files
+&lt;/a&gt;
+ | 
+&lt;a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#32_MDB_implementations" target="_blank"&gt;
+&lt;strong&gt;TKCat user guide&lt;/strong&gt; &amp;gt; MDB implementations
+&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;div style="height:25px; visibility:hidden;"&gt;a&lt;/div&gt;
+
+&lt;img src="media/double-bent-arrow-l.svg" style="position: absolute; top:150px; left:80px; width:1000px; height:75px" alt="Double arrow"&gt;
+&lt;img src="media/double-bent-arrow-s.svg" style="position: absolute; top:165px; left:300px; width:175px; height:55px" alt="Double arrow"&gt;
+&lt;img src="media/double-bent-arrow-s.svg" style="position: absolute; top:165px; right:400px; width:175px; height:55px" alt="Double arrow"&gt;
+
+&lt;div class="full-left" style="float:left; width:350px"&gt;
+
+.pull-left[
+
+#### In memory (`as_memoMDB()`)
+
+- All the data loaded in R memory &lt;br&gt; &amp;nbsp;
+
+- Fast but greedy &lt;br&gt; &amp;nbsp;
+
+- Convenient for using whole tables
+
+]
+
+&lt;/div&gt;
+
+&lt;div class="full-left" style="float:left; width:350px; margin-left:16px;"&gt;
+
+.pull-left[
+
+#### In files (`as_fileMDB()`)
+
+- Data in files until requested (`pull()`, `filter()`, ...)
+
+- Not convenient for subsetting (slow)
+
+- Convenient for archiving and sharing
+
+]
+
+&lt;/div&gt;
+
+&lt;div class="full-left" style="float:right; width:350px"&gt;
+
+.pull-left[
+
+#### In ClickHouse DBMS (`as_chMDB()`)
+
+- Data in DBMS until requested (`pull()`, `filter()`, ...)
+
+- Efficient to get subsets &lt;br&gt; (`get_query()`)
+
+- Convenient for sharing and managing access
+
+- Versioning
+
+]
+
+&lt;/div&gt;
+
+???
+
+As mentioned before, the *TKCat* package supports three main implementations
+of *MDBs* that can be easily interconverted.
+
+Each implementation presents features that make it more or less relevant
+for different usages.
+
+In *memoMDB* all the data are loaded in memory.
+
+It makes data manipulation fast but greedy.
+
+It is convenient when the data are small or when we need to work with the whole
+tables.
+
+///
+
+In *fileMDB* the data remain in text files until requested.
+
+It saves memory and allows to load only a few tables of interest when needed.
+However it makes data filtering slow.
+
+The main purpose of *fileMDB* is to archive the MDB and to share it
+with external collaborators.
+
+///
+
+Finally, in *chMDB* the data are stored in a *ClickHouse* database.
+
+It's very efficient to load the whole tables when needed, but also to
+get only records of interest by sending *SQL* queries.
+
+Moreover, mechanisms have been implemented for managing access rights and
+for supporting the versioning of *chMDB*.
+
+The main purpose of *chMDB* is to provide an easy and flexible access to the
+data, which is quite convenient for sharing them internally.
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+## TKCat: a data warehouse management system
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#42_chTKCat" target="_blank"&gt;
+&lt;strong&gt;TKCat user guide&lt;/strong&gt; &amp;gt; chTKCat
+&lt;/a&gt;
+ | 
+&lt;a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#51_chTKCat_operations" target="_blank"&gt;
+&lt;strong&gt;TKCat user guide&lt;/strong&gt; &amp;gt; chTKCat operations
+&lt;/a&gt;
+&lt;/p&gt;
+
+.left-column[
+
+
+```r
+k &lt;- chTKCat(
+   host="localhost",
+   user="default",
+   password=""
+)
+explore_MDBs(k)
+```
+
+]
+
+.right-column[
+
+&lt;img src="media/chTKCat-resources.png" style="width:100%;" alt="explore_MDBs(k) graphical user interface: available knowledge resources"&gt;
+
+]
+
+???
+
+Multiple *chMDB* can be stored in the same *ClickHouse* instance,
+providing therefore a standard access to many knowledge resources.
+
+And they can be accessed via a *chTKCat* object which is a special connector
+to *ClickHouse*.
+
+The `explore_MDBs()` function opens a shiny user interface which can be
+used to browse available knowledge resources.
+
+***
+
+When a resource is selected, its data model can be explored and
+tables can be previewed and potentially downloaded.
+
+This application can also be deployed to improve the awareness of available
+resources within a community.
+
+--
+
+&lt;div style="position: absolute; top:125px; left:200px; width:810px; padding:5px; border:solid black 3px; background:white;"&gt;
+&lt;img src="media/chTKCat-model.png" style="width:100%" alt="explore_MDBs(k) graphical user interface: explore the model of a specific resource" /&gt;
+&lt;/div&gt;
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+class: code-marg-5
+
+## Merging MDBs with collections
+
+&lt;p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;"&gt;
+&lt;a href="https://doi.org/10.1093/nar/gkx1153" target="_blank"&gt;
+ClinVar: &lt;strong&gt;Landrum et al. (2018)&lt;/strong&gt;
+&lt;/a&gt;
+ | 
+&lt;a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#36_Merging_MDBs_with_collections" target="_blank"&gt;
+&lt;strong&gt;TKCat user guide&lt;/strong&gt; &amp;gt; Merging with collections
+&lt;/a&gt;
+&lt;/p&gt;
+
+
+
+
+&lt;iframe src="TKCat-useR2022-Patrice-Godard_files/htmlwidgets_plots/unnamed-chunk-45.html" style="height:470px; width:95%; border-style:none; background-color:transparent;"&gt;&lt;/iframe&gt;
+
+???
+
+
+*Collections* are a powerful mechanism to merge different knowledge resources
+based on shared concepts.
+
+For the sake of time, I'm not going to describe this mechanism today.
+You can find more information about it in the documentation.
+
+Quickly, here you can see the results of merging 2 MDBs sharing the concept
+of diseases. Thanks the DODO dictionary, an association table, in yellow,
+has been automatically created between the tables providing disease references.
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+
+## Supported data types
+
+- character, numeric, integer, logic, Date, POSIXct (time)
+
+???
+
+I would like to finish with a comment regarding supported data types
+in *ReDaMoR* and *TKCat*.
+
+Currently, the following **canonical R types** are supported.
+
+***
+
+In addition, *TKCat* allows the storing of **files** in *MDBs*
+using *base64* encoding.
+
+
+
+
+***
+
+Finally, **matrices and sparse matrices** are also supported by *TKCat*.
+In the data model they are represented as tables with 3 fields:
+
+   - one for row names
+   - one for column names
+   - and one for the values
    
-   <div style="margin-top:20px; margin-left:auto; margin-right:auto; width:600px;">
 
-      <h2>Managing and leveraging knowledge catalogs with TKCat</h2>
-      <h3>Patrice Godard | <a href="https://user2022.r-project.org/" target="_blank">useR!2022</a> | 23 Jun 2022</h3>
-      
-      <p><strong>Slides will be available here soon</strong></p>
-      
-      <h4>Abstract</h4>
-      
-      <p>Research organizations generate, manage, and use more and more knowledge resources which can be highly heterogenous in their origin, their scope, and their structure. Making this knowledge compliant to F.A.I.R. (Findable, Accessible, Interoperable, Reusable) principles is critical for facilitating the generation of new insights leveraging it. The aim of the TKCat (Tailored Knowledge Catalog) R package is to facilitate the management of such resources that are frequently used alone or in combination in research environments. In TKCat, knowledge resources are manipulated as modeled database (MDB) objects. These objects provide access to the data tables along with a general description of the resource and a detailed data model generated with ReDaMoR (<a href="https://CRAN.R-project.org/package=ReDaMoR" target="_blank">https://CRAN.R-project.org/package=ReDaMoR</a>) and which documents the tables, their fields, and their relationships. These MDBs are then gathered in catalogs that can be easily explored and shared. TKCat provides tools to easily subset, filter and combine MDBs and create new catalogs suited for specific needs. Currently, there are 3 different implementations of MDBs which are supported by TKCat: in R memory (memoMDB), in files (fileMDB) and in ClickHouse (<a href="https://clickhouse.com/" target="_blank">https://clickhouse.com/</a>) (chMDB). The TKCat R package is available on github (<a href="https://github.com/patzaw/TKCat" target="_blank">https://github.com/patzaw/TKCat</a>).</p>
+--
 
-   </div>
+&lt;div class="r70"&gt;
 
-</body>
+.pull-left[
+
+- base64 (file)
+
+]
+
+.pull-right[
+
+&lt;img src="media/MetaBase_Imagemaps.png" style="width:100%; border:solid 3px black;" alt="Example of files stored in base64 character"&gt;
+
+]
+
+--
+
+.pull-left[
+
+- matrix and sparse matrix
+
+]
+
+.pull-right[
+
+&lt;img src="media/snRNASeq-matrix.png" style="width:100%; border:solid 3px black;" alt="Example of matrix"&gt;
+
+]
+
+&lt;/div&gt;
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+class: comp-title
+
+## Acknowledgements
+
+&lt;div style="width:85%; margin-left:auto; margin-right:0%;"&gt;
+
+.pull-left[
+
+### Supporting tools
+
+- [tidyverse](https://www.tidyverse.org/) and related packages
+
+- [visNetwork](https://datastorm-open.github.io/visNetwork/)
+
+- [shiny](https://shiny.rstudio.com/) and related packages
+
+- [ClickHouse](https://clickhouse.com/)
+and [RClickhouse](https://github.com/IMSMWU/RClickhouse)
+
+- [Matrix](https://cran.r-project.org/package=Matrix)
+
+- **Many others**:
+   - [ReDaMoR dependencies](https://github.com/patzaw/ReDaMoR#dependencies)
+   - [TKCat dependencies](https://github.com/patzaw/TKCat#dependencies)
+   
+- [CRAN](https://cran.r-project.org/)
+
+]
+
+???
+
+Obviously, *ReDaMoR* and *TKCat* packages were developed relying
+on existing tools.
+
+I wanted to highlight here those of particular importance for the success of
+this project.
+
+However, it's not an exhaustive list that you can eventually find on the CRAN
+or on github repositories.
+
+I would also like to take this opportunity to thank the CRAN team for
+their efficiency in the publication of those R packages.
+
+***
+
+To conclude, I would like to thank people from my team at UCB who have supported
+this project at different levels.
+
+Thanks to the organizers of the *useR!* conference who gave me the opportunity
+to present this work,
+
+and thank you all for the attention you gave to this presentation...
+
+--
+
+.pull-right[
+
+### UCB team
+
+#### Managers and Developers
+
+- Jonathan van Eyll
+- Liesbeth François
+- Yuliya Nigmatullina
+
+#### Users and testers
+
+- Aurélie Bousard
+- Olga Giannakopoulou
+- Ioana Cutcutache
+- Bram Van de Sande
+- Waqar Ali
+- John Santa Maria
+
+]
+
+&lt;/div&gt;
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+---
+layout: false
+count: false
+background-image: url("UCB-theme/UCB-logo-foot.png"), url("media/user2022-logo.png")
+background-position: 3% 97%, 98% 3%
+background-size: 15%, 6%
+
+&lt;img src="UCB-theme/UCB-bottom-right-big.png" style="position:absolute; right:0px; bottom:0px; height:100%;"&gt;
+
+&lt;a href="https://patzaw.github.io/TKCat/useR2022/TKCat-useR2022-Patrice-Godard.html" target="_blank"&gt;
+&lt;img src="media/slides-link.svg" style="position:absolute; right:5px; bottom:5px; height:100%;"&gt;
+&lt;/a&gt;
+
+&lt;div style="position:absolute; width:60%; left:20%; top:120px; text-align:center;"&gt;
+&lt;a href="https://patzaw.github.io/TKCat/useR2022/TKCat-useR2022-Patrice-Godard.html"&gt;
+&lt;img src="media/slides-qr-code.png" style="width:400px"&gt;
+&lt;/a&gt;
+&lt;/div&gt;
+
+&lt;div style="position:absolute; left:2%; top:13%;writing-mode:vertical-rl; transform:rotate(-180deg);"&gt;
+Slides created with &lt;a href="https://github.com/yihui/xaringan" target="_blank"&gt;xaringan&lt;/a&gt;
+and &lt;a href="https://pkg.garrickadenbuie.com/xaringanthemer/" target="_blank"&gt;xaringanthemer&lt;/a&gt;
+&lt;/div&gt;
+
+???
+
+Don't hesitate to contact me if you have any question.
+
+
+&lt;!-----------------------------------------------------------------------------&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"slideNumberFormat": "%current% / %total%",
+"highlightStyle": "github",
+"highlightLines": true,
+"highlightSpans": true,
+"ratio": "16:9",
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
 </html>
-
