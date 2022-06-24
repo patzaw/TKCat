@@ -35,6 +35,10 @@ fields and their relationships. These MDB are then gathered in catalogs that can
 be easily explored an shared. TKCat provides tools to easily subset, filter and
 combine MDBs and create new catalogs suited for specific needs.
 
+This package has been presented
+at the [useR!2022 conference](https://user2022.r-project.org/) and
+here are [the slides](https://patzaw.github.io/TKCat/useR2022/TKCat-useR2022-Patrice-Godard.html).
+
 The TKCat R package is licensed under
 [GPL-3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
