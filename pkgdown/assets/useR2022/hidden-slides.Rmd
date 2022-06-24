@@ -1,0 +1,363 @@
+
+
+<!----------------------------------------------------------------------------->
+
+---
+class: code-marg-5
+
+## Collections and collection members
+
+<p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;">
+<a href="https://doi.org/10.1093/nar/gkx1153" target="_blank">
+ClinVar: <strong>Landrum et al. (2018)</strong>
+</a>
+ |
+<a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#25_Documenting_collection_members" target="_blank">
+<strong>TKCat user guide</strong> &gt; Collection members
+</a>
+ | 
+<a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#collections" target="_blank">
+<strong>TKCat user guide</strong> &gt; Collections
+</a>
+</p>
+
+.pull-left[
+
+```{r, eval=FALSE}
+clinvar <- read_fileMDB(system.file(
+   "examples/ClinVar", package="TKCat"
+))
+```
+
+```{r, echo=FALSE, results='hide'}
+clinvar <- read_fileMDB(system.file("examples/ClinVar", package="TKCat"))
+```
+
+```{r, echo=FALSE, results='asis'}
+pp <- data_model(clinvar) %>%
+   plot() %>%
+   visOptions(width="100%", height="260px")
+pp$sizingPolicy <- htmlwidgets::sizingPolicy(
+   browser.defaultWidth = "500px",
+   browser.defaultHeight = "260px",
+   browser.padding=0,
+   browser.fill = FALSE
+)
+cvif <- hwIframe(
+   p=pp,
+   style="height:270px; width:100%; border-style:none; background-color:transparent;"
+)
+cat(cvif)
+```
+
+]
+
+.pull-right[
+
+```{r, echo=FALSE, results='asis'}
+pp <- data_model(hpo) %>%
+   plot() %>%
+   visOptions(width="100%", height="100px")
+pp$sizingPolicy <- htmlwidgets::sizingPolicy(
+   browser.defaultWidth = "500px",
+   browser.defaultHeight = "100px",
+   browser.padding=0,
+   browser.fill = FALSE
+)
+hpif <- hwIframe(
+   p=pp,
+   style="height:120px; width:100%; border-style:none; background-color:transparent;"
+)
+cat(hpif)
+```
+
+
+]
+
+???
+
+```{r, echo=FALSE, results='asis'}
+cat(notes$collections)
+```
+
+<!----------------------------------------------------------------------------->
+
+---
+class: code-marg-5
+count: false
+
+## Collections and collection members
+
+<p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;">
+<a href="https://doi.org/10.1093/nar/gkx1153" target="_blank">
+ClinVar: <strong>Landrum et al. (2018)</strong>
+</a>
+ |
+<a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#25_Documenting_collection_members" target="_blank">
+<strong>TKCat user guide</strong> &gt; Collection members
+</a>
+ | 
+<a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#collections" target="_blank">
+<strong>TKCat user guide</strong> &gt; Collections
+</a>
+</p>
+
+.pull-left[
+
+```{r, eval=FALSE}
+clinvar <- read_fileMDB(system.file(
+   "examples/ClinVar", package="TKCat"
+))
+```
+
+```{r, echo=FALSE, results='hide'}
+clinvar <- read_fileMDB(system.file("examples/ClinVar", package="TKCat"))
+```
+
+```{r, echo=FALSE, results='asis'}
+cat(cvif)
+```
+
+]
+
+.pull-right[
+
+```{r, echo=FALSE, results='asis'}
+cat(hpif)
+```
+
+```{r}
+hpo <- hpo %>% add_collection_member(
+   collection="Condition",
+   table="HPO_diseases",
+   condition=list(
+      value="Disease", static=TRUE
+   ),
+   source=list(
+      value="db", static=FALSE
+   ),
+   identifier=list(
+      value="id", static=FALSE
+   )
+)
+```
+
+
+]
+
+???
+
+```{r, echo=FALSE, results='asis'}
+cat(notes$collections)
+```
+
+<!----------------------------------------------------------------------------->
+
+---
+class: code-marg-5
+count: false
+
+## Collections and collection members
+
+<p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;">
+<a href="https://doi.org/10.1093/nar/gkx1153" target="_blank">
+ClinVar: <strong>Landrum et al. (2018)</strong>
+</a>
+ |
+<a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#25_Documenting_collection_members" target="_blank">
+<strong>TKCat user guide</strong> &gt; Collection members
+</a>
+ | 
+<a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#collections" target="_blank">
+<strong>TKCat user guide</strong> &gt; Collections
+</a>
+</p>
+
+.pull-left[
+
+```{r, eval=FALSE}
+clinvar <- read_fileMDB(system.file(
+   "examples/ClinVar", package="TKCat"
+))
+```
+
+```{r, echo=FALSE, results='hide'}
+clinvar <- read_fileMDB(system.file("examples/ClinVar", package="TKCat"))
+```
+
+```{r, echo=FALSE, results='asis'}
+cat(cvif)
+```
+
+```{r, eval=FALSE}
+collection_members(clinvar)
+```
+
+]
+
+.pull-right[
+
+```{r, echo=FALSE, results='asis'}
+cat(hpif)
+```
+
+```{r, eval=FALSE}
+hpo <- hpo %>% add_collection_member(
+   collection="Condition",
+   table="HPO_diseases",
+   condition=list(
+      value="Disease", static=TRUE
+   ),
+   source=list(
+      value="db", static=FALSE
+   ),
+   identifier=list(
+      value="id", static=FALSE
+   )
+)
+```
+
+]
+
+???
+
+```{r, echo=FALSE, results='asis'}
+cat(notes$collections)
+```
+
+
+
+<!----------------------------------------------------------------------------->
+
+---
+class: code-marg-5
+
+## Merging with collections
+
+<p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;">
+<a href="https://f1000research.com/articles/7-195" target="_blank">
+BED: a Biological Entity Dictionary
+</a>
+ | 
+<a href="https://f1000research.com/articles/9-942" target="_blank">
+DODO: Dictionary Of Disease Ontologies
+ | 
+</a>
+<a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#36_Merging_MDBs_with_collections" target="_blank">
+<strong>TKCat user guide</strong> &gt; Merging with collections
+</a>
+</p>
+
+<div class="l64 code-marg-0">
+
+.pull-left[
+
+```{r}
+shared_collections <- get_shared_collections(
+   hpo, clinvar
+)
+shared_collections
+```
+
+]
+
+</div>
+
+???
+
+```{r, echo=FALSE, results='asis'}
+cat(notes$merging)
+```
+
+<!----------------------------------------------------------------------------->
+
+---
+class: code-marg-5
+count: false
+
+## Merging with collections
+
+<p style="position: absolute; bottom:3%; right:10%; margin:0; font-size:small; font-style:italic;">
+<a href="https://f1000research.com/articles/7-195" target="_blank">
+BED: a Biological Entity Dictionary
+</a>
+ | 
+<a href="https://f1000research.com/articles/9-942" target="_blank">
+DODO: Dictionary Of Disease Ontologies
+ | 
+</a>
+<a href="https://patzaw.github.io/TKCat/TKCat-User-guide.html#36_Merging_MDBs_with_collections" target="_blank">
+<strong>TKCat user guide</strong> &gt; Merging with collections
+</a>
+</p>
+
+<div class="l64 code-marg-0">
+
+.pull-left[
+
+```{r}
+shared_collections <- get_shared_collections(
+   hpo, clinvar
+)
+shared_collections
+```
+
+```{r, eval=FALSE}
+hpo_clinvar <- merge(
+   hpo, clinvar,
+   by=shared_collections[1,]
+)
+hpo_clinvar %>% data_model() %>% plot()
+```
+
+]
+
+.pull-right[
+
+```{r dodoMerge, echo=FALSE, cache=TRUE}
+hpo_clinvar <- merge(
+   hpo, clinvar,
+   by=shared_collections[1,],
+   dmAutoLayout=FALSE
+)
+```
+
+
+```{r, echo=FALSE, results='asis'}
+tp <- hpo_clinvar %>% data_model()
+tp$Condition_1_HPO_diseases_1_ClinVar_traitCref$display$x <-
+   tp$ClinVar_traitCref$display$x
+tp <- unclass(tp)
+for(
+   n in
+   c(
+      "HPO_diseases", "HPO_diseaseHP", "HPO_hp",
+      "Condition_1_HPO_diseases_1_ClinVar_traitCref"
+   )
+){
+   tp[[n]]$display$y <- -250
+}
+tp <- RelDataModel(tp)
+pp <- tp %>% plot() %>%
+   visOptions(width="100%", height="400px")
+pp$sizingPolicy <- htmlwidgets::sizingPolicy(
+   browser.defaultWidth = "400px",
+   browser.defaultHeight = "400px",
+   browser.padding=0,
+   browser.fill = FALSE
+)
+cat(hwIframe(
+   p=pp,
+   style="height:410px; width:100%; border-style:none; background-color:transparent;"
+))
+```
+
+]
+
+</div>
+
+???
+
+```{r, echo=FALSE, results='asis'}
+cat(notes$merging)
+```

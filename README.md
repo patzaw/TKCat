@@ -14,17 +14,17 @@ README
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
 [![](http://cranlogs.r-pkg.org/badges/TKCat)](https://cran.r-project.org/package=TKCat)
 
-The aim of TKCat (Tailored Knowledge Catalog) is to facilitate the
-management of data from knowledge resources that are frequently used
-alone or together in research environments. In TKCat, knowledge
-resources are manipulated as modeled database (MDB) objects. These
-objects provide access to the data tables along with a general
-description of the resource and a detail data model generated with
-[ReDaMoR](https://github.com/patzaw/ReDaMoR) documenting the tables,
-their fields and their relationships. These MDB are then gathered in
-catalogs that can be easily explored an shared. TKCat provides tools to
-easily subset, filter and combine MDBs and create new catalogs suited
-for specific needs.
+The aim of [TKCat](https://patzaw.github.io/TKCat/) (Tailored Knowledge
+Catalog) is to facilitate the management of data from knowledge
+resources that are frequently used alone or together in research
+environments. In TKCat, knowledge resources are manipulated as modeled
+database (MDB) objects. These objects provide access to the data tables
+along with a general description of the resource and a detail data model
+generated with [ReDaMoR](https://github.com/patzaw/ReDaMoR) documenting
+the tables, their fields and their relationships. These MDB are then
+gathered in catalogs that can be easily explored an shared. TKCat
+provides tools to easily subset, filter and combine MDBs and create new
+catalogs suited for specific needs.
 
 This package has been presented at the [useR!2022
 conference](https://user2022.r-project.org/) and here are [the
@@ -114,7 +114,7 @@ devtools::install_github("patzaw/TKCat")
 # Documentation
 
 Documentation is available in the following vignette: [TKCat user
-guide](https://patzaw.github.io/TKCat/TKCat-User-guide.html)
+guide](https://patzaw.github.io/TKCat/articles/TKCat-User-guide.html)
 
 # Alternatives
 
@@ -132,8 +132,9 @@ guide](https://patzaw.github.io/TKCat/TKCat-User-guide.html)
     -   **dm** supports connection to many different DBMS. It also take
         advantage of constraints which are documented in the DBMS when
         available. **TKCat** only supports the
-        [ClickHouse](https://clickhouse.tech/) system through the
-        [RClickhouse](https://github.com/IMSMWU/RClickhouse) package.
+        [ClickHouse](https://clickhouse.com/) system through the
+        [ClickHouseHTTP](https://github.com/patzaw/ClickHouseHTTP) or
+        [RClickhouse](https://github.com/IMSMWU/RClickhouse) packages.
     -   **TKCat** implements 3 main types of MDB based on files, memory
         tables or ClickHouse database. It also provides mechanisms to
         automatically convert from and to any of these implementations.

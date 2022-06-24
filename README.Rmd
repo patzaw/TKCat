@@ -25,7 +25,8 @@ cranRef <- function(x){
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
 [![](http://cranlogs.r-pkg.org/badges/TKCat)](https://cran.r-project.org/package=TKCat)
 
-The aim of TKCat (Tailored Knowledge Catalog) is to facilitate the management of
+The aim of [TKCat](https://patzaw.github.io/TKCat/) (Tailored Knowledge Catalog)
+is to facilitate the management of
 data from knowledge resources that are frequently used alone or together in
 research environments. In TKCat, knowledge resources are manipulated as modeled
 database (MDB) objects. These objects provide access to the data tables along
@@ -80,7 +81,7 @@ devtools::install_github("patzaw/TKCat")
 # Documentation
 
 Documentation is available in the following vignette:
-[TKCat user guide](https://patzaw.github.io/TKCat/TKCat-User-guide.html)
+[TKCat user guide](https://patzaw.github.io/TKCat/articles/TKCat-User-guide.html)
 
 # Alternatives
 
@@ -96,8 +97,9 @@ Documentation is available in the following vignette:
     -   **dm** supports connection to many different DBMS. It also take
         advantage of constraints which are documented in the DBMS when
         available. **TKCat** only supports the
-        [ClickHouse](https://clickhouse.tech/) system through the
-        [RClickhouse](https://github.com/IMSMWU/RClickhouse) package.
+        [ClickHouse](https://clickhouse.com/) system through the
+        [ClickHouseHTTP](https://github.com/patzaw/ClickHouseHTTP) or
+        [RClickhouse](https://github.com/IMSMWU/RClickhouse) packages.
     -   **TKCat** implements 3 main types of MDB based on files, memory tables
         or ClickHouse database. It also provides mechanisms to automatically
         convert from and to any of these implementations.

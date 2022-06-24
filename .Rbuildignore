@@ -11,3 +11,5 @@
 ^README.Rmd$
 ^README.md$
 ^README.html$
+^_pkgdown\.yml$
+^pkgdown$

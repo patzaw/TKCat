@@ -1,0 +1,158 @@
+{
+  "HPO_hp": {
+    "tableName": ["HPO_hp"],
+    "fields": [
+      {
+        "name": "id",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "HP identifier"
+      },
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "HP name"
+      },
+      {
+        "name": "description",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "HP description"
+      },
+      {
+        "name": "level",
+        "type": "integer",
+        "nullable": false,
+        "unique": false,
+        "comment": ""
+      }
+    ],
+    "primaryKey": ["id"],
+    "foreignKeys": [],
+    "indexes": [
+      {
+        "fields": ["id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [315],
+      "y": [-173],
+      "color": ["#F67FC4"],
+      "comment": ["Human phenotypes (HP)"]
+    }
+  },
+  "HPO_diseases": {
+    "tableName": ["HPO_diseases"],
+    "fields": [
+      {
+        "name": "db",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Disease database"
+      },
+      {
+        "name": "id",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Disease ID"
+      },
+      {
+        "name": "label",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Disease lable (preferred synonym)"
+      }
+    ],
+    "primaryKey": ["db", "id"],
+    "foreignKeys": [],
+    "indexes": [
+      {
+        "fields": ["db", "id"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-171],
+      "y": [-173],
+      "color": ["#9BC8FE"],
+      "comment": ["Diseases"]
+    }
+  },
+  "HPO_diseaseHP": {
+    "tableName": ["HPO_diseaseHP"],
+    "fields": [
+      {
+        "name": "db",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Disease database"
+      },
+      {
+        "name": "id",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Disease ID"
+      },
+      {
+        "name": "hp",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "HP identifier"
+      }
+    ],
+    "foreignKeys": [
+      {
+        "refTable": ["HPO_hp"],
+        "key": [
+          {
+            "from": "hp",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      },
+      {
+        "refTable": ["HPO_diseases"],
+        "key": [
+          {
+            "from": "db",
+            "to": "db"
+          },
+          {
+            "from": "id",
+            "to": "id"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": [
+      {
+        "fields": ["hp"],
+        "unique": [false]
+      },
+      {
+        "fields": ["db", "id"],
+        "unique": [false]
+      }
+    ],
+    "display": {
+      "x": [75],
+      "y": [-172],
+      "color": ["#D9D9D9"],
+      "comment": ["HP presented by diseases"]
+    },
+    "primaryKey": []
+  }
+}

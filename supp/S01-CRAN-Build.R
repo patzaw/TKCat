@@ -15,7 +15,7 @@ for(f in list.files(here("doc"))){
    )
    if(sub("^.*[.]", "", f)=="html"){
       file.copy(
-         file.path(here("doc"), f), file.path(here("docs"), f),
+         file.path(here("doc"), f), file.path(here("pkgdown/assets"), f),
          overwrite=TRUE
       )
    }
@@ -24,12 +24,9 @@ for(f in list.files(here("doc"))){
 file.remove("doc")
 
 ##############################@
-## Copy introduction ----
-file.copy(
-   here("supp/introduction/Introduction-to-TKCat.html"),
-   here("docs/Introduction-to-TKCat.html"),
-   overwrite=TRUE
-)
+## Build website ----
+unlink("docs", recursive=TRUE, force=TRUE)
+pkgdown::build_site()
 
 ##############################@
 ## Build and check package ----
