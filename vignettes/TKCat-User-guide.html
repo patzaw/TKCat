@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2022-06-24" />
+<meta name="date" content="2022-06-27" />
 
 <title>TKCat User guide</title>
 
@@ -8562,7 +8562,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">TKCat User guide</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">June 24, 2022</h4>
+<h4 class="date">June 27, 2022</h4>
 
 </div>
 
@@ -8616,7 +8616,7 @@ alone or in combination in research environments.</p>
 <p>In TKCat, knowledge resources are manipulated as modeled database
 (MDB) objects. These objects provide access to the data tables along
 with a general description of the resource and a detail data model
-generated with <a href="https://github.com/patzaw/ReDaMoR">ReDaMoR</a>
+generated with <a href="https://patzaw.github.io/ReDaMoR/">ReDaMoR</a>
 documenting the tables, their fields and their relationships. These MDB
 are then gathered in catalogs that can be easily explored an shared.
 TKCat provides tools to easily subset, filter and combine MDBs and
@@ -8656,7 +8656,7 @@ phenotypic abnormalities encountered in human diseases <span class="citation">(<
 <div id="loading-example-data" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Loading example
 data</h2>
-<p>A subset of the HPO is provided within the <a href="https://github.com/patzaw/ReDaMoR">ReDaMoR</a> package. We can
+<p>A subset of the HPO is provided within the <a href="https://patzaw.github.io/ReDaMoR/">ReDaMoR</a> package. We can
 read some of the tables as follow:</p>
 <pre class="r"><code>library(readr)
 hpo_data_dir &lt;- system.file(&quot;examples/HPO-subset&quot;, package=&quot;ReDaMoR&quot;)</code></pre>
@@ -8724,7 +8724,7 @@ HPO_diseaseHP</code></pre>
 <div id="creating-a-data-model-with-redamor" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> Creating a data model
 with ReDaMoR</h2>
-<p>The <a href="https://github.com/patzaw/ReDaMoR">ReDaMoR</a> package
+<p>The <a href="https://patzaw.github.io/ReDaMoR/">ReDaMoR</a> package
 can be used for drafting a data model from a set of table:</p>
 <pre class="r"><code>mhpo_dm &lt;- ReDaMoR::df_to_model(HPO_hp, HPO_diseases, HPO_diseaseHP)
 mhpo_dm %&gt;%
@@ -8739,7 +8739,7 @@ is no information regarding the relationships between the different
 tables. The <code>model_relational_data()</code> can be used to improve
 the documentation of the dataset according to what we know about it.
 This function raises a graphical interface for manipulating and
-modifying the data model (see <a href="https://patzaw.github.io/ReDaMoR/ReDaMoR.html">ReDaMoR
+modifying the data model (see <a href="https://patzaw.github.io/ReDaMoR/articles/ReDaMoR.html">ReDaMoR
 documentation</a>).</p>
 <pre class="r"><code>mhpo_dm &lt;- ReDaMoR::model_relational_data(mhpo_dm)</code></pre>
 <p>Below is the model we get after completing it using the function
@@ -8924,7 +8924,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-06-24 08:56:08
+## Timesamp: 2022-06-27 17:17:06
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -8962,7 +8962,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-06-24 08:56:08
+## Timesamp: 2022-06-27 17:17:06
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -9055,7 +9055,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-06-24 08:56:08
+## Timesamp: 2022-06-27 17:17:06
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -9114,7 +9114,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-06-24 08:56:08
+## Timesamp: 2022-06-27 17:17:06
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -9132,7 +9132,7 @@ following information:</p>
 <li>General database information including a mandatory <em>name</em> and
 optionally the following fields: <em>title</em>, <em>description</em>,
 <em>url</em>, <em>version</em> and <em>maintainer</em>.</li>
-<li>A <a href="https://github.com/patzaw/ReDaMoR">ReDaMoR</a> data
+<li>A <a href="https://patzaw.github.io/ReDaMoR/">ReDaMoR</a> data
 model.</li>
 <li>A list of tables corresponding to reference concepts shared by
 different MDBs. The way these concepts are identified is defined in
@@ -9143,13 +9143,13 @@ specific documents called collections.</li>
 <h2><span class="header-section-number">3.1</span> Loading example
 data</h2>
 <p>To illustrate how MDBs can be used, some example data are provided
-within the <a href="https://github.com/patzaw/ReDaMoR">ReDaMoR</a> and
+within the <a href="https://patzaw.github.io/ReDaMoR/">ReDaMoR</a> and
 the TKCat package. The following paragraphs show how to load them in the
 R session.</p>
 <div id="hpo" class="section level3" number="3.1.1">
 <h3><span class="header-section-number">3.1.1</span> HPO</h3>
 <p>A subset of the <a href="https://hpo.jax.org/app/">Human Phenotype
-Ontology (HPO)</a> is provided within the <a href="https://github.com/patzaw/ReDaMoR">ReDaMoR</a> package. The HPO
+Ontology (HPO)</a> is provided within the <a href="https://patzaw.github.io/ReDaMoR/">ReDaMoR</a> package. The HPO
 aims to provide a standardized vocabulary of phenotypic abnormalities
 encountered in human diseases <span class="citation">(<a href="#ref-kohler_expansion_2019" role="doc-biblioref">Köhler et al.
 2019</a>)</span>. An MDB object based on files (see <a href="#mdb-implementations">MDB implementations</a>) can be read as

@@ -20,7 +20,7 @@ resources that are frequently used alone or together in research
 environments. In TKCat, knowledge resources are manipulated as modeled
 database (MDB) objects. These objects provide access to the data tables
 along with a general description of the resource and a detail data model
-generated with [ReDaMoR](https://github.com/patzaw/ReDaMoR) documenting
+generated with [ReDaMoR](https://patzaw.github.io/ReDaMoR/) documenting
 the tables, their fields and their relationships. These MDB are then
 gathered in catalogs that can be easily explored an shared. TKCat
 provides tools to easily subset, filter and combine MDBs and create new
@@ -125,7 +125,7 @@ guide](https://patzaw.github.io/TKCat/articles/TKCat-User-guide.html)
     -   The **dm** data model feature is built upon the
         [datamodelr](https://github.com/bergant/datamodelr) package
         whereas **TKCat** relies on
-        [ReDaMoR](https://github.com/patzaw/ReDaMoR).
+        [ReDaMoR](https://patzaw.github.io/ReDaMoR/).
     -   Both **dm** and **TKCat** provides mechanisms to check the
         fulfillment of the data model constrains and tools to
         automatically take advantage of them.

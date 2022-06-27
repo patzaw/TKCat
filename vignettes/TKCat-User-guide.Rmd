@@ -70,8 +70,8 @@ opts_chunk$set(
 library(TKCat)
 ```
 
-[redamor]: https://github.com/patzaw/ReDaMoR
-[tkcat]: https://github.com/patzaw/TKCat
+[redamor]: https://patzaw.github.io/ReDaMoR/
+[tkcat]: https://patzaw.github.io/TKCat/
 [clickhouse]: https://clickhouse.com/
 [rclickhouse]: https://github.com/IMSMWU/RClickhouse
 [chhttp]: https://github.com/patzaw/ClickHouseHTTP
@@ -203,7 +203,7 @@ relationships between the different tables.
 The `model_relational_data()` can be used to improve the documentation of the
 dataset according to what we know about it. This function raises a graphical
 interface for manipulating and modifying the data model
-(see [ReDaMoR documentation](https://patzaw.github.io/ReDaMoR/ReDaMoR.html)).
+(see [ReDaMoR documentation](https://patzaw.github.io/ReDaMoR/articles/ReDaMoR.html)).
 
 ```{r, eval=FALSE}
 mhpo_dm <- ReDaMoR::model_relational_data(mhpo_dm)

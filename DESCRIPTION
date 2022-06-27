@@ -20,7 +20,9 @@ Description: Facilitate the management of data from knowledge
    explored an shared.
    Finally, 'TKCat' provides tools to easily subset, filter and combine MDBs and
    create new catalogs suited for specific needs.
-URL: https://github.com/patzaw/TKCat
+URL:
+   https://patzaw.github.io/TKCat/,
+   https://github.com/patzaw/TKCat/
 BugReports: https://github.com/patzaw/TKCat/issues
 Depends:
    R (>= 3.6),
