@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2022-06-27" />
+<meta name="date" content="2022-09-05" />
 
 <title>TKCat User guide</title>
 
@@ -6779,7 +6779,8 @@ HTMLWidgets.widget({
     // in order that the type=number inputs return a number
     $.valHooks.number = {
       get: function(el) {
-        return el.value * 1;
+        var value = parseFloat(el.value);
+        return isNaN(value) ? "" : value;
       }
     };
     $(el).html('&nbsp;');
@@ -8562,7 +8563,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">TKCat User guide</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">June 27, 2022</h4>
+<h4 class="date">September 05, 2022</h4>
 
 </div>
 
@@ -8924,7 +8925,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-06-27 17:17:06
+## Timesamp: 2022-09-05 06:57:29
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -8962,7 +8963,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-06-27 17:17:06
+## Timesamp: 2022-09-05 06:57:29
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -9055,7 +9056,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-06-27 17:17:06
+## Timesamp: 2022-09-05 06:57:29
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -9114,7 +9115,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-06-27 17:17:06
+## Timesamp: 2022-09-05 06:57:29
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -9358,18 +9359,19 @@ names(file_clinvar)</code></pre>
 <code>collection_members()</code> function.</p>
 <pre class="r"><code>collection_members(file_clinvar)</code></pre>
 <pre><code>## # A tibble: 10 × 9
-##    collection cid                  resource   mid table field static value type 
-##    &lt;chr&gt;      &lt;chr&gt;                &lt;chr&gt;    &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;
-##  1 Condition  ClinVar_conditions_… ClinVar      2 trai… cond… TRUE   Dise… &lt;NA&gt; 
-##  2 Condition  ClinVar_conditions_… ClinVar      2 trai… iden… FALSE  id    &lt;NA&gt; 
-##  3 Condition  ClinVar_conditions_… ClinVar      2 trai… sour… TRUE   Clin… &lt;NA&gt; 
-##  4 Condition  ClinVar_conditions_… ClinVar      1 trai… cond… TRUE   Dise… &lt;NA&gt; 
-##  5 Condition  ClinVar_conditions_… ClinVar      1 trai… iden… FALSE  id    &lt;NA&gt; 
-##  6 Condition  ClinVar_conditions_… ClinVar      1 trai… sour… FALSE  db    &lt;NA&gt; 
-##  7 BE         ClinVar_BE_1.0       ClinVar      1 entr… be    TRUE   Gene  &lt;NA&gt; 
-##  8 BE         ClinVar_BE_1.0       ClinVar      1 entr… iden… FALSE  entr… &lt;NA&gt; 
-##  9 BE         ClinVar_BE_1.0       ClinVar      1 entr… orga… TRUE   Homo… Scie…
-## 10 BE         ClinVar_BE_1.0       ClinVar      1 entr… sour… TRUE   Entr… &lt;NA&gt;</code></pre>
+##    collection cid                   resou…¹   mid table field static value type 
+##    &lt;chr&gt;      &lt;chr&gt;                 &lt;chr&gt;   &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;
+##  1 Condition  ClinVar_conditions_1… ClinVar     2 trai… cond… TRUE   Dise… &lt;NA&gt; 
+##  2 Condition  ClinVar_conditions_1… ClinVar     2 trai… iden… FALSE  id    &lt;NA&gt; 
+##  3 Condition  ClinVar_conditions_1… ClinVar     2 trai… sour… TRUE   Clin… &lt;NA&gt; 
+##  4 Condition  ClinVar_conditions_1… ClinVar     1 trai… cond… TRUE   Dise… &lt;NA&gt; 
+##  5 Condition  ClinVar_conditions_1… ClinVar     1 trai… iden… FALSE  id    &lt;NA&gt; 
+##  6 Condition  ClinVar_conditions_1… ClinVar     1 trai… sour… FALSE  db    &lt;NA&gt; 
+##  7 BE         ClinVar_BE_1.0        ClinVar     1 entr… be    TRUE   Gene  &lt;NA&gt; 
+##  8 BE         ClinVar_BE_1.0        ClinVar     1 entr… iden… FALSE  entr… &lt;NA&gt; 
+##  9 BE         ClinVar_BE_1.0        ClinVar     1 entr… orga… TRUE   Homo… Scie…
+## 10 BE         ClinVar_BE_1.0        ClinVar     1 entr… sour… TRUE   Entr… &lt;NA&gt; 
+## # … with abbreviated variable name ¹​resource</code></pre>
 <p>The following functions are use to get the number of tables, the
 number of fields per table and the number of records.</p>
 <pre class="r"><code>length(file_clinvar)        # Number of tables</code></pre>
@@ -9520,12 +9522,14 @@ of interest in a single table as shown below.</p>
 gene_traits$entrezNames %&gt;%
    select(symbol, name, variants.type, variants.name, traitType, traits.name)</code></pre>
 <pre><code>## # A tibble: 4 × 6
-##   symbol name                  variants.type variants.name traitType traits.name
-##   &lt;chr&gt;  &lt;chr&gt;                 &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;     &lt;chr&gt;      
-## 1 PIK3R2 phosphoinositide-3-k… single nucle… NM_005027.4(… Disease   Megalencep…
-## 2 PIK3R2 phosphoinositide-3-k… single nucle… NM_005027.4(… Disease   not provid…
-## 3 PIK3R2 phosphoinositide-3-k… single nucle… NM_005027.4(… Disease   not provid…
-## 4 UGT1A8 UDP glucuronosyltran… Microsatelli… UGT1A1*28     Disease   Gilbert&#39;s …</code></pre>
+##   symbol name                                    varia…¹ varia…² trait…³ trait…⁴
+##   &lt;chr&gt;  &lt;chr&gt;                                   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+## 1 PIK3R2 phosphoinositide-3-kinase regulatory s… single… NM_005… Disease Megale…
+## 2 PIK3R2 phosphoinositide-3-kinase regulatory s… single… NM_005… Disease not pr…
+## 3 PIK3R2 phosphoinositide-3-kinase regulatory s… single… NM_005… Disease not pr…
+## 4 UGT1A8 UDP glucuronosyltransferase family 1 m… Micros… UGT1A1… Disease Gilber…
+## # … with abbreviated variable names ¹​variants.type, ²​variants.name, ³​traitType,
+## #   ⁴​traits.name</code></pre>
 </div>
 <div id="merging-with-collections" class="section level2" number="3.6">
 <h2><span class="header-section-number">3.6</span> Merging MDBs with
@@ -9686,10 +9690,10 @@ TKCat along with BE collection definition (to get the function:
 package to be installed with a connection to BED database in order to
 run the code below.</p>
 <pre class="r"><code>bedCheck &lt;- try(BED::checkBedConn())</code></pre>
-<pre><code>## http://bel040344:5454</code></pre>
+<pre><code>## http://bel028272:5454</code></pre>
 <pre><code>## BED</code></pre>
 <pre><code>## UCB-Human-Internal</code></pre>
-<pre><code>## 2022.04.25</code></pre>
+<pre><code>## 2022.07.16</code></pre>
 <pre><code>## Cache ON</code></pre>
 <pre class="r"><code>if(!inherits(bedCheck, &quot;try-error&quot;) &amp;&amp; bedCheck){
    sel_coll &lt;- get_shared_collections(file_clinvar, file_chembl) %&gt;% 
@@ -9775,10 +9779,11 @@ their preparation for potential integration. Several functions are
 available to achieve this goal.</p>
 <pre class="r"><code>list_MDBs(k)                     # list all the MDBs in a TKCat object</code></pre>
 <pre><code>## # A tibble: 2 × 7
-##   name    title         description url   version maintainer timestamp
-##   &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dttm&gt;   
-## 1 HPO     Data extract… This is a … http… &lt;NA&gt;    &lt;NA&gt;       NA       
-## 2 ClinVar Data extract… ClinVar is… http… 0.9     Patrice G… NA</code></pre>
+##   name    title                descr…¹ url   version maint…² timestamp
+##   &lt;chr&gt;   &lt;chr&gt;                &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;dttm&gt;   
+## 1 HPO     Data extracted from… This i… http… &lt;NA&gt;    &lt;NA&gt;    NA       
+## 2 ClinVar Data extracted from… ClinVa… http… 0.9     Patric… NA       
+## # … with abbreviated variable names ¹​description, ²​maintainer</code></pre>
 <pre class="r"><code>get_MDB(k, &quot;HPO&quot;)                # get a specific MDBs from the catalog</code></pre>
 <pre><code>## fileMDB HPO: Data extracted from the HPO database
 ##    - 9 tables with 25 fields
@@ -9864,11 +9869,12 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <em>TKCat</em> object.</p>
 <pre class="r"><code>list_MDBs(k)             # get a specific MDBs from the catalog</code></pre>
 <pre><code>## # A tibble: 2 × 11
-##   name    title description url   version maintainer public populated timestamps
-##   &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;lgl&gt;  &lt;lgl&gt;     &lt;lgl&gt;     
-## 1 ClinVar Data… ClinVar is… http… 0.13    Patrice G… TRUE   TRUE      TRUE      
-## 2 HPO     Data… The Human … http… 0.12    Patrice G… TRUE   TRUE      TRUE      
-## # … with 2 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;</code></pre>
+##   name    title             descr…¹ url   version maint…² public popul…³ times…⁴
+##   &lt;chr&gt;   &lt;chr&gt;             &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;lgl&gt;  &lt;lgl&gt;   &lt;lgl&gt;  
+## 1 ClinVar Data extracted f… ClinVa… http… 0.13    Patric… TRUE   TRUE    TRUE   
+## 2 HPO     Data extracted f… The Hu… http… 0.12    Patric… TRUE   TRUE    TRUE   
+## # … with 2 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;, and abbreviated
+## #   variable names ¹​description, ²​maintainer, ³​populated, ⁴​timestamps</code></pre>
 <pre class="r"><code>search_MDB_tables(k, &quot;disease&quot;)  # Search table about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 3 × 3
 ##   resource name                comment                 
@@ -9878,16 +9884,17 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 ## 3 HPO      HPO_diseases        Diseases</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 8 × 7
-##   resource table               name    comment             type  nullable unique
-##   &lt;chr&gt;    &lt;chr&gt;               &lt;chr&gt;   &lt;chr&gt;               &lt;chr&gt; &lt;lgl&gt;    &lt;lgl&gt; 
-## 1 HPO      HPO_diseaseHP       db      Disease database    char… FALSE    FALSE 
-## 2 HPO      HPO_diseaseSynonyms db      Disease database    char… FALSE    FALSE 
-## 3 HPO      HPO_diseases        db      Disease database    char… FALSE    FALSE 
-## 4 HPO      HPO_diseaseHP       id      Disease ID          char… FALSE    FALSE 
-## 5 HPO      HPO_diseaseSynonyms id      Disease ID          char… FALSE    FALSE 
-## 6 HPO      HPO_diseases        id      Disease ID          char… FALSE    FALSE 
-## 7 HPO      HPO_diseases        label   Disease lable (pre… char… FALSE    FALSE 
-## 8 HPO      HPO_diseaseSynonyms synonym Disease synonym     char… FALSE    FALSE</code></pre>
+##   resource table               name    comment              type  nulla…¹ unique
+##   &lt;chr&gt;    &lt;chr&gt;               &lt;chr&gt;   &lt;chr&gt;                &lt;chr&gt; &lt;lgl&gt;   &lt;lgl&gt; 
+## 1 HPO      HPO_diseaseHP       db      Disease database     char… FALSE   FALSE 
+## 2 HPO      HPO_diseaseSynonyms db      Disease database     char… FALSE   FALSE 
+## 3 HPO      HPO_diseases        db      Disease database     char… FALSE   FALSE 
+## 4 HPO      HPO_diseaseHP       id      Disease ID           char… FALSE   FALSE 
+## 5 HPO      HPO_diseaseSynonyms id      Disease ID           char… FALSE   FALSE 
+## 6 HPO      HPO_diseases        id      Disease ID           char… FALSE   FALSE 
+## 7 HPO      HPO_diseases        label   Disease lable (pref… char… FALSE   FALSE 
+## 8 HPO      HPO_diseaseSynonyms synonym Disease synonym      char… FALSE   FALSE 
+## # … with abbreviated variable name ¹​nullable</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 5 × 3
 ##   resource collection table              

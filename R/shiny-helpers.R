@@ -83,17 +83,17 @@ TKCAT_LOGO_DIV <- shiny::div(
       shinydashboard::menuItem(
          "Resources",
          tabName="resources",
-         icon=shiny::icon("list-alt")
+         icon=shiny::icon("list-alt", verify_fa = FALSE)
       ),
       shinydashboard::menuItem(
          "Data model",
          tabName="model",
-         icon=shiny::icon("project-diagram")
+         icon=shiny::icon("project-diagram", verify_fa = FALSE)
       ),
       shinydashboard::menuItem(
          "Search resources",
          tabName="search",
-         icon=shiny::icon("search")
+         icon=shiny::icon("search", verify_fa = FALSE)
       )
    )
    
@@ -104,7 +104,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          shinydashboard::menuItem(
             "System",
             tabName="system",
-            icon=shiny::icon("info-circle")
+            icon=shiny::icon("info-circle", verify_fa = FALSE)
          ),
          shinydashboard::menuItem(
             shiny::uiOutput("currentUser"),
@@ -143,7 +143,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          do.call(shinydashboard::menuItem, c(
             list(
                text="Documentation",
-               icon=shiny::icon("question-circle")
+               icon=shiny::icon("question-circle", verify_fa = FALSE)
             ),
             mit
          ))
@@ -574,7 +574,10 @@ TKCAT_LOGO_DIV <- shiny::div(
             }
             return(
                shiny::a(
-                  list(shiny::icon("download"), sprintf("Download %s", n)),
+                  list(
+                     shiny::icon("download", verify_fa = FALSE),
+                     sprintf("Download %s", n)
+                  ),
                   id="downloadTable",
                   class=paste(
                      "btn btn-default shiny-download-link shiny-bound-output"
@@ -1013,7 +1016,10 @@ TKCAT_LOGO_DIV <- shiny::div(
             return(shiny::tagList(
                shiny::tags$br(),
                shiny::a(
-                  list(shiny::icon("download"), sprintf("Download %s", sel)),
+                  list(
+                     shiny::icon("download", verify_fa = FALSE),
+                     sprintf("Download %s", sel)
+                  ),
                   id="downloadTable",
                   class=paste(
                      "btn btn-default shiny-download-link shiny-bound-output"
@@ -1357,7 +1363,7 @@ TKCAT_LOGO_DIV <- shiny::div(
             shiny::actionLink(
                inputId="silink",
                label=shiny::span("Sign in", style="margin-left:6px;"),
-               icon=shiny::icon("sign-in-alt"),
+               icon=shiny::icon("sign-in-alt", verify_fa = FALSE),
                style="margin:0;"
             )
          })
@@ -1442,7 +1448,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                      ifelse(
                         instance$tkcat$chcon@user!="default",
                         as.character(shiny::span(
-                           shiny::icon("sign-out-alt"),
+                           shiny::icon("sign-out-alt", verify_fa = FALSE),
                            style="margin-left:6px;"
                         )),
                         ""
@@ -1455,7 +1461,8 @@ TKCAT_LOGO_DIV <- shiny::div(
                      instance$tkcat$chcon@user!="default",
                      "user",
                      "user-slash"
-                  )
+                  ),
+                  verify_fa = FALSE
                ),
                style="margin:0;",
                title=ifelse(
@@ -1485,7 +1492,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                shiny::actionLink(
                   inputId="umlink",
                   label=shiny::span("User settings", style="margin-left:6px;"),
-                  icon=shiny::icon("user-cog"),
+                  icon=shiny::icon("user-cog", verify_fa = FALSE),
                   style="margin:0;"
                )
             })
