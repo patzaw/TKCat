@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2022-09-05" />
+<meta name="date" content="2022-10-17" />
 
 <title>TKCat User guide</title>
 
@@ -2769,13 +2769,18 @@ function resetOneNode(node, options, network){
 }
 
 // Global function to reset all node
-function resetAllNodes(nodes, update, options, network){
-  var nodesToReset = nodes.get({
-    filter: function (item) {
-      return item.isHardToRead === true;
-    },
-    returnType :'Array'
-  });
+function resetAllNodes(nodes, update, options, network, all){
+  
+  if(all === false){
+      var nodesToReset = nodes.get({
+      filter: function (item) {
+        return item.isHardToRead === true;
+      },
+      returnType :'Array'
+    });
+  } else {
+      var nodesToReset = nodes.get({returnType :'Array'});
+  }
   
   var have_cluster_nodes = false;
   var nodes_in_clusters;
@@ -4134,7 +4139,7 @@ if (HTMLWidgets.shinyMode){
 
             //reset nodes
             resetAllEdges(el.edges, el.highlightColor, el.byselectionColor, el.chart);
-            resetAllNodes(el.nodes, true, el.options, el.chart);
+            resetAllNodes(el.nodes, true, el.options, el.chart, false);
             
             if (main_el.selectActive === true){
               main_el.selectActive = false;
@@ -4219,7 +4224,7 @@ if (HTMLWidgets.shinyMode){
           // reset some parameters / date before
           if (main_el.selectActive === true | main_el.highlightActive === true) {
             //reset nodes
-            resetAllNodes(el.nodes, true, el.options, el.chart);
+            resetAllNodes(el.nodes, true, el.options, el.chart, false);
             
             if (main_el.selectActive === true){
               main_el.selectActive = false;
@@ -5532,7 +5537,7 @@ HTMLWidgets.widget({
       }
       else if (el_id.selectActive === true) {
         //reset nodes
-        resetAllNodes(nodes, update, options, instance.network)
+        resetAllNodes(nodes, update, options, instance.network, false)
         el_id.selectActive = false
       }
     } 
@@ -5946,7 +5951,7 @@ HTMLWidgets.widget({
             resetList("nodeSelect", el.id, 'selected');
           }
           //reset nodes
-          resetAllNodes(nodes, update, options, instance.network)
+          resetAllNodes(nodes, update, options, instance.network, false)
           el_id.highlightActive = false;
           is_clicked = false;
           
@@ -6279,13 +6284,15 @@ HTMLWidgets.widget({
     if(x.clusteringGroup || x.clusteringColor || x.clusteringOutliers || x.clusteringHubsize || x.clusteringConnection){
       // if we click on a node, we want to open it up!
       instance.network.on("doubleClick", function (params){
-        
         if (params.nodes.length === 1) {
           if (instance.network.isCluster(params.nodes[0]) === true) {
             is_clicked = false;
             instance.network.openCluster(params.nodes[0], {releaseFunction : function(clusterPosition, containedNodesPositions) {
               return containedNodesPositions;
             }});
+            // must be better...
+            resetAllEdges(edges, el_id.highlightColor, el_id.byselectionColor, instance.network);
+            resetAllNodes(nodes, true, options, instance.network, true);
           } else {
             if(x.clusteringGroup){
               var array_group = nodes.get({
@@ -8425,8 +8432,8 @@ pre code {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -8434,16 +8441,9 @@ pre code {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -8563,7 +8563,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">TKCat User guide</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">September 05, 2022</h4>
+<h4 class="date">October 17, 2022</h4>
 
 </div>
 
@@ -8925,7 +8925,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-09-05 06:57:29
+## Timesamp: 2022-10-17 09:51:37
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -8963,7 +8963,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-09-05 06:57:29
+## Timesamp: 2022-10-17 09:51:37
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -9056,7 +9056,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-09-05 06:57:29
+## Timesamp: 2022-10-17 09:51:37
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -9115,7 +9115,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2022-09-05 06:57:29
+## Timesamp: 2022-10-17 09:51:37
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical

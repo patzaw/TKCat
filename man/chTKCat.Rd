@@ -9,8 +9,8 @@ chTKCat(
   port = 9111L,
   user = "default",
   password,
-  settings = list(max_query_size = 1073741824, use_uncompressed_cache = 0,
-    load_balancing = "random", max_memory_usage = 0, allow_introspection_functions = 1,
+  settings = list(max_query_size = 1073741824, use_uncompressed_cache = 0, load_balancing
+    = "random", max_memory_usage = 0, allow_introspection_functions = 1,
     joined_subquery_requires_alias = 0),
   ports = NULL,
   drv = ClickHouseHTTP::ClickHouseHTTP(),

@@ -633,7 +633,7 @@ merge.MDB <- function(
          ) %>% 
             dplyr::distinct()
          
-         tm <- ReDaMoR::RelTableModel(list(
+         tm <- ReDaMoR::RelTableModel(
             tableName=byi$rt,
             fields=tmxy,
             primaryKey=NULL,
@@ -661,7 +661,7 @@ merge.MDB <- function(
                color=rtColor,
                comment=as.character(NA)
             )
-         ))
+         )
          
       }
       
@@ -702,7 +702,7 @@ merge.MDB <- function(
                nullable=TRUE, unique=FALSE,
                refTable=byi$table.y
             )
-         tm <- ReDaMoR::RelTableModel(list(
+         tm <- ReDaMoR::RelTableModel(
             tableName=byi$rt,
             fields=dplyr::bind_rows(
                dplyr::select(
@@ -737,7 +737,7 @@ merge.MDB <- function(
                color=rtColor,
                comment=as.character(NA)
             )
-         ))
+         )
          
          ## The relational table
          nrt <- map_collection_members(
