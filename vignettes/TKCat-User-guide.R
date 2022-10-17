@@ -34,9 +34,14 @@ HPO_diseaseHP
 
 ## ---- out.height="200px"------------------------------------------------------
 mhpo_dm <- ReDaMoR::df_to_model(HPO_hp, HPO_diseases, HPO_diseaseHP)
-mhpo_dm %>%
-   ReDaMoR::auto_layout(lengthMultiplier=80) %>% 
-   plot()
+if("igraph" %in% installed.packages()){
+   mhpo_dm %>%
+      ReDaMoR::auto_layout(lengthMultiplier=80) %>% 
+      plot()
+}else{
+   mhpo_dm %>%
+      plot()
+}
 
 ## ---- eval=FALSE--------------------------------------------------------------
 #  mhpo_dm <- ReDaMoR::model_relational_data(mhpo_dm)
@@ -260,8 +265,13 @@ file_clinvar %>% pull(traitNames)
 
 ## -----------------------------------------------------------------------------
 file_clinvar[1:3]
-c(file_clinvar[1:3], file_hpo[c(1,5,7)]) %>% 
-   data_model() %>% auto_layout(force=TRUE) %>% plot()
+if("igraph" %in% installed.packages()){
+   c(file_clinvar[1:3], file_hpo[c(1,5,7)]) %>% 
+      data_model() %>% auto_layout(force=TRUE) %>% plot()
+}else{
+   c(file_clinvar[1:3], file_hpo[c(1,5,7)]) %>% 
+      data_model() %>% plot()
+}
 
 ## -----------------------------------------------------------------------------
 filtered_clinvar <- file_clinvar %>%

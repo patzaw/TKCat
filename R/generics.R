@@ -64,7 +64,7 @@ data_model <- function(x, ...){
 #' @param ... names of the collections
 #' to focus on. By default, all of them are taken.
 #' 
-#' @return A [tibble::tibble] with the following columns:
+#' @return A [dplyr::tibble] with the following columns:
 #' - **collection** (character): The name of the collection
 #' - **cid** (character): Collection identifier
 #' - **resource** (character): The name of the resource

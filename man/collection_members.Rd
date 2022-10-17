@@ -60,7 +60,7 @@ or the field value if static is TRUE.
 }}
 }
 \value{
-A \link[tibble:tibble]{tibble::tibble} with the following columns:
+A \link[dplyr:reexports]{dplyr::tibble} with the following columns:
 \itemize{
 \item \strong{collection} (character): The name of the collection
 \item \strong{cid} (character): Collection identifier
