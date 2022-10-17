@@ -80,6 +80,7 @@ TKCAT_LOGO_DIV <- shiny::div(
    ## Resources ----
    sbelts <- list(
       id="sidebarmenu",
+      style="white-space:normal;",
       shinydashboard::menuItem(
          "Resources",
          tabName="resources",
@@ -642,7 +643,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                   label=shiny::HTML(sprintf(
                      paste(
                         '<i class=" fa fa-project-diagram"></i>',
-                        '%s data model'
+                        'Data model of %s'
                      ),
                      n
                   ))
