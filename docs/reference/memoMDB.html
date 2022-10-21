@@ -189,12 +189,11 @@ done (all of them c("unique", "not nullable", "foreign keys"))</p></dd>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        HPO_synonyms </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 730 </span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## Too long on win-builder.r-project.org</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>   </span></span>
 <span class="r-in"><span><span class="va">hpoSlice</span> <span class="op">&lt;-</span> <span class="fu">slice</span><span class="op">(</span><span class="va">hpo</span>, HPO_diseases<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="count_records.html">count_records</a></span><span class="op">(</span><span class="va">hpoSlice</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        HPO_diseases       HPO_diseaseHP HPO_diseaseSynonyms              HPO_hp </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  10                  13                  15                  13 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           HPO_altId         HPO_parents     HPO_descendants        HPO_synonyms </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   8                   0                  14                  15 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="st">"stringr"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html" class="external-link">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>,<span class="st">"Package"</span><span class="op">]</span><span class="op">)</span><span class="op">{</span></span></span>
 <span class="r-in"><span>   <span class="va">epilHP</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span></span></span>
@@ -205,10 +204,8 @@ done (all of them c("unique", "not nullable", "foreign keys"))</p></dd>
 <span class="r-in"><span>   <span class="op">)</span></span></span>
 <span class="r-in"><span>   <span class="fu"><a href="count_records.html">count_records</a></span><span class="op">(</span><span class="va">epilHP</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        HPO_diseases       HPO_diseaseHP HPO_diseaseSynonyms              HPO_hp </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                  12                  24                  16                   9 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           HPO_altId         HPO_parents     HPO_descendants        HPO_synonyms </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                   2                   0                   9                   6 </span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

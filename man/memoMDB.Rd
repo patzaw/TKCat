@@ -85,6 +85,9 @@ hpo <- read_fileMDB(
    as_memoMDB()
 count_records(hpo)
 
+## Too long on win-builder.r-project.org
+\dontrun{
+   
 hpoSlice <- slice(hpo, HPO_diseases=1:10)
 count_records(hpoSlice)
 
@@ -96,6 +99,8 @@ if("stringr" \%in\% installed.packages()[,"Package"]){
       )
    )
    count_records(epilHP)
+}
+
 }
 }
 \seealso{
