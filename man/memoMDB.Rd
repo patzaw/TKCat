@@ -88,7 +88,7 @@ count_records(hpo)
 hpoSlice <- slice(hpo, HPO_diseases=1:10)
 count_records(hpoSlice)
 
-if(requireNamespace("stringr", quietly = TRUE)){
+if("stringr" \%in\% installed.packages()[,"Package"]){
    epilHP <- filter(
       hpo,
       HPO_diseases=stringr::str_detect(

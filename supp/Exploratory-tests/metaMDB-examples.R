@@ -1,3 +1,5 @@
+igraph_available <- requireNamespace("igraph", quietly=TRUE)
+
 hpof <- read_fileMDB("~/Tmp/HPO")
 cvf <- read_fileMDB("~/Tmp/ClinVar")
 pmf <- read_fileMDB("~/Tmp/PubMed/")
@@ -7,9 +9,9 @@ rt <- get_shared_collections(cvf, pmf)
 rt[which(rt$collection=="BE"), "table.y"] <- "PubMed_geneByMedgen"
 rt[which(rt$collection=="BE"), "collection"] <- NA
 
-cvpm <- merge(cvf, pmf, by=rt)
+cvpm <- merge(cvf, pmf, by=rt, dmAutoLayout=igraph_available)
 rt2 <- get_shared_collections(cvpm, hpof)
-cvpmhp <- merge(cvpm, hpof, by=rt2[4,])
+cvpmhp <- merge(cvpm, hpof, by=rt2[4,], dmAutoLayout=igraph_available)
 
 searchTerm <- stringr::regex("Epilepsy", ignore_case=TRUE)
 scv <- cvf %>% 
@@ -27,9 +29,9 @@ spm <- pmf %>%
       PubMed_medgenNames=stringr::str_detect(name, searchTerm),
       PubMed_geneByPubmed=entrez %in% c(6505, 9900)
    )
-scvpm <- merge(scv, spm)
+scvpm <- merge(scv, spm, dmAutoLayout=igraph_available)
 shp <- hpof %>% 
    filter(HPO_diseases=stringr::str_detect(label, searchTerm))
 rt <- get_shared_collections(scvpm, shp)
-scvpmhp <- merge(scvpm, shp, by=rt[4,])
+scvpmhp <- merge(scvpm, shp, by=rt[4,], dmAutoLayout=igraph_available)
 plot(data_model(scvpmhp, rtOnly=TRUE, recursive=TRUE))

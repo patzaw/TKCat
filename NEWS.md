@@ -4,6 +4,7 @@
 
 - Fix notes and warning from CRAN
 - Fix overflow in sidebar of the explorer when the MDB name is too long
+- Better management of indirect igraph suggest dependency in vignettes
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
