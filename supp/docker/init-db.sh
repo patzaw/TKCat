@@ -10,7 +10,7 @@ clickhouse client -n <<-EOSQL
 	CREATE TABLE default.Collections (title String, description String, json String) ENGINE = MergeTree() ORDER BY (title);
 	CREATE TABLE default.Users (login String, contact Nullable(String), admin UInt8, provider UInt8) ENGINE = MergeTree() ORDER BY (login);
 	INSERT INTO default.System (name, instance, version, contact, path) VALUES ('chTKCat', 'UCB - IT', '2022-11-17', 'Patrice Godard <patrice.godard@ucb.com>', '');
-	CREATE USER techadmin IDENTIFIED BY 'b3e80871779520603f9b8947ae60a91d';
+	CREATE USER techadmin IDENTIFIED BY 'a_password_TO_CHANGE';
 	GRANT ALL ON *.* TO techadmin WITH GRANT OPTION;
 	INSERT INTO default.Users (login, admin, provider) VALUES ('techadmin', 1, 1);
 EOSQL
@@ -18,7 +18,7 @@ EOSQL
 cp /users-2.xml /etc/clickhouse-server/users.xml
 sleep 2
 
-clickhouse client -u techadmin --password b3e80871779520603f9b8947ae60a91d -n <<-EOSQL
+clickhouse client -u techadmin --password a_password_TO_CHANGE -n <<-EOSQL
 	CREATE USER default IDENTIFIED WITH no_password;
 	INSERT INTO default.Users (login, admin, provider) VALUES ('default', 0, 0) ;
 	REVOKE ALL ON *.* FROM default;
