@@ -650,10 +650,18 @@ create_chTKCat_user <- function(
    x, login, password, contact, admin=FALSE, provider=admin
 ){
    contact <- as.character(contact)
+   valid_email <- function(x){
+      toRet <- rep(FALSE, length(x))
+      toRet[grep(
+         "^[[:alnum:].!#$%&'*+/=?^_`{|}~-]+@[[:alnum:]-]+(?:[.][[:alnum:]-]+)*$",
+         x
+      )] <- TRUE
+      return(toRet)
+   }
    stopifnot(
       is.chTKCat(x),
       is.character(login), length(login)==1, !is.na(login),
-      length(grep("[^[:alnum:]_]", login))==0,
+      valid_email(login) || length(grep("[^[:alnum:]_]", login))==0,
       is.character(contact), length(contact)==1,
       is.logical(admin), length(admin)==1, !is.na(admin),
       is.logical(provider), length(provider)==1, !is.na(provider)
@@ -673,7 +681,7 @@ create_chTKCat_user <- function(
    DBI::dbSendQuery(
       con, 
       sprintf(
-         "CREATE USER %s %s",
+         "CREATE USER '%s' %s",
          login,
          ifelse(
             is.na(password),
@@ -701,7 +709,7 @@ create_chTKCat_user <- function(
       DBI::dbSendQuery(
          con,
          sprintf(
-            "GRANT ALL ON *.* TO %s WITH GRANT OPTION",
+            "GRANT ALL ON *.* TO '%s' WITH GRANT OPTION",
             login
          )
       )
@@ -710,7 +718,7 @@ create_chTKCat_user <- function(
       DBI::dbSendQuery(
          con,
          sprintf(
-            "REVOKE ALL ON *.* FROM %s",
+            "REVOKE ALL ON *.* FROM '%s'",
             login
          )
       )
@@ -722,7 +730,7 @@ create_chTKCat_user <- function(
                paste(
                   "GRANT SELECT,",
                   " CREATE DATABASE, CREATE TABLE, DROP TABLE, ALTER, INSERT",
-                  " ON *.* TO %s WITH GRANT OPTION"
+                  " ON *.* TO '%s' WITH GRANT OPTION"
                ),
                login
             )
@@ -731,14 +739,14 @@ create_chTKCat_user <- function(
          DBI::dbSendQuery(
             con,
             sprintf(
-               "REVOKE ALL ON default.* FROM %s",
+               "REVOKE ALL ON default.* FROM '%s'",
                login
             )
          )
          DBI::dbSendQuery(
             con,
             sprintf(
-               "REVOKE ALL ON system.* FROM %s",
+               "REVOKE ALL ON system.* FROM '%s'",
                login
             )
          )
@@ -746,31 +754,31 @@ create_chTKCat_user <- function(
       }
       
       DBI::dbSendQuery(
-         con, sprintf("GRANT SHOW DATABASES ON *.* TO %s", login)
+         con, sprintf("GRANT SHOW DATABASES ON *.* TO '%s'", login)
       )
       DBI::dbSendQuery(
-         con, sprintf("GRANT SHOW TABLES ON *.* TO %s", login)
+         con, sprintf("GRANT SHOW TABLES ON *.* TO '%s'", login)
       )
       DBI::dbSendQuery(
-         con, sprintf("GRANT SHOW COLUMNS ON *.* TO %s", login)
+         con, sprintf("GRANT SHOW COLUMNS ON *.* TO '%s'", login)
       )
       DBI::dbSendQuery(
          con,
          sprintf(
             paste(
                "GRANT SELECT(name, instance, version, contact)",
-               "ON default.System TO %s"
+               "ON default.System TO '%s'"
             ),
             login
          )
       )
       DBI::dbSendQuery(
-         con, sprintf("GRANT SELECT ON default.Collections TO %s", login)
+         con, sprintf("GRANT SELECT ON default.Collections TO '%s'", login)
       )
       DBI::dbSendQuery(
          con,
          sprintf(
-            "GRANT SELECT(login, admin, provider) ON default.Users TO %s",
+            "GRANT SELECT(login, admin, provider) ON default.Users TO '%s'",
             login
          )
       )
@@ -819,7 +827,7 @@ change_chTKCat_password <- function(
    DBI::dbSendQuery(
       con, 
       sprintf(
-         "ALTER USER %s %s",
+         "ALTER USER '%s' %s",
          login,
          ifelse(
             is.na(password),
@@ -914,7 +922,7 @@ update_chTKCat_user <- function(
             DBI::dbSendQuery(
                con,
                sprintf(
-                  "GRANT ALL ON *.* TO %s WITH GRANT OPTION",
+                  "GRANT ALL ON *.* TO '%s' WITH GRANT OPTION",
                   login
                )
             )
@@ -923,7 +931,7 @@ update_chTKCat_user <- function(
             DBI::dbSendQuery(
                con,
                sprintf(
-                  "REVOKE ALL ON *.* FROM %s",
+                  "REVOKE ALL ON *.* FROM '%s'",
                   login
                )
             )
@@ -936,7 +944,7 @@ update_chTKCat_user <- function(
                         "GRANT SELECT,",
                         " CREATE DATABASE, CREATE TABLE, DROP TABLE,",
                         " ALTER, INSERT",
-                        " ON *.* TO %s WITH GRANT OPTION"
+                        " ON *.* TO '%s' WITH GRANT OPTION"
                      ),
                      login
                   )
@@ -945,14 +953,14 @@ update_chTKCat_user <- function(
                DBI::dbSendQuery(
                   con,
                   sprintf(
-                     "REVOKE ALL ON default.* FROM %s",
+                     "REVOKE ALL ON default.* FROM '%s'",
                      login
                   )
                )
                DBI::dbSendQuery(
                   con,
                   sprintf(
-                     "REVOKE ALL ON system.* FROM %s",
+                     "REVOKE ALL ON system.* FROM '%s'",
                      login
                   )
                )
@@ -960,31 +968,31 @@ update_chTKCat_user <- function(
             }
             
             DBI::dbSendQuery(
-               con, sprintf("GRANT SHOW DATABASES ON *.* TO %s", login)
+               con, sprintf("GRANT SHOW DATABASES ON *.* TO '%s'", login)
             )
             DBI::dbSendQuery(
-               con, sprintf("GRANT SHOW TABLES ON *.* TO %s", login)
+               con, sprintf("GRANT SHOW TABLES ON *.* TO '%s'", login)
             )
             DBI::dbSendQuery(
-               con, sprintf("GRANT SHOW COLUMNS ON *.* TO %s", login)
+               con, sprintf("GRANT SHOW COLUMNS ON *.* TO '%s'", login)
             )
             DBI::dbSendQuery(
                con,
                sprintf(
                   paste(
                      "GRANT SELECT(name, instance, version, contact)",
-                     "ON default.System TO %s"
+                     "ON default.System TO '%s'"
                   ),
                   login
                )
             )
             DBI::dbSendQuery(
-               con, sprintf("GRANT SELECT ON default.Collections TO %s", login)
+               con, sprintf("GRANT SELECT ON default.Collections TO '%s'", login)
             )
             DBI::dbSendQuery(
                con,
                sprintf(
-                  "GRANT SELECT(login, admin, provider) ON default.Users TO %s",
+                  "GRANT SELECT(login, admin, provider) ON default.Users TO '%s'",
                   login
                )
             )
@@ -1035,7 +1043,7 @@ drop_chTKCat_user <- function(x, login){
    )
    DBI::dbSendQuery(
       con,
-      sprintf("DROP USER %s", login)
+      sprintf("DROP USER '%s'", login)
    )
    invisible()
 }
@@ -1392,7 +1400,7 @@ drop_chMDB <- function(x, name){
                   "GRANT SELECT,",
                   " CREATE DATABASE, CREATE TABLE, DROP TABLE,",
                   " ALTER, INSERT",
-                  " ON `%s`.* TO %s WITH GRANT OPTION"
+                  " ON `%s`.* TO '%s' WITH GRANT OPTION"
                ),
                name,
                paste(pl, collapse=", ")
@@ -1407,7 +1415,7 @@ drop_chMDB <- function(x, name){
       DBI::dbSendQuery(
          con,
          sprintf(
-            "REVOKE %s ON `%s`.* FROM %s",
+            "REVOKE %s ON `%s`.* FROM '%s'",
             paste(CH_DB_STATEMENTS, collapse=", "),
             name,
             paste(cl, collapse=", ")
@@ -1462,7 +1470,7 @@ update_chMDB_grants <- function(x, mdb){
       DBI::dbSendQuery(
          con,
          sprintf(
-            "REVOKE SELECT ON `%s`.* FROM %s",
+            "REVOKE SELECT ON `%s`.* FROM '%s'",
             mdb, paste(others, collapse=", ")
          )
       )
@@ -1471,7 +1479,7 @@ update_chMDB_grants <- function(x, mdb){
          DBI::dbSendQuery(
             con,
             sprintf(
-               "GRANT SELECT ON `%s`.`%s` TO %s",
+               "GRANT SELECT ON `%s`.`%s` TO '%s'",
                mdb, tn, paste(others, collapse=", ")
             )
          )
@@ -1482,7 +1490,7 @@ update_chMDB_grants <- function(x, mdb){
    DBI::dbSendQuery(
       con,
       sprintf(
-         "GRANT SELECT ON `%s`.* TO %s",
+         "GRANT SELECT ON `%s`.* TO '%s'",
          mdb, paste(c(readUsers, adminUsers), collapse=", ")
       )
    )
@@ -1492,7 +1500,10 @@ update_chMDB_grants <- function(x, mdb){
       DBI::dbSendQuery(
          con,
          sprintf(
-            "REVOKE CREATE TABLE, DROP TABLE, ALTER, INSERT ON `%s`.* FROM %s",
+            paste(
+               "REVOKE CREATE TABLE, DROP TABLE, ALTER, INSERT",
+               " ON `%s`.* FROM '%s'"
+            ),
             mdb, paste(c(readUsers, others), collapse=", ")
          )
       )
@@ -1504,7 +1515,7 @@ update_chMDB_grants <- function(x, mdb){
       sprintf(
          paste(
             "GRANT SELECT, CREATE TABLE, DROP TABLE, ALTER, INSERT",
-            " ON `%s`.* TO %s WITH GRANT OPTION"
+            " ON `%s`.* TO '%s' WITH GRANT OPTION"
          ),
          mdb, paste(adminUsers, collapse=", ")
       )
