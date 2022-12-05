@@ -1403,7 +1403,7 @@ drop_chMDB <- function(x, name){
                   " ON `%s`.* TO '%s' WITH GRANT OPTION"
                ),
                name,
-               paste(pl, collapse=", ")
+               paste(pl, collapse="', '")
             )
          )
       }
@@ -1418,7 +1418,7 @@ drop_chMDB <- function(x, name){
             "REVOKE %s ON `%s`.* FROM '%s'",
             paste(CH_DB_STATEMENTS, collapse=", "),
             name,
-            paste(cl, collapse=", ")
+            paste(cl, collapse="', '")
          )
       )
    }
@@ -1471,7 +1471,7 @@ update_chMDB_grants <- function(x, mdb){
          con,
          sprintf(
             "REVOKE SELECT ON `%s`.* FROM '%s'",
-            mdb, paste(others, collapse=", ")
+            mdb, paste(others, collapse="', '")
          )
       )
       modelTables <- names(CHMDB_DATA_MODEL)
@@ -1480,7 +1480,7 @@ update_chMDB_grants <- function(x, mdb){
             con,
             sprintf(
                "GRANT SELECT ON `%s`.`%s` TO '%s'",
-               mdb, tn, paste(others, collapse=", ")
+               mdb, tn, paste(others, collapse="', '")
             )
          )
       }
@@ -1491,7 +1491,7 @@ update_chMDB_grants <- function(x, mdb){
       con,
       sprintf(
          "GRANT SELECT ON `%s`.* TO '%s'",
-         mdb, paste(c(readUsers, adminUsers), collapse=", ")
+         mdb, paste(c(readUsers, adminUsers), collapse="', '")
       )
    )
    
@@ -1504,7 +1504,7 @@ update_chMDB_grants <- function(x, mdb){
                "REVOKE CREATE TABLE, DROP TABLE, ALTER, INSERT",
                " ON `%s`.* FROM '%s'"
             ),
-            mdb, paste(c(readUsers, others), collapse=", ")
+            mdb, paste(c(readUsers, others), collapse="', '")
          )
       )
    }
@@ -1517,7 +1517,7 @@ update_chMDB_grants <- function(x, mdb){
             "GRANT SELECT, CREATE TABLE, DROP TABLE, ALTER, INSERT",
             " ON `%s`.* TO '%s' WITH GRANT OPTION"
          ),
-         mdb, paste(adminUsers, collapse=", ")
+         mdb, paste(adminUsers, collapse="', '")
       )
    )
    
