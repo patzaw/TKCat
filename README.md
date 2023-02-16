@@ -79,7 +79,7 @@ The following R packages available on CRAN are required:
 -   [base64enc](https://CRAN.R-project.org/package=base64enc): Tools for
     base64 encoding
 -   [markdown](https://CRAN.R-project.org/package=markdown): Render
-    Markdown with the C Library ‘Sundown’
+    Markdown with ‘commonmark’
 -   [promises](https://CRAN.R-project.org/package=promises):
     Abstractions for Promise-Based Asynchronous Programming
 -   [future](https://CRAN.R-project.org/package=future): Unified
