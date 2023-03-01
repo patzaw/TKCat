@@ -178,7 +178,7 @@ format.MDB <- function(x, ...){
       ifelse(
          is.na(dbi$timestamp),
          '',
-         sprintf('\nTimesamp: %s', dbi$timestamp)
+         sprintf('\nTimestamp: %s', dbi$timestamp)
       )
    ))
 }
