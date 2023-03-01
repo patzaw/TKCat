@@ -633,7 +633,7 @@ list_chTKCat_users <- function(x){
 #' 
 #' @param x a [chTKCat] object
 #' @param login user login
-#' @param password user password
+#' @param password user password (NA ==> no password)
 #' @param contact contact information (can be NA)
 #' @param admin a logical indicating if the user is an admin of the chTKCat
 #' instance
