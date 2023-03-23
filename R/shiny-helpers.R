@@ -242,6 +242,12 @@ TKCAT_LOGO_DIV <- shiny::div(
    shinydashboard::dashboardBody(
       ## Page header ----
       shiny::tags$head(
+         shiny::tags$style(shiny::HTML(
+            paste(
+               'table.dataTable tr.selected td a',
+               '{background-color: white !important;}'
+            )
+         )),
          shiny::tags$link(
             rel="icon",
             href=tabIcon
@@ -347,12 +353,17 @@ TKCAT_LOGO_DIV <- shiny::div(
       selStatus <- shiny::reactiveValues(
          resource=NULL,
          mdb=NULL,
+         access=NULL,
          tables=NULL
       )
       output$status <- shiny::renderUI({
          mdb <- selStatus$mdb
          shiny::req(mdb)
-         dbi <- db_info(mdb)
+         if(is.MDB(mdb)){
+            dbi <- db_info(mdb)
+         }else{
+            dbi <- mdb$dbInfo
+         }
          shiny::tags$p(
             "Selected resource:",
             shiny::tags$strong(dbi$name),
@@ -445,11 +456,13 @@ TKCAT_LOGO_DIV <- shiny::div(
       
       shiny::observe({
          shiny::req(mdbs$validInput)
+         mdbl <- mdbs$list
          s <- input$mdbList_rows_selected
-         n <- mdbs$list$name[s]
+         n <- mdbl$name[s]
          if(length(n)==0 || n==""){
             selStatus$resource <- NULL
             selStatus$mdb <- NULL
+            selStatus$access <- NULL
          }else{
             selStatus$resource <- n
          }
@@ -457,11 +470,29 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::observe({
          n <- selStatus$resource
          shiny::req(n)
-         mdb <- try(get_MDB(instance$tkcat, n, check=FALSE), silent=TRUE)
+         mdbl <- shiny::isolate(mdbs$list)
+         if("access" %in% colnames(mdbl)){
+            access <- dplyr::filter(mdbl, .data$name==!!n) %>% 
+               dplyr::pull("access")
+         }else{
+            access <- NULL
+         }
+         selStatus$access <- access
+         if(!is.null(access) && access=="none"){
+            mdb <- try(get_chMDB_metadata(instance$tkcat, n))
+         }else{
+            mdb <- try(get_MDB(instance$tkcat, n, check=FALSE), silent=TRUE)
+         }
          selStatus$mdb <- mdb
+         if(is.MDB(mdb)){
+            m <- data_model(mdb)
+         }
+         if(is.list(mdb) && "dataModel" %in% names(mdb)){
+            m <- mdb$dataModel
+         }
          if(
             inherits(mdb, "try-error") ||
-            !all(shiny::isolate(selStatus$tables) %in% names(mdb))
+            !all(shiny::isolate(selStatus$tables) %in% names(m))
          ){
             selStatus$tables <- NULL
          }
@@ -469,8 +500,14 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::observe({
          mdb <- selStatus$mdb
          shiny::req(mdb)
+         if(is.MDB(mdb)){
+            m <- data_model(mdb)
+         }
+         if(is.list(mdb) && "dataModel" %in% names(mdb)){
+            m <- mdb$dataModel
+         }
          tn <- shiny::isolate(selStatus$tables)
-         if(!all(tn %in% names(mdb))){
+         if(inherits(mdb, "try-error") || !all(tn %in% names(m))){
             selStatus$tables <- NULL
          }
       })
@@ -481,6 +518,8 @@ TKCAT_LOGO_DIV <- shiny::div(
       output$dbInfo <- shiny::renderUI({
          mdb <- selStatus$mdb
          shiny::req(!is.null(mdb))
+         access <- shiny::isolate(selStatus$access)
+         tkcon <- shiny::isolate(instance$tkcat)
          if(inherits(mdb, "try-error")){
             n <- shiny::isolate(selStatus$resource)
             shiny::tagList(
@@ -490,21 +529,30 @@ TKCAT_LOGO_DIV <- shiny::div(
                )
             )
          }else{
-            dbi <- db_info(mdb)
-            if(is.fileMDB(mdb)){
-               dbs <- sum(data_file_size(mdb)$size)
-               dbi$size <- .format_file_size(dbs)
-            }else{
-               if(!is.metaMDB(mdb)){
-                  dbi$records <- sum(count_records(mdb))
+            if(is.MDB(mdb)){
+               dbi <- db_info(mdb)
+               if(is.fileMDB(mdb)){
+                  dbs <- sum(data_file_size(mdb)$size)
+                  dbi$size <- .format_file_size(dbs)
+               }else{
+                  if(!is.metaMDB(mdb)){
+                     dbi$records <- sum(count_records(mdb))
+                  }
                }
-            }
-            if(is.chMDB(mdb)){
-               ts <- get_chMDB_timestamps(unclass(mdb)$tkcon, dbi$name)
+               if(is.chMDB(mdb)){
+                  ts <- get_chMDB_timestamps(unclass(mdb)$tkcon, dbi$name)
+                  if(!is.null(ts)){
+                     dbi$"other instances"=nrow(ts)-1
+                  }
+               }
+            }else{
+               dbi <- mdb$dbInfo
+               ts <- get_chMDB_timestamps(tkcon, dbi$name)
                if(!is.null(ts)){
                   dbi$"other instances"=nrow(ts)-1
                }
             }
+            dbi$access <- access
             shiny::tagList(
                shiny::h3(dbi$name),
                do.call(shiny::tags$ul, lapply(
@@ -519,6 +567,14 @@ TKCAT_LOGO_DIV <- shiny::div(
                         }else if(n=="maintainer"){
                            vt <- markdown::renderMarkdown(text=dbi[[n]])
                            vt <- gsub("<[/]?p>", "", as.character(vt))
+                        }else if(n=="access"){
+                           vt <- as.character(shiny::tags$span(
+                              dbi[[n]],
+                              style=sprintf(
+                                 "color:%s;",
+                                 ifelse(dbi[[n]]=="none", "red", "blue")
+                              )
+                           ))
                         }else if(is.numeric(dbi[[n]])){
                            vt <- format(dbi[[n]], big.mark=",")
                         }else{
@@ -663,20 +719,29 @@ TKCAT_LOGO_DIV <- shiny::div(
             dbdm$model <- data_model(mdb)
             dbdm$collections <- collection_members(mdb)
          }else{
-            dbdm$model <- NULL
-            dbdm$collections <- NULL
-            dbdm$validInput <- FALSE
+            if(is.list(mdb) && "dataModel" %in% names(mdb)){
+               dbdm$model <- mdb$dataModel
+               dbdm$collections <- mdb$collectionMembers
+            }else{
+               dbdm$model <- NULL
+               dbdm$collections <- NULL
+               dbdm$validInput <- FALSE
+            }
          }
       })
       
       output$dataModel <- visNetwork::renderVisNetwork({
          mdb <- selStatus$mdb
          shiny::req(mdb)
-         dm <- data_model(mdb)
+         if(is.MDB(mdb)){
+            dm <- data_model(mdb)
+         }else{
+            dm <- mdb$dataModel
+         }
          dbdm$validInput <- TRUE
          nodesIdSelection <- list(enabled=TRUE, useLabels=FALSE)
          sel <- shiny::isolate(selStatus$tables) %>% 
-            intersect(names(mdb))
+            intersect(names(dm))
          if(length(sel)>0){
             nodesIdSelection$selected <- sel
          }
@@ -692,7 +757,13 @@ TKCAT_LOGO_DIV <- shiny::div(
          n <- input$dataModel_selected
          mdb <- shiny::isolate(selStatus$mdb)
          shiny::req(mdb)
-         if(length(n)==0 || n=="" || !all(n %in% names(mdb))){
+         if(is.MDB(mdb)){
+            m <- data_model(mdb)
+         }
+         if(is.list(mdb) && "dataModel" %in% names(mdb)){
+            m <- mdb$dataModel
+         }
+         if(length(n)==0 || n=="" || !all(n %in% names(m))){
             selStatus$tables <- NULL
          }else{
             selStatus$tables <- n
@@ -756,6 +827,14 @@ TKCAT_LOGO_DIV <- shiny::div(
       output$tableInfo <- shiny::renderUI({
          mdb <- selStatus$mdb
          shiny::req(mdb)
+         if(!is.MDB(mdb)){
+            return(shiny::tagList(
+               shiny::tags$strong(
+                  "You don't have access to these data",
+                  style='color:red;'
+               )
+            ))
+         }
          sel <- selStatus$tables %>%
             intersect(names(mdb))
          shiny::req(sel)
