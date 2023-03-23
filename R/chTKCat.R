@@ -2281,6 +2281,137 @@ remove_chMDB_user <- function(x, mdb, login){
 
 
 ###############################################################################@
+#' Get the metadata of an MDB from a [chTKCat] connection
+#' 
+#' @param x a [chTKCat] object
+#' @param dbName the name of the MDB
+#' @param timestamp the timestamp of the instance to get.
+#' Default=NA: get the current version.
+#' 
+#' @return An list with the followign elements:
+#' - dbInfo: General information regarding the MDB
+#' - dataModel: The data model
+#' - collectionMembers: Members of different collections
+#' - access: type of access to the MDB
+#' 
+#' @seealso [get_MDB]
+#' 
+#' @export
+#' 
+get_chMDB_metadata <- function(x, dbName, timestamp=NA){
+   timestamp <- as.POSIXct(timestamp)
+   stopifnot(
+      is.chTKCat(x),
+      is.na(timestamp) || inherits(timestamp, "POSIXct"), length(timestamp)==1
+   )
+   dbl <- list_MDBs(x)
+   if(!is.data.frame(dbl) || !dbName %in% dbl$name){
+      stop(sprintf(
+         "%s does not exist in the provided chTKCat",
+         dbName
+      ))
+   }
+   access <- dplyr::filter(dbl, .data$name==!!dbName)$access
+   tst <- list_chMDB_timestamps(x, dbName)
+   if(is.null(tst) || nrow(tst)==0){
+      tstToComplete <- TRUE
+      if(!is.na(timestamp)){
+         stop("This MDB is not timestamped: timestamp must be NA")
+      }else{
+         if(!dplyr::filter(dbl, .data$name==!!dbName)$populated){
+            stop(sprintf("The %s is not populated yet", dbName))
+         }
+         tst <- dplyr::tibble(
+            table=setdiff(names(CHMDB_DATA_MODEL), MGT_TABLES)
+         ) %>% 
+            dplyr::mutate(
+               instance=.data$table
+            )
+      }
+   }else{
+      tstToComplete <- FALSE
+      if(is.na(timestamp)){
+         if(is.na(attr(tst, "current"))){
+            stop("There is no current instance of the MDB: provide a timestamp")
+         }else{
+            timestamp <- attr(tst, "current")
+         }
+      }
+      if(!timestamp %in% tst$timestamp){
+         stop("The selected timestamp does not exist")
+      }
+      tst <- tst %>% 
+         dplyr::filter(.data$timestamp==!!timestamp)
+   }
+   
+   ## Data model ----
+   tsSelect <- function(table){
+      sprintf(
+         "SELECT * FROM `%s`.`%s`",
+         dbName,
+         tst$instance[which(tst$table==table)]
+      )
+   }
+   dbm <- list(
+      tables=get_query(
+         x, tsSelect("___Tables___"),
+         format="Arrow"
+      ),
+      fields=get_query(
+         x, tsSelect("___Fields___"),
+         format="Arrow"
+      ),
+      primaryKeys=get_query(
+         x, tsSelect("___PrimaryKeys___"),
+         format="TabSeparatedWithNamesAndTypes"
+      ),
+      foreignKeys=get_query(
+         x, tsSelect("___ForeignKeys___"),
+         format="TabSeparatedWithNamesAndTypes"
+      ),
+      indexes=get_query(
+         x, tsSelect("___Indexes___"),
+         format="TabSeparatedWithNamesAndTypes"
+      )
+   )
+   dbm$fields$nullable <- as.logical(dbm$fields$nullable)
+   dbm$fields$unique <- as.logical(dbm$fields$unique)
+   dbm$indexes$unique <- as.logical(dbm$indexes$unique)
+   dataModel <- ReDaMoR::fromDBM(dbm)
+   
+   ## DB information ----
+   dbInfo <- as.list(get_query(
+      x, tsSelect("___MDB___"),
+      format="Arrow"
+   ))
+   dbInfo <- c(dbInfo, list("timestamp"=as.POSIXct(timestamp)))
+   
+   ## Collection members ----
+   collectionMembers <- get_query(
+      x, tsSelect("___CollectionMembers___"),
+      format="TabSeparatedWithNamesAndTypes"
+   ) %>%
+      dplyr::mutate(
+         resource=dbName,
+         static=as.logical(.data$static)
+      ) %>% 
+      dplyr::select(
+         "collection", "cid", "resource", "mid", "table", "field",
+         "static", "value", "type"
+      )
+   attr(collectionMembers, "data.type") <- NULL
+   
+   ## Return model ----
+   return(list(
+      dbInfo=dbInfo,
+      dataModel=dataModel,
+      collectionMembers=collectionMembers,
+      access=access
+   ))
+}
+
+
+###############################################################################@
 #### COLLECTIONS ####
 ###############################################################################@
 

@@ -18,7 +18,7 @@ create_chTKCat_user(
 
 \item{login}{user login}
 
-\item{password}{user password}
+\item{password}{user password (NA ==> no password)}
 
 \item{contact}{contact information (can be NA)}
 
