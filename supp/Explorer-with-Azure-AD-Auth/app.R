@@ -68,7 +68,14 @@ ui <- function(req) {
          shiny::tags$li(
             class = "dropdown",
             shiny::tags$div(
-               shiny::uiOutput("status"),
+               shiny::uiOutput("status", inline=TRUE),
+               shiny::HTML("&nbsp;&nbsp;|&nbsp;&nbsp;"),
+               shiny::actionLink(
+                  "refresh", "",
+                  icon=shiny::icon("arrows-rotate", verify_fa = FALSE),
+                  style="color:black;",
+                  title="Refresh resource table"
+               ),
                style = paste(
                   "margin-top:0;",
                   "margin-right:15px;",
@@ -312,7 +319,7 @@ server <- function(input, output, session) {
       }else{
          dbi <- mdb$dbInfo
       }
-      shiny::tags$p(
+      shiny::tags$span(
          "Selected resource:",
          shiny::tags$strong(dbi$name),
          sprintf("(%s)", dbi$title)
@@ -328,6 +335,7 @@ server <- function(input, output, session) {
    )
    shiny::observe({
       req(auth_cred())
+      input$refresh
       tkcon <- get_tkcat()
       mdbs$list <- list_MDBs(tkcon) %>% 
          dplyr::filter(.data$populated)
@@ -1161,13 +1169,11 @@ server <- function(input, output, session) {
       selStatus$tables <- rt %>% dplyr::slice(sel) %>% dplyr::pull("table")
    })
    
-   
 }
 
 ###############################################################################@
 ## Run the application ----
 shiny::shinyApp(
    ui = ui,
-   server = server,
-   enableBookmarking = "url"
+   server = server
 )
