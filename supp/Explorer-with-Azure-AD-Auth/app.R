@@ -389,7 +389,7 @@ server <- function(input, output, session) {
          selection = list(
             mode="single",
             selected=which(
-               toShow$Resource==shiny::isolate(selStatus$resource$name)
+               toShow$Resource==shiny::isolate(selStatus$resource)
             )
          ),
          options = list(
