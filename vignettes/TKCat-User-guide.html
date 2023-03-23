@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2023-02-16" />
+<meta name="date" content="2023-03-23" />
 
 <title>TKCat User guide</title>
 
@@ -8570,7 +8570,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">TKCat User guide</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">February 16, 2023</h4>
+<h4 class="date">March 23, 2023</h4>
 
 </div>
 
@@ -8904,7 +8904,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2023-02-16 13:21:01
+## Timestamp: 2023-03-23 13:37:01
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -8942,7 +8942,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2023-02-16 13:21:01
+## Timestamp: 2023-03-23 13:37:01
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -9035,7 +9035,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2023-02-16 13:21:01
+## Timestamp: 2023-03-23 13:37:01
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -9094,7 +9094,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timesamp: 2023-02-16 13:21:01
+## Timestamp: 2023-03-23 13:37:01
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -9674,11 +9674,8 @@ TKCat along with BE collection definition (to get the function:
 package to be installed with a connection to BED database in order to
 run the code below.</p>
 <pre class="r"><code>bedCheck &lt;- try(BED::checkBedConn())</code></pre>
-<pre><code>## http://bel028272:5454</code></pre>
-<pre><code>## BED</code></pre>
-<pre><code>## UCB-Human-Internal</code></pre>
-<pre><code>## 2023.02.11</code></pre>
-<pre><code>## Cache ON</code></pre>
+<pre><code>## BED is not connected.
+## You can connect to a BED database instance using the connectToBed function.</code></pre>
 <pre class="r"><code>if(!inherits(bedCheck, &quot;try-error&quot;) &amp;&amp; bedCheck){
    sel_coll &lt;- get_shared_collections(file_clinvar, file_chembl) %&gt;% 
       filter(collection==&quot;BE&quot;)
