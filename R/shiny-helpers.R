@@ -564,7 +564,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                               shiny::HTML(dbi[[n]]),
                               href=dbi[[n]], target="_blank"
                            ) %>% as.character()
-                        }else if(n=="maintainer"){
+                        }else if(n %in% c("maintainer", "description")){
                            vt <- markdown::renderMarkdown(text=dbi[[n]])
                            vt <- gsub("<[/]?p>", "", as.character(vt))
                         }else if(n=="access"){
