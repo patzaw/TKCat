@@ -1,0 +1,68 @@
+## Connecting to TKCat after Azure AD authentication in R
+
+
+### 1. Authentication
+
+- a) Prepare the credentials
+
+```{r}
+device_credentials <- AuthHelpers::create_azure_device_credentials(
+   resource=c("api://kmt-prd01/user_impersonation"),
+   tenant="237582ad-3eab-4d44-8688-06ca9f2e613b",
+   app="f55d2b52-9fed-4b05-8b0a-b24cf8149922"
+)
+```
+
+
+- b) Print the user code, paste it, go to the verification URL and follow instruction
+
+```{r}
+device_credentials$get_user_code()
+device_credentials$browse_verification_uri()
+```
+
+- c) Request the token
+
+```{r}
+device_credentials$request_token()
+```
+
+- d) Verify the validity of the token
+
+```{r}
+device_credentials$is_valid()
+device_credentials$get_token()
+device_credentials$get_access_token()
+```
+
+### 2. (Optional) Save and reuse credentials
+
+- a) Save the credentials and change permission to limit the access to the file
+
+```{r}
+cred_file <- "~/etc/kmt.rds"
+saveRDS(device_credentials, file=cred_file, compress=FALSE)
+Sys.chmod(cred_file, "0600")
+```
+
+- b) In a new session, load the credentials and refresh the token
+
+```{r}
+device_credentials <- readRDS("~/etc/kmt.rds")
+device_credentials$refresh_token()
+```
+
+### 3. Connecting to TKCat with Azure AD token
+
+```{r}
+library(TKCat)
+k <- chTKCat(
+   "tkcat.ucb.com",
+   password="",
+   port=443, https=TRUE,
+   extended_headers=list(
+      "Authorization"=paste("Bearer", device_credentials$get_access_token())
+   )
+)
+list_MDBs(k)
+```
