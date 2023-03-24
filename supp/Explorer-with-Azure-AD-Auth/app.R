@@ -311,7 +311,8 @@ server <- function(input, output, session) {
       resource=NULL,
       mdb=NULL,
       access=NULL,
-      tables=NULL
+      tables=NULL,
+      size=NULL
    )
    output$status <- shiny::renderUI({
       mdb <- selStatus$mdb
@@ -338,10 +339,15 @@ server <- function(input, output, session) {
    shiny::observe({
       req(auth_cred())
       input$refresh
-      tkcon <- get_tkcat()
-      mdbs$list <- list_MDBs(tkcon) %>% 
-         dplyr::filter(.data$populated)
-      mdbs$collections <- collection_members(tkcon)
+      shiny::withProgress(
+         message="Getting list of MDBs",
+         expr={
+            tkcon <- get_tkcat()
+            mdbs$list <- list_MDBs(tkcon) %>% 
+               dplyr::filter(.data$populated)
+            mdbs$collections <- collection_members(tkcon)
+         }
+      )
    })
    output$mdbList <- DT::renderDT({
       shiny::req(mdbs$list)
@@ -424,6 +430,7 @@ server <- function(input, output, session) {
          selStatus$resource <- NULL
          selStatus$mdb <- NULL
          selStatus$access <- NULL
+         selStatus$size <- NULL
       }else{
          selStatus$resource <- n
       }
@@ -439,19 +446,25 @@ server <- function(input, output, session) {
          access <- NULL
       }
       selStatus$access <- access
-      tkcon <- get_tkcat()
-      if(!is.null(access) && access=="none"){
-         mdb <- try(get_chMDB_metadata(tkcon, n))
-      }else{
-         mdb <- try(get_MDB(tkcon, n, check=FALSE), silent=TRUE)
-      }
-      selStatus$mdb <- mdb
-      if(is.MDB(mdb)){
-         m <- data_model(mdb)
-      }
-      if(is.list(mdb) && "dataModel" %in% names(mdb)){
-         m <- mdb$dataModel
-      }
+      selStatus$size <- NULL
+      shiny::withProgress(
+         message=sprintf("Getting %s metadata", n),
+         expr={
+            tkcon <- get_tkcat()
+            if(!is.null(access) && access=="none"){
+               mdb <- try(get_chMDB_metadata(tkcon, n))
+            }else{
+               mdb <- try(get_MDB(tkcon, n, check=FALSE), silent=TRUE)
+            }
+            selStatus$mdb <- mdb
+            if(is.MDB(mdb)){
+               m <- data_model(mdb)
+            }
+            if(is.list(mdb) && "dataModel" %in% names(mdb)){
+               m <- mdb$dataModel
+            }
+         }
+      )
       if(
          inherits(mdb, "try-error") ||
          !all(shiny::isolate(selStatus$tables) %in% names(m))
@@ -493,14 +506,7 @@ server <- function(input, output, session) {
       }else{
          if(is.MDB(mdb)){
             dbi <- db_info(mdb)
-            if(is.fileMDB(mdb)){
-               dbs <- sum(data_file_size(mdb)$size)
-               dbi$size <- .format_file_size(dbs)
-            }else{
-               if(!is.metaMDB(mdb)){
-                  dbi$records <- sum(count_records(mdb))
-               }
-            }
+            dm <- data_model(mdb)
             if(is.chMDB(mdb)){
                ts <- get_chMDB_timestamps(unclass(mdb)$tkcon, dbi$name)
                if(!is.null(ts)){
@@ -509,11 +515,16 @@ server <- function(input, output, session) {
             }
          }else{
             dbi <- mdb$dbInfo
+            dm <- mdb$dataModel
             ts <- get_chMDB_timestamps(tkcon, dbi$name)
             if(!is.null(ts)){
                dbi$"other instances"=nrow(ts)-1
             }
          }
+         dbi$"Number of tables" <- length(dm)
+         dbi$"Number of fields" <- lapply(dm, function(x) nrow(x$fields)) %>% 
+            unlist() %>% 
+            sum()
          dbi$access <- access
          shiny::tagList(
             shiny::h3(dbi$name),
@@ -544,14 +555,42 @@ server <- function(input, output, session) {
                      }
                      return(shiny::tags$li(
                         shiny::strong(n), ":",
-                        shiny::HTML(vt))
-                     )
+                        shiny::HTML(vt)
+                     ))
                   }
                }
             )),
-            shiny::uiOutput("dbDownload")
+            shiny::uiOutput("dbSize")
          )
       }
+   })
+   output$dbSize <- shiny::renderUI({
+      size <- selStatus$size
+      if(is.null(size)){
+         shiny::actionButton(
+            inputId = "mdbSize", label = "Get the number of records"
+         )
+      }else{
+         shiny::tags$ul(shiny::tags$li(
+            shiny::strong("Number of records"), ":",
+            shiny::HTML(format(size, big.mark=","))
+         ))
+      }
+   })
+   
+   shiny::observeEvent(input$mdbSize, {
+      mdb <- selStatus$mdb
+      shiny::req(!is.null(mdb))
+      req(is.MDB(mdb))
+      shiny::withProgress(
+         message = sprintf(
+            "Getting the number of records in %s",
+            db_info(mdb)$name
+         ),
+         expr={
+            selStatus$size <- sum(count_records(mdb))
+         }
+      )
    })
    
    ########################@
