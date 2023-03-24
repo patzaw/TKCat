@@ -1,5 +1,13 @@
 ## Connecting to TKCat after Azure AD authentication in R
 
+### 0. Requirements
+
+- Install the following packages
+
+```{r}
+install.packages(TKCat)
+devtools::install_github("patzaw/AuthHelpers")
+```
 
 ### 1. Authentication
 

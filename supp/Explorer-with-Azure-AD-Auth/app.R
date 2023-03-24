@@ -142,7 +142,9 @@ ui <- function(req) {
             shinydashboard::menuItem(
                text = "Contact admin",
                icon = shiny::icon("envelope", verify_fa = FALSE),
-               href = "mailto:patrice.godard@ucb.com",
+               href = shiny::HTML(
+                  "mailto:Patrice Godard <patrice.godard@ucb.com>?Subject=UCB-TKCat"
+               ),
                newtab = FALSE
             )
          )
