@@ -277,7 +277,8 @@ server <- function(input, output, session) {
          port=443, https=TRUE,
          extended_headers=list(
             "Authorization"=paste("Bearer", token)
-         )
+         ),
+         reset_handle=TRUE
       )
    }
    observe({
