@@ -3,6 +3,8 @@
 ## Version 1.0.8
 
 - Getting chMDB data model only
+- Allow additional parameters in `db_reconnect()`
+- Improved `format.chTKCat()`
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->

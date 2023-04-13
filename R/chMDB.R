@@ -157,7 +157,7 @@ db_reconnect.chMDB <- function(x, user, password, ntries=3, ...){
    xn <- deparse(substitute(x))
    x <- unclass(x)
    tkcon <- x$tkcon
-   db_reconnect(tkcon, user=user, password=password, ntries=ntries)
+   db_reconnect(tkcon, user=user, password=password, ntries=ntries, ...)
    nv <- x
    nv$tkcon <- tkcon
    class(nv) <- c("chMDB", "MDB", class(nv))

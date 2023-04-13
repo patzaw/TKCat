@@ -310,7 +310,15 @@ format.chTKCat <- function(x, ...){
             )
          ),
          lapply(names(x$cpar), function(p){
-            sprintf("      + %s: %s", p, x$cpar[[p]])
+            sprintf(
+               "      + %s: %s",
+               p,
+               ifelse(
+                  (nchar(x$cpar[[p]]) + nchar(p)) > 72,
+                  paste0(substr(x$cpar[[p]], 1, 69-nchar(p)), "..."),
+                  x$cpar[[p]]
+               )
+            )
          }),
          list(
             sep="\n"
@@ -355,6 +363,8 @@ db_disconnect.chTKCat <- function(x){
 db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
    xn <- deparse(substitute(x))
    con <- x$chcon
+   newPar <- list(...)
+   newPar <- c(x$cpar[setdiff(names(x$cpar), names(newPar))], newPar)
    
    if(missing(user)){
       user <- con@user
@@ -369,7 +379,7 @@ db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
             user=user,
             password=""
          ),
-         x$cpar
+         newPar
       )), silent=TRUE)
       n <- 0
       while(inherits(ncon, "try-error") & n < ntries){
@@ -387,7 +397,7 @@ db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
                user=user,
                password=password
             ),
-            x$cpar
+            newPar
          )), silent=TRUE)
          n <- n+1
       }
@@ -403,7 +413,7 @@ db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
             user=user,
             password=password
          ),
-         x$cpar
+         newPar
       )), silent=TRUE)
    }
    for(s in names(x$settings)){
@@ -412,6 +422,7 @@ db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
    
    nv <- x
    nv$chcon <- ncon
+   nv$cpar <- newPar
    nv <- check_chTKCat(nv)
    assign(xn, nv, envir=parent.frame(n=1))
    invisible(nv)

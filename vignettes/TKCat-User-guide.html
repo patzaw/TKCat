@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2023-03-23" />
+<meta name="date" content="2023-04-13" />
 
 <title>TKCat User guide</title>
 
@@ -8570,7 +8570,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">TKCat User guide</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">March 23, 2023</h4>
+<h4 class="date">April 13, 2023</h4>
 
 </div>
 
@@ -8654,7 +8654,7 @@ HPO_hp</code></pre>
 ##  8 0000024 Prostatitis                                       The presence…     8
 ##  9 0000025 Functional abnormality of male internal genitalia &lt;NA&gt;              6
 ## 10 0000030 Testicular gonadoblastoma                         The presence…     9
-## # … with 490 more rows</code></pre>
+## # ℹ 490 more rows</code></pre>
 <p>The <code>HPO_diseases</code> table gathers disease identifiers and
 labels from different disease database.</p>
 <pre class="r"><code>HPO_diseases &lt;- readr::read_tsv(
@@ -8674,7 +8674,7 @@ HPO_diseases</code></pre>
 ##  8 OMIM     102510 ACROPECTOROVERTEBRAL DYSPLASIA, F-FORM OF                    
 ##  9 OMIM     102700 SEVERE COMBINED IMMUNODEFICIENCY, AUTOSOMAL RECESSIVE, T CEL…
 ## 10 OMIM     102800 ADENOSINE TRIPHOSPHATASE DEFICIENCY, ANEMIA DUE TO           
-## # … with 1,893 more rows</code></pre>
+## # ℹ 1,893 more rows</code></pre>
 <p>The <code>HPO_diseaseHP</code> table indicates which phenotype is
 triggered by each disease.</p>
 <pre class="r"><code>HPO_diseaseHP &lt;- readr::read_tsv(
@@ -8694,7 +8694,7 @@ HPO_diseaseHP</code></pre>
 ##  8 ORPHA    391487 0000009
 ##  9 ORPHA    488594 0000009
 ## 10 ORPHA     71211 0000009
-## # … with 2,584 more rows</code></pre>
+## # ℹ 2,584 more rows</code></pre>
 </div>
 <div id="creating-a-data-model-with-redamor" class="section level2" number="2.2">
 <h2><span class="header-section-number">2.2</span> Creating a data model
@@ -8904,7 +8904,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2023-03-23 13:37:01
+## Timestamp: 2023-04-13 10:23:11
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -8942,7 +8942,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2023-03-23 13:37:01
+## Timestamp: 2023-04-13 10:23:11
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -8999,7 +8999,7 @@ as a member of the <em>Condition</em> collection.</p>
 ##  8 0000024 Prostatitis                                       The presence…     8
 ##  9 0000025 Functional abnormality of male internal genitalia &lt;NA&gt;              6
 ## 10 0000030 Testicular gonadoblastoma                         The presence…     9
-## # … with 490 more rows</code></pre>
+## # ℹ 490 more rows</code></pre>
 <pre class="r"><code>mhpo_db &lt;- add_collection_member(
    mhpo_db, collection=&quot;Condition&quot;, table=&quot;HPO_hp&quot;,
    condition=list(value=&quot;Phenotype&quot;, static=TRUE),
@@ -9035,7 +9035,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2023-03-23 13:37:01
+## Timestamp: 2023-04-13 10:23:11
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -9094,7 +9094,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2023-03-23 13:37:01
+## Timestamp: 2023-04-13 10:23:11
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -9338,19 +9338,18 @@ names(file_clinvar)</code></pre>
 <code>collection_members()</code> function.</p>
 <pre class="r"><code>collection_members(file_clinvar)</code></pre>
 <pre><code>## # A tibble: 10 × 9
-##    collection cid                   resou…¹   mid table field static value type 
-##    &lt;chr&gt;      &lt;chr&gt;                 &lt;chr&gt;   &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;
-##  1 Condition  ClinVar_conditions_1… ClinVar     2 trai… cond… TRUE   Dise… &lt;NA&gt; 
-##  2 Condition  ClinVar_conditions_1… ClinVar     2 trai… iden… FALSE  id    &lt;NA&gt; 
-##  3 Condition  ClinVar_conditions_1… ClinVar     2 trai… sour… TRUE   Clin… &lt;NA&gt; 
-##  4 Condition  ClinVar_conditions_1… ClinVar     1 trai… cond… TRUE   Dise… &lt;NA&gt; 
-##  5 Condition  ClinVar_conditions_1… ClinVar     1 trai… iden… FALSE  id    &lt;NA&gt; 
-##  6 Condition  ClinVar_conditions_1… ClinVar     1 trai… sour… FALSE  db    &lt;NA&gt; 
-##  7 BE         ClinVar_BE_1.0        ClinVar     1 entr… be    TRUE   Gene  &lt;NA&gt; 
-##  8 BE         ClinVar_BE_1.0        ClinVar     1 entr… iden… FALSE  entr… &lt;NA&gt; 
-##  9 BE         ClinVar_BE_1.0        ClinVar     1 entr… orga… TRUE   Homo… Scie…
-## 10 BE         ClinVar_BE_1.0        ClinVar     1 entr… sour… TRUE   Entr… &lt;NA&gt; 
-## # … with abbreviated variable name ¹​resource</code></pre>
+##    collection cid                  resource   mid table field static value type 
+##    &lt;chr&gt;      &lt;chr&gt;                &lt;chr&gt;    &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;
+##  1 Condition  ClinVar_conditions_… ClinVar      2 trai… cond… TRUE   Dise… &lt;NA&gt; 
+##  2 Condition  ClinVar_conditions_… ClinVar      2 trai… iden… FALSE  id    &lt;NA&gt; 
+##  3 Condition  ClinVar_conditions_… ClinVar      2 trai… sour… TRUE   Clin… &lt;NA&gt; 
+##  4 Condition  ClinVar_conditions_… ClinVar      1 trai… cond… TRUE   Dise… &lt;NA&gt; 
+##  5 Condition  ClinVar_conditions_… ClinVar      1 trai… iden… FALSE  id    &lt;NA&gt; 
+##  6 Condition  ClinVar_conditions_… ClinVar      1 trai… sour… FALSE  db    &lt;NA&gt; 
+##  7 BE         ClinVar_BE_1.0       ClinVar      1 entr… be    TRUE   Gene  &lt;NA&gt; 
+##  8 BE         ClinVar_BE_1.0       ClinVar      1 entr… iden… FALSE  entr… &lt;NA&gt; 
+##  9 BE         ClinVar_BE_1.0       ClinVar      1 entr… orga… TRUE   Homo… Scie…
+## 10 BE         ClinVar_BE_1.0       ClinVar      1 entr… sour… TRUE   Entr… &lt;NA&gt;</code></pre>
 <p>The following functions are use to get the number of tables, the
 number of fields per table and the number of records.</p>
 <pre class="r"><code>length(file_clinvar)        # Number of tables</code></pre>
@@ -9403,7 +9402,7 @@ instead.</p>
 ##  8 revStatOrder              101 B  TRUE      
 ##  9 variants                  2.1 KB TRUE      
 ## 10 cvaObservedIn             1.8 KB TRUE      
-## # … with 11 more rows</code></pre>
+## # ℹ 11 more rows</code></pre>
 </div>
 <div id="pulling-subsetting-and-combining" class="section level2" number="3.4">
 <h2><span class="header-section-number">3.4</span> Pulling, subsetting
@@ -9427,7 +9426,7 @@ file_clinvar %&gt;% pull(traitNames)</code></pre>
 ##  8  1352 Neuronal ceroid lipofuscinosis due to Cathepsin D deficiency      Alte…
 ##  9  1481 Diabetes mellitus, neonatal, with congenital hypothyroidism       Pref…
 ## 10  1481 NDH SYNDROME                                                      Alte…
-## # … with 34 more rows</code></pre>
+## # ℹ 34 more rows</code></pre>
 <p>MDBs can also be subset and combined. The corresponding functions
 ensure that the data model is fulfilled by the data tables.</p>
 <pre class="r"><code>file_clinvar[1:3]</code></pre>
@@ -9493,7 +9492,7 @@ left_join(
 ##  8 revStatOrder                     2         1
 ##  9 variants                       138         3
 ## 10 cvaObservedIn                  412        15
-## # … with 11 more rows</code></pre>
+## # ℹ 11 more rows</code></pre>
 <p>The object returned by <code>filter()</code> or <code>slice</code> is
 a <em>memoMDB</em>: all the data are in memory.</p>
 <p>Tables can be easily joined to get diseases associated to the genes
@@ -9506,14 +9505,12 @@ of interest in a single table as shown below.</p>
 gene_traits$entrezNames %&gt;%
    select(symbol, name, variants.type, variants.name, traitType, traits.name)</code></pre>
 <pre><code>## # A tibble: 4 × 6
-##   symbol name                                    varia…¹ varia…² trait…³ trait…⁴
-##   &lt;chr&gt;  &lt;chr&gt;                                   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
-## 1 PIK3R2 phosphoinositide-3-kinase regulatory s… single… NM_005… Disease Megale…
-## 2 PIK3R2 phosphoinositide-3-kinase regulatory s… single… NM_005… Disease not pr…
-## 3 PIK3R2 phosphoinositide-3-kinase regulatory s… single… NM_005… Disease not pr…
-## 4 UGT1A8 UDP glucuronosyltransferase family 1 m… Micros… UGT1A1… Disease Gilber…
-## # … with abbreviated variable names ¹​variants.type, ²​variants.name, ³​traitType,
-## #   ⁴​traits.name</code></pre>
+##   symbol name                  variants.type variants.name traitType traits.name
+##   &lt;chr&gt;  &lt;chr&gt;                 &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;     &lt;chr&gt;      
+## 1 PIK3R2 phosphoinositide-3-k… single nucle… NM_005027.4(… Disease   Megalencep…
+## 2 PIK3R2 phosphoinositide-3-k… single nucle… NM_005027.4(… Disease   not provid…
+## 3 PIK3R2 phosphoinositide-3-k… single nucle… NM_005027.4(… Disease   not provid…
+## 4 UGT1A8 UDP glucuronosyltran… Microsatelli… UGT1A1*28     Disease   Gilbert&#39;s …</code></pre>
 </div>
 <div id="merging-with-collections" class="section level2" number="3.6">
 <h2><span class="header-section-number">3.6</span> Merging MDBs with
@@ -9548,7 +9545,7 @@ Uniprot peptide identifiers from different species.</p>
 ##  8         2541 Q8II92    Plasmodium falciparum 3D7 Uniprot   2019_09   
 ##  9         3803 Q64346    Rattus norvegicus         Uniprot   2019_09   
 ## 10         4395 O60502    Homo sapiens              Uniprot   2019_09   
-## # … with 25 more rows</code></pre>
+## # ℹ 25 more rows</code></pre>
 <p>Whereas ClinVar refers to causal genes in the <em>entrezNames</em>
 table using human Entrez gene identifiers.</p>
 <pre class="r"><code>file_clinvar$entrezNames</code></pre>
@@ -9746,7 +9743,7 @@ plot(data_model(hpo_clinvar))</code></pre>
 ##  8 OMIM     102510
 ##  9 OMIM     102700
 ## 10 OMIM     102800
-## # … with 1,940 more rows</code></pre>
+## # ℹ 1,940 more rows</code></pre>
 </div>
 </div>
 </div>
@@ -9763,11 +9760,10 @@ their preparation for potential integration. Several functions are
 available to achieve this goal.</p>
 <pre class="r"><code>list_MDBs(k)                     # list all the MDBs in a TKCat object</code></pre>
 <pre><code>## # A tibble: 2 × 7
-##   name    title                descr…¹ url   version maint…² timestamp
-##   &lt;chr&gt;   &lt;chr&gt;                &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;dttm&gt;   
-## 1 HPO     Data extracted from… This i… http… &lt;NA&gt;    &lt;NA&gt;    NA       
-## 2 ClinVar Data extracted from… ClinVa… http… 0.9     Patric… NA       
-## # … with abbreviated variable names ¹​description, ²​maintainer</code></pre>
+##   name    title         description url   version maintainer timestamp
+##   &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dttm&gt;   
+## 1 HPO     Data extract… This is a … http… &lt;NA&gt;    &lt;NA&gt;       NA       
+## 2 ClinVar Data extract… ClinVar is… http… 0.9     Patrice G… NA</code></pre>
 <pre class="r"><code>get_MDB(k, &quot;HPO&quot;)                # get a specific MDBs from the catalog</code></pre>
 <pre><code>## fileMDB HPO: Data extracted from the HPO database
 ##    - 9 tables with 25 fields
@@ -9853,12 +9849,11 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <em>TKCat</em> object.</p>
 <pre class="r"><code>list_MDBs(k)             # get a specific MDBs from the catalog</code></pre>
 <pre><code>## # A tibble: 2 × 11
-##   name    title             descr…¹ url   version maint…² public popul…³ times…⁴
-##   &lt;chr&gt;   &lt;chr&gt;             &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;lgl&gt;  &lt;lgl&gt;   &lt;lgl&gt;  
-## 1 ClinVar Data extracted f… ClinVa… http… 0.13    Patric… TRUE   TRUE    TRUE   
-## 2 HPO     Data extracted f… The Hu… http… 0.12    Patric… TRUE   TRUE    TRUE   
-## # … with 2 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;, and abbreviated
-## #   variable names ¹​description, ²​maintainer, ³​populated, ⁴​timestamps</code></pre>
+##   name    title description url   version maintainer public populated timestamps
+##   &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;lgl&gt;  &lt;lgl&gt;     &lt;lgl&gt;     
+## 1 ClinVar Data… ClinVar is… http… 0.13    Patrice G… TRUE   TRUE      TRUE      
+## 2 HPO     Data… The Human … http… 0.12    Patrice G… TRUE   TRUE      TRUE      
+## # ℹ 2 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;</code></pre>
 <pre class="r"><code>search_MDB_tables(k, &quot;disease&quot;)  # Search table about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 3 × 3
 ##   resource name                comment                 
@@ -9868,17 +9863,16 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 ## 3 HPO      HPO_diseases        Diseases</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 8 × 7
-##   resource table               name    comment              type  nulla…¹ unique
-##   &lt;chr&gt;    &lt;chr&gt;               &lt;chr&gt;   &lt;chr&gt;                &lt;chr&gt; &lt;lgl&gt;   &lt;lgl&gt; 
-## 1 HPO      HPO_diseaseHP       db      Disease database     char… FALSE   FALSE 
-## 2 HPO      HPO_diseaseSynonyms db      Disease database     char… FALSE   FALSE 
-## 3 HPO      HPO_diseases        db      Disease database     char… FALSE   FALSE 
-## 4 HPO      HPO_diseaseHP       id      Disease ID           char… FALSE   FALSE 
-## 5 HPO      HPO_diseaseSynonyms id      Disease ID           char… FALSE   FALSE 
-## 6 HPO      HPO_diseases        id      Disease ID           char… FALSE   FALSE 
-## 7 HPO      HPO_diseases        label   Disease lable (pref… char… FALSE   FALSE 
-## 8 HPO      HPO_diseaseSynonyms synonym Disease synonym      char… FALSE   FALSE 
-## # … with abbreviated variable name ¹​nullable</code></pre>
+##   resource table               name    comment             type  nullable unique
+##   &lt;chr&gt;    &lt;chr&gt;               &lt;chr&gt;   &lt;chr&gt;               &lt;chr&gt; &lt;lgl&gt;    &lt;lgl&gt; 
+## 1 HPO      HPO_diseaseHP       db      Disease database    char… FALSE    FALSE 
+## 2 HPO      HPO_diseaseSynonyms db      Disease database    char… FALSE    FALSE 
+## 3 HPO      HPO_diseases        db      Disease database    char… FALSE    FALSE 
+## 4 HPO      HPO_diseaseHP       id      Disease ID          char… FALSE    FALSE 
+## 5 HPO      HPO_diseaseSynonyms id      Disease ID          char… FALSE    FALSE 
+## 6 HPO      HPO_diseases        id      Disease ID          char… FALSE    FALSE 
+## 7 HPO      HPO_diseases        label   Disease lable (pre… char… FALSE    FALSE 
+## 8 HPO      HPO_diseaseSynonyms synonym Disease synonym     char… FALSE    FALSE</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 5 × 3
 ##   resource collection table              
@@ -9929,7 +9923,7 @@ object as shown below.</p>
 ##  8 OMIM  182610 Spastic paraplegia, epilepsy, and mental retardation            
 ##  9 OMIM  203600 Alopecia-Epilepsy-Oligophrenia syndrome of moynahan             
 ## 10 OMIM  208700 Ataxia with myoclonic epilepsy and presenile dementia           
-## # … with 255 more rows</code></pre>
+## # ℹ 255 more rows</code></pre>
 </div>
 </div>
 <div id="appendices" class="section level1" number="5">
