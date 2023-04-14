@@ -1008,20 +1008,108 @@ dims.chMDB <- function(x, ...){
    }
    toTake <- names(toTake)
    dbt <- db_tables(x)
-   toTake <- dbt$dbTables[toTake]
    m <- data_model(x)
    
-   toRet <- do.call(dplyr::bind_rows, lapply(
-      names(toTake),
-      function(tn){
-         .dim_ch_mtable(
-            x,
-            tablePath=toTake[tn], tableModel=m[[tn]]
+   dbTables <- list_tables(unclass(x)$tkcon, db_info(x)$name) %>% 
+      dplyr::mutate(
+         "instance"=paste0("`", .data$database, "`.`", .data$name, "`")
+      )
+   matrices <- lapply(m, ReDaMoR::is.MatrixModel) %>%
+      unlist() %>% which() %>% names()
+   
+   tables <- setdiff(names(m), matrices)
+   if(length(tables)==0){
+      tableValues <- NULL
+   }else{
+      tableValues <- dplyr::tibble(
+         table=tables,
+         instance=as.character(dbt$dbTables[tables])
+      ) %>% 
+         dplyr::left_join(
+            dbTables %>% 
+               dplyr::select(
+                  "instance",
+                  "total_rows", "total_bytes", "total_columns",
+                  "transposed"
+               ),
+            by="instance"
+         ) %>% 
+         dplyr::mutate(format="table") %>% 
+         dplyr::select(
+            "name"="table", "format",
+            "ncol"="total_columns",
+            "nrow"="total_rows",
+            "records"="total_rows",
+            "bytes"="total_bytes",
+            "transposed"
          )
-      }
-   )) %>%
-      dplyr::mutate(name=names(toTake)) %>% 
-      dplyr::relocate("name")
+   }
+   
+   if(length(matrices)==0){
+      matValues <- NULL
+   }else{
+      matTables <- get_query(
+         x,
+         paste(
+            sprintf(
+               "SELECT table, info, '%s' as matrice from %s",
+               matrices, dbt$dbTables[matrices]
+            ),
+            collapse=" UNION ALL "
+         )
+      )
+      matValues <- matTables %>%
+         dplyr::left_join(dbTables, by=c("table"="name")) %>%
+         dplyr::group_by(.data$matrice) %>% 
+         dplyr::summarize(
+            transposed=.data$transposed[1],
+            format=if(.data$info[1]=="values"){
+               "matrix"
+            }else{
+               "MatrixMarket"
+            },
+            nrow=if(.data$info[1]=="values"){
+               if(.data$transposed[1]){
+                  sum(.data$total_columns)
+               }else{
+                  .data$total_rows[1]
+               }
+            }else{
+               .data$total_rows[which(.data$info=="rows")]
+            },
+            ncol=if(.data$info[1]=="values"){
+               if(.data$transposed[1]){
+                  .data$total_rows[1]
+               }else{
+                  sum(.data$total_columns)
+               }
+            }else{
+               .data$total_rows[which(.data$info=="columns")]
+            },
+            bytes=sum(.data$total_bytes)
+         ) %>% 
+         dplyr::mutate(records=.data$nrow*.data$ncol) %>% 
+         dplyr::select(
+            "name"="matrice",
+            "format", "ncol", "nrow", "records", "bytes", "transposed"
+         )
+   }
+   
+   toRet <- rbind(tableValues, matValues) %>% 
+      dplyr::slice(match(toTake, .data$name))
+   
+   
+   # toRet <- do.call(dplyr::bind_rows, lapply(
+   #    names(toTake),
+   #    function(tn){
+   #       .dim_ch_mtable(
+   #          x,
+   #          tablePath=toTake[tn], tableModel=m[[tn]]
+   #       )
+   #    }
+   # )) %>%
+   #    dplyr::mutate(name=names(toTake)) %>% 
+   #    dplyr::relocate("name")
    
    return(toRet)
    
@@ -2320,122 +2408,6 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
    return(toRet)
 }
 
-.dim_ch_mtable <- function(x, tablePath, tableModel){
-   
-   tp <- gsub("`", "", strsplit(tablePath, split="`[.]`")[[1]])
-   tdb <- tp[1]
-   tn <- tp[2]
-   chTables <- list_tables(
-      unclass(x)$tkcon$chcon, dbNames=tdb
-   )
-   chFields <- get_query(
-      x,
-      sprintf(
-         paste(
-            "SELECT database, table, name FROM system.columns",
-            " WHERE database='%s'"
-         ),
-         tdb
-      ),
-      autoalias=FALSE,
-      format="TabSeparatedWithNamesAndTypes"
-   )
-   
-   if(ReDaMoR::is.MatrixModel(tableModel)){
-      dbmt <- tablePath
-      query <- "SELECT * FROM %s"
-      tquery <- sprintf(query, dbmt)
-      qr <- get_query(
-         x, tquery, autoalias=FALSE,
-         format="TabSeparatedWithNamesAndTypes"
-      )
-      
-      if(.is_chMM(qr)){
-         
-         ## Sparse matrix ----
-         
-         nr <- chTables %>% 
-            dplyr::filter(
-               .data$database==tdb &
-                  .data$name==qr$table[which(qr$info=="rows")]
-            ) %>% 
-            dplyr::pull("total_rows")
-         nc <- chTables %>% 
-            dplyr::filter(
-               .data$database==tdb &
-                  .data$name==qr$table[which(qr$info=="columns")]
-            ) %>% 
-            dplyr::pull("total_rows")
-         toRet <- dplyr::tibble(
-            format="MatrixMarket",
-            ncol=nc,
-            nrow=nr,
-            records=as.numeric(nc) * as.numeric(nr),
-            transposed=FALSE
-         )
-         
-      }else{
-         
-         ## Matrix ----
-      
-         nr <- chTables %>% 
-            dplyr::filter(
-               .data$database==tdb & .data$name==qr$table[1]
-            ) %>% 
-            dplyr::pull("total_rows")
-         tfields <- chFields %>% 
-            dplyr::filter(
-               .data$database==tdb,
-               .data$table %in% qr$table
-            )
-         if("___ROWNAMES___" %in% tfields$name){
-            if("___COLNAMES___" %in% tfields$name){
-               stop(paste0(tn, ": Ambiguous matrix format"))
-            }else{
-               transposed=FALSE
-            }
-         }else{
-            if("___COLNAMES___" %in% tfields$name){
-               transposed=TRUE
-            }else{
-               stop(paste0(tn, ": Wrong matrix format"))
-            }
-         }
-         nc <- nrow(tfields) - nrow(qr)
-         
-         toRet <- dplyr::tibble(
-            format="matrix",
-            ncol=ifelse(transposed, nr, nc),
-            nrow=ifelse(transposed, nc, nr),
-            records=as.numeric(nc) * as.numeric(nr),
-            transposed=transposed
-         )
-      
-      }
-      
-   }else{{
-      
-      ## Table ----
-      
-      toRet <- dplyr::tibble(
-         format="table",
-         ncol=length(tableModel),
-         nrow=dplyr::filter(
-            chTables,
-            .data$database==tdb,
-            .data$name==tn
-         ) %>% dplyr::pull("total_rows")
-      ) %>%
-         dplyr::mutate(
-            records=.data$nrow,
-            transposed=FALSE
-         )
-   }}
-   
-   return(toRet)
-
-}
-
 .head_ch_mtable <- function(
    x,
    tablePath,
@@ -2443,7 +2415,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
    n=6L
 ){
    if(ReDaMoR::is.MatrixModel(tableModel)){
-      dd <- .dim_ch_mtable(x, tablePath, tableModel)
+      dd <- dims(x, tableModel$tableName)
       
       if(is.infinite(n)){
          nc <- dd$ncol

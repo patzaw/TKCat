@@ -604,6 +604,7 @@ dims.fileMDB <- function(
          ncol=numeric(),
          nrow=numeric(),
          records=numeric(),
+         bytes=numeric(),
          transposed=logical()
       ))
    }
@@ -693,7 +694,7 @@ dims.fileMDB <- function(
                "table"
             ),
             ncol=n[2],
-            nrow=n[1],
+            nrow=n[1]
          ) %>% 
             dplyr::mutate(
                records=ifelse(
@@ -701,6 +702,7 @@ dims.fileMDB <- function(
                   as.numeric(.data$ncol) * as.numeric(.data$nrow),
                   .data$nrow
                ),
+               bytes=fs,
                transposed=FALSE
             )
       }

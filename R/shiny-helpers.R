@@ -418,8 +418,13 @@ TKCAT_LOGO_DIV <- shiny::div(
          validInput=FALSE
       )
       shiny::observe({
-         mdbs$list <- list_MDBs(instance$tkcat)
-         mdbs$collections <- collection_members(instance$tkcat)
+         shiny::withProgress(
+            message="Getting list of MDBs",
+            expr={
+               mdbs$list <- list_MDBs(instance$tkcat)
+               mdbs$collections <- collection_members(instance$tkcat)
+            }
+         )
       })
       output$mdbList <- DT::renderDT({
          shiny::req(mdbs$list)
@@ -525,24 +530,30 @@ TKCAT_LOGO_DIV <- shiny::div(
             access <- NULL
          }
          selStatus$access <- access
-         if(!is.null(access) && access=="none"){
-            mdb <- try(get_chMDB_metadata(instance$tkcat, n))
-         }else{
-            mdb <- try(get_MDB(instance$tkcat, n, check=FALSE), silent=TRUE)
-         }
-         selStatus$mdb <- mdb
-         if(is.MDB(mdb)){
-            m <- data_model(mdb)
-         }
-         if(is.list(mdb) && "dataModel" %in% names(mdb)){
-            m <- mdb$dataModel
-         }
-         if(
-            inherits(mdb, "try-error") ||
-            !all(shiny::isolate(selStatus$tables) %in% names(m))
-         ){
-            selStatus$tables <- NULL
-         }
+         shiny::withProgress(
+            message=sprintf("Getting %s metadata", n),
+            expr={
+               if(!is.null(access) && access=="none"){
+                  mdb <- try(get_chMDB_metadata(instance$tkcat, n))
+               }else{
+                  mdb <- try(
+                     get_MDB(instance$tkcat, n, check=FALSE), silent=TRUE
+                  )
+               }
+               selStatus$mdb <- mdb
+               if(is.MDB(mdb)){
+                  m <- data_model(mdb)
+               }
+               if(is.list(mdb) && "dataModel" %in% names(mdb)){
+                  m <- mdb$dataModel
+               }
+               if(
+                  inherits(mdb, "try-error") ||
+                  !all(shiny::isolate(selStatus$tables) %in% names(m))
+               ){
+                  selStatus$tables <- NULL
+               }
+         })
       })
       shiny::observe({
          mdb <- selStatus$mdb
@@ -578,12 +589,21 @@ TKCAT_LOGO_DIV <- shiny::div(
          }else{
             if(is.MDB(mdb)){
                dbi <- db_info(mdb)
+               dm <- data_model(mdb)
+               dbi$"Number of tables" <- length(dm)
+               dbi$"Number of fields" <- lapply(
+                  dm, function(x) nrow(x$fields)
+               ) %>% 
+                  unlist() %>% 
+                  sum()
                if(is.fileMDB(mdb)){
                   dbs <- sum(data_file_size(mdb)$size)
                   dbi$size <- .format_bytes(dbs)
                }else{
                   if(!is.metaMDB(mdb)){
-                     dbi$records <- sum(count_records(mdb))
+                     dbdims <- dims(mdb)
+                     dbi$values <- sum(dbdims$nrow*dbdims$ncol)
+                     dbi$size <- .format_bytes(sum(dbdims$bytes))
                   }
                }
                if(is.chMDB(mdb)){
@@ -594,6 +614,13 @@ TKCAT_LOGO_DIV <- shiny::div(
                }
             }else{
                dbi <- mdb$dbInfo
+               dm <- mdb$dataModel
+               dbi$"Number of tables" <- length(dm)
+               dbi$"Number of fields" <- lapply(
+                  dm, function(x) nrow(x$fields)
+               ) %>% 
+                  unlist() %>% 
+                  sum()
                ts <- get_chMDB_timestamps(tkcon, dbi$name)
                if(!is.null(ts)){
                   dbi$"other instances"=nrow(ts)-1
@@ -903,12 +930,32 @@ TKCAT_LOGO_DIV <- shiny::div(
                   )
                }else{
                   if(!is.metaMDB(mdb)){
-                     shiny::tags$li(
-                        shiny::tags$strong("Number of records"),
-                        ":",
-                        count_records(mdb, dplyr::all_of(sel)) %>%
-                           format(big.mark=","),
-                        sprintf("(showing %s records)", nr)
+                     tdim <- dims(mdb, all_of(sel))
+                     list(
+                        shiny::tags$li(
+                           shiny::tags$strong("Number of columns"),
+                           ":",
+                           tdim$ncol %>%
+                              format(big.mark=",")
+                        ),
+                        shiny::tags$li(
+                           shiny::tags$strong("Number of rows"),
+                           ":",
+                           tdim$nrow %>%
+                              format(big.mark=",")
+                        ),
+                        shiny::tags$li(
+                           shiny::tags$strong("Size"),
+                           ":",
+                           .format_bytes(tdim$bytes)
+                        ),
+                        shiny::tags$li(
+                           shiny::tags$strong("Number of values"),
+                           ":",
+                           (tdim$nrow*tdim$ncol) %>%
+                              format(big.mark=","),
+                           sprintf("(showing %s records)", nr)
+                        )
                      )
                   }
                }

@@ -48,10 +48,11 @@ A tibble with one row for each considered table and the
 following columns:
 \itemize{
 \item name: the name of the table
-\item format: "table" or "matrix"
+\item format: "table", "matrix" or "MatrixMarket"
 \item ncol: number of columns
 \item nrow: number of rows
 \item records: number of records (\code{nrow} for tables and \code{ncol*nrow} for matrices)
+\item bytes: size in bytes
 \item transposed: FALSE by default. TRUE only for matrices stored in a
 transposed format.
 }

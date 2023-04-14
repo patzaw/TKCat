@@ -16,7 +16,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">TKCat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.9</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -121,10 +121,11 @@ of row number should be computed instead of a precise count
 
 <p>A tibble with one row for each considered table and the
 following columns:</p><ul><li><p>name: the name of the table</p></li>
-<li><p>format: "table" or "matrix"</p></li>
+<li><p>format: "table", "matrix" or "MatrixMarket"</p></li>
 <li><p>ncol: number of columns</p></li>
 <li><p>nrow: number of rows</p></li>
 <li><p>records: number of records (<code>nrow</code> for tables and <code>ncol*nrow</code> for matrices)</p></li>
+<li><p>bytes: size in bytes</p></li>
 <li><p>transposed: FALSE by default. TRUE only for matrices stored in a
 transposed format.</p></li>
 </ul></div>

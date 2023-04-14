@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2023-04-13" />
+<meta name="date" content="2023-04-14" />
 
 <title>TKCat User guide</title>
 
@@ -8570,7 +8570,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">TKCat User guide</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">April 13, 2023</h4>
+<h4 class="date">April 14, 2023</h4>
 
 </div>
 
@@ -8904,7 +8904,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2023-04-13 10:23:11
+## Timestamp: 2023-04-14 16:56:35
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -8942,7 +8942,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2023-04-13 10:23:11
+## Timestamp: 2023-04-14 16:56:35
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -9035,7 +9035,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2023-04-13 10:23:11
+## Timestamp: 2023-04-14 16:56:35
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -9094,7 +9094,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2023-04-13 10:23:11
+## Timestamp: 2023-04-14 16:56:35
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -9848,12 +9848,12 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <p>Once connected, this <em>chTKCat</em> object can be used as a
 <em>TKCat</em> object.</p>
 <pre class="r"><code>list_MDBs(k)             # get a specific MDBs from the catalog</code></pre>
-<pre><code>## # A tibble: 2 × 11
+<pre><code>## # A tibble: 2 × 12
 ##   name    title description url   version maintainer public populated timestamps
 ##   &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;lgl&gt;  &lt;lgl&gt;     &lt;lgl&gt;     
 ## 1 ClinVar Data… ClinVar is… http… 0.13    Patrice G… TRUE   TRUE      TRUE      
 ## 2 HPO     Data… The Human … http… 0.12    Patrice G… TRUE   TRUE      TRUE      
-## # ℹ 2 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;</code></pre>
+## # ℹ 3 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;, total_size &lt;dbl&gt;</code></pre>
 <pre class="r"><code>search_MDB_tables(k, &quot;disease&quot;)  # Search table about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 3 × 3
 ##   resource name                comment                 

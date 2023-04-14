@@ -38,7 +38,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">TKCat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.9</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,7 +91,7 @@
                         <h4 data-toc-skip class="author">Patrice
 Godard</h4>
             
-            <h4 data-toc-skip class="date">April 13, 2023</h4>
+            <h4 data-toc-skip class="date">April 14, 2023</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/patzaw/TKCat/blob/HEAD/vignettes/TKCat-User-guide.Rmd" class="external-link"><code>vignettes/TKCat-User-guide.Rmd</code></a></small>
       <div class="d-none name"><code>TKCat-User-guide.Rmd</code></div>
@@ -461,7 +461,7 @@ to document the data themselves.</li>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/app/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2023-04-13 10:25:09</span></span>
+<span><span class="co">## Timestamp: 2023-04-14 16:58:29</span></span>
 <span><span class="co">## </span></span></code></pre>
 </div>
 <div class="section level3">
@@ -501,7 +501,7 @@ statement displayed when printing the object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/app/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2023-04-13 10:25:09</span></span>
+<span><span class="co">## Timestamp: 2023-04-14 16:58:29</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -602,7 +602,7 @@ MDB object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/app/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2023-04-13 10:25:09</span></span>
+<span><span class="co">## Timestamp: 2023-04-14 16:58:29</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -664,7 +664,7 @@ the corresponding documentation from it back in R:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/app/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2023-04-13 10:25:09</span></span>
+<span><span class="co">## Timestamp: 2023-04-14 16:58:29</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -1465,12 +1465,12 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <em>TKCat</em> object.</p>
 <div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/list_MDBs.html">list_MDBs</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>             <span class="co"># get a specific MDBs from the catalog</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 2 × 11</span></span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 2 × 12</span></span></span>
 <span><span class="co">##   name    title description url   version maintainer public populated timestamps</span></span>
 <span><span class="co">##   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> ClinVar Data… ClinVar is… http… 0.13    Patrice G… TRUE   TRUE      TRUE      </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">2</span> HPO     Data… The Human … http… 0.12    Patrice G… TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 2 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #949494;"># ℹ 3 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;, total_size &lt;dbl&gt;</span></span></span></code></pre>
 <div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_tables.html">search_MDB_tables</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search table about "disease"</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 3 × 3</span></span></span>

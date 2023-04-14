@@ -170,10 +170,11 @@ count_records <- function(x, ...){
 #' following columns:
 #' 
 #' - name: the name of the table
-#' - format: "table" or "matrix"
+#' - format: "table", "matrix" or "MatrixMarket"
 #' - ncol: number of columns
 #' - nrow: number of rows
 #' - records: number of records (`nrow` for tables and `ncol*nrow` for matrices)
+#' - bytes: size in bytes
 #' - transposed: FALSE by default. TRUE only for matrices stored in a
 #' transposed format.
 #' 

@@ -1,4 +1,8 @@
 #' Format bytes numbers in human readable values 
+#' 
+#' @param bytes a vector of integers
+#' @return A vector of character with human readable size
+#' 
 .format_bytes <- function(bytes){
    sunits <- c("B", "KB", "MB", "GB", "TB", "PB", "EB")
    uniti <- log2(bytes)%/%10

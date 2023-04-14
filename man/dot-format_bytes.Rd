@@ -6,6 +6,12 @@
 \usage{
 .format_bytes(bytes)
 }
+\arguments{
+\item{bytes}{a vector of integers}
+}
+\value{
+A vector of character with human readable size
+}
 \description{
 Format bytes numbers in human readable values
 }

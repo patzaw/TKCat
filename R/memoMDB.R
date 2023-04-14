@@ -439,6 +439,7 @@ dims.memoMDB <- function(x, ...){
                   is.data.frame(y), nrow(y),
                   as.numeric(ncol(y)) * as.numeric(nrow(y))
                ),
+               bytes=as.numeric(object.size(y)),
                transposed=FALSE
             )
          )

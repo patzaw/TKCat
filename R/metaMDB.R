@@ -524,6 +524,7 @@ dims.metaMDB <- function(x, ...){
                   ncol=ncol(y),
                   nrow=nrow(y),
                   records=ifelse(is.matrix(y), ncol(y)*nrow(y), nrow(y)),
+                  bytes=as.numeric(object.size(y)),
                   transposed=FALSE
                )
             )
