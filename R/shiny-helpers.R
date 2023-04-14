@@ -74,7 +74,8 @@ TKCAT_LOGO_DIV <- shiny::div(
    sysInterface,
    userManager=FALSE,
    manList,
-   logoDiv=TKCAT_LOGO_DIV
+   logoDiv=TKCAT_LOGO_DIV,
+   totalSize=FALSE
 ){
    
    ## Resources ----
@@ -148,6 +149,17 @@ TKCAT_LOGO_DIV <- shiny::div(
             ),
             mit
          ))
+      ))
+   }
+   
+   #### Size ----
+   if(totalSize){
+      sbelts <- c(sbelts, list(
+         shiny::tags$hr(),
+         shinydashboard::menuItem(
+            shiny::uiOutput("totalSize"),
+            icon=NULL
+         )
       ))
    }
    
@@ -274,8 +286,13 @@ TKCAT_LOGO_DIV <- shiny::div(
    ddir=NULL,
    userManager=NULL,
    skinColors=c("blue", "yellow"),
-   title=NULL
+   title=NULL,
+   totalSize=FALSE
 ){
+   
+   pckn <- utils::packageName()
+   jsFormatBytes <- readLines(system.file("www/format_bytes.js", package=pckn))
+   
    
    function(input, output, session) {
       
@@ -349,6 +366,28 @@ TKCAT_LOGO_DIV <- shiny::div(
       }
       
       ########################@
+      ## Total size ----
+      if(totalSize){
+         output$totalSize <- shiny::renderUI({
+            tkcon <- instance$tkcat
+            req(tkcon)
+            totalSize <- sum(list_tables(tkcon)$total_bytes,  na.rm = TRUE)
+            shiny::actionLink(
+               inputId="totalSize",
+               label=shiny::span(
+                  paste("Total size:", .format_bytes(totalSize))
+               ),
+               icon=shiny::icon(
+                  "database",
+                  verify_fa = FALSE
+               ),
+               style="margin:0;",
+               title="Total size"
+            )
+         })
+      }
+      
+      ########################@
       ## Selection status ----
       selStatus <- shiny::reactiveValues(
          resource=NULL,
@@ -385,13 +424,17 @@ TKCAT_LOGO_DIV <- shiny::div(
       output$mdbList <- DT::renderDT({
          shiny::req(mdbs$list)
          colToTake <- intersect(
-            c("name", "title", "access", "maintainer", "timestamp"),
+            c(
+               "name", "title", "access", "maintainer", "timestamp",
+               "total_size"
+            ),
             colnames(mdbs$list)
          )
          toShow <- mdbs$list %>%
             dplyr::select(dplyr::all_of(colToTake)) %>%
             dplyr::rename("Resource"="name") %>% 
             dplyr::rename_all(function(x){
+               x <- gsub("_", " ", x)
                paste0(
                   toupper(substr(x, 1, 1)),
                   substr(x, 2, nchar(x))
@@ -436,7 +479,11 @@ TKCAT_LOGO_DIV <- shiny::div(
             options = list(
                pageLength=10,
                dom=c("ltip"),
-               order=list(list(0, 'asc'))
+               order=list(list(0, 'asc')),
+               columnDefs = list(list(
+                  targets = which(colnames(toShow)=="Total size")-1,
+                  render = DT::JS(jsFormatBytes)
+               ))
             )
          )
          if("Access" %in% colnames(toShow)){
@@ -533,7 +580,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                dbi <- db_info(mdb)
                if(is.fileMDB(mdb)){
                   dbs <- sum(data_file_size(mdb)$size)
-                  dbi$size <- .format_file_size(dbs)
+                  dbi$size <- .format_bytes(dbs)
                }else{
                   if(!is.metaMDB(mdb)){
                      dbi$records <- sum(count_records(mdb))
@@ -851,7 +898,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                      data_file_size(mdb) %>% 
                         dplyr::filter(table==!!sel) %>% 
                         dplyr::pull("size") %>% 
-                        .format_file_size(),
+                        .format_bytes(),
                      sprintf("(showing %s records)", nr)
                   )
                }else{

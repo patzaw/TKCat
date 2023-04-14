@@ -99,13 +99,16 @@ ui <- function(req) {
          '),
          ### Menu ----
          shinydashboard::sidebarMenu(
-            #### Resources ----
             id = "sidebarmenu",
             style = "white-space:normal;",
+            
+            #### User ----
             shinydashboard::menuItem(
                shiny::uiOutput("currentUser"),
                icon=NULL
             ),
+            
+            #### Resources ----
             shiny::tags$hr(),
             shinydashboard::menuItem(
                "Resources",
@@ -146,6 +149,13 @@ ui <- function(req) {
                   "mailto:Patrice Godard <patrice.godard@ucb.com>?Subject=UCB-TKCat"
                ),
                newtab = FALSE
+            ),
+            
+            #### Size ----
+            shiny::tags$hr(),
+            shinydashboard::menuItem(
+               shiny::uiOutput("totalSize"),
+               icon=NULL
             )
          )
       ),
@@ -249,6 +259,9 @@ ui <- function(req) {
 
 ###############################################################################@
 ## Server ----
+jsFormatBytes <- readLines(
+   system.file("www/format_bytes.js", package="TKCat")
+)
 server <- function(input, output, session) {
    
    ## Authentication ----
@@ -306,6 +319,25 @@ server <- function(input, output, session) {
       )
    })
    
+   ## Size ----
+   output$totalSize <- shiny::renderUI({
+      req(mdbs$list)
+      tkcon <- get_tkcat()
+      totalSize <- sum(list_tables(tkcon)$total_bytes,  na.rm = TRUE)
+      shiny::actionLink(
+         inputId="totalSize",
+         label=shiny::span(
+            paste("Total size:", TKCat:::.format_bytes(totalSize))
+         ),
+         icon=shiny::icon(
+            "database",
+            verify_fa = FALSE
+         ),
+         style="margin:0;",
+         title="Total size"
+      )
+   })
+   
    ########################@
    ## Selection status ----
    selStatus <- shiny::reactiveValues(
@@ -353,13 +385,17 @@ server <- function(input, output, session) {
    output$mdbList <- DT::renderDT({
       shiny::req(mdbs$list)
       colToTake <- intersect(
-         c("name", "title", "access", "maintainer", "timestamp"),
+         c(
+            "name", "title", "access", "maintainer", "timestamp",
+            "total_size"
+         ),
          colnames(mdbs$list)
       )
       toShow <- mdbs$list %>%
          dplyr::select(dplyr::all_of(colToTake)) %>%
          dplyr::rename("Resource"="name") %>% 
          dplyr::rename_all(function(x){
+            x <- gsub("_", " ", x)
             paste0(
                toupper(substr(x, 1, 1)),
                substr(x, 2, nchar(x))
@@ -404,7 +440,13 @@ server <- function(input, output, session) {
          options = list(
             pageLength=10,
             dom=c("ltip"),
-            order=list(list(0, 'asc'))
+            order=list(list(0, 'asc')),
+            columnDefs = list(
+               list(
+                  targets = which(colnames(toShow)=="Total size")-1,
+                  render = DT::JS(jsFormatBytes)
+               )
+            )
          )
       )
       if("Access" %in% colnames(toShow)){

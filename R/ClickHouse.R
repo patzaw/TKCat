@@ -21,42 +21,53 @@ get_hosts.DBIConnection <- function(x, ...){
 
 
 ###############################################################################@
-#' List tables in a clickhouse database
 #' 
-#' @param con the clickhouse connection
 #' @param dbNames the name of databases to focus on (default NULL ==> all)
-#' 
-#' @return A tibble with the following columns:
-#' - **database**: the name of the database
-#' - **name**: the name of the table
-#' - **total_rows**: the number of rows in the table
-#' - **total_bytes**: the size of the table
+#'
+#' @rdname list_tables
+#' @method list_tables DBIConnection
 #' 
 #' @export
-#' 
-list_tables <- function(
-   con, dbNames=NULL
+#'
+list_tables.DBIConnection <- function(
+   x, dbNames=NULL, ...
 ){
    stopifnot(
-      inherits(con, "DBIConnection"),
       length(dbNames)==0 || is.character(dbNames) & all(!is.na(dbNames))
    )
-   query <- paste(
-      "SELECT database, name, total_rows, total_bytes",
-      "FROM system.tables"
-   )
    if(length(dbNames)>0){
-      query <- paste(
-         query,
-         sprintf("WHERE database IN ('%s')", paste(dbNames, collapse="', '"))
+      fquery <- sprintf(
+         "WHERE database IN ('%s')",
+         paste(dbNames, collapse="', '")
       )
+   }else{
+      fquery <- ""
    }
+   query <- paste(
+      "SELECT * FROM",
+      "(",
+      "SELECT database, name as table, total_rows, total_bytes",
+      "FROM system.tables",
+      fquery,
+      ")",
+      "LEFT JOIN",
+      "(",
+      "SELECT database, table, count() as total_columns",
+      ", sum(name='___COLNAMES___') as transposed",
+      "FROM system.columns",
+      "GROUP BY database, table",
+      ")",
+      "USING database, table"
+   )
    toRet <- dplyr::as_tibble(DBI::dbGetQuery(
-      con, query, format="TabSeparatedWithNamesAndTypes"
+      x, query, format="TabSeparatedWithNamesAndTypes"
    )) %>% 
+      dplyr::rename("name"="table") %>% 
       dplyr::mutate(
          total_rows=as.numeric(.data$total_rows),
-         total_bytes=as.numeric(.data$total_bytes)
+         total_bytes=as.numeric(.data$total_bytes),
+         total_columns=as.numeric(.data$total_columns),
+         transposed=as.logical(.data$transposed)
       )
    return(toRet)
 }

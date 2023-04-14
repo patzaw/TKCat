@@ -742,7 +742,7 @@ data_file_size <- function(x, hr=FALSE){
    df <- data_files(x)$dataFiles
    fs <- file.size(df)
    if(hr){
-      fs <- .format_file_size(fs)
+      fs <- .format_bytes(fs)
    }
    fc <- lapply(
       df, function(x){
@@ -1872,22 +1872,6 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
       d <- .file_filtByConta(d, fdb, nfk, dm)
    }
    return(d)
-}
-
-.format_file_size <- function(n){
-   sunits <- c("B", "KB", "MB", "GB", "TB")
-   nunits <- log2(n)%/%10
-   toRet <- lapply(
-      1:length(n),
-      function(i){
-         format(
-            n[i]/(2^(10*nunits[i])),
-            digit=1,
-            nsmall=ifelse(nunits[i]==0, 0, 1)
-         )
-      }
-   )
-   return(paste(toRet, sunits[nunits+1]))
 }
 
 .read_td <- function(

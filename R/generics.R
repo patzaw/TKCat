@@ -127,6 +127,26 @@ data_tables <- function(x, ..., skip=0, n_max=Inf){
 
 
 ###############################################################################@
+#' List tables in a clickhouse database
+#' 
+#' @param x an object with a clickhouse connection
+#' @param ... method specific parameters
+#' 
+#' @return A tibble with at least the following columns:
+#' - **database**: the name of the database
+#' - **name**: the name of the table
+#' - **total_rows**: the number of rows in the table
+#' - **total_bytes**: the size of the table
+#' - **total_columns**: the number of columns in the table
+#' 
+#' @export
+#' 
+list_tables <- function(x, ...){
+   UseMethod("list_tables", x)
+}
+
+
+###############################################################################@
 #' Count the number of records
 #'
 #' @param x an object with embedded data tables

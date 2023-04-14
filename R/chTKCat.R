@@ -460,6 +460,22 @@ get_query.chTKCat <- function(x, query, ...){
 
 
 ###############################################################################@
+#' 
+#' @param dbNames the name of databases to focus on (default NULL ==> all)
+#'
+#' @rdname list_tables
+#' @method list_tables chTKCat
+#' 
+#' @export
+#'
+list_tables.chTKCat <- function(
+      x, dbNames=NULL, ...
+){
+   list_tables(x$chcon, dbNames=dbNames, ...)
+}
+
+
+###############################################################################@
 #### DATABASE MANAGEMENT ####
 ###############################################################################@
 
@@ -1108,9 +1124,15 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
             maintainer=character(),
             public=logical(),
             populated=logical(),
-            access=factor(c(), levels=accessLevels)
+            access=factor(c(), levels=accessLevels),
+            bytes=numeric(),
+            total_size=character()
          )
       }else{
+         dbSize <- list_tables(x) %>% 
+            dplyr::filter(!is.na(.data$total_bytes)) %>% 
+            dplyr::group_by(.data$database) %>%
+            dplyr::summarize(total_size=sum(.data$total_bytes))
          mdbDesc <- DBI::dbGetQuery(
             con,
             paste(
@@ -1200,6 +1222,7 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
                ) %>%
                   factor(levels=accessLevels)
             )
+         toRet <- dplyr::left_join(toRet, dbSize, by=c("name"="database"))
       }
       return(toRet)
    }
@@ -2794,7 +2817,8 @@ explore_MDBs.chTKCat <- function(
             manList=c(
                "TKCat user guide"="doc/TKCat-User-guide.html"
             ),
-            logoDiv=logoDiv
+            logoDiv=logoDiv,
+            totalSize=TRUE
          ),
          
          ########################@
@@ -2821,7 +2845,8 @@ explore_MDBs.chTKCat <- function(
       ddir=ddir,
       userManager=userManager,
       title=title,
-      skinColors=skinColors
+      skinColors=skinColors,
+      totalSize=TRUE
    )
 }
 
