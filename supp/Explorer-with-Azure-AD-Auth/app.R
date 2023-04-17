@@ -265,12 +265,16 @@ jsFormatBytes <- readLines(
 server <- function(input, output, session) {
    
    ## Authentication ----
-   auth_cred <- shiny_azure_auth(
+   auth_cred_expr <- shiny_azure_auth(
       id="authentication",
       resource=c("api://kmt-prd01/user_impersonation"),
       tenant="237582ad-3eab-4d44-8688-06ca9f2e613b",
       app="f55d2b52-9fed-4b05-8b0a-b24cf8149922",
       timeout=60
+   )
+   auth_cred <- reactiveVal()
+   observe(
+      auth_cred(auth_cred_expr())
    )
    
    ## TKCat ----
