@@ -7,6 +7,7 @@
 #' @import visNetwork
 #' @import future
 #' @import promises
+#' @import crayon
 #' 
 #' @importFrom ClickHouseHTTP ClickHouseHTTP
 #' @importFrom rlang .data enquo
@@ -26,7 +27,8 @@
 #' 
 #' @importFrom uuid UUIDgenerate
 #' 
-#' 
 #' @importFrom Matrix summary sparseMatrix drop0
+#' 
+#' @importFrom roxygen2 parse_text
 #' 
 NULL

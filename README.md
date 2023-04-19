@@ -89,6 +89,10 @@ The following R packages available on CRAN are required:
     Dense Matrix Classes and Methods
 -   [uuid](https://CRAN.R-project.org/package=uuid): Tools for
     Generating and Handling of UUIDs
+-   [crayon](https://CRAN.R-project.org/package=crayon): Colored
+    Terminal Output
+-   [roxygen2](https://CRAN.R-project.org/package=roxygen2): In-Line
+    Documentation for R
 
 And those are suggested:
 

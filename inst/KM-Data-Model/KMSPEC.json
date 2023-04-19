@@ -1,0 +1,135 @@
+{
+  "___%s-Tables___": {
+    "tableName": ["___%s-Tables___"],
+    "fields": [
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Table name"
+      },
+      {
+        "name": "type",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Type of supported information"
+      }
+    ],
+    "primaryKey": ["name"],
+    "foreignKeys": [],
+    "indexes": [
+      {
+        "fields": ["name"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [52],
+      "y": [-42],
+      "color": ["NA"],
+      "comment": ["Tables to import for knowledge management"]
+    }
+  },
+  "___%s-Features___": {
+    "tableName": ["___%s-Features___"],
+    "fields": [
+      {
+        "name": "table",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Table providing the feature"
+      },
+      {
+        "name": "field",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "The name of the column where to find the property value."
+      },
+      {
+        "name": "feature",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Name of the supported feature"
+      },
+      {
+        "name": "property",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Supported feature property"
+      },
+      {
+        "name": "unit",
+        "type": "character",
+        "nullable": true,
+        "unique": false,
+        "comment": "Unit of the feature property"
+      }
+    ],
+    "primaryKey": [],
+    "foreignKeys": [
+      {
+        "refTable": ["___%s-Tables___"],
+        "key": [
+          {
+            "from": "table",
+            "to": "name"
+          }
+        ],
+        "cardinality": [0, -1, 1, 1]
+      }
+    ],
+    "indexes": {},
+    "display": {
+      "x": [51],
+      "y": [71],
+      "color": ["NA"],
+      "comment": ["Features to import for knowledge management"]
+    }
+  },
+  "___%s-Helpers___": {
+    "tableName": ["___%s-Helpers___"],
+    "fields": [
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Name of the set of helpers"
+      },
+      {
+        "name": "code",
+        "type": "base64",
+        "nullable": false,
+        "unique": false,
+        "comment": "Code of the helper functions"
+      },
+      {
+        "name": "language",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Programming language"
+      }
+    ],
+    "foreignKeys": {},
+    "indexes": [
+      {
+        "fields": ["name"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [56],
+      "y": [170],
+      "color": ["NA"],
+      "comment": ["Language specific functions and tools to help manipulating data"]
+    },
+    "primaryKey": ["name"]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "TBKM",
+  "title": "Translational Bioinformatics Knowledge Management",
+  "description": "Requirements for integrating knwoledge from translational bioinformatics activities",
+  "url": null,
+  "version": "0.1",
+  "maintainer": "Patrice Godard <patrice.godard@ucb.com>",
+  "timestamp": null,
+  "delim": "\t",
+  "na": "<NA>"
+}
