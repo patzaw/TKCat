@@ -1962,6 +1962,9 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       if(!vtype %in% c("Date", "POSIXct")){
          toRet <- toRet %>% magrittr::set_class(vtype)
       }
+      if(dimcol=="___COLNAMES___"){
+         toRet <- t(toRet)
+      }
       if(frc=="r"){
          toRet <- toRet[intersect(fr, rownames(toRet)),, drop=FALSE]
       }
