@@ -2340,7 +2340,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                return(NULL)
             }
             chFields <- chFields[(skip + 1):nrow(chFields),]
-            chFields <- chFields[1:min(nrow(chFields), n_max),]
+            chFields <- chFields[1:min(nrow(chFields), as.numeric(n_max)),]
             for(st in unique(chFields$table)){
                stquery <- sprintf(
                   'SELECT `%s` FROM %s ORDER BY %s',
