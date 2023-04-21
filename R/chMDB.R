@@ -1052,12 +1052,15 @@ dims.chMDB <- function(x, ...){
          x,
          paste(
             sprintf(
-               "SELECT table, info, '%s' as matrice from %s",
+               "SELECT *, '%s' as matrice from %s",
                matrices, dbt$dbTables[matrices]
             ),
             collapse=" UNION ALL "
          )
       )
+      if(!"info" %in% colnames(matTables)){
+         matTables$info <- "values"
+      }
       matValues <- matTables %>%
          dplyr::left_join(dbTables, by=c("table"="name")) %>%
          dplyr::group_by(.data$matrice) %>% 
@@ -1342,22 +1345,24 @@ as_fileMDB.chMDB <- function(
          )
          
          rquery <- sprintf(
-            "SELECT i, name FROM %s ORDER BY i",
+            "SELECT i, name FROM %s",# ORDER BY i",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="rows")])
          )
          rowNames <- get_query(
             x, rquery, autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$i)
          
          cquery <- sprintf(
-            "SELECT j, name FROM %s ORDER BY j",
+            "SELECT j, name FROM %s",# ORDER BY j",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="columns")])
          )
          colNames <- get_query(
             x, cquery, autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$j)
          
          chTables <- list_tables(
             unclass(x)$tkcon$chcon, dbNames=tdb
@@ -1383,7 +1388,7 @@ as_fileMDB.chMDB <- function(
          )
          
          vtquery <- sprintf(
-            "SELECT i, j, x FROM %s ORDER BY j, i",
+            "SELECT i, j, x FROM %s",# ORDER BY j, i",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="values")])
          )
          r <- 0
@@ -1394,7 +1399,8 @@ as_fileMDB.chMDB <- function(
          toWrite <- get_query(
             x, vquery, autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$j, .data$i)
          while(!is.null(toWrite) && nrow(toWrite)>0){
             readr::write_delim(
                toWrite, file=dfiles[tn],
@@ -1412,7 +1418,8 @@ as_fileMDB.chMDB <- function(
             toWrite <- get_query(
                x, vquery, autoalias=FALSE,
                format="Arrow"
-            )
+            ) %>% 
+               dplyr::arrange(.data$j, .data$i)
          }
 
       }else{
@@ -1675,14 +1682,15 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   x,
                   sprintf(
                      paste(
-                        "SELECT i, name FROM `%s`.`%s` WHERE name in ('%s')",
-                        "ORDER BY i"
+                        "SELECT i, name FROM `%s`.`%s` WHERE name in ('%s')"#,
+                        # "ORDER BY i"
                      ),
                      dbn, rt, paste(frn, collapse="', '")
                   ),
                   autoalias=FALSE,
                   format="Arrow"
-               )
+               ) %>% 
+                  dplyr::arrange(.data$i)
             }
          }
          if(ft=="column"){
@@ -1694,14 +1702,15 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   x,
                   sprintf(
                      paste(
-                        "SELECT j, name FROM `%s`.`%s` WHERE name in ('%s')",
-                        "ORDER BY j"
+                        "SELECT j, name FROM `%s`.`%s` WHERE name in ('%s')"#,
+                        # "ORDER BY j"
                      ),
                      dbn, ct, paste(fcn, collapse="', '")
                   ),
                   autoalias=FALSE,
                   format="Arrow"
-               )
+               ) %>% 
+                  dplyr::arrange(.data$j)
             }
          }
       }
@@ -1710,12 +1719,13 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          fri <- get_query(
             x,
             sprintf(
-               "SELECT i, name FROM `%s`.`%s` ORDER BY i",
+               "SELECT i, name FROM `%s`.`%s`",# ORDER BY i",
                dbn, rt
             ),
             autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$i)
          frn <- fri$name
       }else(
          fri <- fr
@@ -1724,12 +1734,13 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          fcj <- get_query(
             x,
             sprintf(
-               "SELECT j, name FROM `%s`.`%s` ORDER BY j",
+               "SELECT j, name FROM `%s`.`%s`",# ORDER BY j",
                dbn, ct
             ),
             autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$j)
          fcn <- fcj$name
       }else{
          fcj <- fc
@@ -1762,7 +1773,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       
       ### Value query ----
       query <- sprintf(
-         "SELECT i, j, x FROM `%s`.`%s` WHERE %s AND %s ORDER BY j, i",
+         "SELECT i, j, x FROM `%s`.`%s` WHERE %s AND %s",# ORDER BY j, i",
          dbn, vt,
          ifelse(
             is.null(fr), "1",
@@ -1773,7 +1784,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             sprintf('j in (%s)', paste(fc$j, collapse=", "))
          )
       )
-      toRet <- get_query(x, query, autoalias=FALSE, format="Arrow")
+      toRet <- get_query(x, query, autoalias=FALSE, format="Arrow") %>% 
+         dplyr::arrange(.data$j, .data$i)
       mi <- max(fri$i)
       mj <- max(fcj$j)
       if(!mi %in% toRet$i || !mj %in% toRet$j){
@@ -2009,22 +2021,24 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             
             ## Columns and rows
             rquery <- sprintf(
-               "SELECT i, name FROM %s ORDER BY i",
+               "SELECT i, name FROM %s",# ORDER BY i",
                sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="rows")])
             )
             rowNames <- get_query(
                x, rquery, autoalias=FALSE,
                format="Arrow"
-            )
+            ) %>% 
+               dplyr::arrange(.data$i)
             
             cquery <- sprintf(
-               "SELECT j, name FROM %s ORDER BY j",
+               "SELECT j, name FROM %s",# ORDER BY j",
                sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="columns")])
             )
             colNames <- get_query(
                x, cquery, autoalias=FALSE,
                format="Arrow"
-            )
+            ) %>% 
+               dplyr::arrange(.data$j)
             
             write_MergeTree(
                con=con,
@@ -2071,7 +2085,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                dplyr::pull("total_rows")
             
             vtquery <- sprintf(
-               "SELECT i, j, x FROM %s ORDER BY j, i",
+               "SELECT i, j, x FROM %s",# ORDER BY j, i",
                sprintf('`%s`.`%s`', tdb, valTable)
             )
             r <- 0
@@ -2082,7 +2096,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             toWrite <- get_query(
                x, vquery, autoalias=FALSE,
                format="Arrow"
-            )
+            ) %>% 
+               dplyr::arrange(.data$j, .data$i)
             while(!is.null(toWrite) && nrow(toWrite)>0){
                ch_insert(
                   con=con, dbName=dbName, tableName=valTable, value=toWrite
@@ -2096,7 +2111,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                toWrite <- get_query(
                   x, vquery, autoalias=FALSE,
                   format="Arrow"
-               )
+               ) %>% 
+                  dplyr::arrange(.data$j, .data$i)
             }
             
             ## Reference table
@@ -2226,7 +2242,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          }
          
          vquery <- sprintf(
-            "SELECT i, j, x FROM %s ORDER BY j, i",
+            "SELECT i, j, x FROM %s",# ORDER BY j, i",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="values")])
          )
          vquery <- paste(
@@ -2236,29 +2252,32 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          values <- get_query(
             x, vquery, autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$j, .data$i)
          
          rToTake <- max(values$i)
          rquery <- sprintf(
-            "SELECT i, name FROM %s WHERE i <= %s ORDER BY i",
+            "SELECT i, name FROM %s WHERE i <= %s",# ORDER BY i",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="rows")]),
             rToTake
          )
          rowNames <- get_query(
             x, rquery, autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$i)
          
          cToTake <- max(values$j)
          cquery <- sprintf(
-            "SELECT j, name FROM %s WHERE j <= %s ORDER BY j",
+            "SELECT j, name FROM %s WHERE j <= %s",# ORDER BY j",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="columns")]),
             cToTake
          )
          colNames <- get_query(
             x, cquery, autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$j)
          
          toRet <- Matrix::sparseMatrix(
             i=as.integer(values$i), j=as.integer(values$j), x=values$x,
@@ -2308,9 +2327,9 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          if(dimcol=="___ROWNAMES___"){
             for(st in unique(chFields$table)){
                stquery <- sprintf(
-                  paste(query, 'ORDER BY %s'),
-                  sprintf('`%s`.`%s`', tdb, st),
-                  dimcol
+                  query,# paste(query, 'ORDER BY %s'),
+                  sprintf('`%s`.`%s`', tdb, st)#,
+                  # dimcol
                )
                stquery <- paste(
                   stquery,
@@ -2319,7 +2338,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                stqr <- get_query(
                   x, stquery, autoalias=FALSE,
                   format="TabSeparatedWithNamesAndTypes"
-               )
+               ) %>% 
+                  dplyr::arrange(.data[[dimcol]])
                dimname <- stqr[[dimcol]]
                stopifnot(
                   !any(duplicated(dimname)),
@@ -2343,7 +2363,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             chFields <- chFields[1:min(nrow(chFields), as.numeric(n_max)),]
             for(st in unique(chFields$table)){
                stquery <- sprintf(
-                  'SELECT `%s` FROM %s ORDER BY %s',
+                  'SELECT `%s` FROM %s",# ORDER BY %s',
                   paste(
                      c(
                         dimcol,
@@ -2351,13 +2371,14 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                      ),
                      collapse='`, `'
                   ),
-                  sprintf('`%s`.`%s`', tdb, st),
-                  dimcol
+                  sprintf('`%s`.`%s`', tdb, st)#,
+                  # dimcol
                )
                stqr <- get_query(
                   x, stquery, autoalias=FALSE,
                   format="TabSeparatedWithNamesAndTypes"
-               )
+               ) %>% 
+                  dplyr::arrange(.data[[dimcol]])
                dimname <- stqr[[dimcol]]
                stopifnot(
                   !any(duplicated(dimname)),
@@ -2376,7 +2397,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             toRet <- toRet[sort(rownames(toRet)),]
          }
       }
-   }else{{
+   }else{
       
       ## Table ----
       
@@ -2407,7 +2428,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                dplyr::pull("type")
          )
       }
-   }}
+   }
    return(toRet)
 }
 
@@ -2455,14 +2476,15 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          ## Sparse matrix ----
          
          vquery <- sprintf(
-            "SELECT i, j, x FROM %s WHERE i <= %s AND j <= %s ORDER BY j, i",
+            "SELECT i, j, x FROM %s WHERE i <= %s AND j <= %s",# ORDER BY j, i",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="values")]),
             nr, nc
          )
          values <- get_query(
             x, vquery, autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$j, .data$i)
          ## Sparse ==> all values may be missing
          if(nrow(values)==0){
             values <- dplyr::tibble(
@@ -2473,24 +2495,26 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          }
 
          rquery <- sprintf(
-            "SELECT i, name FROM %s WHERE i <= %s ORDER BY i",
+            "SELECT i, name FROM %s WHERE i <= %s",# ORDER BY i",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="rows")]),
             nr
          )
          rowNames <- get_query(
             x, rquery, autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$i)
          
          cquery <- sprintf(
-            "SELECT j, name FROM %s WHERE j <= %s ORDER BY j",
+            "SELECT j, name FROM %s WHERE j <= %s",# ORDER BY j",
             sprintf('`%s`.`%s`', tdb, qr$table[which(qr$info=="columns")]),
             nc
          )
          colNames <- get_query(
             x, cquery, autoalias=FALSE,
             format="Arrow"
-         )
+         ) %>% 
+            dplyr::arrange(.data$j)
          
          mi <- max(rowNames$i)
          mj <- max(colNames$j)
@@ -2542,7 +2566,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
          toRet <- c()
          for(st in unique(chFields$table)){
             stquery <- sprintf(
-               'SELECT `%s` FROM %s ORDER BY %s LIMIT %s',
+               # 'SELECT `%s` FROM %s ORDER BY %s LIMIT %s',
+               'SELECT `%s` FROM %s LIMIT %s',
                paste(
                   c(
                      dimcol,
@@ -2551,13 +2576,14 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   collapse='`, `'
                ),
                sprintf('`%s`.`%s`', tdb, st),
-               dimcol,
+               # dimcol,
                lim
             )
             stqr <- get_query(
                x, stquery, autoalias=FALSE,
                format="TabSeparatedWithNamesAndTypes"
-            )
+            ) %>% 
+               dplyr::arrange(.data[[dimcol]])
             dimname <- stqr[[dimcol]]
             stopifnot(
                !any(duplicated(dimname)),
@@ -2580,12 +2606,12 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
       
       }
       
-   }else{{
+   }else{
       ## Table ----
       return(.get_ch_mtable(
          x, tablePath=tablePath, tableModel=tableModel, n_max=n
       ))
-   }}
+   }
 }
 
 .ch_filtByConta <- function(d, fdb, fk, by=10^5){
