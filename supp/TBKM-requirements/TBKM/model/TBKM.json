@@ -1,4 +1,44 @@
 {
+  "Helpers": {
+    "tableName": ["Helpers"],
+    "fields": [
+      {
+        "name": "name",
+        "type": "character",
+        "nullable": false,
+        "unique": true,
+        "comment": "Name of the set of helpers"
+      },
+      {
+        "name": "code",
+        "type": "base64",
+        "nullable": false,
+        "unique": false,
+        "comment": "Code of the helper functions"
+      },
+      {
+        "name": "language",
+        "type": "character",
+        "nullable": false,
+        "unique": false,
+        "comment": "Programming language"
+      }
+    ],
+    "primaryKey": ["name"],
+    "foreignKeys": [],
+    "indexes": [
+      {
+        "fields": ["name"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [645],
+      "y": [0],
+      "color": ["#A9ECC9"],
+      "comment": ["Code of helper functions"]
+    }
+  },
   "Units": {
     "tableName": ["Units"],
     "fields": [
@@ -24,6 +64,7 @@
         "comment": "Unit description"
       }
     ],
+    "primaryKey": ["measurement", "unit"],
     "foreignKeys": [],
     "indexes": [
       {
@@ -36,8 +77,7 @@
       "y": [-293],
       "color": ["#F8DEC3"],
       "comment": ["Supported units"]
-    },
-    "primaryKey": ["measurement", "unit"]
+    }
   },
   "Features": {
     "tableName": ["Features"],
@@ -57,6 +97,7 @@
         "comment": "Description of the feature"
       }
     ],
+    "primaryKey": ["name"],
     "foreignKeys": [],
     "indexes": [
       {
@@ -69,8 +110,7 @@
       "y": [-148],
       "color": ["#F67FC4"],
       "comment": ["Supported features"]
-    },
-    "primaryKey": ["name"]
+    }
   },
   "Feature_properties": {
     "tableName": ["Feature_properties"],
@@ -118,18 +158,6 @@
         "comment": "Description of the feature property"
       }
     ],
-    "indexes": [
-      {
-        "fields": ["feature", "property"],
-        "unique": [true]
-      }
-    ],
-    "display": {
-      "x": [-108],
-      "y": [-145],
-      "color": ["#F67FC4"],
-      "comment": ["Feature properties"]
-    },
     "primaryKey": ["feature", "property"],
     "foreignKeys": [
       {
@@ -152,7 +180,19 @@
         ],
         "cardinality": [0, -1, 0, -1]
       }
-    ]
+    ],
+    "indexes": [
+      {
+        "fields": ["feature", "property"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [-108],
+      "y": [-145],
+      "color": ["#F67FC4"],
+      "comment": ["Feature properties"]
+    }
   },
   "Tables": {
     "tableName": ["Tables"],
@@ -179,6 +219,8 @@
         "comment": "The name of a collection for which the table should be a member"
       }
     ],
+    "primaryKey": ["name"],
+    "foreignKeys": [],
     "indexes": [
       {
         "fields": ["name"],
@@ -190,9 +232,7 @@
       "y": [-148],
       "color": ["#9BC8FE"],
       "comment": ["Type of tables supported in the Knowledge Management database"]
-    },
-    "primaryKey": ["name"],
-    "foreignKeys": []
+    }
   },
   "Table_features": {
     "tableName": ["Table_features"],
@@ -219,18 +259,6 @@
         "comment": "Is it a mandatory feature in the table?"
       }
     ],
-    "indexes": [
-      {
-        "fields": ["feature", "table"],
-        "unique": [true]
-      }
-    ],
-    "display": {
-      "x": [408],
-      "y": [-149],
-      "color": ["NA"],
-      "comment": ["NA"]
-    },
     "primaryKey": ["feature", "table"],
     "foreignKeys": [
       {
@@ -253,7 +281,19 @@
         ],
         "cardinality": [0, -1, 1, 1]
       }
-    ]
+    ],
+    "indexes": [
+      {
+        "fields": ["feature", "table"],
+        "unique": [true]
+      }
+    ],
+    "display": {
+      "x": [408],
+      "y": [-149],
+      "color": ["NA"],
+      "comment": ["NA"]
+    }
   },
   "Integer_values": {
     "tableName": ["Integer_values"],
@@ -287,6 +327,7 @@
         "comment": "Additional information about the meaning of the value"
       }
     ],
+    "primaryKey": ["feature", "property", "value"],
     "foreignKeys": [
       {
         "refTable": ["Feature_properties"],
@@ -314,8 +355,7 @@
       "y": [-2],
       "color": ["#DFFB86"],
       "comment": ["Possible integer values for the property"]
-    },
-    "primaryKey": ["feature", "property", "value"]
+    }
   },
   "Character_values": {
     "tableName": ["Character_values"],
@@ -349,6 +389,7 @@
         "comment": "Additional information about the meaning of the value"
       }
     ],
+    "primaryKey": ["feature", "property", "value"],
     "foreignKeys": [
       {
         "refTable": ["Feature_properties"],
@@ -376,7 +417,6 @@
       "y": [-1],
       "color": ["#DFFB86"],
       "comment": ["Possible character values for the property"]
-    },
-    "primaryKey": ["feature", "property", "value"]
+    }
   }
 }

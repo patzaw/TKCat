@@ -7,7 +7,7 @@
 get_KMR(...)
 }
 \arguments{
-\item{...}{paramters for the \code{\link[=get_MDB]{get_MDB()}} function}
+\item{...}{parameters for the \code{\link[=get_MDB]{get_MDB()}} function}
 }
 \value{
 A \link{KMR} object

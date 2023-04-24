@@ -445,6 +445,41 @@ explore_MDBs <- function(x, ...){
 
 
 ###############################################################################@
+#' Add a set of helper functions to a compatible object
+#' 
+#' @param x an object accepting helpers
+#' @param code file path to the source code of helper functions
+#' @param name the name of the helper set
+#' @param language the programming language of the code (default: "R")
+#' @param ... method specific parameters
+#' 
+#' @return Return x with additional helpers
+#' 
+#' @export
+#' 
+add_helpers <- function(x, code, name, language, ...){
+   UseMethod("add_helpers", x)
+}
+
+
+###############################################################################@
+#' Get a set of helper functions from an object
+#' 
+#' @param x an object with helpers
+#' @param hnames the names of the helper sets. If NA (default),
+#' all available are sourced.
+#' @param ... method specific parameters
+#' 
+#' @return Return a list of functions
+#' 
+#' @export
+#' 
+get_R_helpers <- function(x, hnames, ...){
+   UseMethod("get_R_helpers", x)
+}
+
+
+###############################################################################@
 ## Helpers ----
 .write_chTables <- function(x, con, dbName, by, ...){
    UseMethod(".write_chTables", x)

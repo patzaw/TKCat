@@ -1,7 +1,9 @@
-library(IMoK)
+library(TKCat)
 library(here)
 library(DODO)
+connect_to_dodo()
 library(BED)
+connectToBed()
 
 ###############################################################################@
 ## Initialization ----

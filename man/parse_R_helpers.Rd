@@ -4,10 +4,12 @@
 \alias{parse_R_helpers}
 \title{Parse source code to get R helpers}
 \usage{
-parse_R_helpers(code)
+parse_R_helpers(code, ...)
 }
 \arguments{
 \item{code}{the source code as a character vector}
+
+\item{...}{other objects to add in the environment of the returned functions}
 }
 \value{
 A list of functions from \code{code} plus an "help" function used to get
@@ -43,13 +45,25 @@ code <- "
    #' 
    #' @export
    add_a <- function(x) x + a
+   
+   #' Add a 'a' value defined separately to a b value made available
+   #' in environment
+   #' 
+   #' 
+   #' @return b + a
+   #' 
+   #' @export
+   add_a_to_b <- function() b + a
 "
-helpers <- parse_R_helpers(code)
+helpers <- parse_R_helpers(code, b=3)
 helpers$help()
 helpers$help("add_a")
 helpers$add_a(3.5)
 helpers$set_a(4)
 helpers$add_a(3.5)
+helpers$add_a_to_b()
+helpers <- parse_R_helpers(code, b=6)
+helpers$add_a_to_b()
 
 }
 

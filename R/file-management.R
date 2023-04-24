@@ -29,6 +29,7 @@ decode_bin <- function(text){
 #' Parse source code to get R helpers
 #' 
 #' @param code the source code as a character vector
+#' @param ... other objects to add in the environment of the returned functions
 #' 
 #' @return A list of functions from `code` plus an "help" function used to get
 #' function documentation.
@@ -58,19 +59,35 @@ decode_bin <- function(text){
 #'    #' 
 #'    #' @export
 #'    add_a <- function(x) x + a
+#'    
+#'    #' Add a 'a' value defined separately to a b value made available
+#'    #' in environment
+#'    #' 
+#'    #' 
+#'    #' @return b + a
+#'    #' 
+#'    #' @export
+#'    add_a_to_b <- function() b + a
 #' "
-#' helpers <- parse_R_helpers(code)
+#' helpers <- parse_R_helpers(code, b=3)
 #' helpers$help()
 #' helpers$help("add_a")
 #' helpers$add_a(3.5)
 #' helpers$set_a(4)
 #' helpers$add_a(3.5)
+#' helpers$add_a_to_b()
+#' helpers <- parse_R_helpers(code, b=6)
+#' helpers$add_a_to_b()
 #' 
 #' }
 #' 
 #' @export
 #' 
-parse_R_helpers <- function(code){
+parse_R_helpers <- function(code, ...){
+   add_obj <- list(...)
+   for(on in names(add_obj)){
+      assign(on, add_obj[[on]])
+   }
    eval(parse(text=code))
    rdoc <- roxygen2::parse_text(code, env=environment())
    rdoc <- do.call(c, lapply(rdoc, function(d){
@@ -189,7 +206,9 @@ parse_R_helpers <- function(code){
       unlist(lapply(rdoc, function(x) "export" %in% names(x)))
    )]
    helpers <- list()
-   for(fn in toExport) helpers[[fn]] <- get(fn)
+   for(fn in toExport){
+      helpers[[fn]] <- get(fn)
+   }
    # names(helpers) <- toExport
    rdoc <- rdoc[toExport]
    return(helpers)

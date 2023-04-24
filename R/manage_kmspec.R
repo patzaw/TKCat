@@ -652,27 +652,24 @@ rm_km_feature <- function(
 #'
 #' @export
 #'
-check_km_spec <- function(x, kmr){}
+check_km_spec <- function(x, kmr){stop("NOT IMPLEMENTED YET")}
 
 ###############################################################################@
-#' Add helpers in an [MDB] object
-#' 
-#' @param x the MDB object
-#' @param kmr an [MDB] object with KM requirements
-#' @param code file path to the source code of helper functions
-#' @param name the name of the helper set (default: "R-Helpers")
-#' @param language the programing language of the code (default: "R")
 #'
-#' @return An [MDB] object with additional helpers
+#' @rdname add_helpers
+#' @method add_helpers MDB
 #' 
+#' @param kmr an [MDB] object with KM requirements
+#'
 #' @export
 #'
-add_helpers <- function(x, kmr, code, name="R-Helpers", language="R"){
+add_helpers.MDB <- function(x, code, name, language, kmr, ...){
    
    stopifnot(
-      is.MDB(x), is_KMR(kmr),
-      is.character(name), length(name)==1,
-      length(code)==1, file.exists(code)
+      is_KMR(kmr),
+      is.character(name), length(name)==1, !is.na(name),
+      length(code)==1, file.exists(code),
+      is.character(language), length(language)==1, !is.na(language)
    )
    
    ## Splitting and preparing information ----
@@ -693,8 +690,12 @@ add_helpers <- function(x, kmr, code, name="R-Helpers", language="R"){
    
    ## Load the code -----
    code <- encode_bin(code)
+   if(name %in% kms$Helpers$name){
+      warning("Existing helpers have been replaced")
+   }
    helpers <- dplyr::bind_rows(
-      kms$Helpers,
+      kms$Helpers %>% 
+         dplyr::filter(.data$name!=!!name),
       dplyr::tibble(name=name, code=code, language=language)
    )
    
@@ -715,22 +716,22 @@ add_helpers <- function(x, kmr, code, name="R-Helpers", language="R"){
 }
 
 ###############################################################################@
-#' Get helpers from an [MDB] object
 #' 
-#' @param x the MDB object
+#' @rdname get_R_helpers
+#' @method get_R_helpers MDB
+#' 
 #' @param kmr an [MDB] object with KM requirements
-#' @param name the name of the helper set (default: "R-Helpers")
 #'
-#' @return A list of functions with their environment.
-#' See [parse_R_helpers()].
+#' @details x and kmr objects are made available in helpers environment as
+#' "THISMDB' and 'THISKMR' objects respectively and can be used as such within
+#' helpers code.
 #' 
 #' @export
 #'
-get_R_helpers <- function(x, kmr, name="R-Helpers"){
+get_R_helpers.MDB <- function(x, hnames=NA, kmr, ...){
    
    stopifnot(
-      is.MDB(x), is_KMR(kmr),
-      is.character(name), length(name)==1
+      is_KMR(kmr)
    )
    
    ## Splitting information ----
@@ -750,20 +751,32 @@ get_R_helpers <- function(x, kmr, name="R-Helpers"){
    
    ## Get the code binary ----
    if(is.chMDB(kms)){
-      code <- get_query(
+      scode <- get_query(
          kms, 
          sprintf(
-            "SELECT code FROM `%s` WHERE name='%s'",
-            db_tables(kms)$dbTables["Helpers"],
-            name
+            "SELECT name, code FROM %s WHERE language='R'",
+            db_tables(kms)$dbTables["Helpers"]
          )
-      ) %>% 
-         dplyr::pull("code")
+      )
    }else{
-      code <- kms$Helpers %>% 
-         dplyr::filter(.data$name==!!name) %>% 
-         dplyr::pull("code")
+      scode <- kms$Helpers %>% 
+         dplyr::filter(.data$language=="R")
+         
+   }
+   if(!is.na(hnames)){
+      scode <- scode %>% 
+         dplyr::filter(.data$name %in% hnames)
+   }
+   toRet <- list()
+   if(nrow(scode) > 0){
+      for(i in 1:nrow(scode)){
+         code <- rawToChar(decode_bin(scode$code[i]))
+         toRet <- c(
+            toRet,
+            parse_R_helpers(code, THISMDB=x, THISKMR=kmr)
+         )
+      }
    }
    code <- rawToChar(decode_bin(code))
-   return(parse_R_helpers(code))
+   return(toRet)
 }

@@ -1,13 +1,13 @@
 README
 ================
 
--   <a href="#installation" id="toc-installation">Installation</a>
-    -   <a href="#from-cran" id="toc-from-cran">From CRAN</a>
-    -   <a href="#dependencies" id="toc-dependencies">Dependencies</a>
-    -   <a href="#from-github" id="toc-from-github">From github</a>
--   <a href="#documentation" id="toc-documentation">Documentation</a>
--   <a href="#alternatives" id="toc-alternatives">Alternatives</a>
--   <a href="#acknowledgments" id="toc-acknowledgments">Acknowledgments</a>
+- <a href="#installation" id="toc-installation">Installation</a>
+  - <a href="#from-cran" id="toc-from-cran">From CRAN</a>
+  - <a href="#dependencies" id="toc-dependencies">Dependencies</a>
+  - <a href="#from-github" id="toc-from-github">From github</a>
+- <a href="#documentation" id="toc-documentation">Documentation</a>
+- <a href="#alternatives" id="toc-alternatives">Alternatives</a>
+- <a href="#acknowledgments" id="toc-acknowledgments">Acknowledgments</a>
 
 <img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px"/>
 
@@ -45,69 +45,69 @@ install.packages("TKCat")
 
 The following R packages available on CRAN are required:
 
--   [ReDaMoR](https://CRAN.R-project.org/package=ReDaMoR): Relational
-    Data Modeler
--   [magrittr](https://CRAN.R-project.org/package=magrittr): A
-    Forward-Pipe Operator for R
--   [DBI](https://CRAN.R-project.org/package=DBI): R Database Interface
--   [dplyr](https://CRAN.R-project.org/package=dplyr): A Grammar of Data
-    Manipulation
--   [ClickHouseHTTP](https://CRAN.R-project.org/package=ClickHouseHTTP):
-    A Simple HTTP Database Interface to ‘ClickHouse’
--   [rlang](https://CRAN.R-project.org/package=rlang): Functions for
-    Base Types and Core R and ‘Tidyverse’ Features
--   [tidyselect](https://CRAN.R-project.org/package=tidyselect): Select
-    from a Set of Strings
--   [visNetwork](https://CRAN.R-project.org/package=visNetwork): Network
-    Visualization using ‘vis.js’ Library
--   [getPass](https://CRAN.R-project.org/package=getPass): Masked User
-    Input
--   [shiny](https://CRAN.R-project.org/package=shiny): Web Application
-    Framework for R
--   [shinydashboard](https://CRAN.R-project.org/package=shinydashboard):
-    Create Dashboards with ‘Shiny’
--   [DT](https://CRAN.R-project.org/package=DT): A Wrapper of the
-    JavaScript Library ‘DataTables’
--   [htmltools](https://CRAN.R-project.org/package=htmltools): Tools for
-    HTML
--   [readr](https://CRAN.R-project.org/package=readr): Read Rectangular
-    Text Data
--   [jsonlite](https://CRAN.R-project.org/package=jsonlite): A Simple
-    and Robust JSON Parser and Generator for R
--   [jsonvalidate](https://CRAN.R-project.org/package=jsonvalidate):
-    Validate ‘JSON’ Schema
--   [base64enc](https://CRAN.R-project.org/package=base64enc): Tools for
-    base64 encoding
--   [markdown](https://CRAN.R-project.org/package=markdown): Render
-    Markdown with ‘commonmark’
--   [promises](https://CRAN.R-project.org/package=promises):
-    Abstractions for Promise-Based Asynchronous Programming
--   [future](https://CRAN.R-project.org/package=future): Unified
-    Parallel and Distributed Processing in R for Everyone
--   [xml2](https://CRAN.R-project.org/package=xml2): Parse XML
--   [Matrix](https://CRAN.R-project.org/package=Matrix): Sparse and
-    Dense Matrix Classes and Methods
--   [uuid](https://CRAN.R-project.org/package=uuid): Tools for
-    Generating and Handling of UUIDs
--   [crayon](https://CRAN.R-project.org/package=crayon): Colored
-    Terminal Output
--   [roxygen2](https://CRAN.R-project.org/package=roxygen2): In-Line
-    Documentation for R
+- [ReDaMoR](https://CRAN.R-project.org/package=ReDaMoR): Relational Data
+  Modeler
+- [magrittr](https://CRAN.R-project.org/package=magrittr): A
+  Forward-Pipe Operator for R
+- [DBI](https://CRAN.R-project.org/package=DBI): R Database Interface
+- [visNetwork](https://CRAN.R-project.org/package=visNetwork): Network
+  Visualization using ‘vis.js’ Library
+- [dplyr](https://CRAN.R-project.org/package=dplyr): A Grammar of Data
+  Manipulation
+- [ClickHouseHTTP](https://CRAN.R-project.org/package=ClickHouseHTTP): A
+  Simple HTTP Database Interface to ‘ClickHouse’
+- [rlang](https://CRAN.R-project.org/package=rlang): Functions for Base
+  Types and Core R and ‘Tidyverse’ Features
+- [tidyselect](https://CRAN.R-project.org/package=tidyselect): Select
+  from a Set of Strings
+- [getPass](https://CRAN.R-project.org/package=getPass): Masked User
+  Input
+- [shiny](https://CRAN.R-project.org/package=shiny): Web Application
+  Framework for R
+- [shinydashboard](https://CRAN.R-project.org/package=shinydashboard):
+  Create Dashboards with ‘Shiny’
+- [DT](https://CRAN.R-project.org/package=DT): A Wrapper of the
+  JavaScript Library ‘DataTables’
+- [htmltools](https://CRAN.R-project.org/package=htmltools): Tools for
+  HTML
+- [readr](https://CRAN.R-project.org/package=readr): Read Rectangular
+  Text Data
+- [jsonlite](https://CRAN.R-project.org/package=jsonlite): A Simple and
+  Robust JSON Parser and Generator for R
+- [jsonvalidate](https://CRAN.R-project.org/package=jsonvalidate):
+  Validate ‘JSON’ Schema
+- [base64enc](https://CRAN.R-project.org/package=base64enc): Tools for
+  base64 encoding
+- [markdown](https://CRAN.R-project.org/package=markdown): Render
+  Markdown with ‘commonmark’
+- [promises](https://CRAN.R-project.org/package=promises): Abstractions
+  for Promise-Based Asynchronous Programming
+- [future](https://CRAN.R-project.org/package=future): Unified Parallel
+  and Distributed Processing in R for Everyone
+- [xml2](https://CRAN.R-project.org/package=xml2): Parse XML
+- [Matrix](https://CRAN.R-project.org/package=Matrix): Sparse and Dense
+  Matrix Classes and Methods
+- [uuid](https://CRAN.R-project.org/package=uuid): Tools for Generating
+  and Handling of UUIDs
+- [crayon](https://CRAN.R-project.org/package=crayon): Colored Terminal
+  Output
+- [roxygen2](https://CRAN.R-project.org/package=roxygen2): In-Line
+  Documentation for R
 
 And those are suggested:
 
--   [knitr](https://CRAN.R-project.org/package=knitr): A General-Purpose
-    Package for Dynamic Report Generation in R
--   [rmarkdown](https://CRAN.R-project.org/package=rmarkdown): Dynamic
-    Documents for R
--   [stringr](https://CRAN.R-project.org/package=stringr): Simple,
-    Consistent Wrappers for Common String Operations
--   [RClickhouse](https://CRAN.R-project.org/package=RClickhouse):
-    ‘Yandex Clickhouse’ Interface for R with Basic ‘dplyr’ Support
--   [data.tree](https://CRAN.R-project.org/package=data.tree): General
-    Purpose Hierarchical Data Structure
--   [BED](https://CRAN.R-project.org/package=BED): Biological Entity
-    Dictionary (BED)
+- [knitr](https://CRAN.R-project.org/package=knitr): A General-Purpose
+  Package for Dynamic Report Generation in R
+- [rmarkdown](https://CRAN.R-project.org/package=rmarkdown): Dynamic
+  Documents for R
+- [stringr](https://CRAN.R-project.org/package=stringr): Simple,
+  Consistent Wrappers for Common String Operations
+- [RClickhouse](https://CRAN.R-project.org/package=RClickhouse): ‘Yandex
+  Clickhouse’ Interface for R with Basic ‘dplyr’ Support
+- [data.tree](https://CRAN.R-project.org/package=data.tree): General
+  Purpose Hierarchical Data Structure
+- [BED](https://CRAN.R-project.org/package=BED): Biological Entity
+  Dictionary (BED)
 
 ## From github
 
@@ -122,31 +122,30 @@ guide](https://patzaw.github.io/TKCat/articles/TKCat-User-guide.html)
 
 # Alternatives
 
--   The [dm](https://github.com/krlmlr/dm) package provides similar
-    features but with different implementation choices. Here are the
-    main differences:
+- The [dm](https://github.com/krlmlr/dm) package provides similar
+  features but with different implementation choices. Here are the main
+  differences:
 
-    -   The **dm** data model feature is built upon the
-        [datamodelr](https://github.com/bergant/datamodelr) package
-        whereas **TKCat** relies on
-        [ReDaMoR](https://patzaw.github.io/ReDaMoR/).
-    -   Both **dm** and **TKCat** provides mechanisms to check the
-        fulfillment of the data model constrains and tools to
-        automatically take advantage of them.
-    -   **dm** supports connection to many different DBMS. It also take
-        advantage of constraints which are documented in the DBMS when
-        available. **TKCat** only supports the
-        [ClickHouse](https://clickhouse.com/) system through the
-        [ClickHouseHTTP](https://github.com/patzaw/ClickHouseHTTP) or
-        [RClickhouse](https://github.com/IMSMWU/RClickhouse) packages.
-    -   **TKCat** implements 3 main types of MDB based on files, memory
-        tables or ClickHouse database. It also provides mechanisms to
-        automatically convert from and to any of these implementations.
-    -   **TKCat** supports catalogs of MDBs facilitating the exploration
-        of existing data. It also allows the integration of different
-        MDBs through the automatic identification of similar concepts
-        (Collections) and the automatic conversion of the different
-        vocabulary on which they rely.
+  - The **dm** data model feature is built upon the
+    [datamodelr](https://github.com/bergant/datamodelr) package whereas
+    **TKCat** relies on [ReDaMoR](https://patzaw.github.io/ReDaMoR/).
+  - Both **dm** and **TKCat** provides mechanisms to check the
+    fulfillment of the data model constrains and tools to automatically
+    take advantage of them.
+  - **dm** supports connection to many different DBMS. It also take
+    advantage of constraints which are documented in the DBMS when
+    available. **TKCat** only supports the
+    [ClickHouse](https://clickhouse.com/) system through the
+    [ClickHouseHTTP](https://github.com/patzaw/ClickHouseHTTP) or
+    [RClickhouse](https://github.com/IMSMWU/RClickhouse) packages.
+  - **TKCat** implements 3 main types of MDB based on files, memory
+    tables or ClickHouse database. It also provides mechanisms to
+    automatically convert from and to any of these implementations.
+  - **TKCat** supports catalogs of MDBs facilitating the exploration of
+    existing data. It also allows the integration of different MDBs
+    through the automatic identification of similar concepts
+    (Collections) and the automatic conversion of the different
+    vocabulary on which they rely.
 
 # Acknowledgments
 

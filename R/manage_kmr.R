@@ -525,7 +525,7 @@ add_table_features <- function(
 ###############################################################################@
 #' Get a [KMR] object from a [TKCat] or a [chTKCat] object
 #' 
-#' @param ... paramters for the [get_MDB()] function
+#' @param ... parameters for the [get_MDB()] function
 #' 
 #' @return A [KMR] object
 #' 
@@ -722,5 +722,93 @@ list_property_values <- function(kmr, feature, property){
    return(toRet)
 }
 
+###############################################################################@
+#'
+#' @rdname add_helpers
+#' @method add_helpers KMR
+#' 
+#'
+#' @export
+#'
+add_helpers.KMR <- function(x, code, name, language, ...){
+   
+   stopifnot(
+      is.character(name), length(name)==1, !is.na(name),
+      length(code)==1, file.exists(code),
+      is.character(language), length(language)==1, !is.na(language)
+   )
+   
+   ## Load the code -----
+   code <- encode_bin(code)
+   if(name %in% x$Helpers$name){
+      warning("Existing helpers have been replaced")
+   }
+   helpers <- dplyr::bind_rows(
+      x$Helpers %>% 
+         dplyr::filter(.data$name!=!!name),
+      dplyr::tibble(name=name, code=code, language=language)
+   )
+   
+   ## Finalizing spec
+   toRet <- memoMDB(
+      dataTables=c(
+         data_tables(x, setdiff(names(x), "Helpers")),
+         list(Helpers=helpers)
+      ),
+      dataModel=data_model(x),
+      dbInfo=db_info(x),
+      check=FALSE
+   ) %>% 
+      as_KMR()
+   
+   return(toRet)
+   
+}
 
-
+###############################################################################@
+#' 
+#' @rdname get_R_helpers
+#' @method get_R_helpers KMR
+#' 
+#' @details x is made available in helpers environment as
+#' 'THISKMR' object and can be used as such within helpers code.
+#' 
+#' @export
+#'
+get_R_helpers.KMR <- function(x, hnames=NA, ...){
+   
+   stopifnot(
+      is.MDB(x)
+   )
+   
+   ## Get the code binary ----
+   if(is.chMDB(x)){
+      scode <- get_query(
+         x, 
+         sprintf(
+            "SELECT name, code FROM %s WHERE language='R'",
+            db_tables(x)$dbTables["Helpers"]
+         )
+      )
+   }else{
+      scode <- x$Helpers %>% 
+         dplyr::filter(.data$language=="R")
+      
+   }
+   if(!is.na(hnames)){
+      scode <- scode %>% 
+         dplyr::filter(.data$name %in% hnames)
+   }
+   toRet <- list()
+   if(nrow(scode) > 0){
+      for(i in 1:nrow(scode)){
+         code <- rawToChar(decode_bin(scode$code[i]))
+         toRet <- c(
+            toRet,
+            parse_R_helpers(code, THISKMR=x)
+         )
+      }
+   }
+   code <- rawToChar(decode_bin(code))
+   return(toRet)
+}
