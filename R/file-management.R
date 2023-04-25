@@ -99,10 +99,11 @@ parse_R_helpers <- function(code, ...){
             list(tag$val)
          )
       }
-      toRet <- lapply(
+      toChange <- lapply(
          toRet[setdiff(names(toRet), "param")],
          function(x) if(length(x)==1) unlist(x) else x
       )
+      toRet[names(toChange)] <- toChange
       toRet <- magrittr::set_names(list(toRet), d$object$alias)
    }))
    
