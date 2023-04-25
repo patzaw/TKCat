@@ -770,12 +770,15 @@ add_helpers.KMR <- function(x, code, name, language, ...){
 #' @rdname get_R_helpers
 #' @method get_R_helpers KMR
 #' 
-#' @details x is made available in helpers environment as
-#' 'THISKMR' object and can be used as such within helpers code.
+#' @param mdb An [MDB] object to make available in helper environment
+#' 
+#' @details x and mdb objects are made available in helpers environment as
+#' 'THISKMR' and 'THISMDB' objects respectively and can be used as such within
+#' helpers code.
 #' 
 #' @export
 #'
-get_R_helpers.KMR <- function(x, hnames=NA, ...){
+get_R_helpers.KMR <- function(x, hnames=NA, mdb=NULL, ...){
    
    stopifnot(
       is.MDB(x)
@@ -799,16 +802,12 @@ get_R_helpers.KMR <- function(x, hnames=NA, ...){
       scode <- scode %>% 
          dplyr::filter(.data$name %in% hnames)
    }
-   toRet <- list()
+   code <- ""
    if(nrow(scode) > 0){
       for(i in 1:nrow(scode)){
-         code <- rawToChar(decode_bin(scode$code[i]))
-         toRet <- c(
-            toRet,
-            parse_R_helpers(code, THISKMR=x)
-         )
+         code <- paste(code, rawToChar(decode_bin(scode$code[i])), sep="\n")
       }
    }
-   code <- rawToChar(decode_bin(code))
+   toRet <- parse_R_helpers(code, THISKMR=x, THISMDB=mdb)
    return(toRet)
 }

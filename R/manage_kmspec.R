@@ -723,7 +723,7 @@ add_helpers.MDB <- function(x, code, name, language, kmr, ...){
 #' @param kmr an [MDB] object with KM requirements
 #'
 #' @details x and kmr objects are made available in helpers environment as
-#' "THISMDB' and 'THISKMR' objects respectively and can be used as such within
+#' 'THISMDB' and 'THISKMR' objects respectively and can be used as such within
 #' helpers code.
 #' 
 #' @export
@@ -767,16 +767,12 @@ get_R_helpers.MDB <- function(x, hnames=NA, kmr, ...){
       scode <- scode %>% 
          dplyr::filter(.data$name %in% hnames)
    }
-   toRet <- list()
+   code <- ""
    if(nrow(scode) > 0){
       for(i in 1:nrow(scode)){
-         code <- rawToChar(decode_bin(scode$code[i]))
-         toRet <- c(
-            toRet,
-            parse_R_helpers(code, THISMDB=x, THISKMR=kmr)
-         )
+         code <- paste(code, rawToChar(decode_bin(scode$code[i])), sep="\n")
       }
    }
-   code <- rawToChar(decode_bin(code))
+   toRet <- parse_R_helpers(code, THISMDB=x, THISKMR=kmr)
    return(toRet)
 }

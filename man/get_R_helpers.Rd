@@ -8,7 +8,7 @@
 \usage{
 get_R_helpers(x, hnames, ...)
 
-\method{get_R_helpers}{KMR}(x, hnames = NA, ...)
+\method{get_R_helpers}{KMR}(x, hnames = NA, mdb = NULL, ...)
 
 \method{get_R_helpers}{MDB}(x, hnames = NA, kmr, ...)
 }
@@ -20,6 +20,8 @@ all available are sourced.}
 
 \item{...}{method specific parameters}
 
+\item{mdb}{An \link{MDB} object to make available in helper environment}
+
 \item{kmr}{an \link{MDB} object with KM requirements}
 }
 \value{
@@ -29,10 +31,11 @@ Return a list of functions
 Get a set of helper functions from an object
 }
 \details{
-x is made available in helpers environment as
-'THISKMR' object and can be used as such within helpers code.
+x and mdb objects are made available in helpers environment as
+'THISKMR' and 'THISMDB' objects respectively and can be used as such within
+helpers code.
 
 x and kmr objects are made available in helpers environment as
-"THISMDB' and 'THISKMR' objects respectively and can be used as such within
+'THISMDB' and 'THISKMR' objects respectively and can be used as such within
 helpers code.
 }

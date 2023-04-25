@@ -107,7 +107,7 @@
         "type": "base64",
         "nullable": false,
         "unique": false,
-        "comment": "Code of the helper functions"
+        "comment": "{txt} Code of the helper functions"
       },
       {
         "name": "language",
@@ -117,7 +117,8 @@
         "comment": "Programming language"
       }
     ],
-    "foreignKeys": {},
+    "primaryKey": ["name"],
+    "foreignKeys": [],
     "indexes": [
       {
         "fields": ["name"],
@@ -129,7 +130,6 @@
       "y": [170],
       "color": ["NA"],
       "comment": ["Language specific functions and tools to help manipulating data"]
-    },
-    "primaryKey": ["name"]
+    }
   }
 }
