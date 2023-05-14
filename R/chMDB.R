@@ -1066,12 +1066,12 @@ dims.chMDB <- function(x, ...){
          dplyr::group_by(.data$matrice) %>% 
          dplyr::summarize(
             transposed=.data$transposed[1],
-            format=if(.data$info[1]=="values"){
+            format=if(all(.data$info=="values")){
                "matrix"
             }else{
                "MatrixMarket"
             },
-            nrow=if(.data$info[1]=="values"){
+            nrow=if(all(.data$info=="values")){
                if(.data$transposed[1]){
                   sum(.data$total_columns)
                }else{
@@ -1080,7 +1080,7 @@ dims.chMDB <- function(x, ...){
             }else{
                .data$total_rows[which(.data$info=="rows")]
             },
-            ncol=if(.data$info[1]=="values"){
+            ncol=if(all(.data$info=="values")){
                if(.data$transposed[1]){
                   .data$total_rows[1]
                }else{
