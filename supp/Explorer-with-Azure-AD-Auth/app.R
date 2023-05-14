@@ -108,6 +108,11 @@ ui <- function(req) {
                icon=NULL
             ),
             
+            shinydashboard::menuItem(
+               shiny::uiOutput("authUI"),
+               icon=NULL
+            ),
+            
             #### Resources ----
             shiny::tags$hr(),
             shinydashboard::menuItem(
@@ -270,17 +275,28 @@ server <- function(input, output, session) {
       resource=c("api://kmt-prd01/user_impersonation"),
       tenant="237582ad-3eab-4d44-8688-06ca9f2e613b",
       app="f55d2b52-9fed-4b05-8b0a-b24cf8149922",
+      auto=FALSE,
       timeout=60
    )
-   auth_cred <- reactiveVal()
-   observe(
+   auth_cred <- reactiveVal(AuthHelpers::create_azure_client_credentials(
+      resource = c("api://kmt-prd01/.default"),
+      tenant = "237582ad-3eab-4d44-8688-06ca9f2e613b",
+      app = "f55d2b52-9fed-4b05-8b0a-b24cf8149922",
+      password=readLines("~/etc/kmp.txt")
+   ))
+   observe({
+      req(auth_cred_expr())
       auth_cred(auth_cred_expr())
-   )
+   })
    
    ## TKCat ----
    tkcatState <- shiny::reactiveValues(
       user=NULL
    )
+   output$authUI <- shiny::renderUI({
+      req(tkcatState$user=="default")
+      shiny_azure_authUI("authentication")
+   })
    get_tkcat <- function(){
       device_credentials <- isolate(auth_cred())
       if(!device_credentials$is_valid()){
@@ -308,7 +324,7 @@ server <- function(input, output, session) {
    
    ## User ----
    output$currentUser <- shiny::renderUI({
-      req(tkcatState$user)
+      req(tkcatState$user!="default")
       shiny::actionLink(
          inputId="currentUser",
          label=shiny::span(
