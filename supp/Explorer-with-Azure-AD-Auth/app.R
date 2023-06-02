@@ -282,7 +282,7 @@ server <- function(input, output, session) {
       resource = c("api://kmt-prd01/.default"),
       tenant = "237582ad-3eab-4d44-8688-06ca9f2e613b",
       app = "f55d2b52-9fed-4b05-8b0a-b24cf8149922",
-      password=readLines("~/etc/kmp.txt")
+      password=readLines("~/etc/kmt_client_pwd.txt")
    ))
    observe({
       req(auth_cred_expr())
