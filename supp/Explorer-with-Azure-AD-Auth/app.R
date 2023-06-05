@@ -253,7 +253,8 @@ ui <- function(req) {
                      paste(
                         readLines("supp/authentication-in-R.Rmd"),
                         collapse = "\n"
-                     )
+                     ),
+                     extensions = FALSE
                   )
                ))
             )

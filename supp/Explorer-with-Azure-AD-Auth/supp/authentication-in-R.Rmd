@@ -1,76 +1,131 @@
-## Connecting to TKCat after Azure AD authentication in R
+## Connecting to knowledge management tools after Azure AD authentication in R
 
 ### 0. Requirements
 
-- Install the following packages
+#### TKCat
 
-```{r}
+- From CRAN
+
+```{r, eval=FALSE}
 install.packages(TKCat)
-devtools::install_github("patzaw/AuthHelpers")
+```
+
+- From Azure DevOps
+
+```{r, eval=FALSE}
+devtools::install_git(
+   "git@ssh.dev.azure.com:v3/ucbalm/Translational%20Medicine/TKCat"
+)
+```
+
+
+#### AuthHelpers
+
+- From Azure DevOps
+<a href="https://dev.azure.com/ucbalm/Translational%20Medicine/_git/AuthHelpers" target="_blank">https://dev.azure.com/ucbalm/Translational%20Medicine/_git/AuthHelpers</a>
+
+```{r, eval=FALSE}
+devtools::install_git(
+   "git@ssh.dev.azure.com:v3/ucbalm/Translational%20Medicine/AuthHelpers"
+)
 ```
 
 ### 1. Authentication
 
-- a) Prepare the credentials
+Further details can be found here:
+<a href="https://dev.azure.com/ucbalm/Translational%20Medicine/_git/AuthHelpers?path=%2Fsupp%2FUCB-KMT" target="_blank">https://dev.azure.com/ucbalm/Translational%20Medicine/_git/AuthHelpers?path=%2Fsupp%2FUCB-KMT</a>
 
-```{r}
-device_credentials <- AuthHelpers::create_azure_device_credentials(
-   resource=c("api://kmt-prd01/user_impersonation"),
-   tenant="237582ad-3eab-4d44-8688-06ca9f2e613b",
-   app="f55d2b52-9fed-4b05-8b0a-b24cf8149922"
+
+
+- a) Generate the credentials from your UCB laptop
+(every 3 months after password change)
+
+```{r, eval=FALSE}
+library(AuthHelpers)
+auth_credentials <- create_azure_authorization_credentials(
+   resource = "api://kmt-prd01/user_impersonation",
+   tenant = "237582ad-3eab-4d44-8688-06ca9f2e613b",
+   app = "f55d2b52-9fed-4b05-8b0a-b24cf8149922"
 )
 ```
 
+- b) Save the credentials and change permission to limit the access to the file
 
-- b) Print the user code, paste it, go to the verification URL and follow instruction
-
-```{r}
-device_credentials$get_user_code()
-device_credentials$browse_verification_uri()
+```{r, eval=FALSE}
+## Save the credentials
+saveRDS(auth_credentials, file="~/etc/kmt_authorization.rds", compress=FALSE)
+Sys.chmod("~/etc/kmt_authorization.rds", "0600")
 ```
 
-- c) Request the token
+You can copy this credentials file in environments from which you want to
+access to knowledge management tools (KMT)
 
-```{r}
-device_credentials$request_token()
+### 2. Connecting to KMT with Azure AD token
+
+- a) Load and prepare the credentials
+
+```{r, eval=FALSE}
+.get_tk_headers <- do.call(function(){
+   credentials <- readRDS("~/etc/kmt_authorization.rds")
+   credentials$refresh_token()
+   return(function(){
+      credentials$refresh_token()
+      list(
+         "Authorization"=paste("Bearer", credentials$get_access_token())
+      )
+   })
+}, list())
 ```
 
-- d) Verify the validity of the token
+- b) Connect to services
 
-```{r}
-device_credentials$is_valid()
-device_credentials$get_token()
-device_credentials$get_access_token()
-```
-
-### 2. (Optional) Save and reuse credentials
-
-- a) Save the credentials and change permission to limit the access to the file
-
-```{r}
-cred_file <- "~/etc/kmt.rds"
-saveRDS(device_credentials, file=cred_file, compress=FALSE)
-Sys.chmod(cred_file, "0600")
-```
-
-- b) In a new session, load the credentials and refresh the token
-
-```{r}
-device_credentials <- readRDS("~/etc/kmt.rds")
-device_credentials$refresh_token()
-```
-
-### 3. Connecting to TKCat with Azure AD token
-
-```{r}
+```{r, eval=FALSE}
+## TKCat
 library(TKCat)
-k <- chTKCat(
+.tkcon <- chTKCat(
    "tkcat.ucb.com",
    password="",
    port=443, https=TRUE,
-   extended_headers=list(
-      "Authorization"=paste("Bearer", device_credentials$get_access_token())
-   )
+   extended_headers=.get_tk_headers()
 )
-list_MDBs(k)
+.db_reconnect <- function(x){
+   xn <- deparse(substitute(x))
+   nv <- db_reconnect(x, extended_headers=.get_tk_headers())
+   assign(xn, nv, envir=parent.frame(n=1))
+   invisible(nv)
+}
 ```
+
+```{r, eval=FALSE}
+## BED
+library(BED)
+.reconnectToBed <- function(){
+   connectToBed(
+      "https://bed.ucb.com",
+      remember=FALSE, useCache=TRUE,
+      .opts = list(
+         extendedHeaders=.get_tk_headers()
+      )
+   )
+}
+.reconnectToBed()
+
+## DODO
+library(DODO)
+.reconnectToDODO <- function(){
+   connect_to_dodo(
+      "https://dodo.ucb.com",
+      remember=FALSE,
+      .opts = list(
+         extendedHeaders=.get_tk_headers()
+      )
+   )
+}
+.reconnectToDODO()
+```
+
+
+Since the Azure AD token expires after one hour, you will have to call
+the `.db_reconnect(.tkcon)`, `.reconnectToBed()` and `.reconnectToDODO()`
+function after this time.
+
