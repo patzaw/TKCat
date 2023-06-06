@@ -12,6 +12,40 @@ tbkm <- read_fileMDB(here("supp/TBKM-requirements/TBKM")) %>%
    as_KMR()
 
 ###############################################################################@
+## Collibra ----
+
+tbkm <- add_property_values(
+   tbkm, "Domain (Collibra)", "value",
+   values=c(
+      "Biochemical information", "Genetics", "Multi omics",
+      "Real world data", "Scientific Information", "UCB Clinical Samples"
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+tbkm <- add_property_values(
+   tbkm, "Community (Collibra)", "value",
+   values=c(
+      "Early Solutions Internal Data Catalog",
+      "Early Solutions External Data Catalog"
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+tbkm <- add_property_values(
+   tbkm, "Drug development stage (Collibra)", "value",
+   values=c(
+      "Target Identification", "Target Validation", "Hit finding",
+      "Biomarker Development", "Post-marketing",
+      "Clinical research and development", "Pre-clinical",
+      "Lead generation (Hit to Lead)",
+      "Lead optimization to candidate selection", "Regulatory approval"
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+
+###############################################################################@
 ## Sample and condition features ----
 
 ### General  <> ----

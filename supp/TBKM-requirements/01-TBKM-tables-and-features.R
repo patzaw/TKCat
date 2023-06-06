@@ -113,6 +113,168 @@ tbkm <- add_feature_def(
    as_memoMDB() %>% as_KMR()
 
 ###############################################################################@
+## Collibra ----
+
+### Features ----
+tbkm <- add_feature_def(
+   tbkm,
+   "Domain (Collibra)",
+   "Scientific domain covered by the data",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "Primary Use Case (Collibra)",
+   "UCB primary reason the data was generated or accessed",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "Restrictions (Collibra)",
+   "Limitations (e.g., geography, function, contract, etc.) on data access and usage",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "License (Collibra)",
+   "UCB relationship with the data provider e.g. public access, academic partnership, commercial license",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "Nature of data (Collibra)",
+   "Type(s) of data within the asset. This can include clarification on the entities captured in the asset (e.g. genes, proteins).",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "Community (Collibra)",
+   "Collibra community of users",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "Alias (Collibra)",
+   "Short name of the asset. This can be an acronym or abbreviation.",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "Source of data (Collibra)",
+   "Main source(s) of the captured data or method of data collection/generation",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "Refresh Frequency (Collibra)",
+   "How often the asset is updated",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "Drug development stage (Collibra)",
+   "Stages in drug development process where the asset may be relevant or valuable.",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+### Tables ----
+
+#### collibra ** ----
+optFeatures <- c(
+   "Alias", "Source of data", "Refresh Frequency"
+) %>% 
+   paste("(Collibra)")
+tbkm <- add_table_def(
+   tbkm,
+   "collibra",
+   "A table with additional metadata for the Collibra catalog",
+   mandatory_features=c(
+      "Domain", "Primary Use Case", "Restrictions", "License",
+      "Nature of data", "Community"
+   ) %>% 
+      paste("(Collibra)")
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_table_features(
+   tbkm,
+   "collibra",
+   features=optFeatures
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+#### collibra drug development stage ** ----
+tbkm <- add_table_def(
+   tbkm,
+   "collibra drug development stage",
+   "Drug development stage of applications to be indicated in Collibra catalog",
+   mandatory_features=c(
+      "Drug development stage"
+   ) %>% 
+      paste("(Collibra)")
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+###############################################################################@
 ## Samples and conditions ----
 
 ### Features ----

@@ -32,7 +32,7 @@ add_km_spec <- function(x, kmr){
    ymin <- min(xpos[,"y"])
    ymax <- max(xpos[,"y"])
    ##
-   dmpos <-    xpos <- do.call(
+   dmpos <- xpos <- do.call(
       rbind,
       lapply(dm, function(tm) unlist(tm$display[c("x", "y")]))
    )
@@ -205,7 +205,7 @@ add_km_table <- function(x, kmr, name, type, features=list()){
    
    ## Finalizing spec
    kms <- memoMDB(
-      dataTables=list(Tables=tables, Features=features_sp),
+      dataTables=list(Tables=tables, Features=features_sp, Helpers=kms$Helpers),
       dataModel=data_model(kms),
       dbInfo=db_info(kms),
       check=FALSE
@@ -295,7 +295,7 @@ rm_km_table <- function(
    }
    
    kms <- memoMDB(
-      dataTables=list(Tables=ftables, Features=ffeatures),
+      dataTables=list(Tables=ftables, Features=ffeatures, Helpers=kms$Helpers),
       dataModel=data_model(kms),
       dbInfo=db_info(kms),
       check=FALSE
@@ -377,7 +377,7 @@ add_km_feature <- function(
       feature=feature, fields=fields, unit=unit
    )
    kms <- memoMDB(
-      dataTables=list(Tables=tables, Features=features),
+      dataTables=list(Tables=tables, Features=features, Helpers=kms$Helpers),
       dataModel=data_model(kms),
       dbInfo=db_info(kms),
       check=FALSE
@@ -627,7 +627,7 @@ rm_km_feature <- function(
    
    
    kms <- memoMDB(
-      dataTables=list(Tables=tables, Features=ffeatures),
+      dataTables=list(Tables=tables, Features=ffeatures, Helpers=kms$Helpers),
       dataModel=data_model(kms),
       dbInfo=db_info(kms),
       check=FALSE
