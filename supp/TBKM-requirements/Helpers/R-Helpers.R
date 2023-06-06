@@ -72,7 +72,7 @@ add_collibra_metadata <- function(
    stopifnot(
       TKCat::is_KMR(kmr), is.MDB(x)
    )
-   if(c("Collibra", "Collibra_drug_dev_stage") %in% names(x)){
+   if(any(c("Collibra", "Collibra_drug_dev_stage") %in% names(x))){
       stop("Collibra reserved table names are already used in the provided MDB")
    }
    kms <- get_km_spec(x, kmr)
