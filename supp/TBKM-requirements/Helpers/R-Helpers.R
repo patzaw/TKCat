@@ -34,10 +34,10 @@ list_MDB_with_DE_analyses <- function(kmr=THISKMR){
 }
 
 ###############################################################################@
-#' Add Collibra metadata to an MDB This MDB should already have KM specification tables (see [TKCat::add_km_spec()])
+#' Add Collibra metadata to an MDB. This MDB should already have KM specification tables (see [TKCat::add_km_spec()])
 #' 
+#' @param x the MDB object to update
 #' @param kmr the KMR object with TBKM specifications (by default, the KMR to which the function is attached).
-#' @param x the MDB objet to update
 #' @param `Alias` Short name of the asset. This can be an acronym or abbreviation.
 #' @param `Domain` Scientific domain covered by the data
 #' @param `Drug development stage` Stages in drug development process where the asset may be relevant or valuable.
@@ -56,29 +56,29 @@ list_MDB_with_DE_analyses <- function(kmr=THISKMR){
 #' @export
 #' 
 add_collibra_metadata <- function(
-   kmr=THISKMR,
    x,
-   `Alias`=NA,
+   kmr=THISKMR,
+   `Alias`=as.character(NA),
    `Domain`,
    `Drug development stage`,
    `Primary Use Case`,
    `Restrictions`,
    `License`,
-   `Source of data`=NA,
+   `Source of data`=as.character(NA),
    `Nature of data`,
-   `Refresh Frequency`=NA,
+   `Refresh Frequency`=as.character(NA),
    `Community`
 ){
    stopifnot(
       TKCat::is_KMR(kmr), is.MDB(x)
    )
-   if(any(c("Collibra", "Collibra_drug_dev_stage") %in% names(x))){
+   if(any(c("___Collibra___", "___Collibra_dds___") %in% names(x))){
       stop("Collibra reserved table names are already used in the provided MDB")
    }
    kms <- get_km_spec(x, kmr)
    toRet <- x
    
-   Collibra <- tibble(
+   `___Collibra___` <- tibble(
       `Alias`=`Alias`,
       `Domain`=`Domain`,
       `Primary Use Case`=`Primary Use Case`,
@@ -89,17 +89,42 @@ add_collibra_metadata <- function(
       `Refresh Frequency`=`Refresh Frequency`,
       `Community`=`Community`
    )
-   Collibra_drug_dev_stage <- tibble(
+   `___Collibra_dds___` <- tibble(
       `Drug development stage`=`Drug development stage`
    )
    
    
-   dm <- ReDaMoR::df_to_model(Collibra, Collibra_drug_dev_stage)
-   dm$Collibra$display$x <- 0
-   dm$Collibra_drug_dev_stage$display$x <- 0
-   dm$Collibra$display$y <- -60
-   dm$Collibra_drug_dev_stage$display$y <- 60
-   ## Adapt display of spec. data model ----
+   dm <- ReDaMoR::df_to_model(
+      list = c("___Collibra___", "___Collibra_dds___"),
+      envir=environment()
+   )
+   dm$`___Collibra___`$display$comment <-
+      dm$`___Collibra_dds___`$display$comment <-
+      "MetaData for the Collibra catalog"
+   dm$`___Collibra___`$display$x <- 0
+   dm$`___Collibra_dds___`$display$x <- 0
+   dm$`___Collibra___`$display$y <- -60
+   dm$`___Collibra_dds___`$display$y <- 60
+   
+   finfo <- list_table_features(kmr, "collibra")
+   dm$`___Collibra___`$fields$comment <- finfo$feature.description[match(
+      paste(dm$`___Collibra___`$fields$name, "(Collibra)"), finfo$feature
+   )]
+   dm$`___Collibra___`$fields$nullable <- !finfo$mandatory[match(
+      paste(dm$`___Collibra___`$fields$name, "(Collibra)"), finfo$feature
+   )]
+   dm$`___Collibra___`$fields$unique <- TRUE
+   
+   finfo <- list_table_features(kmr, "collibra drug development stage")
+   dm$`___Collibra_dds___`$fields$comment <- finfo$feature.description[match(
+      paste(dm$`___Collibra_dds___`$fields$name, "(Collibra)"), finfo$feature
+   )]
+   dm$`___Collibra_dds___`$fields$nullable <- !finfo$mandatory[match(
+      paste(dm$`___Collibra_dds___`$fields$name, "(Collibra)"), finfo$feature
+   )]
+   dm$`___Collibra_dds___`$fields$unique <- TRUE
+   
+   ## Adapt display of spec. data model
    xpos <- do.call(
       rbind,
       lapply(data_model(x), function(tm) unlist(tm$display[c("x", "y")]))
@@ -132,8 +157,8 @@ add_collibra_metadata <- function(
       x,
       memoMDB(
          dataTables=list(
-            "Collibra"=Collibra,
-            "Collibra_drug_dev_stage"=Collibra_drug_dev_stage
+            "___Collibra___"=`___Collibra___`,
+            "___Collibra_dds___"=`___Collibra_dds___`
          ),
          dataModel=dm,
          dbInfo=list(
@@ -145,7 +170,7 @@ add_collibra_metadata <- function(
    
    toRet <- add_km_table(
       toRet, kmr,
-      name="Collibra", type="collibra",
+      name="___Collibra___", type="collibra",
       features=lapply(
          list_table_features(kmr, "collibra")$feature,
          function(x){
@@ -156,7 +181,7 @@ add_collibra_metadata <- function(
    
    toRet <- add_km_table(
       toRet, kmr,
-      name="Collibra_drug_dev_stage", type="collibra drug development stage",
+      name="___Collibra_dds___", type="collibra drug development stage",
       features=lapply(
          list_table_features(kmr, "collibra drug development stage")$feature,
          function(x){
@@ -164,6 +189,121 @@ add_collibra_metadata <- function(
          }
       )
    )
+   
+   return(toRet)
+}
+
+###############################################################################@
+#' Get Collibra metadata from an MDB
+#'
+#' @param x the MDB object with Collibra metadata
+#' 
+#' @return An MDB with Collibra metadata only
+#' 
+#' @import TKCat
+#'   
+#' @export
+#' 
+get_collibra_mdb <- function(x){
+   stopifnot(
+      is.MDB(x)
+   )
+   toRet <- TKCat::as_memoMDB(x[c("___Collibra___", "___Collibra_dds___")])
+   TKCat::db_info(toRet)$name <- sprintf(
+      "Collibra metadata for %s",
+      TKCat::db_info(x)$name
+   )
+   return(toRet)
+}
+
+###############################################################################@
+#' Get Collibra metadata from all MDBs
+#' 
+#' @param kmr the KMR object with TBKM specifications (by default, the KMR to which the function is attached)
+#' 
+#' @return A tibble with Collibra metadata from relevant MDBs
+#' 
+#' @import TKCat ReDaMoR
+#'   
+#' @export
+#' 
+get_collibra_metadata <- function(
+      kmr=THISKMR
+){
+   stopifnot(
+      TKCat::is_KMR(kmr)
+   )
+   allMdbs <- TKCat::list_MDBs(unclass(kmr)$tkcon)
+   allTables <- TKCat::list_tables(unclass(kmr)$tkcon)
+   toTake <- allTables %>%
+      dplyr::filter(name=="___Collibra___") %>% 
+      slice(1) %>% 
+      pull("database")
+   toRet <- get_query(
+      kmr, 
+      paste(
+         sprintf(
+            "SELECT * FROM (
+               SELECT '%s' AS MDB, * FROM MetaBase.`___Collibra___`
+               CROSS JOIN (
+                  SELECT arrayCompact(groupArray(`Drug development stage`))
+                  AS `Drug development stage`
+                  FROM MetaBase.`___Collibra_dds___`
+               )
+            )
+            ",
+            toTake
+         ),
+         collapse = "UNION ALL"
+      )
+   ) %>% 
+      dplyr::as_tibble() %>% 
+      dplyr::mutate(
+         "Drug development stage"=unlist(lapply(
+            `Drug development stage`, paste, collapse=","
+         ))
+      ) %>% left_join(
+         allMdbs %>%
+            mutate(size=TKCat:::.format_bytes(total_size)) %>% 
+            select(
+               "MDB"="name",
+               "Description"="description",
+               # "Last Review Date"="timestamp",
+               "Owner"="maintainer",
+               "Size of asset"="size"
+            ),
+         by="MDB"
+      ) %>% 
+      mutate(
+         Name=paste(MDB, "in TKCat"),
+         "Last Review Date"=NA,
+         "Asset Type"="Data Set",
+         "Location"=sprintf(
+            "chTKCat on %s:%s (contact: %s)",
+            unclass(kmr)$tkcon$chcon@host, unclass(kmr)$tkcon$chcon@port,
+            unclass(kmr)$tkcon$contact
+         )
+      ) %>% 
+      select(all_of(c(
+         "MDB",
+         "Name",
+         "Alias",
+         "Domain",
+         "Description",
+         "Drug development stage",
+         "Primary Use Case",
+         "Restrictions",
+         "Location",
+         "License",
+         "Source of data",
+         "Nature of data",
+         "Last Review Date",
+         "Size of asset",
+         "Refresh Frequency",
+         "Asset Type",
+         "Community",
+         "Owner"
+      )))
    
    return(toRet)
 }
