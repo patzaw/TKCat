@@ -237,8 +237,8 @@ get_collibra_metadata <- function(
    allTables <- TKCat::list_tables(unclass(kmr)$tkcon)
    toTake <- allTables %>%
       dplyr::filter(name=="___Collibra___") %>% 
-      slice(1) %>% 
-      pull("database")
+      pull("database") %>% 
+      unique()
    toRet <- get_query(
       kmr, 
       paste(
@@ -254,7 +254,7 @@ get_collibra_metadata <- function(
             ",
             toTake
          ),
-         collapse = "UNION ALL"
+         collapse = " UNION ALL "
       )
    ) %>% 
       dplyr::as_tibble() %>% 
