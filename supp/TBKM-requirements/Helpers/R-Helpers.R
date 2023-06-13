@@ -275,7 +275,7 @@ get_collibra_metadata <- function(
          by="MDB"
       ) %>% 
       mutate(
-         Name=paste(MDB, "in TKCat"),
+         "Full Name"=paste(MDB, "in TKCat"),
          "Last Review Date"=NA,
          "Asset Type"="Data Set",
          "Location"=sprintf(
@@ -286,7 +286,7 @@ get_collibra_metadata <- function(
       ) %>% 
       select(all_of(c(
          "MDB",
-         "Name",
+         "Full Name",
          "Alias",
          "Domain",
          "Description",
