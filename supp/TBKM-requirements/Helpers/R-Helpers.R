@@ -244,11 +244,11 @@ get_collibra_metadata <- function(
       paste(
          sprintf(
             "SELECT * FROM (
-               SELECT '%s' AS MDB, * FROM %s.`___Collibra___`
+               SELECT '%s' AS MDB, * FROM `%s`.`___Collibra___`
                CROSS JOIN (
                   SELECT arrayCompact(groupArray(`Drug development stage`))
                   AS `Drug development stage`
-                  FROM %s.`___Collibra_dds___`
+                  FROM `%s`.`___Collibra_dds___`
                )
             )
             ",
