@@ -18,7 +18,8 @@ tbkm <- add_property_values(
    tbkm, "Domain (Collibra)", "value",
    values=c(
       "Biochemical information", "Genetics", "Multi omics",
-      "Real world data", "Scientific Information", "UCB Clinical Samples"
+      "Real world data", "Scientific Information", "UCB Clinical Samples",
+      "Experiments", "Assays and reference data", "Molecules"
    )
 ) %>% 
    as_memoMDB() %>% as_KMR()
