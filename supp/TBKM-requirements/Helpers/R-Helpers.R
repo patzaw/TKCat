@@ -268,7 +268,7 @@ get_collibra_metadata <- function(
             select(
                "MDB"="name",
                "Description"="description",
-               # "Last Review Date"="timestamp",
+               "Last update"="timestamp",
                "Owner"="maintainer",
                "Size of asset"="size"
             ),
@@ -297,6 +297,7 @@ get_collibra_metadata <- function(
          "License",
          "Source of data",
          "Nature of data",
+         "Last update",
          "Last Review Date",
          "Size of asset",
          "Refresh Frequency",
