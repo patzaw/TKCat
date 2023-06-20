@@ -1,29 +1,14 @@
-#------------------------------------------------------------------------------#
-#------------------------------------------------------------------------------#
-## Setup libraries ----
-library(AzureAuth)
+library(TKCat)
 library(AuthHelpers)
 library(shiny)
-library(shinyjs)
-################################################@
-### TO EDIT: additional required libraries ----
 library(shinydashboard)
 library(DT)
-library(TKCat)
-################################################@
+library(future)
+## Set future plan to allow several users to log in simultaneously
+future::plan(future::multisession, workers=4)
 
-#------------------------------------------------------------------------------#
-#------------------------------------------------------------------------------#
-## Authorization configuration ----
-`_azure_tenant_` <- "237582ad-3eab-4d44-8688-06ca9f2e613b"
-`_azure_app_` <- "f55d2b52-9fed-4b05-8b0a-b24cf8149922"
-`_azure_resource_` <- c("api://kmt-prd01/.default", "offline_access")
-`_azure_redirect_` <- "https://bel038783/shiny/pgodard/UCB-TKCat/"
-`_shiny_appTitle_` <- "UCB TKCat"
-
-
-################################################@
-## TO EDIT: global logic ----
+###############################################################################@
+## Global ----
 shiny::addResourcePath(
    "www",
    system.file("www", package = "TKCat")
@@ -66,315 +51,277 @@ subSetSize <- 100
       }
    )))
 }
-jsFormatBytes <- readLines(
-   system.file("www/format_bytes.js", package="TKCat")
-)
-################################################@
 
-
-#------------------------------------------------------------------------------#
-#------------------------------------------------------------------------------#
+###############################################################################@
 ## UI ----
-
-################################################@
-### TO EDIT: UI logic ----
-
-## Replace this with your app's regular UI
-## keeping the call to shinyjs::useShinyjs()
-
-ui <-    shinydashboard::dashboardPage(
-   skin="yellow",
-   title = "UCB TKCat",
-   
-   ########################@
-   ## Dashboard header ----
-   ## Uses output$instance and output$status
-   header = shinydashboard::dashboardHeader(
+ui <- function(req) {
+   shinydashboard::dashboardPage(
+      skin="yellow",
       title = "UCB TKCat",
-      titleWidth = "300px",
-      shiny::tags$li(
-         class = "dropdown",
-         shiny::tags$div(
-            shiny::uiOutput("status", inline=TRUE),
-            shiny::HTML("&nbsp;&nbsp;|&nbsp;&nbsp;"),
-            shiny::actionLink(
-               "refresh", "",
-               icon=shiny::icon("arrows-rotate", verify_fa = FALSE),
-               style="color:black;",
-               title="Refresh resource table"
-            ),
-            style = paste(
-               "margin-top:0;",
-               "margin-right:15px;",
-               "-ms-transform:translateY(50%);",
-               "transform:translateY(50%);"
+      
+      ########################@
+      ## Dashboard header ----
+      ## Uses output$instance and output$status
+      header = shinydashboard::dashboardHeader(
+         title = "UCB TKCat",
+         titleWidth = "300px",
+         shiny::tags$li(
+            class = "dropdown",
+            shiny::tags$div(
+               shiny::uiOutput("status", inline=TRUE),
+               shiny::HTML("&nbsp;&nbsp;|&nbsp;&nbsp;"),
+               shiny::actionLink(
+                  "refresh", "",
+                  icon=shiny::icon("arrows-rotate", verify_fa = FALSE),
+                  style="color:black;",
+                  title="Refresh resource table"
+               ),
+               style = paste(
+                  "margin-top:0;",
+                  "margin-right:15px;",
+                  "-ms-transform:translateY(50%);",
+                  "transform:translateY(50%);"
+               )
             )
          )
-      )
-   ),
-   
-   ########################@
-   ## Sidebar ----
-   ## Uses uiOutput("currentUser") and uiOutput("signin")
-   sidebar = shinydashboard::dashboardSidebar(
-      ### Logo ----
-      HTML('
+      ),
+      
+      ########################@
+      ## Sidebar ----
+      ## Uses uiOutput("currentUser") and uiOutput("signin")
+      sidebar = shinydashboard::dashboardSidebar(
+         ### Logo ----
+         HTML('
            <div style="width:150px; margin-left:auto; margin-right:auto; margin-top:15px; margin-bottom:15px; text-align:center;">
                 <img src="www/TKCat-small.png" height="120px" id="mainLogo"/>
               </a>
             </div>
          '),
-      ### Menu ----
-      shinydashboard::sidebarMenu(
-         id = "sidebarmenu",
-         style = "white-space:normal;",
-         
-         #### User ----
-         shinydashboard::menuItem(
-            shiny::uiOutput("currentUser"),
-            icon=NULL
-         ),
-         
-         #### Resources ----
-         shiny::tags$hr(),
-         shinydashboard::menuItem(
-            "Resources",
-            tabName = "resources",
-            icon = shiny::icon("list-alt", verify_fa = FALSE)
-         ),
-         shinydashboard::menuItem(
-            "Data model",
-            tabName = "model",
-            icon = shiny::icon("project-diagram", verify_fa = FALSE)
-         ),
-         shinydashboard::menuItem(
-            "Search resources",
-            tabName = "search",
-            icon = shiny::icon("search", verify_fa = FALSE)
-         ),
-         
-         #### Authentication in R ----
-         shiny::tags$hr(),
-         shinydashboard::menuItem(
-            "Authentication from R",
-            tabName = "authInR",
-            icon = shiny::icon("info-circle", verify_fa = FALSE)
-         ),
-         
-         #### Documentation ----
-         shinydashboard::menuItem(
-            text = "R package",
-            icon = shiny::icon("question-circle", verify_fa = FALSE),
-            href = "https://patzaw.github.io/TKCat/"
-         ),
-         
-         #### Contact ----
-         shinydashboard::menuItem(
-            text = "Contact admin",
-            icon = shiny::icon("envelope", verify_fa = FALSE),
-            href = shiny::HTML(
-               "mailto:Patrice Godard <patrice.godard@ucb.com>?Subject=UCB-TKCat"
+         ### Menu ----
+         shinydashboard::sidebarMenu(
+            id = "sidebarmenu",
+            style = "white-space:normal;",
+            
+            #### User ----
+            shinydashboard::menuItem(
+               shiny::uiOutput("currentUser"),
+               icon=NULL
             ),
-            newtab = FALSE
-         ),
-         
-         #### Size ----
-         shiny::tags$hr(),
-         shinydashboard::menuItem(
-            shiny::uiOutput("totalSize"),
-            icon=NULL
+            
+            shinydashboard::menuItem(
+               shiny::uiOutput("authUI"),
+               icon=NULL
+            ),
+            
+            #### Resources ----
+            shiny::tags$hr(),
+            shinydashboard::menuItem(
+               "Resources",
+               tabName = "resources",
+               icon = shiny::icon("list-alt", verify_fa = FALSE)
+            ),
+            shinydashboard::menuItem(
+               "Data model",
+               tabName = "model",
+               icon = shiny::icon("project-diagram", verify_fa = FALSE)
+            ),
+            shinydashboard::menuItem(
+               "Search resources",
+               tabName = "search",
+               icon = shiny::icon("search", verify_fa = FALSE)
+            ),
+            
+            #### Authentication in R ----
+            shiny::tags$hr(),
+            shinydashboard::menuItem(
+               "Authentication from R",
+               tabName = "authInR",
+               icon = shiny::icon("info-circle", verify_fa = FALSE)
+            ),
+            
+            #### Documentation ----
+            shinydashboard::menuItem(
+               text = "R package",
+               icon = shiny::icon("question-circle", verify_fa = FALSE),
+               href = "https://patzaw.github.io/TKCat/"
+            ),
+            
+            #### Contact ----
+            shinydashboard::menuItem(
+               text = "Contact admin",
+               icon = shiny::icon("envelope", verify_fa = FALSE),
+               href = shiny::HTML(
+                  "mailto:Patrice Godard <patrice.godard@ucb.com>?Subject=UCB-TKCat"
+               ),
+               newtab = FALSE
+            ),
+            
+            #### Size ----
+            shiny::tags$hr(),
+            shinydashboard::menuItem(
+               shiny::uiOutput("totalSize"),
+               icon=NULL
+            )
          )
-      )
-   ),
-   
-   ########################@
-   ## Body ----
-   body = shinydashboard::dashboardBody(
-      shinyjs::useShinyjs(),
-      ### Page header ----
-      shiny::tags$head(
-         shiny::tags$style(shiny::HTML(
-            'table.dataTable tr.selected td a {background-color: white !important;}'
-         )),
-         shiny::tags$link(
-            rel = "icon",
-            href = 'www/TKCat-small.png'
-         ),
-         shiny::tags$script(src = 'www/interactions.js')
       ),
       
-      ### Body ----
-      shinydashboard::tabItems(
-         
-         #### Resources ----
-         shinydashboard::tabItem(
-            tabName="resources",
-            shiny::fluidRow(
-               shiny::column(
-                  9,
-                  DT::DTOutput("mdbList")
-               ),
-               shiny::column(
-                  3,
-                  shiny::uiOutput("dbInfo")
-               )
-            )
+      ########################@
+      ## Body ----
+      body = shinydashboard::dashboardBody(
+         ### Page header ----
+         shiny::tags$head(
+            shiny::tags$style(shiny::HTML(
+               'table.dataTable tr.selected td a {background-color: white !important;}'
+            )),
+            shiny::tags$link(
+               rel = "icon",
+               href = 'www/TKCat-small.png'
+            ),
+            shiny::tags$script(src = 'www/interactions.js')
          ),
          
-         #### Data model ----
-         shinydashboard::tabItem(
-            tabName="model",
-            shiny::fluidRow(
-               shiny::column(
-                  7,
-                  visNetwork::visNetworkOutput(
-                     "dataModel", height="85vh"
+         ### Body ----
+         shinydashboard::tabItems(
+            
+            #### Resources ----
+            shinydashboard::tabItem(
+               tabName="resources",
+               shiny::fluidRow(
+                  shiny::column(
+                     9,
+                     DT::DTOutput("mdbList")
                   ),
-                  style="border:solid; min-height:90vh;"
-               ),
-               shiny::column(
-                  5,
-                  shiny::fluidRow(
-                     shiny::uiOutput("collectionInfo"),
-                     style="margin-left:3px;"
-                  ),
-                  shiny::fluidRow(
-                     shiny::uiOutput("tableInfo"),
-                     style="margin-left:3px;"
+                  shiny::column(
+                     3,
+                     shiny::uiOutput("dbInfo")
                   )
-               ),
-               style="margin-left:3px;margin-right:3px"
-            )
-         ),
-         
-         #### Search ----
-         shinydashboard::tabItem(
-            tabName="search",
-            shiny::fluidRow(
-               shiny::column(
-                  10,
-                  shiny::textInput(
-                     inputId="searchInput",
-                     label="Search resource, table and field information",
-                     placeholder="search value"
-                  )
-               ),
-               shiny::column(
-                  2,
-                  shiny::uiOutput("searchMessages")
                )
             ),
-            shiny::uiOutput("searchResults")
-         ),
-         
-         #### System information ----
-         shinydashboard::tabItem(
-            tabName="authInR",
-            shiny::fluidRow(shiny::column(
-               6,
-               shiny::markdown(
-                  paste(
-                     readLines("supp/authentication-in-R.Rmd"),
-                     collapse = "\n"
+            
+            #### Data model ----
+            shinydashboard::tabItem(
+               tabName="model",
+               shiny::fluidRow(
+                  shiny::column(
+                     7,
+                     visNetwork::visNetworkOutput(
+                        "dataModel", height="85vh"
+                     ),
+                     style="border:solid; min-height:90vh;"
                   ),
-                  extensions = FALSE
+                  shiny::column(
+                     5,
+                     shiny::fluidRow(
+                        shiny::uiOutput("collectionInfo"),
+                        style="margin-left:3px;"
+                     ),
+                     shiny::fluidRow(
+                        shiny::uiOutput("tableInfo"),
+                        style="margin-left:3px;"
+                     )
+                  ),
+                  style="margin-left:3px;margin-right:3px"
                )
-            ))
+            ),
+            
+            #### Search ----
+            shinydashboard::tabItem(
+               tabName="search",
+               shiny::fluidRow(
+                  shiny::column(
+                     10,
+                     shiny::textInput(
+                        inputId="searchInput",
+                        label="Search resource, table and field information",
+                        placeholder="search value"
+                     )
+                  ),
+                  shiny::column(
+                     2,
+                     shiny::uiOutput("searchMessages")
+                  )
+               ),
+               shiny::uiOutput("searchResults")
+            ),
+            
+            #### System information ----
+            shinydashboard::tabItem(
+               tabName="authInR",
+               shiny::fluidRow(shiny::column(
+                  6,
+                  shiny::markdown(
+                     paste(
+                        readLines("supp/authentication-in-R.Rmd"),
+                        collapse = "\n"
+                     ),
+                     extensions = FALSE
+                  )
+               ))
+            )
          )
       )
    )
-)
-
-################################################@
-
-### Final ui function ----
-ui_func <- function(req){
-   opts <- shiny::parseQueryString(req$QUERY_STRING)
-   if(is.null(opts$code)){
-      auth_uri <- build_authorization_uri(
-         resource=`_azure_resource_`,
-         tenant=`_azure_tenant_`,
-         app=`_azure_app_`,
-         redirect_uri=`_azure_redirect_`,
-         version=2
-      )
-      redir_js <- sprintf("location.replace(\"%s\");", auth_uri)
-      tags$script(HTML(redir_js))
-   }
-   else{
-      ui
-   }
 }
 
-#------------------------------------------------------------------------------#
-#------------------------------------------------------------------------------#
+###############################################################################@
 ## Server ----
-server <- function(input, output, session)
-{
-   ### Clean URL after authentication ----
-   shinyjs::runjs(sprintf(
-      "
-      $(document).ready(function(event) {
-         const nextURL = '%s';
-         const nextTitle = '%s';
-         const nextState = { additionalInformation: 'Updated the URL with JS' };
-         // This will create a new entry in the browser's history,
-         //without reloading
-         window.history.pushState(nextState, nextTitle, nextURL);
-      });
-      ",
-      `_azure_redirect_`, `_shiny_appTitle_`
-   ))
-   opts <- shiny::parseQueryString(shiny::isolate(
-      session$clientData$url_search
-   ))
-   if(is.null(opts$code)){
-      return()
-   }
-
-   ### Authentication ----
-   auth_cred <- AuthHelpers::create_azure_authorization_credentials(
-      resource=`_azure_resource_`,
-      tenant=`_azure_tenant_`,
-      app=`_azure_app_`,
-      version=2,
-      offline_access=TRUE,
-      redirect_uri=`_azure_redirect_`,
-      auth_code=opts$code
-   )
-
-   ################################################@
-   ### TO EDIT: Server logic ----
-
-   ## Replace the following lines with your own logic
+jsFormatBytes <- readLines(
+   system.file("www/format_bytes.js", package="TKCat")
+)
+server <- function(input, output, session) {
    
-   .get_tk_headers <- do.call(function(){
-      credentials <- auth_cred
-      return(function(){
-         credentials$refresh_token()
-         list(
-            "Authorization"=paste("Bearer", credentials$get_access_token())
-         )
-      })
-   }, list())
-   tkcon <- chTKCat(
-      "tkcat.ucb.com",
-      password="",
-      port=443, https=TRUE,
-      extended_headers=.get_tk_headers(),
-      reset_handle=TRUE
+   ## Authentication ----
+   auth_cred_expr <- AuthHelpers::shiny_azure_device_auth(
+      id="authentication",
+      resource=c("api://kmt-prd01/user_impersonation"),
+      tenant="237582ad-3eab-4d44-8688-06ca9f2e613b",
+      app="f55d2b52-9fed-4b05-8b0a-b24cf8149922",
+      auto=FALSE,
+      timeout=60
    )
-   .db_reconnect <- function(x){
-      xn <- deparse(substitute(x))
-      nv <- db_reconnect(x, extended_headers=.get_tk_headers())
-      assign(xn, nv, envir=parent.frame(n=1))
-      invisible(nv)
-   }
+   auth_cred <- reactiveVal(AuthHelpers::create_azure_client_credentials(
+      resource = c("api://kmt-prd01/.default"),
+      tenant = "237582ad-3eab-4d44-8688-06ca9f2e613b",
+      app = "f55d2b52-9fed-4b05-8b0a-b24cf8149922",
+      password=readLines("~/etc/kmt_client_pwd.txt")
+   ))
+   observe({
+      req(auth_cred_expr())
+      auth_cred(auth_cred_expr())
+   })
    
    ## TKCat ----
    tkcatState <- shiny::reactiveValues(
-      user=tkcon$chcon@user
+      user=NULL
    )
+   output$authUI <- shiny::renderUI({
+      req(tkcatState$user=="default")
+      AuthHelpers::shiny_azure_device_authUI("authentication")
+   })
+   get_tkcat <- function(){
+      device_credentials <- isolate(auth_cred())
+      if(!device_credentials$is_valid()){
+         device_credentials$refresh_token()
+         auth_cred(device_credentials)
+      }
+      token <- device_credentials$get_access_token()
+      chTKCat(
+         "tkcat.ucb.com",
+         password="",
+         port=443, https=TRUE,
+         extended_headers=list(
+            "Authorization"=paste("Bearer", token)
+         ),
+         reset_handle=TRUE
+      )
+   }
+   observe({
+      device_credentials <- auth_cred()
+      req(device_credentials)
+      token <- device_credentials$get_access_token()
+      tkcon <- get_tkcat()
+      tkcatState$user <- tkcon$chcon@user
+   })
    
    ## User ----
    output$currentUser <- shiny::renderUI({
@@ -396,7 +343,7 @@ server <- function(input, output, session)
    ## Size ----
    output$totalSize <- shiny::renderUI({
       req(mdbs$list)
-      .db_reconnect(tkcon)
+      tkcon <- get_tkcat()
       totalSize <- sum(list_tables(tkcon)$total_bytes,  na.rm = TRUE)
       shiny::actionLink(
          inputId="totalSize",
@@ -444,11 +391,12 @@ server <- function(input, output, session)
       validInput=FALSE
    )
    shiny::observe({
+      req(auth_cred())
       input$refresh
       shiny::withProgress(
          message="Getting list of MDBs",
          expr={
-            .db_reconnect(tkcon)
+            tkcon <- get_tkcat()
             mdbs$list <- list_MDBs(tkcon) %>% 
                dplyr::filter(.data$populated)
             mdbs$collections <- collection_members(tkcon)
@@ -566,7 +514,7 @@ server <- function(input, output, session)
       shiny::withProgress(
          message=sprintf("Getting %s metadata", n),
          expr={
-            .db_reconnect(tkcon)
+            tkcon <- get_tkcat()
             if(!is.null(access) && access=="none"){
                mdb <- try(get_chMDB_metadata(tkcon, n))
             }else{
@@ -610,7 +558,7 @@ server <- function(input, output, session)
       mdb <- selStatus$mdb
       shiny::req(!is.null(mdb))
       access <- shiny::isolate(selStatus$access)
-      .db_reconnect(tkcon)
+      tkcon <- get_tkcat()
       if(inherits(mdb, "try-error")){
          n <- shiny::isolate(selStatus$resource)
          shiny::tagList(
@@ -840,7 +788,6 @@ server <- function(input, output, session)
             )
          ))
       }
-      .db_reconnect(mdb)
       sel <- selStatus$tables %>%
          intersect(names(mdb))
       shiny::req(sel)
@@ -1208,7 +1155,7 @@ server <- function(input, output, session)
       shiny::req(mdbs)
       st <- input$searchInput
       shiny::req(st)
-      .db_reconnect(tkcon)
+      tkcon <- get_tkcat()
       toRet <- search_MDB_tables(tkcon, st)
       if(nrow(toRet)>0){
          searchRes$tables <- toRet
@@ -1270,7 +1217,7 @@ server <- function(input, output, session)
       shiny::req(mdbs)
       st <- input$searchInput
       shiny::req(st)
-      .db_reconnect(tkcon)
+      tkcon <- get_tkcat()
       toRet <- search_MDB_fields(tkcon, st)
       if(nrow(toRet)>0){
          searchRes$fields <- toRet
@@ -1325,11 +1272,12 @@ server <- function(input, output, session)
          )
       selStatus$tables <- rt %>% dplyr::slice(sel) %>% dplyr::pull("table")
    })
-
-   ################################################@
+   
 }
 
-#------------------------------------------------------------------------------#
-#------------------------------------------------------------------------------#
+###############################################################################@
 ## Run the application ----
-shinyApp(ui_func, server)
+shiny::shinyApp(
+   ui = ui,
+   server = server
+)
