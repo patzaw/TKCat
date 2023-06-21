@@ -840,12 +840,12 @@ server <- function(input, output, session)
             )
          ))
       }
-      .db_reconnect(mdb)
       sel <- selStatus$tables %>%
          intersect(names(mdb))
       shiny::req(sel)
       shiny::req(length(sel)==1)
       tss <- tabSubSet()
+      tdim <- tabDims()
       nr <- ifelse(attr(tss, "mat"), nrow(tss)*ncol(tss), nrow(tss))
       shiny::tagList(
          shiny::h3(sel),
@@ -862,7 +862,6 @@ server <- function(input, output, session)
                )
             }else{
                if(!is.metaMDB(mdb)){
-                  tdim <- dims(mdb, all_of(sel))
                   list(
                      shiny::tags$li(
                         shiny::tags$strong("Number of columns"),
@@ -899,14 +898,19 @@ server <- function(input, output, session)
    })
    
    tabSubSet <- shiny::reactiveVal(NULL)
+   tabDims <- shiny::reactiveVal(NULL)
    shiny::observe({
       tabSubSet(NULL)
+      tabDims(NULL)
       mdb <- selStatus$mdb
       shiny::req(mdb)
+      shiny::req(is.MDB(mdb))
       sel <- selStatus$tables %>% 
          intersect(names(mdb))
       shiny::req(sel)
       shiny::req(length(sel)==1)
+      .db_reconnect(mdb)
+      tabDims(dims(mdb, all_of(sel)))
       tabMod <- data_model(mdb)[[sel]]
       fields <- tabMod$fields$name
       b64_fields <- fields[which(tabMod$fields$type=="base64")]
