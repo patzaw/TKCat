@@ -2,7 +2,6 @@
 #------------------------------------------------------------------------------#
 ## Setup libraries ----
 library(AzureAuth)
-library(AuthHelpers)
 library(shiny)
 library(shinyjs)
 ################################################@
@@ -333,13 +332,14 @@ server <- function(input, output, session)
    }
 
    ### Authentication ----
-   auth_cred <- AuthHelpers::create_azure_authorization_credentials(
-      resource=`_azure_resource_`,
+   auth_cred <- AzureAuth::get_azure_token(
+      resource=c(`_azure_resource_`, "offline_access"),
       tenant=`_azure_tenant_`,
       app=`_azure_app_`,
       version=2,
-      offline_access=TRUE,
-      redirect_uri=`_azure_redirect_`,
+      auth_type="authorization_code",
+      use_cache = FALSE,
+      authorize_args=list(redirect_uri=`_azure_redirect_`),
       auth_code=opts$code
    )
 
@@ -351,9 +351,14 @@ server <- function(input, output, session)
    .get_tk_headers <- do.call(function(){
       credentials <- auth_cred
       return(function(){
-         credentials$refresh_token()
+         if(!credentials$validate()){
+            credentials$refresh()
+         }
          list(
-            "Authorization"=paste("Bearer", credentials$get_access_token())
+            "Authorization"=paste(
+               "Bearer",
+               credentials$credentials$access_token
+            )
          )
       })
    }, list())

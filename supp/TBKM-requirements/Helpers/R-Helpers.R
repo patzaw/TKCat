@@ -1,43 +1,16 @@
 ###############################################################################@
-#' List MDB with DE analyses
-#' 
-#' @param kmr the KMR object with TBKM specifications (by default, the KMR to which the function is attached). This KMR must also be a chMDB object.
-#' 
-#' @return  a tibble with DE analyses description tables
-#'   
-#' @import TKCat dplyr
-#' 
-#' @export
-#' 
-list_MDB_with_DE_analyses <- function(kmr=THISKMR){
-   stopifnot(
-      TKCat::is_KMR(kmr), TKCat::is.chMDB(kmr)
-   )
-   k <- unclass(kmr)$tkcon
-   n <- TKCat::db_info(kmr)$name
-   mdbNames <- TKCat::get_query(
-      k,
-      sprintf(
-         "SELECT database FROM system.tables WHERE name='%s'",
-         sprintf("___%s-Tables___", n)
-      )
-   )$database
-   query <- paste(
-      sprintf(
-         "SELECT *, '%s' as mdb FROM `%s`.`%s` WHERE type='DE analyses'",
-         mdbNames, mdbNames, sprintf("___%s-Tables___", n)
-      ),
-      collapse=" UNION ALL "
-   )
-   toRet <- TKCat::get_query(k, query)
-   return(toRet)
-}
+###############################################################################@
+## Collibra ----
+###############################################################################@
+
+collibra_tables <- c("___Collibra___", "___Collibra_dds___")
 
 ###############################################################################@
 #' Add Collibra metadata to an MDB. This MDB should already have KM specification tables (see [TKCat::add_km_spec()])
 #' 
 #' @param x the MDB object to update
 #' @param kmr the KMR object with TBKM specifications (by default, the KMR to which the function is attached).
+#' @param overwrite a logical indicating if existing Collibra metadata should be overwritten (default: FALSE)
 #' @param `Alias` Short name of the asset. This can be an acronym or abbreviation.
 #' @param `Domain` Scientific domain covered by the data
 #' @param `Drug development stage` Stages in drug development process where the asset may be relevant or valuable.
@@ -58,6 +31,7 @@ list_MDB_with_DE_analyses <- function(kmr=THISKMR){
 add_collibra_metadata <- function(
    x,
    kmr=THISKMR,
+   overwrite=FALSE,
    `Alias`=as.character(NA),
    `Domain`,
    `Drug development stage`,
@@ -72,11 +46,20 @@ add_collibra_metadata <- function(
    stopifnot(
       TKCat::is_KMR(kmr), is.MDB(x)
    )
-   if(any(c("___Collibra___", "___Collibra_dds___") %in% names(x))){
-      stop("Collibra reserved table names are already used in the provided MDB")
-   }
    kms <- get_km_spec(x, kmr)
    toRet <- x
+   if(any(collibra_tables %in% names(x))){
+      if(!overwrite){
+         stop(
+            "Collibra reserved table names are already used in the provided MDB"
+         )
+      }else{
+         for(tn in collibra_tables){
+            toRet <- TKCat::rm_km_table(toRet, kmr, tn)
+         }
+         toRet <- toRet[setdiff(names(toRet), collibra_tables)]
+      }
+   }
    
    `___Collibra___` <- tibble(
       `Alias`=`Alias`,
@@ -95,7 +78,7 @@ add_collibra_metadata <- function(
    
    
    dm <- ReDaMoR::df_to_model(
-      list = c("___Collibra___", "___Collibra_dds___"),
+      list = collibra_tables,
       envir=environment()
    )
    dm$`___Collibra___`$display$comment <-
@@ -154,7 +137,7 @@ add_collibra_metadata <- function(
    dm <- ReDaMoR::RelDataModel(dm, checkFK=FALSE)
    
    toRet <- c(
-      x,
+      toRet,
       memoMDB(
          dataTables=list(
             "___Collibra___"=`___Collibra___`,
@@ -208,7 +191,7 @@ get_collibra_mdb <- function(x){
    stopifnot(
       is.MDB(x)
    )
-   toRet <- TKCat::as_memoMDB(x[c("___Collibra___", "___Collibra_dds___")])
+   toRet <- TKCat::as_memoMDB(x[collibra_tables])
    TKCat::db_info(toRet)$name <- sprintf(
       "Collibra metadata for %s",
       TKCat::db_info(x)$name
@@ -306,5 +289,46 @@ get_collibra_metadata <- function(
          "Owner"
       )))
    
+   return(toRet)
+}
+
+###############################################################################@
+###############################################################################@
+## Tests ----
+###############################################################################@
+
+
+###############################################################################@
+#' List MDB with DE analyses
+#' 
+#' @param kmr the KMR object with TBKM specifications (by default, the KMR to which the function is attached). This KMR must also be a chMDB object.
+#' 
+#' @return  a tibble with DE analyses description tables
+#'   
+#' @import TKCat dplyr
+#' 
+#' @export
+#' 
+list_MDB_with_DE_analyses <- function(kmr=THISKMR){
+   stopifnot(
+      TKCat::is_KMR(kmr), TKCat::is.chMDB(kmr)
+   )
+   k <- unclass(kmr)$tkcon
+   n <- TKCat::db_info(kmr)$name
+   mdbNames <- TKCat::get_query(
+      k,
+      sprintf(
+         "SELECT database FROM system.tables WHERE name='%s'",
+         sprintf("___%s-Tables___", n)
+      )
+   )$database
+   query <- paste(
+      sprintf(
+         "SELECT *, '%s' as mdb FROM `%s`.`%s` WHERE type='DE analyses'",
+         mdbNames, mdbNames, sprintf("___%s-Tables___", n)
+      ),
+      collapse=" UNION ALL "
+   )
+   toRet <- TKCat::get_query(k, query)
    return(toRet)
 }

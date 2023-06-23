@@ -83,6 +83,26 @@ add_km_spec <- function(x, kmr){
 }
 
 ###############################################################################@
+#' Check if KM specifications are available in an [MDB] object
+#' 
+#' @param x an [MDB] object with specification tables
+#' @param kmr an [MDB] object with KM requirements
+#'
+#' @return A logical: TRUE if the MDB has KM specifications
+#'
+#' @export
+#'
+has_km_spec  <- function(x, kmr){
+   stopifnot(
+      is.MDB(x), is_KMR(kmr)
+   )
+   dm <- KMSPEC_DM
+   kmn <- db_info(kmr)$name
+   names(dm) <- sprintf(names(dm), kmn)
+   return(all(names(dm) %in% names(x)))
+}
+
+###############################################################################@
 #' Get KM specifications from an [MDB] object
 #' 
 #' @param x an [MDB] object with specification tables
