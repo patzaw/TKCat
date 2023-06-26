@@ -27,6 +27,10 @@ shiny::addResourcePath(
    "www",
    system.file("www", package = "TKCat")
 )
+shiny::addResourcePath(
+   "www2",
+   "/home/pgodard/ShinyApps/Shared-Resources"
+)
 subSetSize <- 100
 .highlightText <- function(text, value){
    value <- sub('^"', '', sub('"$', '', value))
@@ -270,13 +274,17 @@ ui <-    shinydashboard::dashboardPage(
          shinydashboard::tabItem(
             tabName="authInR",
             shiny::fluidRow(shiny::column(
-               6,
-               shiny::markdown(
-                  paste(
-                     readLines("supp/authentication-in-R.Rmd"),
-                     collapse = "\n"
-                  ),
-                  extensions = FALSE
+               12,
+               # shiny::markdown(
+               #    paste(
+               #       readLines("supp/authentication-in-R.Rmd"),
+               #       collapse = "\n"
+               #    ),
+               #    extensions = FALSE
+               # )
+               shiny::tags$iframe(
+                  src="www2/KMT-authentication-in-R.html",
+                  style="border:none; width:100%; height:85vh;"
                )
             ))
          )
