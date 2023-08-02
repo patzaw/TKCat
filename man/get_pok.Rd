@@ -7,11 +7,12 @@
 get_pok(x, mdb_name, corpus_name)
 }
 \arguments{
-\item{x}{a \link{chTKCat} object}
+\item{x}{a \link{chTKCat} or a \link[=chMDB]{KMR} object}
 
-\item{mdb_name}{the piece of knowlege to get}
+\item{mdb_name}{the piece of knowledge to get}
 
-\item{corpus_name}{the corpus to which the piece belongs}
+\item{corpus_name}{if x is a \link{chTKCat} object,
+the corpus to which the piece belongs. Otherwise this parameter is ignored.}
 }
 \description{
 Get a piece of knowledge from a \link{chTKCat} connection

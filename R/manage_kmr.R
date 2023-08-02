@@ -58,7 +58,7 @@ create_KMR <- function(
 #' 
 #' @export
 #'
-is_KMR <- function(x){
+is.KMR <- function(x){
    return(
       inherits(x, "KMR") ||
          (
@@ -111,7 +111,7 @@ as_KMR <- function(x){
 #' 
 add_unit_def <- function(kmr, measurement, unit, description){
    stopifnot(
-      is_KMR(kmr),
+      is.KMR(kmr),
       is.character(measurement), length(measurement)==1, !is.na(measurement),
       measurement != "",
       is.character(unit), length(unit)==1, !is.na(unit), unit != "",
@@ -185,7 +185,7 @@ add_feature_def <- function(
    kmr, name, description, properties
 ){
    stopifnot(
-      is_KMR(kmr),
+      is.KMR(kmr),
       is.character(name), length(name)==1, !is.na(name),
       is.character(description), length(description)==1, !is.na(description),
       is.list(properties), length(properties) > 0,
@@ -304,7 +304,7 @@ add_property_values <- function(
    kmr, feature, property, values
 ){
    stopifnot(
-      is_KMR(kmr),
+      is.KMR(kmr),
       is.character(feature), length(feature)==1, !is.na(feature),
       is.character(property), length(property)==1, !is.na(property)
    )
@@ -407,7 +407,7 @@ add_table_def <- function(
    kmr, name, description, collection=as.character(NA), mandatory_features
 ){
    stopifnot(
-      is_KMR(kmr),
+      is.KMR(kmr),
       is.character(name), length(name)==1, !is.na(name),
       !name %in% kmr$Tables$name,
       is.character(description), length(description)==1, !is.na(description),
@@ -471,7 +471,7 @@ add_table_features <- function(
    kmr, table, features
 ){
    stopifnot(
-      is_KMR(kmr),
+      is.KMR(kmr),
       is.character(table), length(table)==1, !is.na(table),
       table %in% kmr$Tables$name,
       is.character(features), length(features) > 0,
@@ -537,6 +537,24 @@ get_KMR <- function(...){
 
 
 ###############################################################################@
+#' 
+#' @rdname db_reconnect
+#' @method db_reconnect KMR
+#' 
+#' @export
+#'
+db_reconnect.KMR <- function(x, user, password, ntries=3, ...){
+   xn <- deparse(substitute(x))
+   nv <- x
+   class(nv) <- setdiff(class(nv), "KMR")
+   db_reconnect(nv, user=user, password=password, ntries=ntries, ...)
+   class(nv) <- unique(c("KMR", class(nv)))
+   assign(xn, nv, envir=parent.frame(n=1))
+   invisible(nv)
+}
+
+
+###############################################################################@
 #' List types of tables defined in a [KMR] object
 #' 
 #' @param kmr a [KMR] object
@@ -547,7 +565,7 @@ get_KMR <- function(...){
 #' @export
 #' 
 list_table_types <- function(kmr){
-   stopifnot(is_KMR(kmr))
+   stopifnot(is.KMR(kmr))
    return(arrange(kmr$Tables, .data$name))
 }
 
@@ -564,7 +582,7 @@ list_table_types <- function(kmr){
 #' @export
 #' 
 list_table_features <- function(kmr, tables=NULL){
-   stopifnot(is_KMR(kmr))
+   stopifnot(is.KMR(kmr))
    getfp <- function(x){
       dplyr::group_by(x$Feature_properties, .data$feature) %>% 
          dplyr::arrange(
@@ -631,7 +649,7 @@ list_table_features <- function(kmr, tables=NULL){
 #' 
 list_feature_properties <- function(kmr, feature){
    stopifnot(
-      is_KMR(kmr),
+      is.KMR(kmr),
       length(feature)==1,
       feature %in% kmr$Features$name
    )
@@ -652,7 +670,7 @@ list_feature_properties <- function(kmr, feature){
 #' @export
 #' 
 list_measurements <- function(kmr){
-   stopifnot(is_KMR(kmr))
+   stopifnot(is.KMR(kmr))
    return(sort(unique(dplyr::pull(kmr$Units, "measurement"))))
 }
 
@@ -669,7 +687,7 @@ list_measurements <- function(kmr){
 #' 
 list_measurement_units <- function(kmr, measurement){
    stopifnot(
-      is_KMR(kmr),
+      is.KMR(kmr),
       length(measurement)==1,
       measurement %in% kmr$Units$measurement
    )
@@ -693,7 +711,7 @@ list_measurement_units <- function(kmr, measurement){
 #' 
 list_property_values <- function(kmr, feature, property){
    stopifnot(
-      is_KMR(kmr),
+      is.KMR(kmr),
       length(feature)==1, length(property)==1
    )
    fp <- dplyr::filter(

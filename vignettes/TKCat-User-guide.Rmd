@@ -889,6 +889,7 @@ package to be installed with a
 connection to BED database in order to run the code below.
 
 ```{r}
+try(connectToBed())
 bedCheck <- try(BED::checkBedConn())
 if(!inherits(bedCheck, "try-error") && bedCheck){
    sel_coll <- get_shared_collections(file_clinvar, file_chembl) %>% 

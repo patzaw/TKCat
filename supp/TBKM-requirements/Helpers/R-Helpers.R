@@ -44,7 +44,7 @@ add_collibra_metadata <- function(
    `Community`
 ){
    stopifnot(
-      TKCat::is_KMR(kmr), is.MDB(x)
+      TKCat::is.KMR(kmr), is.MDB(x)
    )
    kms <- get_km_spec(x, kmr)
    toRet <- x
@@ -187,7 +187,7 @@ add_collibra_metadata <- function(
 #'   
 #' @export
 #' 
-get_collibra_mdb <- function(x){
+get_collibra_mdb <- function(x=THISMDB){
    stopifnot(
       is.MDB(x)
    )
@@ -214,7 +214,7 @@ get_collibra_metadata <- function(
       kmr=THISKMR
 ){
    stopifnot(
-      TKCat::is_KMR(kmr)
+      TKCat::is.KMR(kmr)
    )
    allMdbs <- TKCat::list_MDBs(unclass(kmr)$tkcon)
    allTables <- TKCat::list_tables(unclass(kmr)$tkcon)
@@ -311,7 +311,7 @@ get_collibra_metadata <- function(
 #' 
 list_MDB_with_DE_analyses <- function(kmr=THISKMR){
    stopifnot(
-      TKCat::is_KMR(kmr), TKCat::is.chMDB(kmr)
+      TKCat::is.KMR(kmr), TKCat::is.chMDB(kmr)
    )
    k <- unclass(kmr)$tkcon
    n <- TKCat::db_info(kmr)$name

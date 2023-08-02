@@ -10,7 +10,7 @@
 #'
 add_km_spec <- function(x, kmr){
    
-   stopifnot(is.MDB(x), is_KMR(kmr))
+   stopifnot(is.MDB(x), is.KMR(kmr))
    
    dm <- KMSPEC_DM
    kmn <- db_info(kmr)$name
@@ -94,7 +94,7 @@ add_km_spec <- function(x, kmr){
 #'
 has_km_spec  <- function(x, kmr){
    stopifnot(
-      is.MDB(x), is_KMR(kmr)
+      is.MDB(x), is.KMR(kmr)
    )
    dm <- KMSPEC_DM
    kmn <- db_info(kmr)$name
@@ -114,7 +114,7 @@ has_km_spec  <- function(x, kmr){
 #'
 get_km_spec  <- function(x, kmr){
    stopifnot(
-      is.MDB(x), is_KMR(kmr)
+      is.MDB(x), is.KMR(kmr)
    )
    dm <- KMSPEC_DM
    kmn <- db_info(kmr)$name
@@ -149,7 +149,7 @@ get_km_spec  <- function(x, kmr){
 #'
 add_km_table <- function(x, kmr, name, type, features=list()){
    stopifnot(
-      is.MDB(x), is_KMR(kmr),
+      is.MDB(x), is.KMR(kmr),
       name %in% names(x),
       type %in% kmr$Tables$name
    )
@@ -277,7 +277,7 @@ rm_km_table <- function(
 ){
    
    stopifnot(
-      is.MDB(x), is_KMR(kmr)
+      is.MDB(x), is.KMR(kmr)
    )
    
    ## Splitting and preparing information ----
@@ -354,7 +354,7 @@ add_km_feature <- function(
 ){
    
    stopifnot(
-      is.MDB(x), is_KMR(kmr),
+      is.MDB(x), is.KMR(kmr),
       feature %in% kmr$Features$name,
       is.character(unit), length(unit)==1
    )
@@ -615,7 +615,7 @@ rm_km_feature <- function(
 ){
    
    stopifnot(
-      is.MDB(x), is_KMR(kmr)
+      is.MDB(x), is.KMR(kmr)
    )
    
    ## Splitting and preparing information ----
@@ -686,7 +686,7 @@ check_km_spec <- function(x, kmr){stop("NOT IMPLEMENTED YET")}
 add_helpers.MDB <- function(x, code, name, language, kmr, ...){
    
    stopifnot(
-      is_KMR(kmr),
+      is.KMR(kmr),
       is.character(name), length(name)==1, !is.na(name),
       length(code)==1, file.exists(code),
       is.character(language), length(language)==1, !is.na(language)
@@ -751,7 +751,7 @@ add_helpers.MDB <- function(x, code, name, language, kmr, ...){
 get_R_helpers.MDB <- function(x, hnames=NA, kmr, ...){
    
    stopifnot(
-      is_KMR(kmr)
+      is.KMR(kmr)
    )
    
    ## Splitting information ----
