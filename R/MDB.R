@@ -150,10 +150,10 @@ format.MDB <- function(x, ...){
                   function(y){
                      return(sprintf(
                         "   - %s %s member%s",
-                        length(unique(cm$table[which(cm$collection==y)])),
+                        length(unique(cm$mid[which(cm$collection==y)])),
                         y,
                         ifelse(
-                           length(unique(cm$table[which(cm$collection==y)]))>1,
+                           length(unique(cm$mid[which(cm$collection==y)]))>1,
                            "s", ""
                         )
                      ))
@@ -328,15 +328,26 @@ add_collection_member <- function(
       "field", "static", "value", "type"
    )
    if(!is.null(cm)){
-      toAddf <- dplyr::anti_join(
-         toAdd, cm,
-         by=c("collection", "table", "field", "value")
-      )
-      if(nrow(toAddf)==0){
+      alreadyIn <- sharedFields <- FALSE
+      for(cmmid in unique(cm$mid)){
+         toAddf <- dplyr::inner_join(
+            toAdd, cm[which(cm$mid==cmmid),],
+            by=c("collection", "table", "field", "value")
+         )
+         alreadyIn <- alreadyIn || nrow(toAddf)==nrow(toAdd)
+         sharedFields <- sharedFields || nrow(toAddf) > 0
+      }
+      if(alreadyIn){
          warning(
-            "This member is already recorded: it won't be added nor modified"
+            "Member already recorded: it won't be added nor modified"
          )
          toAdd <- NULL
+      }else{
+         if(sharedFields){
+            warning(
+               "Members share fields"
+            )
+         }
       }
    }
    cm <- rbind(
