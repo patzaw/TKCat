@@ -984,14 +984,14 @@ tbkm <- add_feature_def(
 tbkm <- add_feature_def(
    tbkm,
    "feature column",
-   "A column name in a table",
+   "A column in a table",
    properties=list(
       "value"=list(
          type="character",
          mandatory=TRUE
       ),
       "table"=list(
-         type="character",
+         type="table",
          mandatory=TRUE
       )
    )
