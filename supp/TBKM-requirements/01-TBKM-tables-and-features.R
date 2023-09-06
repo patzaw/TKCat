@@ -694,6 +694,29 @@ tbkm <- add_feature_def(
 ) %>% 
    as_memoMDB() %>% as_KMR()
 
+#### Phenotypes ----
+
+##### Number of seizures ** ----
+tbkm <- add_feature_def(
+   tbkm,
+   "number of seizures",
+   "Number of recorded seizures during a time period",
+   properties=list(
+      "value"=list(
+         type="integer",
+         description="The number of recorded seizures",
+         mandatory=TRUE
+      ),
+      "period"=list(
+         type="numeric",
+         description="Duration of the recording period",
+         mandatory=FALSE,
+         measurement="duration"
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
 ### Tables ----
 
 #### samples ** ----
@@ -703,7 +726,7 @@ optFeatures <- c(
    "death cause", "disease", "compound",
    "tissue",
    "cell type", "culture type", "time in vitro",
-   "biological entity", "genetic variant"
+   "biological entity", "genetic variant", "number of seizures"
 )
 tbkm <- add_table_def(
    tbkm,
@@ -957,6 +980,24 @@ tbkm <- add_feature_def(
 ) %>% 
    as_memoMDB() %>% as_KMR()
 
+#### feature column ** ----
+tbkm <- add_feature_def(
+   tbkm,
+   "feature column",
+   "A column name in a table",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      ),
+      "table"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
 ### Others ----
 
 #### p-value ** ----
@@ -1026,6 +1067,69 @@ tbkm <- add_table_def(
    description="Description of differential expression analyses",
    mandatory=c(
       "name", "condition ref", "ref. condition ref" 
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_table_features(
+   tbkm,
+   "DE analyses",
+   features=c("dataset ref", "description", "report ref")
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+###############################################################################@
+## Correlation with expression ----
+
+### Features ----
+
+##### correlation method ** ----
+tbkm <- add_feature_def(
+   tbkm,
+   "correlation method",
+   "Method for measuring correlation",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+#### correlation ** ----
+tbkm <- add_feature_def(
+   tbkm,
+   "correlation",
+   "Correlation value between two variables",
+   properties=list(
+      "value"=list(
+         type="numeric",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+### Tables ----
+
+#### expression correlation ** ----
+tbkm <- add_table_def(
+   tbkm,
+   "expression correlation",
+   description="Results of differential expression (DE) analyses",
+   mandatory=c(
+      "analysis ref", "beid ref", "correlation", "p-value", "FDR" 
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+#### EC analyses ** ----
+tbkm <- add_table_def(
+   tbkm,
+   "EC analyses",
+   description="Description of correlation with expression analyses",
+   mandatory=c(
+      "name", "condition ref", "feature column", "correlation method"
    )
 ) %>% 
    as_memoMDB() %>% as_KMR()
@@ -1292,20 +1396,6 @@ tbkm <- add_feature_def(
 ) %>% 
    as_memoMDB() %>% as_KMR()
 
-##### correlation method ** ----
-tbkm <- add_feature_def(
-   tbkm,
-   "correlation method",
-   "Method for measuring correlation",
-   properties=list(
-      "value"=list(
-         type="character",
-         mandatory=TRUE
-      )
-   )
-) %>% 
-   as_memoMDB() %>% as_KMR()
-
 ##### r2 ** ----
 tbkm <- add_feature_def(
    tbkm,
@@ -1536,7 +1626,7 @@ tbkm <- add_feature_def(
 tbkm <- add_table_def(
    tbkm,
    "functional enrichment",
-   description="Results from yACRA analysis",
+   description="Results of functional enrichment analysis",
    mandatory=c(
       "analysis ref", "module ref", "module members",
       "functional be list", "functional members",
