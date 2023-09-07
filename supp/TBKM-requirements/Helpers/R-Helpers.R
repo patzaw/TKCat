@@ -292,53 +292,17 @@ get_collibra_metadata <- function(
    return(toRet)
 }
 
-###############################################################################@
-###############################################################################@
-## Tests ----
-###############################################################################@
-
 
 ###############################################################################@
-#' List MDB with DE analyses
-#' 
-#' @param kmr the KMR object with TBKM specifications (by default, the KMR to which the function is attached). This KMR must also be a chMDB object.
-#' 
-#' @return  a tibble with DE analyses description tables
-#'   
-#' @import TKCat dplyr
-#' 
-#' @export
-#' 
-list_MDB_with_DE_analyses <- function(kmr=THISKMR){
-   stopifnot(
-      TKCat::is.KMR(kmr), TKCat::is.chMDB(kmr)
-   )
-   k <- unclass(kmr)$tkcon
-   n <- TKCat::db_info(kmr)$name
-   mdbNames <- TKCat::get_query(
-      k,
-      sprintf(
-         "SELECT database FROM system.tables WHERE name='%s'",
-         sprintf("___%s-Tables___", n)
-      )
-   )$database
-   query <- paste(
-      sprintf(
-         "SELECT *, '%s' as mdb FROM `%s`.`%s` WHERE type='DE analyses'",
-         mdbNames, mdbNames, sprintf("___%s-Tables___", n)
-      ),
-      collapse=" UNION ALL "
-   )
-   toRet <- TKCat::get_query(k, query)
-   return(toRet)
-}
+###############################################################################@
+## BEID lists ----
 
 ###############################################################################@
 #' Get lists of biological entities provided by an MDB
 #'
 #' @param x the MDB object providing BEIDs lists (by default, the MDB to which the function is attached)
 #' @param tables names of tables to take (default: NULL ==> all compatible tables)
-#' @param types names of table type (default: NULL ==> all compatible types)
+#' @param types names of table type (default: NULL ==> all compatible types). Used only when tables are not provided
 #' @param be the type of biological entity ([BED::listBe()]). This information is only necessary and used when it is ambiguous in the MDB
 #' @param source the source of identifiers ([BED::listBeIdSources()]). This information is only necessary and used when it is ambiguous in the MDB
 #' @param organism the biological organism ([BED::listOrganisms()]). This information is only necessary and used when it is ambiguous in the MDB
@@ -394,7 +358,7 @@ get_beid_lists <- function(
          )
       }
       found <- tbkm_tables %>%
-         dplyr::filter(name %in% !!tables & type %in% !!types) %>% 
+         dplyr::filter(name %in% !!tables & type %in% !!possible_types$type) %>% 
          dplyr::pull("name")
       wrongtype <- setdiff(tables, found)
       if(length(wrongtype)>0){
@@ -466,5 +430,47 @@ get_beid_lists <- function(
       )
    }
    
+   return(toRet)
+}
+
+
+###############################################################################@
+###############################################################################@
+## Tests ----
+###############################################################################@
+
+
+###############################################################################@
+#' List MDB with DE analyses
+#' 
+#' @param kmr the KMR object with TBKM specifications (by default, the KMR to which the function is attached). This KMR must also be a chMDB object.
+#' 
+#' @return  a tibble with DE analyses description tables
+#'   
+#' @import TKCat dplyr
+#' 
+#' @export
+#' 
+list_MDB_with_DE_analyses <- function(kmr=THISKMR){
+   stopifnot(
+      TKCat::is.KMR(kmr), TKCat::is.chMDB(kmr)
+   )
+   k <- unclass(kmr)$tkcon
+   n <- TKCat::db_info(kmr)$name
+   mdbNames <- TKCat::get_query(
+      k,
+      sprintf(
+         "SELECT database FROM system.tables WHERE name='%s'",
+         sprintf("___%s-Tables___", n)
+      )
+   )$database
+   query <- paste(
+      sprintf(
+         "SELECT *, '%s' as mdb FROM `%s`.`%s` WHERE type='DE analyses'",
+         mdbNames, mdbNames, sprintf("___%s-Tables___", n)
+      ),
+      collapse=" UNION ALL "
+   )
+   toRet <- TKCat::get_query(k, query)
    return(toRet)
 }
