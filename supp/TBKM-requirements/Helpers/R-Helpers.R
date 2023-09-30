@@ -298,14 +298,158 @@ get_collibra_metadata <- function(
 ## BEID lists ----
 
 ###############################################################################@
+#' Get possible scopes of biological entities provided by an MDB table
+#'
+#' @param table name of the table of interest
+#' @param x the MDB object providing BEIDs lists (by default, the MDB to which the function is attached)
+#' 
+#' @return A tibble with possible BEID scopes
+#' 
+#' @import TKCat BED magrittr dplyr
+#'   
+#' @export
+#'
+list_beid_scopes <- function(
+      table, x=THISMDB
+){
+   mdb <- x
+   possible_types <- matrix(
+      c(
+         "CoReMo members", "CoReMo modules", "beid ref",
+         "be list members", "be list description", "beid ref",
+         "biological entities", "Table of biological entity identifiers", NA
+      ),
+      ncol=3, byrow = TRUE,
+      dimnames = list(c(), c("type", "description", "ref_field"))
+   ) %>% 
+      dplyr::as_tibble()
+   
+   tbkm_tables <- mdb$`___TBKM-Tables___`
+   tbkm_features <- mdb$`___TBKM-Features___`
+   dm <- TKCat::data_model(mdb)
+   be_cm <- TKCat::collection_members(mdb, "BE")
+   
+   notfound <- setdiff(table, tbkm_tables$name)
+   if(length(notfound)>0){
+      stop(
+         "Cannot find the following tables: ",
+         paste(notfound, collapse=", ")
+      )
+   }
+   found <- tbkm_tables %>%
+      dplyr::filter(name == !!table & type %in% !!possible_types$type)
+   wrongtype <- setdiff(table, found$name)
+   if(length(wrongtype)>0){
+      stop(
+         "The following tables do not provide supported BEID: ",
+         paste(wrongtype, collapse=", ")
+      )
+   }
+   
+   if("biological entities" %in% found$type){
+      bet <- table
+   }else{
+      table_fk <- unlist(lapply(
+         dm[[table]]$foreignKeys, function(x) x$refTable
+      ))
+      bet <- intersect(table_fk, be_cm$table)
+   }
+   
+   if(!bet %in% be_cm$table){
+      stop(table, " does not provide BE")
+   }
+   
+   static <- be_cm %>% 
+      dplyr::filter(table == !!bet & static & field != "identifier")
+   dyn <- be_cm %>% 
+      dplyr::filter(table == !!bet & !static & field != "identifier")
+   field_names <- dyn$value
+   names(field_names) <- dyn$field
+   if(length(field_names) > 0){
+      if(is.chMDB(mdb)){
+         scopes <- get_query(
+            mdb,
+            sprintf(
+               "SELECT DISTINCT %s FROM %s",
+               paste(
+                  sprintf("%s as %s", field_names, names(field_names)),
+                  collapse=", "
+               ),
+               bet
+            )
+         )
+      }else{
+         scopes <- mdb[[bet]] %>% 
+            dplyr::select(dplyr::all_of(field_names)) %>% 
+            dplyr::distinct()
+      }
+      for(sf in static$field){
+         scopes[[sf]] <- static$value[which(static$field==sf)]
+      }
+   }else{
+      scopes <- static$value
+      names(scopes) <- static$field
+      scopes <- dplyr::as_tibble(t(scopes))
+   }
+   
+   org_type <- be_cm %>% 
+      dplyr::filter(table == !!bet & field == "organism") %>% 
+      dplyr::pull("type")
+   if(length(org_type) == 1 && org_type == "NCBI taxon identifier"){
+      scopes <- dplyr::left_join(
+         dplyr::rename(scopes, "taxID"="organism"),
+         BED::getOrgNames() %>% 
+            dplyr::filter(nameClass=="scientific name") %>% 
+            dplyr::select("taxID", "organism"="name"),
+         by="taxID"
+      ) %>% 
+         dplyr::select(-"taxID")
+   }
+   
+   return(scopes)
+}
+
+###############################################################################@
+#' List lists of biological entities provided by an MDB
+#' 
+#' @param x the MDB object providing BEIDs lists (by default, the MDB to which the function is attached)
+#' 
+#' @return A tibble with BEID list names and type
+#' 
+#' @export
+#' 
+list_beid_lists <- function(
+      x=THISMDB
+){
+   mdb <- x
+   possible_types <- matrix(
+      c(
+         "CoReMo members", "CoReMo modules", "module ref",
+         "be list members", "be list description", "be list ref"
+      ),
+      ncol=3, byrow = TRUE,
+      dimnames = list(c(), c("type", "description", "ref_field"))
+   ) %>% 
+      dplyr::as_tibble()
+   
+   tbkm_tables <- mdb$`___TBKM-Tables___`
+   tbkm_features <- mdb$`___TBKM-Features___`
+   types <- possible_types$type
+   tables <- tbkm_tables %>% 
+      dplyr::filter(type %in% !!types)
+   return(tables)
+}
+
+###############################################################################@
+#' Get lists of biological entities provided by an MDB###############################################################################@
 #' Get lists of biological entities provided by an MDB
 #'
-#' @param x the MDB object providing BEIDs lists (by default, the MDB to which the function is attached)
 #' @param tables names of tables to take (default: NULL ==> all compatible tables)
 #' @param types names of table type (default: NULL ==> all compatible types). Used only when tables are not provided
 #' @param be the type of biological entity ([BED::listBe()]). This information is only necessary and used when it is ambiguous in the MDB
 #' @param source the source of identifiers ([BED::listBeIdSources()]). This information is only necessary and used when it is ambiguous in the MDB
 #' @param organism the biological organism ([BED::listOrganisms()]). This information is only necessary and used when it is ambiguous in the MDB
+#' @param x the MDB object providing BEIDs lists (by default, the MDB to which the function is attached)
 #' 
 #' @return A list of [BED::BEIDList] objects
 #' 
@@ -314,8 +458,18 @@ get_collibra_metadata <- function(
 #' @export
 #' 
 get_beid_lists <- function(
-      mdb=THISMDB, tables=NULL, types=NULL, be=NULL, source=NULL, organism=NULL
+      tables=NULL, types=NULL, be=NULL, source=NULL, organism=NULL, x=THISMDB
 ){
+   mdb <- x
+   if(!is.null(organism)){
+      taxid <- BED::getTaxId(organism)
+      if(is.null(taxid)){
+         stop(sprintf("%s organism not in BED", organism))
+      }
+      organism <- BED::getOrgNames(taxid) %>% 
+         filter(nameClass=="scientific name") %>% 
+         pull(name)
+   }
    be_scope <- list(be=be, source=source, organism=organism)
    be_scope <- be_scope[which(!unlist(lapply(be_scope, is.null)))]
    require(BED)
@@ -386,6 +540,7 @@ get_beid_lists <- function(
          dplyr::pull("ref_field")
       table_fk <- unlist(lapply(dm[[tn]]$foreignKeys, function(x) x$refTable))
       
+      ## Metadata ----
       desc_table <- tbkm_tables %>% 
          dplyr::filter(type == !!desc_type) %>% 
          dplyr::pull("name") %>% 
@@ -396,33 +551,117 @@ get_beid_lists <- function(
       md <- mdb[[desc_table]] %>% 
          dplyr::mutate(.lname=.data[[desc_name_field]])
       
+      ## Scope ----
+      be_table <- intersect(be_tables, table_fk)
+      p_scope <- be_cm %>% 
+         dplyr::filter(
+            table==!!be_table & field != "identifier" & static
+         )
+      p_scope$value[which(p_scope$field==organism)] <- ifelse(
+         p_scope$type=="Scientific name",
+         p_scope$value[which(p_scope$field==organism)],
+         BED::getOrgNames(
+            p_scope$value[which(p_scope$field==organism)]
+         ) %>% 
+            filter(nameClass=="scientific name") %>% 
+            pull(name)
+      )
+      p_scope <- p_scope$value %>%
+         magrittr::set_names(p_scope$field) %>% 
+         as.list()
+      missing_scope_elts <- setdiff(
+         c("be", "source", "organism"), names(p_scope)
+      )
+      if(length(missing_scope_elts) > 0){
+         if(length(be_scope) > 0){
+            possible_scopes <- list_beid_scopes(table = be_table, x=mdb)
+            possible_scopes <- possible_scopes %>% 
+               dplyr::filter(eval(parse(text=paste(
+                  sprintf('%s == "%s"', names(be_scope), be_scope),
+                  collapse = " & "
+               ))))
+            if(nrow(possible_scopes)==1){
+               p_scope <- as.list(possible_scopes)
+            }
+            missing_scope_elts <- setdiff(
+               c("be", "source", "organism"), names(p_scope)
+            )
+         }
+         for(missing in missing_scope_elts){
+            
+            if(!missing %in% names(be_scope)){
+               stop(sprintf(
+                  '"%s" is ambiguous and must be provided',
+                  missing
+               ))
+            }
+            p_scope[[missing]] <- be_scope[[missing]]
+         }
+      }
+      amb_input <- names(be_scope)[which(
+         unlist(be_scope) != unlist(p_scope[names(be_scope)])
+      )]
+      if(length(amb_input) > 0){
+         warning(
+            "These scope features do not match MDB scope and wont be used: ",
+            paste(
+               sprintf(
+                  "%s = '%s'",
+                  amb_input, be_scope[amb_input]
+               ),
+               collapse=", "
+            )
+         )
+      }
+      
+      ## Filtering BEIDs according to scope ----
+      dyn_scope <- be_cm %>% 
+         dplyr::filter(
+            table==!!be_table & field != "identifier" & !static
+         )
+      if(nrow(dyn_scope) > 0){
+         filt_exp <- c()
+         for(i in 1:nrow(dyn_scope)){
+            scope_name <- dyn_scope$field[i]
+            field <- dm[[tn]]$foreignKeys[[which(table_fk==be_table)]]$key %>% 
+               dplyr::filter(to==dyn_scope$value[i]) %>% 
+               dplyr::pull(from)
+            filt <- p_scope[[scope_name]]
+            if(scope_name == "organism"){
+               org_type <- dyn_scope$type[i]
+               if(org_type == "NCBI taxon identifier"){
+                  filt <- taxid
+               }
+            }
+            filt_exp <- c(
+               filt_exp,
+               sprintf("%s == '%s'", field, filt)
+            )
+         }
+         if(is.chMDB(mdb)){
+            filt_exp <- paste(filt_exp, collapse = " AND ")
+            l <- get_query(
+               mdb,
+               sprintf("SELECT * FROM %s WHERE %s", tn, filt_exp)
+            )
+         }else{
+            filt_exp <- paste(filt_exp, collapse = " & ")
+            l <- l %>% dplyr::filter(eval(parse(text=ft)))
+         }
+      }else{
+         l <- mdb[[tn]]
+      }
+      
+      ## List ----
       be_field <- tbkm_features %>% 
          dplyr::filter(table==!!tn & feature=="beid ref") %>% 
          dplyr::pull("field")
       l_field <- tbkm_features %>% 
          dplyr::filter(table==!!tn & feature==!!ref_field) %>% 
          dplyr::pull("field")
-      l <- mdb[[tn]]
       l <- split(l[[be_field]], l[[l_field]])
       
-      be_table <- intersect(be_tables, table_fk)
-      p_scope <- be_cm %>% 
-         dplyr::filter(table==!!be_table & field != "identifier")
-      p_scope <- p_scope$value %>%
-         magrittr::set_names(p_scope$field) %>% 
-         as.list()
-      missing_scope_elts <- setdiff(c("be", "source", "organism"), names(p_scope))
-      for(missing in missing_scope_elts){
-         if(!missing %in% names(be_scope)){
-            stop(sprintf(
-               '"%s" is ambiguous and must be provided',
-               missing
-            ))
-         }
-         p_scope[[missing]] <- be_scope[[missing]]
-      }
-      
-      toRet[[tn]] <- BEIDList(
+      toRet[[tn]] <- BED::BEIDList(
          l,
          scope=p_scope,
          metadata=md %>% 
