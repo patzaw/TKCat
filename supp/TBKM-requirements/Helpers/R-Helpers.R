@@ -206,7 +206,7 @@ get_collibra_mdb <- function(x=THISMDB){
 #' 
 #' @return A tibble with Collibra metadata from relevant MDBs
 #' 
-#' @import TKCat ReDaMoR
+#' @import TKCat ReDaMoR dplyr
 #'   
 #' @export
 #' 
@@ -217,6 +217,7 @@ get_collibra_metadata <- function(
       TKCat::is.KMR(kmr)
    )
    allMdbs <- TKCat::list_MDBs(unclass(kmr)$tkcon)
+   public_mdbs <- allMdbs %>% dplyr::filter(public) %>% pull(name)
    allTables <- TKCat::list_tables(unclass(kmr)$tkcon)
    toTake <- allTables %>%
       dplyr::filter(name=="___Collibra___") %>% 
@@ -265,6 +266,22 @@ get_collibra_metadata <- function(
             "chTKCat on %s:%s (contact: %s)",
             unclass(kmr)$tkcon$chcon@host, unclass(kmr)$tkcon$chcon@port,
             unclass(kmr)$tkcon$contact
+         ),
+         "Access Approval"=ifelse(
+            MDB %in% !!public_mdbs,
+            "Technical support is needed",
+            "Owner and Technical support is needed"
+         ),
+         "Access documentation"=ifelse(
+            MDB %in% !!public_mdbs,
+            sprintf(
+               'If you have not done it yet, you should request access to <a href="https://ucb-dwp.onbmc.com/dwp/app/#/itemprofile/6201" target="_blank">DTS Knowledge Management Tools (onbmc.com)</a> in MyWorkplace. You can check the access here: <a href="https://bel038783/shiny/pgodard/UCB-TKCat/" target="_blank">https://bel038783/shiny/pgodard/UCB-TKCat/</a> and follow instructions given in the "Authentication from R" tab to connect from R to TKCat. No approval is needed to get %s data from TKCat. Therefore if you have access to TKCat, you can get %s data from it.',
+               MDB, MDB
+            ),
+            sprintf(
+               'If you have not done it yet, you should request access to <a href="https://ucb-dwp.onbmc.com/dwp/app/#/itemprofile/6201" target="_blank">DTS Knowledge Management Tools (onbmc.com)</a> in MyWorkplace. You can check the access here: <a href="https://bel038783/shiny/pgodard/UCB-TKCat/" target="_blank">https://bel038783/shiny/pgodard/UCB-TKCat/</a> and follow instructions given in the "Authentication from R" tab to connect from R to TKCat. An approval from %s is required to get access to %s data from TKCat.',
+               Owner, MDB
+            )
          )
       ) %>% 
       select(all_of(c(
@@ -286,7 +303,9 @@ get_collibra_metadata <- function(
          "Refresh Frequency",
          "Asset Type",
          "Community",
-         "Owner"
+         "Owner",
+         "Access Approval",
+         "Access documentation"
       )))
    
    return(toRet)
