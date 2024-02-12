@@ -15,8 +15,11 @@ collibra_tables <- c("___Collibra___", "___Collibra_dds___")
 #' @param `Domain` Scientific domain covered by the data
 #' @param `Drug development stage` Stages in drug development process where the asset may be relevant or valuable.
 #' @param `Primary Use Case` UCB primary reason the data was generated or accessed
-#' @param `Restrictions` Limitations (e.g., geography, function, contract, etc.) on data access and usage
+#' @param `Restrictions` Limitations on data access and usage
+#' @param `Restrictions summary`Additional details on restrictions (e.g., geography, function, contract, etc.)
+#' @param `License type` Type of License that dictates the data use terms and conditions
 #' @param `License` UCB relationship with the data provider e.g. public access, academic partnership, commercial license
+#' @param `Data Protection Category` Level of patient identification within the dataset
 #' @param `Source of data` Main source(s) of the captured data or method of data collection/generation
 #' @param `Nature of data` Type(s) of data within the asset. This can include clarification on the entities captured in the asset (e.g. genes, proteins).
 #' @param `Refresh Frequency` How often the asset is updated
@@ -37,7 +40,10 @@ add_collibra_metadata <- function(
    `Drug development stage`,
    `Primary Use Case`,
    `Restrictions`,
+   `Restrictions summary`=as.character(NA),
+   `License type`,
    `License`,
+   `Data Protection Category`,
    `Source of data`=as.character(NA),
    `Nature of data`,
    `Refresh Frequency`=as.character(NA),
@@ -66,7 +72,10 @@ add_collibra_metadata <- function(
       `Domain`=`Domain`,
       `Primary Use Case`=`Primary Use Case`,
       `Restrictions`=`Restrictions`,
+      `Restrictions summary`=`Restrictions summary`,
+      `License type`=`License type`,
       `License`=`License`,
+      `Data Protection Category`=`Data Protection Category`,
       `Source of data`=`Source of data`,
       `Nature of data`=`Nature of data`,
       `Refresh Frequency`=`Refresh Frequency`,
@@ -223,25 +232,66 @@ get_collibra_metadata <- function(
       dplyr::filter(name=="___Collibra___") %>% 
       pull("database") %>% 
       unique()
-   toRet <- get_query(
+   
+   cfields <- TKCat::get_query(
+      kmr,
+      paste(
+         "SELECT database, table, name",
+         "FROM system.columns",
+         "WHERE table='___Collibra___'"
+      )
+   )
+   ucfields <- unique(cfields$name)
+   cfields_call <- lapply(toTake, function(dbn){
+      dbcfields <- cfields %>%
+         dplyr::filter(database == dbn) %>% 
+         dplyr::pull("name")
+      toRet  <- dbcfields %>% 
+         sprintf("`%s`", .)
+      names(toRet) <- dbcfields
+      toAdd <- setdiff(ucfields, dbcfields)
+      toAdd <- toAdd %>% 
+         sprintf("null AS `%s`", .) %>% 
+         magrittr::set_names(toAdd)
+      toRet <- c(toRet, toAdd)[ucfields]
+      paste(toRet, collapse=", ")
+   }) %>%
+      magrittr::set_names(toTake) %>% 
+      unlist()
+   
+   toRet1 <- get_query(
       kmr, 
       paste(
          sprintf(
             "SELECT * FROM (
-               SELECT '%s' AS MDB, * FROM `%s`.`___Collibra___`
-               CROSS JOIN (
-                  SELECT arrayCompact(groupArray(`Drug development stage`))
-                  AS `Drug development stage`
-                  FROM `%s`.`___Collibra_dds___`
-               )
+               SELECT '%s' AS MDB, %s FROM `%s`.`___Collibra___`
             )
             ",
-            toTake, toTake, toTake
+            toTake, cfields_call[toTake], toTake
          ),
          collapse = " UNION ALL "
       )
    ) %>% 
-      dplyr::as_tibble() %>% 
+      dplyr::as_tibble()
+   
+   toRet2 <- get_query(
+      kmr, 
+      paste(
+         sprintf(
+            "
+               SELECT '%s' AS MDB,
+               arrayCompact(groupArray(`Drug development stage`))
+               AS `Drug development stage`
+               FROM `%s`.`___Collibra_dds___`
+            ",
+            toTake, toTake
+         ),
+         collapse = " UNION ALL "
+      )
+   ) %>% 
+      dplyr::as_tibble()
+   
+   toRet <- dplyr::full_join(toRet1, toRet2, by="MDB") %>% 
       dplyr::mutate(
          "Drug development stage"=unlist(lapply(
             `Drug development stage`, paste, collapse=","
@@ -293,8 +343,11 @@ get_collibra_metadata <- function(
          "Drug development stage",
          "Primary Use Case",
          "Restrictions",
+         "Restrictions summary",
          "Location",
+         "License type",
          "License",
+         "Data Protection Category",
          "Source of data",
          "Nature of data",
          "Last update",

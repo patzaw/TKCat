@@ -15,7 +15,8 @@ tbkm <- add_property_values(
    values=c(
       "Biochemical information", "Genetics", "Multi omics",
       "Real world data", "Scientific Information", "UCB Clinical Samples",
-      "Experiments", "Assays and reference data", "Molecules"
+      "Experiments", "Experiments/Multi omics",
+      "Assays and reference data", "Molecules"
    )
 ) %>% 
    as_memoMDB() %>% as_KMR()
@@ -25,6 +26,39 @@ tbkm <- add_property_values(
    values=c(
       "Early Solutions Internal Data Catalog",
       "Early Solutions External Data Catalog"
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+tbkm <- add_property_values(
+   tbkm, "Restrictions (Collibra)", "value",
+   values=c(
+      "Restrictions on data use",
+      "Restrictions on data sharing/disclosure",
+      "Restrictions on the use or sharing of derived data and outputs",
+      "No Restrictions"
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+tbkm <- add_property_values(
+   tbkm, "License type (Collibra)", "value",
+   values=c(
+      "Open access with standard license agreement e.g. Creative Commons",
+      "Open access with specific Data Use Agreement",
+      "Commercial access with specific Data Use Agreement",
+      "Consortium access with  specific Data Use Agreement",
+      "No license/ License not known"
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+
+tbkm <- add_property_values(
+   tbkm, "Data Protection Category (Collibra)", "value",
+   values=c(
+      "Non-personal data",
+      "Anonymized (previously personal) data",
+      "Pseudonymized personal data"
    )
 ) %>% 
    as_memoMDB() %>% as_KMR()

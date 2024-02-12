@@ -143,7 +143,31 @@ tbkm <- add_feature_def(
 tbkm <- add_feature_def(
    tbkm,
    "Restrictions (Collibra)",
-   "Limitations (e.g., geography, function, contract, etc.) on data access and usage",
+   "Limitations on data access and usage",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "Restrictions summary (Collibra)",
+   "Additional details on restrictions (e.g., geography, function, contract, etc.)",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "License type (Collibra)",
+   "Type of License that dictates the data use terms and conditions",
    properties=list(
       "value"=list(
          type="character",
@@ -156,6 +180,18 @@ tbkm <- add_feature_def(
    tbkm,
    "License (Collibra)",
    "UCB relationship with the data provider e.g. public access, academic partnership, commercial license",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+) %>% 
+   as_memoMDB() %>% as_KMR()
+tbkm <- add_feature_def(
+   tbkm,
+   "Data Protection Category (Collibra)",
+   "Level of patient identification within the dataset",
    properties=list(
       "value"=list(
          type="character",
@@ -241,7 +277,7 @@ tbkm <- add_feature_def(
 
 #### collibra ** ----
 optFeatures <- c(
-   "Alias", "Source of data", "Refresh Frequency"
+   "Alias", "Source of data", "Refresh Frequency", "Restrictions summary"
 ) %>% 
    paste("(Collibra)")
 tbkm <- add_table_def(
@@ -249,7 +285,8 @@ tbkm <- add_table_def(
    "collibra",
    "A table with additional metadata for the Collibra catalog",
    mandatory_features=c(
-      "Domain", "Primary Use Case", "Restrictions", "License",
+      "Domain", "Primary Use Case", "Restrictions", "License type", "License",
+      "Data Protection Category",
       "Nature of data", "Community"
    ) %>% 
       paste("(Collibra)")
