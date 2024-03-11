@@ -705,11 +705,12 @@ create_chTKCat_user <- function(
    )
    con <- x$chcon
    ## Create the user in ClickHouse ----
+   elogin <- gsub("'", "\\\\'", login)
    DBI::dbSendQuery(
       con, 
       sprintf(
          "CREATE USER '%s' %s",
-         login,
+         elogin,
          ifelse(
             is.na(password),
             "IDENTIFIED WITH no_password",
@@ -737,7 +738,7 @@ create_chTKCat_user <- function(
          con,
          sprintf(
             "GRANT ALL ON *.* TO '%s' WITH GRANT OPTION",
-            login
+            elogin
          )
       )
    }else{
@@ -746,7 +747,7 @@ create_chTKCat_user <- function(
          con,
          sprintf(
             "REVOKE ALL ON *.* FROM '%s'",
-            login
+            elogin
          )
       )
       
@@ -759,7 +760,7 @@ create_chTKCat_user <- function(
                   " CREATE DATABASE, CREATE TABLE, DROP TABLE, ALTER, INSERT",
                   " ON *.* TO '%s' WITH GRANT OPTION"
                ),
-               login
+               elogin
             )
          )
          
@@ -767,27 +768,27 @@ create_chTKCat_user <- function(
             con,
             sprintf(
                "REVOKE ALL ON default.* FROM '%s'",
-               login
+               elogin
             )
          )
          DBI::dbSendQuery(
             con,
             sprintf(
                "REVOKE ALL ON system.* FROM '%s'",
-               login
+               elogin
             )
          )
          
       }
       
       DBI::dbSendQuery(
-         con, sprintf("GRANT SHOW DATABASES ON *.* TO '%s'", login)
+         con, sprintf("GRANT SHOW DATABASES ON *.* TO '%s'", elogin)
       )
       DBI::dbSendQuery(
-         con, sprintf("GRANT SHOW TABLES ON *.* TO '%s'", login)
+         con, sprintf("GRANT SHOW TABLES ON *.* TO '%s'", elogin)
       )
       DBI::dbSendQuery(
-         con, sprintf("GRANT SHOW COLUMNS ON *.* TO '%s'", login)
+         con, sprintf("GRANT SHOW COLUMNS ON *.* TO '%s'", elogin)
       )
       DBI::dbSendQuery(
          con,
@@ -796,17 +797,17 @@ create_chTKCat_user <- function(
                "GRANT SELECT(name, instance, version, contact)",
                "ON default.System TO '%s'"
             ),
-            login
+            elogin
          )
       )
       DBI::dbSendQuery(
-         con, sprintf("GRANT SELECT ON default.Collections TO '%s'", login)
+         con, sprintf("GRANT SELECT ON default.Collections TO '%s'", elogin)
       )
       DBI::dbSendQuery(
          con,
          sprintf(
             "GRANT SELECT(login, admin, provider) ON default.Users TO '%s'",
-            login
+            elogin
          )
       )
    }
@@ -851,11 +852,12 @@ change_chTKCat_password <- function(
    )
    con <- x$chcon
    ## Alter the user in ClickHouse ----
+   elogin <- gsub("'", "\\\\'", login)
    DBI::dbSendQuery(
       con, 
       sprintf(
          "ALTER USER '%s' %s",
-         login,
+         elogin,
          ifelse(
             is.na(password),
             "IDENTIFIED WITH no_password",
@@ -944,13 +946,14 @@ update_chTKCat_user <- function(
       ch_insert(con, "default", "Users", new_val)
       
       ## Update GRANTs if necessary ----
+      elogin <- gsub("'", "\\\\'", login)
       if(updateGrants){
          if(admin){
             DBI::dbSendQuery(
                con,
                sprintf(
                   "GRANT ALL ON *.* TO '%s' WITH GRANT OPTION",
-                  login
+                  elogin
                )
             )
          }else{
@@ -959,7 +962,7 @@ update_chTKCat_user <- function(
                con,
                sprintf(
                   "REVOKE ALL ON *.* FROM '%s'",
-                  login
+                  elogin
                )
             )
             
@@ -973,7 +976,7 @@ update_chTKCat_user <- function(
                         " ALTER, INSERT",
                         " ON *.* TO '%s' WITH GRANT OPTION"
                      ),
-                     login
+                     elogin
                   )
                )
                
@@ -981,27 +984,27 @@ update_chTKCat_user <- function(
                   con,
                   sprintf(
                      "REVOKE ALL ON default.* FROM '%s'",
-                     login
+                     elogin
                   )
                )
                DBI::dbSendQuery(
                   con,
                   sprintf(
                      "REVOKE ALL ON system.* FROM '%s'",
-                     login
+                     elogin
                   )
                )
                
             }
             
             DBI::dbSendQuery(
-               con, sprintf("GRANT SHOW DATABASES ON *.* TO '%s'", login)
+               con, sprintf("GRANT SHOW DATABASES ON *.* TO '%s'", elogin)
             )
             DBI::dbSendQuery(
-               con, sprintf("GRANT SHOW TABLES ON *.* TO '%s'", login)
+               con, sprintf("GRANT SHOW TABLES ON *.* TO '%s'", elogin)
             )
             DBI::dbSendQuery(
-               con, sprintf("GRANT SHOW COLUMNS ON *.* TO '%s'", login)
+               con, sprintf("GRANT SHOW COLUMNS ON *.* TO '%s'", elogin)
             )
             DBI::dbSendQuery(
                con,
@@ -1010,17 +1013,17 @@ update_chTKCat_user <- function(
                      "GRANT SELECT(name, instance, version, contact)",
                      "ON default.System TO '%s'"
                   ),
-                  login
+                  elogin
                )
             )
             DBI::dbSendQuery(
-               con, sprintf("GRANT SELECT ON default.Collections TO '%s'", login)
+               con, sprintf("GRANT SELECT ON default.Collections TO '%s'", elogin)
             )
             DBI::dbSendQuery(
                con,
                sprintf(
                   "GRANT SELECT(login, admin, provider) ON default.Users TO '%s'",
-                  login
+                  elogin
                )
             )
          }
@@ -1064,13 +1067,14 @@ drop_chTKCat_user <- function(x, login){
    for(mdb in allDb){
       remove_chMDB_user(x=x, login=login, mdb=mdb)
    }
+   elogin <- gsub("'", "\\\\'", login)
    DBI::dbSendQuery(
       con,
-      sprintf("ALTER TABLE default.Users DELETE WHERE login='%s'", login)
+      sprintf("ALTER TABLE default.Users DELETE WHERE login='%s'", elogin)
    )
    DBI::dbSendQuery(
       con,
-      sprintf("DROP USER '%s'", login)
+      sprintf("DROP USER '%s'", elogin)
    )
    invisible()
 }
@@ -1427,6 +1431,7 @@ drop_chMDB <- function(x, name){
    if("provider" %in%  colnames(ul)){
       pl <- ul$login[which(ul$provider)]
       if(length(pl) > 0){
+         epl <- gsub("'", "\\\\'", pl)
          DBI::dbSendQuery(
             con, 
             sprintf(
@@ -1437,7 +1442,7 @@ drop_chMDB <- function(x, name){
                   " ON `%s`.* TO '%s' WITH GRANT OPTION"
                ),
                name,
-               paste(pl, collapse="', '")
+               paste(epl, collapse="', '")
             )
          )
       }
@@ -1446,13 +1451,14 @@ drop_chMDB <- function(x, name){
       cl <- ul$login
    }
    if(length(cl) > 0){
+      ecl <- gsub("'", "\\\\'", cl)
       DBI::dbSendQuery(
          con,
          sprintf(
             "REVOKE %s ON `%s`.* FROM '%s'",
             paste(CH_DB_STATEMENTS, collapse=", "),
             name,
-            paste(cl, collapse="', '")
+            paste(ecl, collapse="', '")
          )
       )
    }
@@ -1499,13 +1505,17 @@ update_chMDB_grants <- function(x, mdb){
    readUsers <- setdiff(unique(readUsers), adminUsers)
    others <- setdiff(tkcUsers$login, c(readUsers, adminUsers))
    
+   eothers <- gsub("'", "\\\\'", others)
+   ereadUsers <- gsub("'", "\\\\'", readUsers)
+   eadminUsers <- gsub("'", "\\\\'", adminUsers)
+   
    ## Revoke read access ----
    if(length(others) > 0){
       DBI::dbSendQuery(
          con,
          sprintf(
             "REVOKE SELECT ON `%s`.* FROM '%s'",
-            mdb, paste(others, collapse="', '")
+            mdb, paste(eothers, collapse="', '")
          )
       )
       modelTables <- names(CHMDB_DATA_MODEL)
@@ -1514,7 +1524,7 @@ update_chMDB_grants <- function(x, mdb){
             con,
             sprintf(
                "GRANT SELECT ON `%s`.`%s` TO '%s'",
-               mdb, tn, paste(others, collapse="', '")
+               mdb, tn, paste(eothers, collapse="', '")
             )
          )
       }
@@ -1525,7 +1535,7 @@ update_chMDB_grants <- function(x, mdb){
       con,
       sprintf(
          "GRANT SELECT ON `%s`.* TO '%s'",
-         mdb, paste(c(readUsers, adminUsers), collapse="', '")
+         mdb, paste(c(ereadUsers, eadminUsers), collapse="', '")
       )
    )
    
@@ -1538,7 +1548,7 @@ update_chMDB_grants <- function(x, mdb){
                "REVOKE CREATE TABLE, DROP TABLE, ALTER, INSERT",
                " ON `%s`.* FROM '%s'"
             ),
-            mdb, paste(c(readUsers, others), collapse="', '")
+            mdb, paste(c(ereadUsers, eothers), collapse="', '")
          )
       )
    }
@@ -1551,7 +1561,7 @@ update_chMDB_grants <- function(x, mdb){
             "GRANT SELECT, CREATE TABLE, DROP TABLE, ALTER, INSERT",
             " ON `%s`.* TO '%s' WITH GRANT OPTION"
          ),
-         mdb, paste(adminUsers, collapse="', '")
+         mdb, paste(eadminUsers, collapse="', '")
       )
    )
    

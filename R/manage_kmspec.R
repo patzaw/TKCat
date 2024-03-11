@@ -672,7 +672,21 @@ rm_km_feature <- function(
 #'
 #' @export
 #'
-check_km_spec <- function(x, kmr){stop("NOT IMPLEMENTED YET")}
+check_km_spec <- function(x, kmr){
+   stop("NOT IMPLEMENTED YET")
+   
+   ## Check table features ----
+   ## check that all documented tables are in the datasets
+   ## check that all the mandatory features are in the documented tables
+   ## check that all the documented features are in documented tables
+   ## check that all the mandatory feature properties are in  documented tables
+   ## check that all the documented feature properties are in documented tables
+   
+   ## Check vocabulary ----
+   ## check that values of documented features properties are in kmr values
+   ## 
+   
+}
 
 ###############################################################################@
 #'

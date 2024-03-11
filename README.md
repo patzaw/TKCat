@@ -1,13 +1,13 @@
 README
 ================
 
-- <a href="#installation" id="toc-installation">Installation</a>
-  - <a href="#from-cran" id="toc-from-cran">From CRAN</a>
-  - <a href="#dependencies" id="toc-dependencies">Dependencies</a>
-  - <a href="#from-github" id="toc-from-github">From github</a>
-- <a href="#documentation" id="toc-documentation">Documentation</a>
-- <a href="#alternatives" id="toc-alternatives">Alternatives</a>
-- <a href="#acknowledgments" id="toc-acknowledgments">Acknowledgments</a>
+- [Installation](#installation)
+  - [From CRAN](#from-cran)
+  - [Dependencies](#dependencies)
+  - [From github](#from-github)
+- [Documentation](#documentation)
+- [Alternatives](#alternatives)
+- [Acknowledgments](#acknowledgments)
 
 <img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px"/>
 

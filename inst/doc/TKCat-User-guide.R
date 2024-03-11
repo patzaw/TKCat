@@ -11,29 +11,29 @@ opts_chunk$set(
 library(TKCat)
 igraph_available <- "igraph" %in% installed.packages()[,"Package"]
 
-## ---- message=FALSE-----------------------------------------------------------
+## ----message=FALSE------------------------------------------------------------
 library(readr)
 hpo_data_dir <- system.file("examples/HPO-subset", package="ReDaMoR")
 
-## ---- message=FALSE-----------------------------------------------------------
+## ----message=FALSE------------------------------------------------------------
 HPO_hp <- readr::read_tsv(
    file.path(hpo_data_dir, "HPO_hp.txt")
 )
 HPO_hp
 
-## ---- message=FALSE-----------------------------------------------------------
+## ----message=FALSE------------------------------------------------------------
 HPO_diseases <- readr::read_tsv(
    file.path(hpo_data_dir, "HPO_diseases.txt")
 )
 HPO_diseases
 
-## ---- message=FALSE-----------------------------------------------------------
+## ----message=FALSE------------------------------------------------------------
 HPO_diseaseHP <- readr::read_tsv(
    file.path(hpo_data_dir, "HPO_diseaseHP.txt")
 )
 HPO_diseaseHP
 
-## ---- out.height="200px"------------------------------------------------------
+## ----out.height="200px"-------------------------------------------------------
 mhpo_dm <- ReDaMoR::df_to_model(HPO_hp, HPO_diseases, HPO_diseaseHP)
 if(igraph_available){
    mhpo_dm %>%
@@ -44,18 +44,18 @@ if(igraph_available){
       plot()
 }
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  mhpo_dm <- ReDaMoR::model_relational_data(mhpo_dm)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 mhpo_dm <- ReDaMoR::read_json_data_model(
    system.file("examples/HPO-model.json", package="ReDaMoR")
 )[c("HPO_hp", "HPO_diseases", "HPO_diseaseHP")]
 
-## ---- out.height="200px"------------------------------------------------------
+## ----out.height="200px"-------------------------------------------------------
 plot(mhpo_dm)
 
-## ---- echo=FALSE, results='hide'----------------------------------------------
+## ----echo=FALSE, results='hide'-----------------------------------------------
 try(
    mhpo_db <- memoMDB(
       dataTables=list(
@@ -67,7 +67,7 @@ try(
    silent=TRUE
 )
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  mhpo_db <- memoMDB(
 #     dataTables=list(
 #        HPO_hp=HPO_hp, HPO_diseases=HPO_diseases, HPO_diseaseHP=HPO_diseaseHP
@@ -76,7 +76,7 @@ try(
 #     dbInfo=list(name="miniHPO")
 #  )
 
-## ---- echo=FALSE, results='asis'----------------------------------------------
+## ----echo=FALSE, results='asis'-----------------------------------------------
 get_confrontation_report() %>% 
    format_confrontation_report_md(
       title="miniHPO",
@@ -159,11 +159,11 @@ mhpo_db
 ## -----------------------------------------------------------------------------
 collection_members(mhpo_db)
 
-## ---- results='hide'----------------------------------------------------------
+## ----results='hide'-----------------------------------------------------------
 tmpDir <- tempdir()
 as_fileMDB(mhpo_db, path=tmpDir, htmlModel=FALSE)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 list.files(
    path=file.path(tmpDir, "miniHPO"),
    recursive=TRUE
@@ -255,13 +255,13 @@ count_records(file_clinvar) # Number of records per table
 ## -----------------------------------------------------------------------------
 data_file_size(file_clinvar, hr=TRUE)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  data_tables(file_clinvar, "traitNames")[[1]]
 #  file_clinvar[["traitNames"]]
 #  file_clinvar$"traitNames"
 #  file_clinvar %>% pull(traitNames)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 file_clinvar %>% pull(traitNames)
 
 ## -----------------------------------------------------------------------------
@@ -317,6 +317,7 @@ collection_members(file_clinvar, "BE")
 get_shared_collections(filtered_clinvar, file_chembl)
 
 ## -----------------------------------------------------------------------------
+try(connectToBed())
 bedCheck <- try(BED::checkBedConn())
 if(!inherits(bedCheck, "try-error") && bedCheck){
    sel_coll <- get_shared_collections(file_clinvar, file_chembl) %>% 
@@ -356,11 +357,11 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
 collection_members(k)            # Get collection members of the different MDBs
 c(k, TKCat(file_chembl))         # Merge 2 TKCat objects
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  library(TKCat)
 #  explore_MDBs(k, download=TRUE)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 ## The following line is to avoid building errors on CRAN
 knitr::opts_chunk$set(eval=Sys.getenv("USER") %in% c("pgodard"))
 
@@ -380,10 +381,10 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
 search_MDB_fields(k, "disease")  # Search a field about "disease"
 collection_members(k)  
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  explore_MDBs(k)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  kw <- chTKCat(host="localhost", port=9111L, user="pgodard")
 #  create_chMDB(kw, "HPO", public=TRUE)
 #  ch_hpo <- as_chMDB(file_hpo, kw)
@@ -397,39 +398,39 @@ get_query(
    query="SELECT * from HPO_diseases WHERE lower(label) LIKE '%epilep%'"
 )
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 ## The following line is to avoid building errors on CRAN
 knitr::opts_chunk$set(eval=TRUE)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  k <- chTKCat(user="pgodard")
 #  create_chTKCat_user(
 #     k, login="lfrancois", contact=NA, admin=FALSE, provider=TRUE
 #  )
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  k <- chTKCat(user="pgodard")
 #  change_chTKCat_password(k, "lfrancois")
 #  update_chTKCat_user(k, contact="email", admin=FALSE)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  manage_chTKCat_users(k)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  drop_chTKCat_user(k, login="lfrancois")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  create_chMDB(k, "CHEMBL", public=FALSE)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  set_chMDB_access(k, "CHEMBL", public=TRUE)
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  add_chMDB_user(k, "CHEMBL", "lfrancois", admin=TRUE)
 #  # remove_chMDB_user(k, "CHEMBL", "lfrancois")
 #  list_chMDB_users(k, "CHEMBL")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  lc <- scan_fileMDBs("fileMDB_directory")
 #  ## The commented line below allows the exploration of the data models in lc.
 #  # explore_MDBs(lc)
@@ -439,30 +440,30 @@ knitr::opts_chunk$set(eval=TRUE)
 #     cr <- as_chMDB(lr, k, overwrite=FALSE)
 #  }
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  empty_chMDB(k, "CHEMBL")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  drop_chMDB(k, "CHEMBL")
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  add_chTKCat_collection(k, "BE")
 #  list_chTKCat_collections(k)
 #  remove_chTKCat_collection(k, "BE")
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 plot(TKCat:::DEFAULT_DATA_MODEL)
 
-## ---- echo=FALSE--------------------------------------------------------------
+## ----echo=FALSE---------------------------------------------------------------
 plot(TKCat:::CHMDB_DATA_MODEL)
 
 ## -----------------------------------------------------------------------------
 list_local_collections()
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  get_local_collection("BE")
 
-## ---- echo=FALSE, results='asis'----------------------------------------------
+## ----echo=FALSE, results='asis'-----------------------------------------------
 get_local_collection("BE") %>%
    paste('```json', ., '```', sep="\n") %>% cat()
 
@@ -470,14 +471,14 @@ get_local_collection("BE") %>%
 get_local_collection("BE") %>%
    show_collection_def()
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  system.file(
 #     "examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json",
 #     package="TKCat"
 #  ) %>%
 #     readLines() %>% paste(collapse="\n")
 
-## ---- echo=FALSE, results='asis'----------------------------------------------
+## ----echo=FALSE, results='asis'-----------------------------------------------
 system.file(
    "examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json",
    package="TKCat"
@@ -495,10 +496,10 @@ jsonvalidate::json_validate(
    engine="ajv"
 )
 
-## ---- eval=FALSE--------------------------------------------------------------
+## ----eval=FALSE---------------------------------------------------------------
 #  get_collection_mapper("BE")
 
-## ---- echo=FALSE, results='asis'----------------------------------------------
+## ----echo=FALSE, results='asis'-----------------------------------------------
 get_collection_mapper("BE") %>% 
    format() %>% paste(collapse="\n") %>% 
    paste('```r', ., '```', sep="\n") %>% cat()
