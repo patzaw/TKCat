@@ -437,14 +437,16 @@ TKCAT_LOGO_DIV <- shiny::div(
          )
          toShow <- mdbs$list %>%
             dplyr::select(dplyr::all_of(colToTake)) %>%
-            dplyr::rename("Resource"="name") %>% 
+            dplyr::rename("Resource"="name") %>%  
+            dplyr::mutate("total_size" = total_size/2^(30)) %>% 
             dplyr::rename_all(function(x){
                x <- gsub("_", " ", x)
                paste0(
                   toupper(substr(x, 1, 1)),
                   substr(x, 2, nchar(x))
                )
-            })
+            }) %>% 
+            dplyr::rename("Total size (GB)"="Total size")
          if(nrow(mdbs$collections)>0){
             cm <- mdbs$collections %>%
                dplyr::select("collection", "resource") %>%
@@ -484,13 +486,14 @@ TKCAT_LOGO_DIV <- shiny::div(
             options = list(
                pageLength=10,
                dom=c("ltip"),
-               order=list(list(0, 'asc')),
-               columnDefs = list(list(
-                  targets = which(colnames(toShow)=="Total size")-1,
-                  render = DT::JS(jsFormatBytes)
-               ))
+               order=list(list(0, 'asc'))
+               # columnDefs = list(list(
+               #    targets = which(colnames(toShow)=="Total size")-1,
+               #    render = DT::JS(jsFormatBytes)
+               # ))
             )
-         )
+         ) %>% 
+            DT::formatSignif("Total size (GB)", digits=3)
          if("Access" %in% colnames(toShow)){
             toRet <- toRet %>% 
                DT::formatStyle(
