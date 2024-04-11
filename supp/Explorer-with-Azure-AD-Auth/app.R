@@ -274,18 +274,32 @@ ui <-    shinydashboard::dashboardPage(
          shinydashboard::tabItem(
             tabName="authInR",
             shiny::fluidRow(shiny::column(
-               12,
-               # shiny::markdown(
-               #    paste(
-               #       readLines("supp/authentication-in-R.Rmd"),
-               #       collapse = "\n"
-               #    ),
-               #    extensions = FALSE
-               # )
-               shiny::tags$iframe(
-                  src="www2/KMT-authentication-in-R.html",
-                  style="border:none; width:100%; height:85vh;"
+               8,
+               
+               shiny::tags$h1("Get your credentials"),
+               
+               shiny::downloadButton(
+                  outputId = "cred_down",
+                  label = "Download credentials R script"
+               ),
+               
+               shiny::tags$h1("Documentation"),
+               
+               shiny::markdown(
+                  paste(
+                     readLines("supp/authentication-in-R.Rmd"),
+                     collapse = "\n"
+                  ),
+                  extensions = FALSE
                )
+               
+               # shiny::tags$iframe(
+               #    src="www2/KMT-authentication-in-R.html",
+               #    style="border:none; width:100%; height:85vh;"
+               # )
+               
+               
+               
             ))
          )
       )
@@ -350,6 +364,30 @@ server <- function(input, output, session)
       authorize_args=list(redirect_uri=`_azure_redirect_`),
       auth_code=opts$code
    )
+   
+   output$cred_down <- shiny::downloadHandler(
+      filename = "kmt_authorization.R",
+      content = function(file) {
+         c64 <- base64enc::base64encode(
+            serialize(auth_cred, connection = NULL)
+         )
+         toWrite <- paste(
+            'library(AzureAuth)',
+            sprintf(
+               paste(
+                  'auth_credentials <- readRDS(gzcon(rawConnection(',
+                  '\tbase64enc::base64decode(',
+                  '\t"%s"',
+                  '\t)',
+                  ')))',
+                  sep="\n"
+               ),
+               c64
+            ),
+            sep="\n"
+         )
+         writeLines(toWrite, file)
+   })
 
    ################################################@
    ### TO EDIT: Server logic ----

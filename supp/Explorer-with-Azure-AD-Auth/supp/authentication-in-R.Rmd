@@ -1,87 +1,100 @@
-## Connecting to knowledge management tools after Azure AD authentication in R
 
-### 0. Requirements
+UCB IT Early Solution team made the databases
+supporting Knowledge Management Tools (KMT) available
+through [Azure Active Directory (AAD)](https://docs.microsoft.com/azure/active-directory/develop/)
+authentication. These databases include:
 
-#### TKCat
+- tkcat.ucb.com for [TKCat](https://patzaw.github.io/TKCat/)
+- bed.ucb.com for [BED](https://patzaw.github.io/BED/)
+- dodo.ucb.com for [DODO](https://github.com/Elysheba/DODO)
 
-- From CRAN
+This document describes how to authenticate in R to be able to connect to
+these databases from different environments.
 
-```{r, eval=FALSE}
-install.packages(TKCat)
-```
+## Generate authorization credentials
 
-- From Azure DevOps
+Authentication within R relies on
+the [AzureAuth](https://cran.r-project.org/web/packages/AzureAuth/index.html)
+R package and this package must be installed to generate and use credentials.
 
-```{r, eval=FALSE}
-devtools::install_git(
-   "git@ssh.dev.azure.com:v3/ucbalm/Translational%20Medicine/TKCat"
-)
-```
+### From local environment
 
-
-#### AuthHelpers
-
-- From Azure DevOps
-<a href="https://dev.azure.com/ucbalm/Translational%20Medicine/_git/AuthHelpers" target="_blank">https://dev.azure.com/ucbalm/Translational%20Medicine/_git/AuthHelpers</a>
-
-```{r, eval=FALSE}
-devtools::install_git(
-   "git@ssh.dev.azure.com:v3/ucbalm/Translational%20Medicine/AuthHelpers"
-)
-```
-
-### 1. Authentication
-
-Further details can be found here:
-<a href="https://dev.azure.com/ucbalm/Translational%20Medicine/_git/AuthHelpers?path=%2Fsupp%2FUCB-KMT" target="_blank">https://dev.azure.com/ucbalm/Translational%20Medicine/_git/AuthHelpers?path=%2Fsupp%2FUCB-KMT</a>
-
-
-
-- a) Generate the credentials from your UCB laptop
-(every 3 months after password change)
+The *"authorization_code"* method allows to authenticate as a specific user
+with relevant access rights. It will open a web browser for authentication
+purpose before providing the credentials. Therefore, this method will only
+work from local environments and not remote environments such as a linux
+workstation.
 
 ```{r, eval=FALSE}
-library(AuthHelpers)
-auth_credentials <- create_azure_authorization_credentials(
-   resource = "api://kmt-prd01/user_impersonation",
+library(AzureAuth)
+auth_credentials <- AzureAuth::get_azure_token(
+   resource = c("api://kmt-prd01/user_impersonation", "offline_access"),
    tenant = "237582ad-3eab-4d44-8688-06ca9f2e613b",
-   app = "f55d2b52-9fed-4b05-8b0a-b24cf8149922"
+   app = "f55d2b52-9fed-4b05-8b0a-b24cf8149922",
+   version=2,
+   auth_type="authorization_code",
+   use_cache = FALSE
 )
 ```
 
-- b) Save the credentials and change permission to limit the access to the file
+### From remote environment
+
+For remote environments, you can download the R script generated
+automatically with your current credentials using
+the "Download credentials R script" button above and source it in R.
+
+To authenticate from a remote environment you can also save the
+credentials created locally and copy them in the remote environment.
+
+The credentials created by one or the other method can be refreshed remotely
+without having to go through web browser authentication anymore
+(see "Connection to KMT section").
+**They remain valid about 3 months or until user password changes.**
 
 ```{r, eval=FALSE}
-## Save the credentials
 saveRDS(auth_credentials, file="~/etc/kmt_authorization.rds", compress=FALSE)
 Sys.chmod("~/etc/kmt_authorization.rds", "0600")
 ```
 
-You can copy this credentials file in environments from which you want to
-access to knowledge management tools (KMT)
+## Connecting to KMT with saved credentials
 
-### 2. Connecting to KMT with Azure AD token
+The scripts below can be copied in an R script file (e.g. `~/opt/KMT.R`) that
+can be sourced whenever needed.
 
-- a) Load and prepare the credentials
+The `.get_tk_headers()` function is made to get an access token from the
+saved credentials (see [Credentials section](#credentials)). It is used by
+connection calls in the rest of the script but is not supposed to be called
+directly.
 
 ```{r, eval=FALSE}
+## Get updated headers ----
 .get_tk_headers <- do.call(function(){
+   ## Choose the relevant credentials
    credentials <- readRDS("~/etc/kmt_authorization.rds")
-   credentials$refresh_token()
+   credentials$refresh()
    return(function(){
-      credentials$refresh_token()
+      if(!credentials$validate()){
+         credentials$refresh()
+      }
       list(
-         "Authorization"=paste("Bearer", credentials$get_access_token())
+         "Authorization"=paste("Bearer", credentials$credentials$access_token)
       )
    })
 }, list())
 ```
 
-- b) Connect to services
+The script below shows how to connect to TKCat. It creates 3 objects:
+
+- `.tkcon`: the TKCat connection
+- `.db_reconnect()`: a function which should be used instead of
+the `TKCat::db_reconnect()` for leveraging credentials
+with the `.get_tk_headers()` function described above
+- `.tbkm`: a KMR object with TBKM specifications and helper functions
+(refer to the relevant documentation)
 
 ```{r, eval=FALSE}
-## TKCat
-library(TKCat)
+## TKCat connection ----
+suppressPackageStartupMessages(library(TKCat))
 .tkcon <- chTKCat(
    "tkcat.ucb.com",
    password="",
@@ -94,11 +107,15 @@ library(TKCat)
    assign(xn, nv, envir=parent.frame(n=1))
    invisible(nv)
 }
+.tbkm <- get_KMR(.tkcon, "TBKM", check=FALSE)
 ```
 
+The script below shows how to connect to BED by providing
+the `.reconnectToBed()` function.
+
 ```{r, eval=FALSE}
-## BED
-library(BED)
+## BED connection ----
+suppressPackageStartupMessages(library(BED))
 .reconnectToBed <- function(){
    connectToBed(
       "https://bed.ucb.com",
@@ -109,10 +126,15 @@ library(BED)
    )
 }
 .reconnectToBed()
+```
 
-## DODO
-library(DODO)
-.reconnectToDODO <- function(){
+The script below shows how to connect to DODO by providing
+the `.reconnectToDodo()` function.
+
+```{r, eval=FALSE}
+## DODO connection ----
+suppressPackageStartupMessages(library(DODO))
+.reconnectToDodo <- function(){
    connect_to_dodo(
       "https://dodo.ucb.com",
       remember=FALSE,
@@ -121,11 +143,5 @@ library(DODO)
       )
    )
 }
-.reconnectToDODO()
+.reconnectToDodo()
 ```
-
-
-Since the Azure AD token expires after one hour, you will have to call
-the `.db_reconnect(.tkcon)`, `.reconnectToBed()` and `.reconnectToDODO()`
-function after this time.
-
