@@ -468,8 +468,10 @@ as_chMDB <- function(x, tkcon, timestamp=Sys.time(), overwrite=FALSE, by=10^5){
    ## Rules of update ----
    tst <- list_chMDB_timestamps(tkcon, dbName)
    maxTs <- suppressWarnings(max(tst$timestamp))
-   if(!is.na(timestamp) && !is.null(maxTs) && timestamp <= maxTs){
-      stop("Timestamp should be more recent than those already recorded")
+   if(!is.na(timestamp) && !is.null(maxTs) && timestamp - maxTs <= 60){
+      stop(
+         "Timestamp should be more recent (60 sec.) than those already recorded"
+      )
    }
    makeEmpty <- makeArchive <- setTS <- FALSE
    if(!dbName %in% mdbl$name[which(mdbl$populated)]){

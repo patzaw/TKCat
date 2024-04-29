@@ -537,10 +537,14 @@ TKCAT_LOGO_DIV <- shiny::div(
             message=sprintf("Getting %s metadata", n),
             expr={
                if(!is.null(access) && access=="none"){
-                  mdb <- try(get_chMDB_metadata(instance$tkcat, n))
+                  mdb <- tryCatch(
+                     get_chMDB_metadata(tkcon, n),
+                     error = function(e) e
+                  )
                }else{
-                  mdb <- try(
-                     get_MDB(instance$tkcat, n, check=FALSE), silent=TRUE
+                  mdb <- tryCatch(
+                     get_MDB(tkcon, n, check=FALSE),
+                     error = function(e) e
                   )
                }
                selStatus$mdb <- mdb
@@ -551,7 +555,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                   m <- mdb$dataModel
                }
                if(
-                  inherits(mdb, "try-error") ||
+                  inherits(mdb, c("try-error", "error")) ||
                   !all(shiny::isolate(selStatus$tables) %in% names(m))
                ){
                   selStatus$tables <- NULL
@@ -568,7 +572,7 @@ TKCAT_LOGO_DIV <- shiny::div(
             m <- mdb$dataModel
          }
          tn <- shiny::isolate(selStatus$tables)
-         if(inherits(mdb, "try-error") || !all(tn %in% names(m))){
+         if(inherits(mdb, c("try-error", "error")) || !all(tn %in% names(m))){
             selStatus$tables <- NULL
          }
       })
@@ -581,7 +585,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          shiny::req(!is.null(mdb))
          access <- shiny::isolate(selStatus$access)
          tkcon <- shiny::isolate(instance$tkcat)
-         if(inherits(mdb, "try-error")){
+         if(inherits(mdb, c("try-error", "error"))){
             n <- shiny::isolate(selStatus$resource)
             shiny::tagList(
                shiny::tags$p(
@@ -764,7 +768,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       ## Data model ----
       shiny::observe({
          mdb <- selStatus$mdb
-         if(is.null(mdb) || inherits(mdb, "try-error")){
+         if(is.null(mdb) || inherits(mdb, c("try-error", "error"))){
             session$sendCustomMessage('hideNavs', 'model')
          }else{
             n <- shiny::isolate(selStatus$resource)
@@ -1276,7 +1280,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          ))
          mdb <- selStatus$mdb
          shiny::req(!is.null(mdb))
-         if(inherits(mdb, "try-error")){
+         if(inherits(mdb, c("try-error", "error"))){
             n <- shiny::isolate(selStatus$resource)
             shiny::tagList(
                shiny::tags$p(
@@ -1595,7 +1599,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                shiny::isolate(instance$tkcat),
                user=u, password=p
             ), silent=TRUE)
-            if(!inherits(nk, "try-error")){
+            if(!inherits(nk, c("try-error", "error"))){
                suppressWarnings(db_disconnect(instance$tkcat))
                instance$tkcat <- nk
                okConnect(TRUE)
