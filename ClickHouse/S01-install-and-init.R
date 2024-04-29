@@ -12,7 +12,8 @@ CONFIGFILE <- system.file(
    package="TKCat"
 )
 
-CH_VERSION <- "22.2.3.5"
+CH_VERSION <- "24.3.2.23"
+# CH_VERSION <- "22.2.3.5"
 
 TKCAT_HOME <- "/data/pgodard/Projects/TKCat_Test" # TKCat_UCB_TBN
 TKCAT_NAT_PORT <- 9101
@@ -65,7 +66,7 @@ Sys.chmod(TKCAT_CONFIG, mode="777", use_umask=FALSE)
 ### SSL certificate : run in a terminal ----
 TKCAT_KEY <- file.path(TKCAT_CONF, "server.key")
 TKCAT_CRT <- file.path(TKCAT_CONF, "server.crt")
-cat(sprintf(
+system(sprintf(
    paste(
       'openssl req -subj "/CN=localhost" -new -newkey rsa:2048 -days 365',
       '-nodes -x509 -keyout %s -out %s'
@@ -76,8 +77,8 @@ Sys.chmod(TKCAT_KEY, mode="777", use_umask=FALSE)
 Sys.chmod(TKCAT_CRT, mode="777", use_umask=FALSE)
 
 TKCAT_PEM <- file.path(TKCAT_CONF, "dhparam.pem")
-cat(sprintf(
-   'openssl dhparam -out %s 4096',
+system(sprintf(
+   'openssl dhparam -out %s 2048',
    TKCAT_PEM
 ))
 Sys.chmod(TKCAT_PEM, mode="777", use_umask=FALSE)
