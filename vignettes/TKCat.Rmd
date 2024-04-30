@@ -1,5 +1,5 @@
 ---
-title: "TKCat User guide"
+title: "Introduction to TKCat (Tailored Knowledge Catalog)"
 author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
 package: "TKCat (version `r packageVersion('TKCat')`)"
@@ -15,7 +15,7 @@ output:
       fig_width: 7
       fig_height: 5
 vignette: >
-   %\VignetteIndexEntry{TKCat User guide}
+   %\VignetteIndexEntry{TKCat}
    %\VignetteEncoding{UTF-8}
    %\VignetteEngine{knitr::rmarkdown}
 editor_options: 

@@ -1,0 +1,152 @@
+---
+title: "Defining and using Requirements for Knowledge Management (KMR) in TKCat"
+author: "Patrice Godard"
+date:  "`r format(Sys.time(), '%B %d, %Y')`"
+package: "TKCat (version `r packageVersion('TKCat')`)"
+bibliography: TKCat.bib
+link-citations: yes
+output:
+   rmarkdown::html_document:
+      number_sections: yes
+      self_contained: true
+      theme: cerulean
+      toc: yes
+      toc_float: yes
+      fig_width: 7
+      fig_height: 5
+vignette: >
+   %\VignetteIndexEntry{TKCat-KMR}
+   %\VignetteEncoding{UTF-8}
+   %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, message=FALSE, echo=FALSE, include=FALSE, cache=FALSE}
+library(knitr)
+opts_chunk$set(
+   include=TRUE,
+   echo=TRUE,
+   message=TRUE,
+   warning=TRUE,
+   cache=FALSE,
+   cache.lazy=FALSE
+)
+library(TKCat)
+```
+
+In TKCat, knowledge resources are manipulated as modeled
+database (MDB) objects. These objects provide access to the data tables along
+with a general description of the resource and a detail data model documenting
+the tables, their fields and their relationships.
+These MDB are then gathered in TKCat catalogs that can be explored an shared.
+
+In addition to the relational model, no additional constraints are applied to
+an MDB. This allows for high flexibility in the data that can be managed.
+However, in some cases, it could be useful to add further constraints to ensure
+that the data is compatible with specific analysis or integration workflows.
+In TKCat, this feature is supported by KMR (Knowledge Management Requirements).
+A KMR object is meant to be shared and centrally managed.
+MDBs intended to meet these requirements must contain technical tables
+referring to the corresponding KMR. When grouped in the same TKCat catalog,
+KMRs and MDBs form a coherent corpus of knowledge that can be leveraged
+consistently by KMR-tailored functions.
+
+The first part of this document describes how to create a KMR object.
+The second part shows how to refer to these requirements in an MDB object.
+Finally, the third part describes how to use KMR and MDB together.
+
+
+# Defining KMR
+
+## KMR organization
+
+A KMR object is an MDB object with a predefined data model. It is simply
+created by calling the `create_KMR()` function which takes some metadata as
+arguments.
+
+```{r}
+ebkm <- create_KMR(
+   name="EBKM",
+   title="Experimental and Biological Knowledge Management",
+   description="Requirements for integrating knowledge from biological research activities",
+   version="0.1",
+   maintainer="[Patrice Godard](mailto:patrice.godard@gmail.com)"
+)
+```
+
+The figure below shows the data model of such an object. A KMR object describes
+requirements regarding:
+   
+   - Tables: the features that can be found in the table and which of them
+   are mandatory.
+   
+   - Features: the properties composing the feature and which of them are
+   mandatory. In tables providing the feature, there should be one column
+   per feature property.
+   
+   - Feature properties: the type and the kind of measurement (if relevant)
+   
+   - Units: possible units for measurements
+   
+   - Possible character or integer values for measurement properties
+   
+It's also possible to store helpers in a KMR object. These helpers are typically
+functions used to query MDBs fitting KMR requirements.
+
+```{r}
+data_model(ebkm) %>% 
+   plot()
+```
+
+## Define requirements
+
+In the example below, we define requirements for tables providing information
+about biological samples.
+
+Such table must provide at least a sample name and a sample description:
+
+```{r}
+ebkm <- add_feature_def(
+   ebkm,
+   "name",
+   "name/identifier of a record",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+)
+ebkm <- add_feature_def(
+   ebkm,
+   "description",
+   "description of a record",
+   properties=list(
+      "value"=list(
+         type="character",
+         mandatory=TRUE
+      )
+   )
+)
+ebkm <- add_table_def(
+   ebkm,
+   "samples",
+   "A table listing samples and associated features",
+   mandatory_features=c("name", "description")
+)
+```
+
+
+
+
+
+# KMR specifications
+
+
+
+
+# Peaces Of Knowledge (POK)
+
+
+
