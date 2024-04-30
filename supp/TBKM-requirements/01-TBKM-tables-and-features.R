@@ -16,56 +16,33 @@ tbkm <- create_KMR(
 ## Units ----
 
 ### Duration units ----
-tbkm <- add_unit_def(tbkm, "duration", "s", "Duration in seconds") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "duration", "min", "Duration in minutes") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "duration", "days", "Duration in days") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "duration", "h", "Duration in hours") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "duration", "months", "Duration in month") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "duration", "years", "Duration in years") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "duration", "weeks", "Duration in weeks") %>% 
-   as_memoMDB() %>% as_KMR()
+tbkm <- add_unit_def(tbkm, "duration", "s", "Duration in seconds")
+tbkm <- add_unit_def(tbkm, "duration", "min", "Duration in minutes")
+tbkm <- add_unit_def(tbkm, "duration", "days", "Duration in days")
+tbkm <- add_unit_def(tbkm, "duration", "h", "Duration in hours")
+tbkm <- add_unit_def(tbkm, "duration", "months", "Duration in month")
+tbkm <- add_unit_def(tbkm, "duration", "years", "Duration in years")
+tbkm <- add_unit_def(tbkm, "duration", "weeks", "Duration in weeks")
 
 ### Concentration units ----
-tbkm <- add_unit_def(tbkm, "concentration", "M", "Concentration in molars (moles per liter)") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "concentration", "mM", "Concentration in millimolars") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "concentration", "µM", "Concentration in micromolars") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "concentration", "nM", "Concentration in nanomolars") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "concentration", "pM", "Concentration in picomolars") %>% 
-   as_memoMDB() %>% as_KMR()
+tbkm <- add_unit_def(tbkm, "concentration", "M", "Concentration in molars (moles per liter)")
+tbkm <- add_unit_def(tbkm, "concentration", "mM", "Concentration in millimolars")
+tbkm <- add_unit_def(tbkm, "concentration", "µM", "Concentration in micromolars")
+tbkm <- add_unit_def(tbkm, "concentration", "nM", "Concentration in nanomolars")
+tbkm <- add_unit_def(tbkm, "concentration", "pM", "Concentration in picomolars")
 
 ### Dose units ----
-tbkm <- add_unit_def(tbkm, "dose", "M", "Concentration in molars (moles per liter)") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "dose", "mM", "Concentration in millimolars") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "dose", "µM", "Concentration in micromolars") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "dose", "nM", "Concentration in nanomolars") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "dose", "pM", "Concentration in picomolars") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "dose", "mg/kg", "Dose in mg/kg") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "dose", "mg", "Dose in mg") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "dose", "vg", "Dose in vector genomes") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "dose", "vg/kg", "Dose in vector genomes per kg") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "dose", "IU", "Dose in infectious units") %>% 
-   as_memoMDB() %>% as_KMR()
-tbkm <- add_unit_def(tbkm, "dose", "IU/kg", "Dose in infectious units per kg") %>% 
-   as_memoMDB() %>% as_KMR()
+tbkm <- add_unit_def(tbkm, "dose", "M", "Concentration in molars (moles per liter)")
+tbkm <- add_unit_def(tbkm, "dose", "mM", "Concentration in millimolars")
+tbkm <- add_unit_def(tbkm, "dose", "µM", "Concentration in micromolars")
+tbkm <- add_unit_def(tbkm, "dose", "nM", "Concentration in nanomolars")
+tbkm <- add_unit_def(tbkm, "dose", "pM", "Concentration in picomolars")
+tbkm <- add_unit_def(tbkm, "dose", "mg/kg", "Dose in mg/kg")
+tbkm <- add_unit_def(tbkm, "dose", "mg", "Dose in mg")
+tbkm <- add_unit_def(tbkm, "dose", "vg", "Dose in vector genomes")
+tbkm <- add_unit_def(tbkm, "dose", "vg/kg", "Dose in vector genomes per kg")
+tbkm <- add_unit_def(tbkm, "dose", "IU", "Dose in infectious units")
+tbkm <- add_unit_def(tbkm, "dose", "IU/kg", "Dose in infectious units per kg")
 
 ###############################################################################@
 ## General features ----
@@ -81,8 +58,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### description ** ----
 tbkm <- add_feature_def(
@@ -95,8 +71,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### table ref ** ----
 tbkm <- add_feature_def(
@@ -109,8 +84,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ###############################################################################@
 ## Collibra ----
@@ -126,8 +100,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "Primary Use Case (Collibra)",
@@ -138,8 +111,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "Restrictions (Collibra)",
@@ -150,8 +122,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "Restrictions summary (Collibra)",
@@ -162,8 +133,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "License type (Collibra)",
@@ -174,8 +144,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "License (Collibra)",
@@ -186,8 +155,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "Data Protection Category (Collibra)",
@@ -198,8 +166,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "Nature of data (Collibra)",
@@ -210,8 +177,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "Community (Collibra)",
@@ -222,8 +188,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "Alias (Collibra)",
@@ -234,8 +199,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "Source of data (Collibra)",
@@ -246,8 +210,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "Refresh Frequency (Collibra)",
@@ -258,8 +221,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "Drug development stage (Collibra)",
@@ -270,8 +232,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -290,14 +251,12 @@ tbkm <- add_table_def(
       "Nature of data", "Community"
    ) %>% 
       paste("(Collibra)")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "collibra",
    features=optFeatures
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### collibra drug development stage ** ----
 tbkm <- add_table_def(
@@ -308,8 +267,7 @@ tbkm <- add_table_def(
       "Drug development stage"
    ) %>% 
       paste("(Collibra)")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ###############################################################################@
 ## Samples and conditions ----
@@ -329,8 +287,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### condition ref ** ----
 tbkm <- add_feature_def(
@@ -343,8 +300,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_feature_def(
    tbkm,
    "ref. condition ref",
@@ -355,8 +311,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### General ----
 
@@ -381,8 +336,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 
 ##### biological model ** ----
@@ -396,8 +350,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### treatment ** ----
 tbkm <- add_feature_def(
@@ -410,8 +363,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### In vivo models ----
 
@@ -426,8 +378,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### age ** ----
 tbkm <- add_feature_def(
@@ -441,8 +392,7 @@ tbkm <- add_feature_def(
          measurement="duration"
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### ethnicity ** ----
 tbkm <- add_feature_def(
@@ -455,8 +405,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### Hardy scale ** ----
 tbkm <- add_feature_def(
@@ -469,8 +418,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### strain ** ----
 tbkm <- add_feature_def(
@@ -493,8 +441,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### tissue ** ----
 tbkm <- add_feature_def(
@@ -527,8 +474,7 @@ tbkm <- add_feature_def(
          mandatory=FALSE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### death cause ** ----
 tbkm <- add_feature_def(
@@ -541,8 +487,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### disease ** ----
 tbkm <- add_feature_def(
@@ -571,8 +516,7 @@ tbkm <- add_feature_def(
          measurement="duration"
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### compound ** ----
 tbkm <- add_feature_def(
@@ -601,8 +545,7 @@ tbkm <- add_feature_def(
          measurement="dose"
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### In vitro models ----
 
@@ -627,8 +570,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### culture type ** ----
 tbkm <- add_feature_def(
@@ -641,8 +583,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### time in vitro ** ----
 tbkm <- add_feature_def(
@@ -656,8 +597,7 @@ tbkm <- add_feature_def(
          measurement="duration"
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### Genetics ----
 
@@ -698,8 +638,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### genetic variant ** ----
 tbkm <- add_feature_def(
@@ -728,8 +667,7 @@ tbkm <- add_feature_def(
          mandatory=FALSE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### Phenotypes ----
 
@@ -751,8 +689,7 @@ tbkm <- add_feature_def(
          measurement="duration"
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -770,14 +707,12 @@ tbkm <- add_table_def(
    "samples",
    "A table listing samples and associated features",
    mandatory_features=c("name", "description")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "samples",
    features=c("sample ref", optFeatures)
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### conditions ** ----
 tbkm <- add_table_def(
@@ -785,14 +720,12 @@ tbkm <- add_table_def(
    "conditions",
    "A table listing conditions and associated features. A condition correspond to a set of samples considered as a coherent group.",
    mandatory_features=c("name", "description")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "conditions",
    features=optFeatures
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### shared sample features ** ----
 tbkm <- add_table_def(
@@ -800,14 +733,12 @@ tbkm <- add_table_def(
    "shared sample features",
    "A table listing features associated to all records in samples or conditions tables.",
    mandatory_features=c("table ref")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "shared sample features",
    features=optFeatures
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### samples per condition ** ----
 tbkm <- add_table_def(
@@ -815,8 +746,7 @@ tbkm <- add_table_def(
    "samples per condition",
    description="Association table between samples and conditions",
    mandatory_features=c("sample ref", "condition ref")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 
 ###############################################################################@
@@ -837,8 +767,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### Others ----
 
@@ -864,8 +793,7 @@ tbkm <- add_feature_def(
          description="The file itself"
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -877,8 +805,7 @@ tbkm <- add_table_def(
    mandatory=c(
       "file", "description"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 
 ###############################################################################@
@@ -899,8 +826,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### Others ----
 
@@ -926,8 +852,7 @@ tbkm <- add_feature_def(
          description="Type of measurement reported in the dataset (e.g. 'log2 CPM')"
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -939,14 +864,12 @@ tbkm <- add_table_def(
    mandatory=c(
       "table ref", "description", "dataset type"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "datasets",
    features=c("report ref")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 
 ###############################################################################@
@@ -967,8 +890,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### Others ----
 
@@ -983,8 +905,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -995,8 +916,7 @@ tbkm <- add_table_def(
    description="Table of biological entity identifiers",
    mandatory=c("beid"),
    collection="BE"
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ###############################################################################@
 ## Analyses features ----
@@ -1014,8 +934,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### feature column ** ----
 tbkm <- add_feature_def(
@@ -1032,8 +951,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Others ----
 
@@ -1048,8 +966,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ####  FDR ** ----
 tbkm <- add_feature_def(
@@ -1062,8 +979,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ###############################################################################@
 ## Differential expression ----
@@ -1081,8 +997,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -1094,8 +1009,7 @@ tbkm <- add_table_def(
    mandatory=c(
       "analysis ref", "beid ref", "logFC", "p-value", "FDR" 
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### DE analyses ** ----
 tbkm <- add_table_def(
@@ -1105,14 +1019,12 @@ tbkm <- add_table_def(
    mandatory=c(
       "name", "condition ref", "ref. condition ref" 
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "DE analyses",
    features=c("dataset ref", "description", "report ref")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ###############################################################################@
 ## Correlation with expression ----
@@ -1130,8 +1042,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### correlation ** ----
 tbkm <- add_feature_def(
@@ -1144,8 +1055,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -1157,8 +1067,7 @@ tbkm <- add_table_def(
    mandatory=c(
       "analysis ref", "beid ref", "correlation", "p-value", "FDR" 
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### EC analyses ** ----
 tbkm <- add_table_def(
@@ -1168,14 +1077,12 @@ tbkm <- add_table_def(
    mandatory=c(
       "name", "condition ref", "feature column", "correlation method"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "DE analyses",
    features=c("dataset ref", "description", "report ref")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ###############################################################################@
 ## Distribution of expression -----
@@ -1193,8 +1100,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### exp. SD ** ----
 tbkm <- add_feature_def(
@@ -1207,8 +1113,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### exp. min ** ----
 tbkm <- add_feature_def(
@@ -1221,8 +1126,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### exp. max ** ----
 tbkm <- add_feature_def(
@@ -1235,8 +1139,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### exp. Q25 ** ----
 tbkm <- add_feature_def(
@@ -1249,8 +1152,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### exp. Q50 ** ----
 tbkm <- add_feature_def(
@@ -1263,8 +1165,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### exp. Q75 ** ----
 tbkm <- add_feature_def(
@@ -1277,8 +1178,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### exp. MAD ** ----
 tbkm <- add_feature_def(
@@ -1291,8 +1191,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -1307,8 +1206,7 @@ tbkm <- add_table_def(
       "exp. min", "exp. max",
       "exp. Q25", "exp. Q50", "exp. Q75", "exp. MAD"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### ED analyses ** ----
 tbkm <- add_table_def(
@@ -1321,14 +1219,12 @@ tbkm <- add_table_def(
       "exp. min", "exp. max",
       "exp. Q25", "exp. Q50", "exp. Q75", "exp. MAD"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "ED analyses",
    features=c("dataset ref", "description", "report ref")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ###############################################################################@
 ## BE list ----
@@ -1362,8 +1258,7 @@ tbkm <- add_table_def(
    mandatory=c(
       "name", "description"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### be list members ** ----
 tbkm <- add_table_def(
@@ -1373,8 +1268,7 @@ tbkm <- add_table_def(
    mandatory=c(
       "be list ref", "beid ref"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 
 ###############################################################################@
@@ -1410,8 +1304,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### CoReMo sub-module ** ----
 tbkm <- add_feature_def(
@@ -1430,8 +1323,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### r2 ** ----
 tbkm <- add_feature_def(
@@ -1444,8 +1336,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -1457,8 +1348,7 @@ tbkm <- add_table_def(
    mandatory=c(
       "module ref", "beid ref"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### CoReMo modules ** ----
 tbkm <- add_table_def(
@@ -1468,14 +1358,12 @@ tbkm <- add_table_def(
    mandatory=c(
       "name", "r2", "module members", "analysis ref"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "CoReMo modules",
    features=c("description", "CoReMo sub-module")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### CoReMo analyses ** ----
 tbkm <- add_table_def(
@@ -1485,14 +1373,12 @@ tbkm <- add_table_def(
    mandatory=c(
       "name", "condition ref", "correlation method", "be list ref"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "CoReMo analyses",
    features=c("dataset ref", "description", "report ref")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 
 ###############################################################################@
@@ -1513,8 +1399,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### Others ----
 
@@ -1529,8 +1414,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### regulation impact ** ----
 tbkm <- add_feature_def(
@@ -1543,8 +1427,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### intersection ** ----
 tbkm <- add_feature_def(
@@ -1557,8 +1440,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### direct impact ** ----
 tbkm <- add_feature_def(
@@ -1571,8 +1453,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -1586,8 +1467,7 @@ tbkm <- add_table_def(
       "regulator ref", "regulation impact", "regulator targets",
       "intersection", "p-value", "FDR"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### yACRA analyses ** ----
 tbkm <- add_table_def(
@@ -1597,14 +1477,12 @@ tbkm <- add_table_def(
    mandatory=c(
       "name", "be list ref", "direct impact"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "yACRA analyses",
    features=c("description", "report ref")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 
 
@@ -1640,8 +1518,7 @@ tbkm <- add_feature_def(
          description="Reference to an external resource"
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ##### functional members ** ----
 tbkm <- add_feature_def(
@@ -1654,8 +1531,7 @@ tbkm <- add_feature_def(
          mandatory=TRUE
       )
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Tables ----
 
@@ -1669,8 +1545,7 @@ tbkm <- add_table_def(
       "functional be list", "functional members",
       "intersection", "p-value", "FDR"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### FE analyses ** ----
 tbkm <- add_table_def(
@@ -1680,14 +1555,12 @@ tbkm <- add_table_def(
    mandatory=c(
       "name", "be list ref"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_table_features(
    tbkm,
    "FE analyses",
    features=c("description", "report ref")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 
 ###############################################################################@

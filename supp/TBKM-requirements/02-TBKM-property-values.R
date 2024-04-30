@@ -3,9 +3,7 @@ source("~/opt/KMT.R")
 
 ###############################################################################@
 ## Initialization ----
-tbkm <- read_fileMDB(here("supp/TBKM-requirements/TBKM")) %>% 
-   as_memoMDB() %>% 
-   as_KMR()
+tbkm <- read_KMR(here("supp/TBKM-requirements/TBKM"))
 
 ###############################################################################@
 ## Collibra ----
@@ -18,8 +16,7 @@ tbkm <- add_property_values(
       "Experiments", "Experiments/Multi omics",
       "Assays and reference data", "Molecules"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 tbkm <- add_property_values(
    tbkm, "Community (Collibra)", "value",
@@ -27,8 +24,7 @@ tbkm <- add_property_values(
       "Early Solutions Internal Data Catalog",
       "Early Solutions External Data Catalog"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 tbkm <- add_property_values(
    tbkm, "Restrictions (Collibra)", "value",
@@ -38,8 +34,7 @@ tbkm <- add_property_values(
       "Restrictions on the use or sharing of derived data and outputs",
       "No Restrictions"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 tbkm <- add_property_values(
    tbkm, "License type (Collibra)", "value",
@@ -50,8 +45,7 @@ tbkm <- add_property_values(
       "Consortium access with  specific Data Use Agreement",
       "No license/ License not known"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 tbkm <- add_property_values(
    tbkm, "Data Protection Category (Collibra)", "value",
@@ -60,8 +54,7 @@ tbkm <- add_property_values(
       "Anonymized (previously personal) data",
       "Pseudonymized personal data"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 tbkm <- add_property_values(
    tbkm, "Drug development stage (Collibra)", "value",
@@ -72,8 +65,7 @@ tbkm <- add_property_values(
       "Lead generation (Hit to Lead)",
       "Lead optimization to candidate selection", "Regulatory approval"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 
 ###############################################################################@
@@ -85,8 +77,7 @@ tbkm <- add_property_values(
 tbkm <- add_property_values(
    tbkm, "organism", "reference",
    values="NCBI"
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 
 #### biological model ----
@@ -95,8 +86,7 @@ tbkm <- add_property_values(
    values=c(
       "in vivo", "in vitro"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### In vivo models  <> ----
 
@@ -107,8 +97,7 @@ tbkm <- add_property_values(
       "F"="female", "female"="female", "woman"="female",
       "M"="male", "male"="male", "man"="male"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### Hardy scale ----
 tbkm <- add_property_values(
@@ -120,8 +109,7 @@ tbkm <- add_property_values(
       "4"="low death Death after a long illness, with a terminal phase longer than 1 day (commonly cancer or chronic pulmonary disease); deaths that are not unexpected 
 0) Ventilator Case All cases on a ventilator immediately before death."
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### strain ----
 tbkm <- add_property_values(
@@ -131,8 +119,7 @@ tbkm <- add_property_values(
       "Charles River"="Animal strains in the Charles River Laboratories: https://www.criver.com/products-services/find-model/",
       "hPSCreg"="Human Pluripotent Stem Cell Registry: https://hpscreg.eu/"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### tissue ----
 tbkm <- add_property_values(
@@ -140,8 +127,7 @@ tbkm <- add_property_values(
    values=c(
       "Uberon"="Identifier should be provided without the 'Uberon_' or 'Uberon:' prefix. http://obofoundry.org/ontology/uberon.html"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_property_values(
    tbkm, "tissue", "side",
    values=c(
@@ -153,15 +139,13 @@ tbkm <- add_property_values(
    values=c(
       "ipsilateral", "contralateral"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### disease ----
 tbkm <- add_property_values(
    tbkm, "disease", "reference",
    values=DODO::list_database()$database
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### In vitro models <> ----
 
@@ -171,8 +155,7 @@ tbkm <- add_property_values(
    values=c(
       "Cell Ontology"="Identifier should be provided without the 'CL_' or 'CL:' prefix. http://obofoundry.org/ontology/cl.html"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Genetics <> ----
 
@@ -180,20 +163,17 @@ tbkm <- add_property_values(
 tbkm <- add_property_values(
    tbkm, "biological entity", "be",
    values=BED::listBe()
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_property_values(
    tbkm, "biological entity", "source",
    values=sort(setdiff(BED::bedCall(
       neo2R::cypher, query="MATCH (n:BEID) RETURN DISTINCT n.database AS db"
    )$db, c("BEDTech_gene", "BEDTech_transcript")))
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 tbkm <- add_property_values(
    tbkm, "biological entity", "organism",
    values=sort(BED::listOrganisms())
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### Treatments  <> ----
 tbkm <- add_property_values(
@@ -201,8 +181,7 @@ tbkm <- add_property_values(
    values=c(
       "CHEMBL"="https://www.ebi.ac.uk/chembl/compound_report_card/"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ###############################################################################@
 ## Dataset features ----
@@ -211,8 +190,7 @@ tbkm <- add_property_values(
 tbkm <- add_property_values(
    tbkm, "dataset type", "value",
    values=c("BE quantification", "BE feature quantification")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ###############################################################################@
 ## Analyses ----
@@ -221,15 +199,13 @@ tbkm <- add_property_values(
 tbkm <- add_property_values(
    tbkm, "correlation method", "value",
    values=c("pearson", "spearman", "kendall")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ### regulation impact ----
 tbkm <- add_property_values(
    tbkm, "regulation impact", "value",
    values=c("activation", "inhibition", "unknown")
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 #### functional be list ----
 tbkm <- add_property_values(
@@ -243,8 +219,7 @@ tbkm <- add_property_values(
       "MedGen PubMed"="Genes associated to MedGen terms in PubMed abstracts",
       "PanglaoDB"="Transcriptional markers of cell types from PangaloDB"
    )
-) %>% 
-   as_memoMDB() %>% as_KMR()
+)
 
 ###############################################################################@
 ## Save requirements ----

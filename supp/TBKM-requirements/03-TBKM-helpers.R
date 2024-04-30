@@ -3,9 +3,7 @@ library(here)
 
 ###############################################################################@
 ## Initialization ----
-tbkm <- read_fileMDB(here("supp/TBKM-requirements/TBKM")) %>% 
-   as_memoMDB() %>% 
-   as_KMR()
+tbkm <- read_KMR(here("supp/TBKM-requirements/TBKM"))
 
 ###############################################################################@
 ## Read helpers ----

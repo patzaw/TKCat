@@ -89,11 +89,27 @@ as_KMR <- function(x){
             )
          )
    ){
+      x <- as_memoMDB(x)
       class(x) <- unique(c("KMR", class(x)))
       return(x)
    }else{
       stop("This is object cannot be a KMR")
    }
+}
+
+
+###############################################################################@
+#' Read [KMR] from a path
+#' 
+#' @param ... parameters for [read_fileMDB()]
+#'
+#' @return A [KMR] object
+#' 
+#' @export
+#'
+read_KMR <- function(...){
+   read_fileMDB(...) %>% 
+      as_KMR()
 }
 
 
@@ -153,7 +169,8 @@ add_unit_def <- function(kmr, measurement, unit, description){
       dataModel=KMR_DM,
       dbInfo=db_info(kmr),
       check=FALSE
-   )
+   ) %>% 
+      as_memoMDB()
    class(toRet) <- unique(c("KMR", class(toRet)))
    return(toRet)
 }
@@ -281,7 +298,8 @@ add_feature_def <- function(
       dataModel=KMR_DM,
       dbInfo=db_info(kmr),
       check=FALSE
-   )
+   ) %>% 
+      as_memoMDB()
    class(toRet) <- unique(c("KMR", class(toRet)))
    return(toRet)
 }
@@ -383,7 +401,8 @@ add_property_values <- function(
       dataModel=KMR_DM,
       dbInfo=db_info(kmr),
       check=FALSE
-   )
+   ) %>% 
+      as_memoMDB()
    class(toRet) <- unique(c("KMR", class(toRet)))
    return(toRet)
 }
@@ -451,7 +470,8 @@ add_table_def <- function(
       dataModel=KMR_DM,
       dbInfo=db_info(kmr),
       check=FALSE
-   )
+   ) %>% 
+      as_memoMDB()
    class(toRet) <- unique(c("KMR", class(toRet)))
    return(toRet)
 }
@@ -516,7 +536,8 @@ add_table_features <- function(
       dataModel=KMR_DM,
       dbInfo=db_info(kmr),
       check=FALSE
-   )
+   ) %>% 
+      as_memoMDB()
    class(toRet) <- unique(c("KMR", class(toRet)))
    return(toRet)
 }
@@ -533,24 +554,6 @@ add_table_features <- function(
 #' 
 get_KMR <- function(...){
    as_KMR(get_MDB(...))
-}
-
-
-###############################################################################@
-#' 
-#' @rdname db_reconnect
-#' @method db_reconnect KMR
-#' 
-#' @export
-#'
-db_reconnect.KMR <- function(x, user, password, ntries=3, ...){
-   xn <- deparse(substitute(x))
-   nv <- x
-   class(nv) <- setdiff(class(nv), "KMR")
-   db_reconnect(nv, user=user, password=password, ntries=ntries, ...)
-   class(nv) <- unique(c("KMR", class(nv)))
-   assign(xn, nv, envir=parent.frame(n=1))
-   invisible(nv)
 }
 
 

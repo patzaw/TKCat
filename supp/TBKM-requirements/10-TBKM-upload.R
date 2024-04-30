@@ -1,10 +1,8 @@
 source("~/opt/KMT.R")
 library(here)
 
-ntbkm <- read_fileMDB(
+ntbkm <- read_KMR(
    here("supp/TBKM-requirements/TBKM/")
-) %>% 
-   as_memoMDB() %>% 
-   as_KMR()
+)
 
 chtbkm <- as_chMDB(ntbkm, .tkcon)
