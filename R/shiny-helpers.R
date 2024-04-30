@@ -438,15 +438,20 @@ TKCAT_LOGO_DIV <- shiny::div(
          toShow <- mdbs$list %>%
             dplyr::select(dplyr::all_of(colToTake)) %>%
             dplyr::rename("Resource"="name") %>%  
-            dplyr::mutate("total_size" = total_size/2^(30)) %>% 
             dplyr::rename_all(function(x){
                x <- gsub("_", " ", x)
                paste0(
                   toupper(substr(x, 1, 1)),
                   substr(x, 2, nchar(x))
                )
-            }) %>% 
-            dplyr::rename("Total size (GB)"="Total size")
+            })
+         if("Total size" %in% colnames(toShow)){
+            toShow <- toShow %>%  
+               dplyr::mutate("Total size" = signif(
+                  .data$`Total size`/2^(30), 3)
+               ) %>% 
+               dplyr::rename("Total size (GB)"="Total size")
+         }
          if(nrow(mdbs$collections)>0){
             cm <- mdbs$collections %>%
                dplyr::select("collection", "resource") %>%
@@ -492,8 +497,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                #    render = DT::JS(jsFormatBytes)
                # ))
             )
-         ) %>% 
-            DT::formatSignif("Total size (GB)", digits=3)
+         )
          if("Access" %in% colnames(toShow)){
             toRet <- toRet %>% 
                DT::formatStyle(
@@ -538,12 +542,12 @@ TKCAT_LOGO_DIV <- shiny::div(
             expr={
                if(!is.null(access) && access=="none"){
                   mdb <- tryCatch(
-                     get_chMDB_metadata(tkcon, n),
+                     get_chMDB_metadata(instance$tkcat, n),
                      error = function(e) e
                   )
                }else{
                   mdb <- tryCatch(
-                     get_MDB(tkcon, n, check=FALSE),
+                     get_MDB(instance$tkcat, n, check=FALSE),
                      error = function(e) e
                   )
                }

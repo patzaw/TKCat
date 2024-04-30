@@ -2332,7 +2332,7 @@ remove_chMDB_user <- function(x, mdb, login){
 #' @param timestamp the timestamp of the instance to get.
 #' Default=NA: get the current version.
 #' 
-#' @return An list with the followign elements:
+#' @return A list with the following elements:
 #' - dbInfo: General information regarding the MDB
 #' - dataModel: The data model
 #' - collectionMembers: Members of different collections

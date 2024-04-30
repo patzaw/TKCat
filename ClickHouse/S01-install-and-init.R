@@ -12,8 +12,8 @@ CONFIGFILE <- system.file(
    package="TKCat"
 )
 
-CH_VERSION <- "24.3.2.23"
-# CH_VERSION <- "22.2.3.5"
+CH_VERSION <- "22.2.3.5"
+# CH_VERSION <- "24.3.2.23" # issues with joins
 
 TKCAT_HOME <- "/data/pgodard/Projects/TKCat_Test" # TKCat_UCB_TBN
 TKCAT_NAT_PORT <- 9101

@@ -15,7 +15,7 @@ get_chMDB_metadata(x, dbName, timestamp = NA)
 Default=NA: get the current version.}
 }
 \value{
-An list with the followign elements:
+A list with the following elements:
 \itemize{
 \item dbInfo: General information regarding the MDB
 \item dataModel: The data model

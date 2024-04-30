@@ -182,10 +182,16 @@ parse_R_helpers <- function(code, ...){
          "param"=list(
             list(
                name="f",
-               description='The name of the helper function to document. If NULL (default), list all the available functions.'
+               description=paste(
+                  'The name of the helper function to document.',
+                  'If NULL (default), list all the available functions.'
+               )
             )
          ),
-         "return"="This function displays the documentation of an helper function and does not return anything",
+         "return"=paste(
+            "This function displays the documentation of an helper function",
+            "and does not return anything"
+         ),
          "import"=c("crayon"),
          "export"=""
       )

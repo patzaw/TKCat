@@ -888,8 +888,8 @@ function uses the [BED package][bed] [@godard_bed:_2018] and you need this
 package to be installed with a
 connection to BED database in order to run the code below.
 
-```{r}
-try(connectToBed())
+```{r, message=FALSE}
+try(BED::connectToBed(a))
 bedCheck <- try(BED::checkBedConn())
 if(!inherits(bedCheck, "try-error") && bedCheck){
    sel_coll <- get_shared_collections(file_clinvar, file_chembl) %>% 
