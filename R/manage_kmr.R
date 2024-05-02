@@ -791,6 +791,8 @@ add_helpers.KMR <- function(x, code, name, language, ...){
 #' @rdname get_R_helpers
 #' @method get_R_helpers KMR
 #' 
+#' @param tkcat A [TKCat] or [chTKCat] object to make available in
+#' helper environment
 #' @param mdb An [MDB] object to make available in helper environment
 #' 
 #' @details x and mdb objects are made available in helpers environment as
@@ -799,26 +801,16 @@ add_helpers.KMR <- function(x, code, name, language, ...){
 #' 
 #' @export
 #'
-get_R_helpers.KMR <- function(x, hnames=NA, mdb=NULL, ...){
+get_R_helpers.KMR <- function(x, hnames=NA, tkcat=NULL, mdb=NULL, ...){
    
    stopifnot(
       is.MDB(x)
    )
    
    ## Get the code binary ----
-   if(is.chMDB(x)){
-      scode <- get_query(
-         x, 
-         sprintf(
-            "SELECT name, code FROM %s WHERE language='R'",
-            db_tables(x)$dbTables["Helpers"]
-         )
-      )
-   }else{
-      scode <- x$Helpers %>% 
-         dplyr::filter(.data$language=="R")
+   scode <- x$Helpers %>% 
+      dplyr::filter(.data$language=="R")
       
-   }
    if(!is.na(hnames)){
       scode <- scode %>% 
          dplyr::filter(.data$name %in% hnames)
@@ -829,6 +821,6 @@ get_R_helpers.KMR <- function(x, hnames=NA, mdb=NULL, ...){
          code <- paste(code, rawToChar(decode_bin(scode$code[i])), sep="\n")
       }
    }
-   toRet <- parse_R_helpers(code, THISKMR=x, THISMDB=mdb)
+   toRet <- parse_R_helpers(code, THISKMR=x, THISTKCAT=tkcat, THISMDB=mdb)
    return(toRet)
 }

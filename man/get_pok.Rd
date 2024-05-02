@@ -2,18 +2,17 @@
 % Please edit documentation in R/knowledge-access.R
 \name{get_pok}
 \alias{get_pok}
-\title{Get a piece of knowledge from a \link{chTKCat} connection}
+\title{Get a piece of knowledge from a \link{chTKCat} connection or a \link{TKCat} object}
 \usage{
-get_pok(x, mdb_name, corpus_name)
+get_pok(tkcat, mdb_name, corpus_name)
 }
 \arguments{
-\item{x}{a \link{chTKCat} or a \link[=chMDB]{KMR} object}
+\item{tkcat}{a \link{chTKCat} or a \link{TKCat} object}
 
 \item{mdb_name}{the piece of knowledge to get}
 
-\item{corpus_name}{if x is a \link{chTKCat} object,
-the corpus to which the piece belongs. Otherwise this parameter is ignored.}
+\item{corpus_name}{the corpus to which the piece belongs}
 }
 \description{
-Get a piece of knowledge from a \link{chTKCat} connection
+Get a piece of knowledge from a \link{chTKCat} connection or a \link{TKCat} object
 }

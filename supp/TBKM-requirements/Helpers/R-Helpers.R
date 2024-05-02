@@ -220,21 +220,22 @@ get_collibra_mdb <- function(x=THISMDB){
 #' @export
 #' 
 get_collibra_metadata <- function(
-      kmr=THISKMR
+      kmr=THISKMR,
+      tkcon=THISTKCAT
 ){
    stopifnot(
-      TKCat::is.KMR(kmr)
+      TKCat::is.KMR(kmr), TKCat::is.chTKCat(tkcon)
    )
-   allMdbs <- TKCat::list_MDBs(unclass(kmr)$tkcon)
+   allMdbs <- TKCat::list_MDBs(tkcon)
    public_mdbs <- allMdbs %>% dplyr::filter(public) %>% pull(name)
-   allTables <- TKCat::list_tables(unclass(kmr)$tkcon)
+   allTables <- TKCat::list_tables(tkcon)
    toTake <- allTables %>%
       dplyr::filter(name=="___Collibra___") %>% 
       pull("database") %>% 
       unique()
    
    cfields <- TKCat::get_query(
-      kmr,
+      tkcon,
       paste(
          "SELECT database, table, name",
          "FROM system.columns",
@@ -260,7 +261,7 @@ get_collibra_metadata <- function(
       unlist()
    
    toRet1 <- get_query(
-      kmr, 
+      tkcon, 
       paste(
          sprintf(
             "SELECT * FROM (
@@ -275,7 +276,7 @@ get_collibra_metadata <- function(
       dplyr::as_tibble()
    
    toRet2 <- get_query(
-      kmr, 
+      tkcon, 
       paste(
          sprintf(
             "
@@ -314,8 +315,8 @@ get_collibra_metadata <- function(
          "Asset Type"="Data Set",
          "Location"=sprintf(
             "chTKCat on %s:%s (contact: %s)",
-            unclass(kmr)$tkcon$chcon@host, unclass(kmr)$tkcon$chcon@port,
-            unclass(kmr)$tkcon$contact
+            tkcon$chcon@host, tkcon$chcon@port,
+            tkcon$contact
          ),
          "Access Approval"=ifelse(
             MDB %in% !!public_mdbs,
@@ -513,7 +514,6 @@ list_beid_lists <- function(
 }
 
 ###############################################################################@
-#' Get lists of biological entities provided by an MDB###############################################################################@
 #' Get lists of biological entities provided by an MDB
 #'
 #' @param tables names of tables to take (default: NULL ==> all compatible tables)
@@ -762,14 +762,13 @@ get_beid_lists <- function(
 #' 
 #' @export
 #' 
-list_MDB_with_DE_analyses <- function(kmr=THISKMR){
+list_MDB_with_DE_analyses <- function(kmr=THISKMR, tkcon=THISTKCAT){
    stopifnot(
-      TKCat::is.KMR(kmr), TKCat::is.chMDB(kmr)
+      TKCat::is.KMR(kmr), TKCat::is.chTKCat(tkcon)
    )
-   k <- unclass(kmr)$tkcon
    n <- TKCat::db_info(kmr)$name
    mdbNames <- TKCat::get_query(
-      k,
+      tkcon,
       sprintf(
          "SELECT database FROM system.tables WHERE name='%s'",
          sprintf("___%s-Tables___", n)
@@ -782,6 +781,6 @@ list_MDB_with_DE_analyses <- function(kmr=THISKMR){
       ),
       collapse=" UNION ALL "
    )
-   toRet <- TKCat::get_query(k, query)
+   toRet <- TKCat::get_query(tkcon, query)
    return(toRet)
 }

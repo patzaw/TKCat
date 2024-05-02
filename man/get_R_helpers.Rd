@@ -8,7 +8,7 @@
 \usage{
 get_R_helpers(x, hnames, ...)
 
-\method{get_R_helpers}{KMR}(x, hnames = NA, mdb = NULL, ...)
+\method{get_R_helpers}{KMR}(x, hnames = NA, tkcat = NULL, mdb = NULL, ...)
 
 \method{get_R_helpers}{MDB}(x, hnames = NA, kmr, ...)
 }
@@ -19,6 +19,9 @@ get_R_helpers(x, hnames, ...)
 all available are sourced.}
 
 \item{...}{method specific parameters}
+
+\item{tkcat}{A \link{TKCat} or \link{chTKCat} object to make available in
+helper environment}
 
 \item{mdb}{An \link{MDB} object to make available in helper environment}
 

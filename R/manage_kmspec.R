@@ -572,7 +572,6 @@ add_km_feature <- function(
          }
       }
       
-      #### Field value ----
       return(toRet)
       
    })
@@ -658,33 +657,6 @@ rm_km_feature <- function(
    toRet <- c(toRet, kms)
    
    return(toRet)
-   
-}
-
-###############################################################################@
-#' Check if data shared in an [MDB] object fits the KM requirements
-#' 
-#' @param x an [MDB] object to check
-#' @param kmr an [MDB] object with KM requirements
-#'
-#' @return A logical: TRUE if requirements are met, FALSE if not.
-#' report is also generated indicating error or warnings.
-#'
-#' @export
-#'
-check_km_spec <- function(x, kmr){
-   stop("NOT IMPLEMENTED YET")
-   
-   ## Check table features ----
-   ## check that all documented tables are in the datasets
-   ## check that all the mandatory features are in the documented tables
-   ## check that all the documented features are in documented tables
-   ## check that all the mandatory feature properties are in  documented tables
-   ## check that all the documented feature properties are in documented tables
-   
-   ## Check vocabulary ----
-   ## check that values of documented features properties are in kmr values
-   ## 
    
 }
 

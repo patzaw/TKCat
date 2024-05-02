@@ -316,8 +316,8 @@ collection_members(file_clinvar, "BE")
 ## -----------------------------------------------------------------------------
 get_shared_collections(filtered_clinvar, file_chembl)
 
-## -----------------------------------------------------------------------------
-try(connectToBed())
+## ----message=FALSE------------------------------------------------------------
+try(BED::connectToBed(a))
 bedCheck <- try(BED::checkBedConn())
 if(!inherits(bedCheck, "try-error") && bedCheck){
    sel_coll <- get_shared_collections(file_clinvar, file_chembl) %>% 

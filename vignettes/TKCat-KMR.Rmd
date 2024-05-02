@@ -9,9 +9,7 @@ output:
    rmarkdown::html_document:
       number_sections: yes
       self_contained: true
-      theme: cerulean
       toc: yes
-      toc_float: yes
       fig_width: 7
       fig_height: 5
 vignette: >
@@ -94,55 +92,311 @@ requirements regarding:
 It's also possible to store helpers in a KMR object. These helpers are typically
 functions used to query MDBs fitting KMR requirements.
 
-```{r}
+```{r, eval=FALSE}
 data_model(ebkm) %>% 
    plot()
 ```
 
+![](KMR-data-model.png)
+
 ## Define requirements
 
-In the example below, we define requirements for tables providing information
-about biological samples.
+### Table and mandatory features
 
-Such table must provide at least a sample name and a sample description:
+In the example below, we define requirements for tables providing information
+about biological samples. Such table must provide at least a sample name and
+a sample description.
+
+It is specified by first defining the features,
 
 ```{r}
 ebkm <- add_feature_def(
-   ebkm,
-   "name",
-   "name/identifier of a record",
-   properties=list(
-      "value"=list(
-         type="character",
-         mandatory=TRUE
+   kmr = ebkm,
+   name = "name",
+   description = "name/identifier of a record",
+   properties = list(
+      "value" = list(
+         type = "character",
+         mandatory = TRUE
       )
    )
 )
 ebkm <- add_feature_def(
-   ebkm,
-   "description",
-   "description of a record",
-   properties=list(
-      "value"=list(
-         type="character",
-         mandatory=TRUE
+   kmr = ebkm,
+   name = "description",
+   description = "description of a record",
+   properties = list(
+      "value" = list(
+         type = "character",
+         mandatory = TRUE
       )
    )
 )
+```
+
+and then by defining the table.
+
+```{r}
 ebkm <- add_table_def(
-   ebkm,
-   "samples",
-   "A table listing samples and associated features",
+   kmr = ebkm,
+   name = "samples",
+   description = "A table listing samples and associated features",
    mandatory_features=c("name", "description")
 )
 ```
 
+### Optional features
+
+Non mandatory features can then added to the table definition.
+For samples, we can define the sex and tissue features and add them
+to the table definition:
+
+```{r}
+ebkm <- add_feature_def(
+   kmr = ebkm,
+   name = "sex",
+   description = "Subject sex",
+   properties = list(
+      "value" = list(
+         type = "character",
+         mandatory = TRUE
+      )
+   )
+)
+ebkm <- add_feature_def(
+   kmr = ebkm,
+   name = "tissue",
+   description = "Name of a biological tissue",
+   properties = list(
+      "value" = list(
+         type = "character",
+         mandatory = TRUE
+      ),
+      "identifier" = list(
+         type = "character",
+         description = "Identifier in reference database",
+         mandatory = TRUE
+      ),
+      "reference" = list(
+         type="character",
+         description = "Reference database",
+         mandatory=TRUE
+      ),
+      "side" = list(
+         type = "character",
+         description = "Sampling side",
+         mandatory = FALSE
+      ),
+      "relative side" = list(
+         type="character",
+         description = "Sampling relative side",
+         mandatory = FALSE
+      ),
+      "side reference" = list(
+         type="character",
+         description =
+            "Reference for relative side (e.g., Handedness, treatment...)",
+         mandatory = FALSE
+      )
+   )
+)
+ebkm <- add_table_features(
+   kmr = ebkm,
+   table = "samples",
+   features = c("sex", "tissue")
+)
+```
+
+### Possible values for feature properties
+
+We can also define a list of possible values for some feature property that
+we want to standardize as shown below.
+
+-  Possible values for sex
+
+   ```{r}
+   ebkm <- add_property_values(
+      kmr = ebkm, feature = "sex", property = "value",
+      values = c("female", "male")
+   )
+   ```
+
+-  Tissues must be defined using
+the [Uberon](http://obofoundry.org/ontology/uberon.html) ontology.
+The way to define sampling side, absolutely or relatively to a reference,
+is also controlled.
+
+   ```{r}
+   ebkm <- add_property_values(
+      kmr = ebkm, feature = "tissue", property = "reference",
+      values=c(
+         "Uberon" = "http://obofoundry.org/ontology/uberon.html"
+      )
+   )
+   ebkm <- add_property_values(
+      kmr = ebkm, feature = "tissue", property = "side",
+      values = c("left", "right")
+   )
+   ebkm <- add_property_values(
+      kmr = ebkm, feature = "tissue", property = "relative side",
+      values = c("ipsilateral", "contralateral")
+   )
+   ```
+
+### Measurements
+
+Some feature properties could correspond to measurements with units.
+To be able to create such property, we first need to define the possible units.
+For example, "age" "value" is a "duration" that can be expressed using
+different units, such as "m" (months) or "y" (years).
+
+```{r}
+ebkm <- add_unit_def(
+   kmr = ebkm,
+   measurement = "duration", unit = "s", description = "seconds"
+)
+ebkm <- add_unit_def(
+   kmr = ebkm,
+   measurement = "duration", unit = "min", description = "minutes"
+)
+ebkm <- add_unit_def(
+   kmr = ebkm,
+   measurement = "duration", unit = "h", description = "hours"
+)
+ebkm <- add_unit_def(
+   kmr = ebkm,
+   measurement = "duration", unit = "d", description = "days"
+)
+ebkm <- add_unit_def(
+   kmr = ebkm,
+   measurement = "duration", unit = "m", description = "months"
+)
+ebkm <- add_unit_def(
+   kmr = ebkm,
+   measurement = "duration", unit = "y", description = "years"
+)
+ebkm <- add_unit_def(
+   kmr = ebkm,
+   measurement = "duration", unit = "w", description = "weeks"
+)
+
+##
+
+ebkm <- add_feature_def(
+   kmr = ebkm,
+   name = "age",
+   description = "Elapsed time since birth",
+   properties = list(
+      "value" = list(
+         type = "numeric",
+         mandatory = TRUE,
+         measurement = "duration"
+      )
+   )
+)
+ebkm <- add_table_features(
+   kmr = ebkm,
+   table = "samples",
+   features = c("age")
+)
+```
+
+# KM specifications
+
+## Exploring requirements
+
+Before documenting the specifications of an MDB fitting KMR requirements,
+those requirements can be explored using different functions.
+
+-  Get supported table types:
+
+   ```{r}
+   list_table_types(ebkm)
+   ```
+
+-  Get supported features:
+
+   ```{r}
+   list_table_features(ebkm, "samples")
+   ```
+
+-  Details about feature properties:
+
+   ```{r}
+   list_feature_properties(ebkm, "tissue")
+   ```
+
+-  Get property supported values:
+
+   ```{r}
+   list_property_values(ebkm, "sex", "value")
+   ```
+
+-  Get measurements and units:
+
+   ```{r}
+   list_measurements(ebkm)
+   list_measurement_units(ebkm, "duration")
+   ```
+
+## Documenting MDB specifications
+
+### Simple example
+
+```{r}
+samples <- tibble(
+   name = c("S1", "S2", "S3", "S4"),
+   description = c(
+      "Sample from left hippocampus from patient 1",
+      "Sample from left hippocampus from patient 2",
+      "Sample from left hippocampus from patient 3",
+      "Sample from left hippocampus from patient 4"
+   ),
+   sex = c("male", "female", "female", "male"),
+   age = c(25, 36, 28, 42),
+   tissue_name = rep("hippocampus", 4),
+   tissue_id = rep("UBERON_0002421", 4),
+   tissue_ref = rep("Uberon", 4),
+   tissue_side = rep("left", 4)
+)
+model <- ReDaMoR::df_to_model(samples) %>% 
+   ReDaMoR::auto_layout()
+mdb <- memoMDB(
+   list(samples=samples),
+   model,
+   dbInfo=list(
+      name="Test"
+   )
+)
+```
 
 
-
-
-# KMR specifications
-
+```{r}
+mdb <- add_km_spec(mdb, ebkm)
+mdb <- add_km_table(
+   mdb, ebkm,
+   name="samples", type="samples",
+   features=list(
+      
+      ### TBKM mandatory features ###
+      list(feature="name", fields="name"),
+      list(feature="description", fields="description"),
+      
+      ### TBKM optional features  ###
+      list(feature="age", fields="age", unit="y"),
+      list(feature="sex", fields="sex"),
+      list(
+         feature="tissue",
+         fields=list(
+            "value"=list(field="tissue_name"),
+            "identifier"=list(field="tissue_id"),
+            "reference"=list(field="tissue_ref"),
+            "side"=list(field="tissue_side")
+         )
+      )
+   )
+)
+```
 
 
 

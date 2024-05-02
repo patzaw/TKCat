@@ -9,9 +9,7 @@ output:
    rmarkdown::html_document:
       number_sections: yes
       self_contained: true
-      theme: cerulean
       toc: yes
-      toc_float: yes
       fig_width: 7
       fig_height: 5
 vignette: >
