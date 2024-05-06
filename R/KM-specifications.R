@@ -726,15 +726,17 @@ add_helpers.MDB <- function(x, code, name, language, kmr, ...){
 #' @rdname get_R_helpers
 #' @method get_R_helpers MDB
 #' 
-#' @param kmr an [MDB] object with KM requirements
+#' @param kmr a [KMR] object
+#' @param tkcat A [TKCat] or [chTKCat] object to make available in
+#' helper environment
 #'
-#' @details x and kmr objects are made available in helpers environment as
-#' 'THISMDB' and 'THISKMR' objects respectively and can be used as such within
-#' helpers code.
+#' @details x, kmr and tkcat objects are made available in helpers environment
+#' as 'THISMDB', 'THISKMR' and 'THISTKCAT' objects respectively and can be used
+#' as such within helpers code.
 #' 
 #' @export
 #'
-get_R_helpers.MDB <- function(x, hnames=NA, kmr, ...){
+get_R_helpers.MDB <- function(x, hnames=NA, kmr, tkcat=NULL, ...){
    
    stopifnot(
       is.KMR(kmr)
@@ -779,6 +781,9 @@ get_R_helpers.MDB <- function(x, hnames=NA, kmr, ...){
          code <- paste(code, rawToChar(decode_bin(scode$code[i])), sep="\n")
       }
    }
-   toRet <- parse_R_helpers(code, THISMDB=x, THISKMR=kmr)
+   if(is.null(tkcat) && is.chMDB(x)){
+      tkcat <- unclass(x)$tkcon
+   }
+   toRet <- parse_R_helpers(code, THISMDB=x, THISKMR=kmr, THISTKCAT=tkcat)
    return(toRet)
 }

@@ -795,9 +795,9 @@ add_helpers.KMR <- function(x, code, name, language, ...){
 #' helper environment
 #' @param mdb An [MDB] object to make available in helper environment
 #' 
-#' @details x and mdb objects are made available in helpers environment as
-#' 'THISKMR' and 'THISMDB' objects respectively and can be used as such within
-#' helpers code.
+#' @details x, tkcat and mdb objects are made available in helpers environment
+#' as 'THISKMR', 'THISTKCAT' and 'THISMDB' objects respectively and can be used
+#' as such within helpers code.
 #' 
 #' @export
 #'

@@ -1,9 +1,3 @@
-#' Get a piece of knowledge from a [chTKCat] connection or a [TKCat] object
-#' 
-#' @param tkcat a [chTKCat] or a [TKCat] object 
-#' @param mdb_name the piece of knowledge to get
-#' @param corpus_name the corpus to which the piece belongs
-#' 
 #' @export
 #' 
 get_pok <- function(tkcat, mdb_name, corpus_name){
@@ -32,20 +26,15 @@ get_pok <- function(tkcat, mdb_name, corpus_name){
       kmr=kmr,
       helpers=c(mdb_helpers, kmr_helpers)
    )
-   class(toRet) <- c("POK", class(toRet))
+   class(toRet) <- c("dpok", class(toRet))
    return(toRet)
    
 }
 
 
-###############################################################################@
-#' 
-#' @rdname db_reconnect
-#' @method db_reconnect POK
-#' 
 #' @export
 #'
-db_reconnect.POK <- function(x, user, password, ntries=3, ...){
+db_reconnect.dpok <- function(x, user, password, ntries=3, ...){
    xn <- deparse(substitute(x))
    x <- unclass(x)
    mdb <- x$mdb
@@ -57,7 +46,7 @@ db_reconnect.POK <- function(x, user, password, ntries=3, ...){
    nv <- x
    nv$mdb <- mdb
    nv$kmr <- kmr
-   class(nv) <- c("POK", class(nv))
+   class(nv) <- c("dpok", class(nv))
    
    lenv <- lapply(nv$helpers, environment) %>% unique()
    for(i in 1:length(lenv)){

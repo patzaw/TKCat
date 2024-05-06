@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2024-05-02" />
+<meta name="date" content="2024-05-06" />
 
 <title>Introduction to TKCat (Tailored Knowledge Catalog)</title>
 
@@ -7276,7 +7276,7 @@ display: none;
 <h1 class="title toc-ignore">Introduction to TKCat (Tailored Knowledge
 Catalog)</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">May 02, 2024</h4>
+<h4 class="date">May 06, 2024</h4>
 
 </div>
 
@@ -7691,7 +7691,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2024-05-02 07:15:26.881501
+## Timestamp: 2024-05-06 16:30:42.866148
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -7729,7 +7729,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2024-05-02 07:15:26.881501
+## Timestamp: 2024-05-06 16:30:42.866148
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -7822,7 +7822,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2024-05-02 07:15:26.881501
+## Timestamp: 2024-05-06 16:30:42.866148
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -7881,7 +7881,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2024-05-02 07:15:26
+## Timestamp: 2024-05-06 16:30:42
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -8654,18 +8654,18 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <pre><code>## # A tibble: 12 × 7
 ##    resource table                  name            comment type  nullable unique
 ##    &lt;chr&gt;    &lt;chr&gt;                  &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt; &lt;lgl&gt;    &lt;lgl&gt; 
-##  1 CHEMBL   CHEMBL_drug_indication DB              &quot;Datab… char… FALSE    FALSE 
-##  2 CHEMBL   CHEMBL_drug_mechanism  disease_effica… &quot;&quot;      char… TRUE     FALSE 
-##  3 CHEMBL   CHEMBL_drug_indication id              &quot;Disea… char… FALSE    FALSE 
-##  4 CHEMBL   CHEMBL_drug_indication name            &quot;Term … char… FALSE    FALSE 
-##  5 HPO      HPO_diseaseHP          db              &quot;Disea… char… FALSE    FALSE 
-##  6 HPO      HPO_diseaseSynonyms    db              &quot;Disea… char… FALSE    FALSE 
-##  7 HPO      HPO_diseases           db              &quot;Disea… char… FALSE    FALSE 
-##  8 HPO      HPO_diseaseHP          id              &quot;Disea… char… FALSE    FALSE 
-##  9 HPO      HPO_diseaseSynonyms    id              &quot;Disea… char… FALSE    FALSE 
-## 10 HPO      HPO_diseases           id              &quot;Disea… char… FALSE    FALSE 
-## 11 HPO      HPO_diseases           label           &quot;Disea… char… FALSE    FALSE 
-## 12 HPO      HPO_diseaseSynonyms    synonym         &quot;Disea… char… FALSE    FALSE</code></pre>
+##  1 HPO      HPO_diseaseHP          db              &quot;Disea… char… FALSE    FALSE 
+##  2 HPO      HPO_diseaseSynonyms    db              &quot;Disea… char… FALSE    FALSE 
+##  3 HPO      HPO_diseases           db              &quot;Disea… char… FALSE    FALSE 
+##  4 HPO      HPO_diseaseHP          id              &quot;Disea… char… FALSE    FALSE 
+##  5 HPO      HPO_diseaseSynonyms    id              &quot;Disea… char… FALSE    FALSE 
+##  6 HPO      HPO_diseases           id              &quot;Disea… char… FALSE    FALSE 
+##  7 HPO      HPO_diseases           label           &quot;Disea… char… FALSE    FALSE 
+##  8 HPO      HPO_diseaseSynonyms    synonym         &quot;Disea… char… FALSE    FALSE 
+##  9 CHEMBL   CHEMBL_drug_indication DB              &quot;Datab… char… FALSE    FALSE 
+## 10 CHEMBL   CHEMBL_drug_mechanism  disease_effica… &quot;&quot;      char… TRUE     FALSE 
+## 11 CHEMBL   CHEMBL_drug_indication id              &quot;Disea… char… FALSE    FALSE 
+## 12 CHEMBL   CHEMBL_drug_indication name            &quot;Term … char… FALSE    FALSE</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 7 × 3
 ##   resource collection table                    
