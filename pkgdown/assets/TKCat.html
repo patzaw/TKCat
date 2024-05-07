@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2024-05-06" />
+<meta name="date" content="2024-05-07" />
 
 <title>Introduction to TKCat (Tailored Knowledge Catalog)</title>
 
@@ -7276,7 +7276,7 @@ display: none;
 <h1 class="title toc-ignore">Introduction to TKCat (Tailored Knowledge
 Catalog)</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">May 06, 2024</h4>
+<h4 class="date">May 07, 2024</h4>
 
 </div>
 
@@ -7329,34 +7329,35 @@ instance</a></li>
 <li><a href="#specific-operations-on-chmdb-objects" id="toc-specific-operations-on-chmdb-objects"><span class="toc-section-number">4.4</span> Specific operations on chMDB
 objects</a></li>
 </ul></li>
-<li><a href="#appendices" id="toc-appendices"><span class="toc-section-number">5</span> Appendices</a>
+<li><a href="#defining-and-using-requirements-for-knowledge-management-kmr" id="toc-defining-and-using-requirements-for-knowledge-management-kmr"><span class="toc-section-number">5</span> Defining and using Requirements for
+Knowledge Management (KMR)</a></li>
+<li><a href="#appendices" id="toc-appendices"><span class="toc-section-number">6</span> Appendices</a>
 <ul>
-<li><a href="#ch-op" id="toc-ch-op"><span class="toc-section-number">5.1</span> chTKCat operations</a>
+<li><a href="#ch-op" id="toc-ch-op"><span class="toc-section-number">6.1</span> chTKCat operations</a>
 <ul>
-<li><a href="#instantiating-the-clickhouse-database" id="toc-instantiating-the-clickhouse-database"><span class="toc-section-number">5.1.1</span> Instantiating the ClickHouse
+<li><a href="#instantiating-the-clickhouse-database" id="toc-instantiating-the-clickhouse-database"><span class="toc-section-number">6.1.1</span> Instantiating the ClickHouse
 database</a></li>
-<li><a href="#user-management" id="toc-user-management"><span class="toc-section-number">5.1.2</span> User management</a></li>
-<li><a href="#chmdb-management" id="toc-chmdb-management"><span class="toc-section-number">5.1.3</span> chMDB management</a></li>
-<li><a href="#collection-management" id="toc-collection-management"><span class="toc-section-number">5.1.4</span> Collection management</a></li>
-<li><a href="#implementation" id="toc-implementation"><span class="toc-section-number">5.1.5</span> Implementation</a></li>
+<li><a href="#user-management" id="toc-user-management"><span class="toc-section-number">6.1.2</span> User management</a></li>
+<li><a href="#chmdb-management" id="toc-chmdb-management"><span class="toc-section-number">6.1.3</span> chMDB management</a></li>
+<li><a href="#collection-management" id="toc-collection-management"><span class="toc-section-number">6.1.4</span> Collection management</a></li>
+<li><a href="#implementation" id="toc-implementation"><span class="toc-section-number">6.1.5</span> Implementation</a></li>
 </ul></li>
-<li><a href="#collections" id="toc-collections"><span class="toc-section-number">5.2</span> TKCat collections</a>
+<li><a href="#collections" id="toc-collections"><span class="toc-section-number">6.2</span> TKCat collections</a>
 <ul>
-<li><a href="#creating-a-collection" id="toc-creating-a-collection"><span class="toc-section-number">5.2.1</span> Creating a collection</a></li>
-<li><a href="#documenting-collection-members" id="toc-documenting-collection-members"><span class="toc-section-number">5.2.2</span> Documenting collection
+<li><a href="#creating-a-collection" id="toc-creating-a-collection"><span class="toc-section-number">6.2.1</span> Creating a collection</a></li>
+<li><a href="#documenting-collection-members" id="toc-documenting-collection-members"><span class="toc-section-number">6.2.2</span> Documenting collection
 members</a></li>
-<li><a href="#collection-mapper-functions" id="toc-collection-mapper-functions"><span class="toc-section-number">5.2.3</span> Collection mapper
+<li><a href="#collection-mapper-functions" id="toc-collection-mapper-functions"><span class="toc-section-number">6.2.3</span> Collection mapper
 functions</a></li>
 </ul></li>
-<li><a href="#remarks-about-supported-data-format-and-data-types" id="toc-remarks-about-supported-data-format-and-data-types"><span class="toc-section-number">5.3</span> Remarks about supported data
+<li><a href="#remarks-about-supported-data-format-and-data-types" id="toc-remarks-about-supported-data-format-and-data-types"><span class="toc-section-number">6.3</span> Remarks about supported data
 format and data types</a>
 <ul>
-<li><a href="#matrices-of-values" id="toc-matrices-of-values"><span class="toc-section-number">5.3.1</span> Matrices of values</a></li>
-<li><a href="#documents-stored-as-base64-values" id="toc-documents-stored-as-base64-values"><span class="toc-section-number">5.3.2</span> Documents stored as base64
+<li><a href="#matrices-of-values" id="toc-matrices-of-values"><span class="toc-section-number">6.3.1</span> Matrices of values</a></li>
+<li><a href="#documents-stored-as-base64-values" id="toc-documents-stored-as-base64-values"><span class="toc-section-number">6.3.2</span> Documents stored as base64
 values</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#acknowledgments" id="toc-acknowledgments">Acknowledgments</a></li>
 <li><a href="#references" id="toc-references">References</a></li>
 </ul>
 </div>
@@ -7691,7 +7692,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2024-05-06 16:30:42.866148
+## Timestamp: 2024-05-07 13:49:47.779959
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -7729,7 +7730,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2024-05-06 16:30:42.866148
+## Timestamp: 2024-05-07 13:49:47.779959
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -7822,7 +7823,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2024-05-06 16:30:42.866148
+## Timestamp: 2024-05-07 13:49:47.779959
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -7881,7 +7882,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/app/)
 ## 
-## Timestamp: 2024-05-06 16:30:42
+## Timestamp: 2024-05-07 13:49:47
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -8654,18 +8655,18 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <pre><code>## # A tibble: 12 × 7
 ##    resource table                  name            comment type  nullable unique
 ##    &lt;chr&gt;    &lt;chr&gt;                  &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt; &lt;lgl&gt;    &lt;lgl&gt; 
-##  1 HPO      HPO_diseaseHP          db              &quot;Disea… char… FALSE    FALSE 
-##  2 HPO      HPO_diseaseSynonyms    db              &quot;Disea… char… FALSE    FALSE 
-##  3 HPO      HPO_diseases           db              &quot;Disea… char… FALSE    FALSE 
-##  4 HPO      HPO_diseaseHP          id              &quot;Disea… char… FALSE    FALSE 
-##  5 HPO      HPO_diseaseSynonyms    id              &quot;Disea… char… FALSE    FALSE 
-##  6 HPO      HPO_diseases           id              &quot;Disea… char… FALSE    FALSE 
-##  7 HPO      HPO_diseases           label           &quot;Disea… char… FALSE    FALSE 
-##  8 HPO      HPO_diseaseSynonyms    synonym         &quot;Disea… char… FALSE    FALSE 
-##  9 CHEMBL   CHEMBL_drug_indication DB              &quot;Datab… char… FALSE    FALSE 
-## 10 CHEMBL   CHEMBL_drug_mechanism  disease_effica… &quot;&quot;      char… TRUE     FALSE 
-## 11 CHEMBL   CHEMBL_drug_indication id              &quot;Disea… char… FALSE    FALSE 
-## 12 CHEMBL   CHEMBL_drug_indication name            &quot;Term … char… FALSE    FALSE</code></pre>
+##  1 CHEMBL   CHEMBL_drug_indication DB              &quot;Datab… char… FALSE    FALSE 
+##  2 CHEMBL   CHEMBL_drug_mechanism  disease_effica… &quot;&quot;      char… TRUE     FALSE 
+##  3 CHEMBL   CHEMBL_drug_indication id              &quot;Disea… char… FALSE    FALSE 
+##  4 CHEMBL   CHEMBL_drug_indication name            &quot;Term … char… FALSE    FALSE 
+##  5 HPO      HPO_diseaseHP          db              &quot;Disea… char… FALSE    FALSE 
+##  6 HPO      HPO_diseaseSynonyms    db              &quot;Disea… char… FALSE    FALSE 
+##  7 HPO      HPO_diseases           db              &quot;Disea… char… FALSE    FALSE 
+##  8 HPO      HPO_diseaseHP          id              &quot;Disea… char… FALSE    FALSE 
+##  9 HPO      HPO_diseaseSynonyms    id              &quot;Disea… char… FALSE    FALSE 
+## 10 HPO      HPO_diseases           id              &quot;Disea… char… FALSE    FALSE 
+## 11 HPO      HPO_diseases           label           &quot;Disea… char… FALSE    FALSE 
+## 12 HPO      HPO_diseaseSynonyms    synonym         &quot;Disea… char… FALSE    FALSE</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 7 × 3
 ##   resource collection table                    
@@ -8726,16 +8727,33 @@ object as shown below.</p>
 ## 16 ORPHA 86909  Myoclonic epilepsy of infancy</code></pre>
 </div>
 </div>
-<div id="appendices" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Appendices</h1>
-<div id="ch-op" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> chTKCat
+<div id="defining-and-using-requirements-for-knowledge-management-kmr" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Defining and using
+Requirements for Knowledge Management (KMR)</h1>
+<p>Beside the relational model, no additional constraints are applied to
+an MDB. This allows for high flexibility in the data that can be
+managed. However, in some cases, it could be useful to add further
+constraints to ensure that the data is compatible with specific analysis
+or integration workflows. In TKCat, this feature is supported by KMR
+(Knowledge Management Requirements). A KMR object is meant to be shared
+and centrally managed. MDBs intended to meet these requirements must
+contain technical tables referring to the corresponding KMR. When
+grouped in the same TKCat catalog, KMRs and MDBs form a coherent corpus
+of knowledge that can be leveraged consistently by KMR-tailored
+functions.</p>
+<p>This set of features is described in the vignette <a href="TKCat-KMR-POK.html">Defining and using Requirements for Knowledge
+Management (KMR) in TKCat</a>.</p>
+</div>
+<div id="appendices" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Appendices</h1>
+<div id="ch-op" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> chTKCat
 operations</h2>
-<div id="instantiating-the-clickhouse-database" class="section level3" number="5.1.1">
-<h3><span class="header-section-number">5.1.1</span> Instantiating the
+<div id="instantiating-the-clickhouse-database" class="section level3" number="6.1.1">
+<h3><span class="header-section-number">6.1.1</span> Instantiating the
 ClickHouse database</h3>
-<div id="install-clickhouse-initialize-and-configure-the-tkcat-instance" class="section level4" number="5.1.1.1">
-<h4><span class="header-section-number">5.1.1.1</span> Install
+<div id="install-clickhouse-initialize-and-configure-the-tkcat-instance" class="section level4" number="6.1.1.1">
+<h4><span class="header-section-number">6.1.1.1</span> Install
 ClickHouse, initialize and configure the TKCat instance</h4>
 <p>The ClickHouse docker container supporting TKCat, its initialization
 and its configuration procedures are implemented here: <a href="https://github.com/patzaw/TKCat/blob/master/ClickHouse/S01-install-and-init.R">S01-install-and-init.R</a>.
@@ -8746,8 +8764,8 @@ whereas HTTP and HTTP ports are supported by the <a href="https://github.com/pat
 package.</p>
 <p>The data are stored in the <code>TKCAT_HOME</code> folder.</p>
 </div>
-<div id="cleaning-and-removing-a-tkcat-instance" class="section level4" number="5.1.1.2">
-<h4><span class="header-section-number">5.1.1.2</span> Cleaning and
+<div id="cleaning-and-removing-a-tkcat-instance" class="section level4" number="6.1.1.2">
+<h4><span class="header-section-number">6.1.1.2</span> Cleaning and
 removing a TKCat instance</h4>
 <p>When no longer needed, stoping and removing the docker container can
 be achieved as exemplified below</p>
@@ -8760,12 +8778,12 @@ sudo rm -rf ~/Documents/Projects/TKCat_Test
 </code></pre>
 </div>
 </div>
-<div id="user-management" class="section level3" number="5.1.2">
-<h3><span class="header-section-number">5.1.2</span> User
+<div id="user-management" class="section level3" number="6.1.2">
+<h3><span class="header-section-number">6.1.2</span> User
 management</h3>
 <p>User management requires admin rights on the database.</p>
-<div id="ch-u-create" class="section level4" number="5.1.2.1">
-<h4><span class="header-section-number">5.1.2.1</span> Creation</h4>
+<div id="ch-u-create" class="section level4" number="6.1.2.1">
+<h4><span class="header-section-number">6.1.2.1</span> Creation</h4>
 <pre class="r"><code>k &lt;- chTKCat(user=&quot;pgodard&quot;)
 create_chTKCat_user(
    k, login=&quot;lfrancois&quot;, contact=NA, admin=FALSE, provider=TRUE
@@ -8776,8 +8794,8 @@ chTKCat instance (default: FALSE). The provider parameter indicates if
 the new user can create and populate new databases whithin the chTKCat
 instance (default: FALSE).</p>
 </div>
-<div id="update" class="section level4" number="5.1.2.2">
-<h4><span class="header-section-number">5.1.2.2</span> Update</h4>
+<div id="update" class="section level4" number="6.1.2.2">
+<h4><span class="header-section-number">6.1.2.2</span> Update</h4>
 <pre class="r"><code>k &lt;- chTKCat(user=&quot;pgodard&quot;)
 change_chTKCat_password(k, &quot;lfrancois&quot;)
 update_chTKCat_user(k, contact=&quot;email&quot;, admin=FALSE)</code></pre>
@@ -8787,16 +8805,16 @@ update_chTKCat_user(k, contact=&quot;email&quot;, admin=FALSE)</code></pre>
 from the <code>explore_MDBs()</code> Shiny application by providing the
 URL as the <code>userManager</code> parameter.</p>
 </div>
-<div id="drop" class="section level4" number="5.1.2.3">
-<h4><span class="header-section-number">5.1.2.3</span> Drop</h4>
+<div id="drop" class="section level4" number="6.1.2.3">
+<h4><span class="header-section-number">6.1.2.3</span> Drop</h4>
 <pre class="r"><code>drop_chTKCat_user(k, login=&quot;lfrancois&quot;)</code></pre>
 </div>
 </div>
-<div id="chmdb-management" class="section level3" number="5.1.3">
-<h3><span class="header-section-number">5.1.3</span> chMDB
+<div id="chmdb-management" class="section level3" number="6.1.3">
+<h3><span class="header-section-number">6.1.3</span> chMDB
 management</h3>
-<div id="chmdb-creation" class="section level4" number="5.1.3.1">
-<h4><span class="header-section-number">5.1.3.1</span> chMDB
+<div id="chmdb-creation" class="section level4" number="6.1.3.1">
+<h4><span class="header-section-number">6.1.3.1</span> chMDB
 Creation</h4>
 <p>Before MDB data can be uploaded, the database should be created. This
 operation can only be achieved by data providers (see <a href="#ch-u-create">above</a>).</p>
@@ -8812,8 +8830,8 @@ the chMDB data.</p>
 # remove_chMDB_user(k, &quot;CHEMBL&quot;, &quot;lfrancois&quot;)
 list_chMDB_users(k, &quot;CHEMBL&quot;)</code></pre>
 </div>
-<div id="populating-chmdb" class="section level4" number="5.1.3.2">
-<h4><span class="header-section-number">5.1.3.2</span> Populating
+<div id="populating-chmdb" class="section level4" number="6.1.3.2">
+<h4><span class="header-section-number">6.1.3.2</span> Populating
 chMDB</h4>
 <p>Each chMDB can be populated individualy using the
 <code>as_chMDB()</code> function. The code chunk below shows how to scan
@@ -8834,8 +8852,8 @@ for(r in toFeed){
    cr &lt;- as_chMDB(lr, k, overwrite=FALSE)
 }</code></pre>
 </div>
-<div id="deleting-a-chmdb" class="section level4" number="5.1.3.3">
-<h4><span class="header-section-number">5.1.3.3</span> Deleting a
+<div id="deleting-a-chmdb" class="section level4" number="6.1.3.3">
+<h4><span class="header-section-number">6.1.3.3</span> Deleting a
 chMDB</h4>
 <p>Any admin user of a chMDB can delete the corresponding data.</p>
 <pre class="r"><code>empty_chMDB(k, &quot;CHEMBL&quot;)</code></pre>
@@ -8844,8 +8862,8 @@ database.</p>
 <pre class="r"><code>drop_chMDB(k, &quot;CHEMBL&quot;)</code></pre>
 </div>
 </div>
-<div id="collection-management" class="section level3" number="5.1.4">
-<h3><span class="header-section-number">5.1.4</span> Collection
+<div id="collection-management" class="section level3" number="6.1.4">
+<h3><span class="header-section-number">6.1.4</span> Collection
 management</h3>
 <p>Details about collections are provided in the <a href="#collections">following appendix</a>.</p>
 <p>Collections needs to be added to a chTKCat instance in order to
@@ -8857,20 +8875,20 @@ remove chTKCat collections.</p>
 list_chTKCat_collections(k)
 remove_chTKCat_collection(k, &quot;BE&quot;)</code></pre>
 </div>
-<div id="implementation" class="section level3" number="5.1.5">
-<h3><span class="header-section-number">5.1.5</span> Implementation</h3>
-<div id="data-models" class="section level4" number="5.1.5.1">
-<h4><span class="header-section-number">5.1.5.1</span> Data models</h4>
-<div id="default-database" class="section level5" number="5.1.5.1.1">
-<h5><span class="header-section-number">5.1.5.1.1</span> Default
+<div id="implementation" class="section level3" number="6.1.5">
+<h3><span class="header-section-number">6.1.5</span> Implementation</h3>
+<div id="data-models" class="section level4" number="6.1.5.1">
+<h4><span class="header-section-number">6.1.5.1</span> Data models</h4>
+<div id="default-database" class="section level5" number="6.1.5.1.1">
+<h5><span class="header-section-number">6.1.5.1.1</span> Default
 database</h5>
 <p>The default database stores information about chTKCat instance, users
 and user access.</p>
 <div class="visNetwork html-widget html-fill-item" id="htmlwidget-e25d81a0dea67c74bfc5" style="width:672px;height:480px;"></div>
 <script type="application/json" data-for="htmlwidget-e25d81a0dea67c74bfc5">{"x":{"nodes":{"tableName":["System","Collections","Users"],"label":["<b>System<\/b>\n    - *name {character}\n    - *instance {character}\n    - *version {character}\n    - *contact {character}\n    - *path {character}","<b>Collections<\/b>\n    - <b>*title<\/b> {character - uidx.1}\n    - description {character}\n    - json {character}","<b>Users<\/b>\n    - <b>*login<\/b> {character - uidx.1}\n    - (contact {character})\n    - admin {logical}\n    - provider {logical}"],"title":["<div style=\"max-width:400px; max-height:300px;overflow:scroll;\"><p><strong style=\"text-decoration:underline;\">System<\/strong> (Technical table for documenting the instance of chTKCat. This table has only one row.)<\/p> <ul> <li><strong>name<\/strong>: Always \"chTKCat\"<\/li> <li><strong>instance<\/strong>: The name of the chTKCat instance<\/li> <li><strong>version<\/strong>: Version of the chTKCat instance<\/li> <li><strong>contact<\/strong>: Maintainer of the chTKCat instance<\/li> <li><strong>path<\/strong>: Local path to the ClickHouse folder<\/li> <\/ul><\/div>","<div style=\"max-width:400px; max-height:300px;overflow:scroll;\"><p><strong style=\"text-decoration:underline;\">Collections<\/strong> (Collections of concepts: define information that must be provided by a table to identify a specific concept such as a disease or a biological entity.)<\/p> <ul> <li><strong>title<\/strong>: The name of the collection<\/li> <li><strong>description<\/strong>: Description of the collection<\/li> <li><strong>json<\/strong>: A formal definition of the collection in json format fitting the \"Collection-Schema.json\"<\/li> <\/ul><\/div>","<div style=\"max-width:400px; max-height:300px;overflow:scroll;\"><p><strong style=\"text-decoration:underline;\">Users<\/strong><\/p> <ul> <li><strong>login<\/strong><\/li> <li><strong>contact<\/strong>: Contact information<\/li> <li><strong>admin<\/strong>: If the user is an admin of the chTKCat instance<\/li> <li><strong>provider<\/strong>: If the user is a data provider (TRUE), or a data consumer only (FALSE)<\/li> <\/ul><\/div>"],"shape":["box","box","box"],"font.multi":[true,true,true],"font.align":["left","left","left"],"x":[-627,-514,-385],"y":[-335,-198,-335],"color.background":["#F67FC4","#DFFB86","#9BC8FE"],"color.border":["black","black","black"],"color.highlight.border":["orange","orange","orange"],"color.highlight.background":["#F67FC4","#DFFB86","#9BC8FE"],"id":["System","Collections","Users"]},"edges":{"id":[],"from":[],"to":[]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","borderWidth":2,"labelHighlightBold":false},"manipulation":{"enabled":false},"edges":{"width":2,"selectionWidth":2},"interaction":{"multiselect":true,"zoomSpeed":1},"layout":{"randomSeed":2},"physics":{"enabled":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
-<div id="modeled-databases" class="section level5" number="5.1.5.1.2">
-<h5><span class="header-section-number">5.1.5.1.2</span> Modeled
+<div id="modeled-databases" class="section level5" number="6.1.5.1.2">
+<h5><span class="header-section-number">6.1.5.1.2</span> Modeled
 databases</h5>
 <p>Modeled databases (MDB) are stored in dedicated database in chTKCat.
 Their data model is provided in dedicated tables described below.</p>
@@ -8880,8 +8898,8 @@ Their data model is provided in dedicated tables described below.</p>
 </div>
 </div>
 </div>
-<div id="collections" class="section level2" number="5.2">
-<h2><span class="header-section-number">5.2</span> TKCat
+<div id="collections" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> TKCat
 collections</h2>
 <p>Some MDBs refer to the same concepts and can be integrated
 accordingly. However they often use different vocabularies or scopes.
@@ -8893,8 +8911,8 @@ different scopes, as shown <a href="#merging-with-collections">above</a>.</p>
 <p>This appendix describes how to create TKCat Collections, document
 collection members and create functions to support the merging of
 MDBs.</p>
-<div id="creating-a-collection" class="section level3" number="5.2.1">
-<h3><span class="header-section-number">5.2.1</span> Creating a
+<div id="creating-a-collection" class="section level3" number="6.2.1">
+<h3><span class="header-section-number">6.2.1</span> Creating a
 collection</h3>
 <p>A collection is defined by a JSON document. This document should
 fulfill the requirements defined by the <a href="https://github.com/patzaw/TKCat/blob/master/inst/Collections/Collection-Schema.json">Collection-Schema.json</a>.
@@ -9043,8 +9061,8 @@ function.</p>
 ##       + static: logical
 ##       + value: character</code></pre>
 </div>
-<div id="documenting-collection-members" class="section level3" number="5.2.2">
-<h3><span class="header-section-number">5.2.2</span> Documenting
+<div id="documenting-collection-members" class="section level3" number="6.2.2">
+<h3><span class="header-section-number">6.2.2</span> Documenting
 collection members</h3>
 <p>Documenting collection members of an <em>MDB</em> can be done by
 using the <code>add_collection_member()</code> function (as <a href="#min-coll-memb">formerly described</a>), or by writing a JSON file
@@ -9101,8 +9119,8 @@ the following validation.</p>
 object or when setting collection members with the
 <code>add_collection_member()</code> function.</p>
 </div>
-<div id="collection-mapper-functions" class="section level3" number="5.2.3">
-<h3><span class="header-section-number">5.2.3</span> Collection mapper
+<div id="collection-mapper-functions" class="section level3" number="6.2.3">
+<h3><span class="header-section-number">6.2.3</span> Collection mapper
 functions</h3>
 <p>The <code>merge.MDB()</code> and the
 <code>map_collection_members()</code> functions rely on functions to map
@@ -9218,16 +9236,16 @@ should return a data frame with all the fields values followed by “_x”
 and “_y” suffix accordingly.</p>
 </div>
 </div>
-<div id="remarks-about-supported-data-format-and-data-types" class="section level2" number="5.3">
-<h2><span class="header-section-number">5.3</span> Remarks about
+<div id="remarks-about-supported-data-format-and-data-types" class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> Remarks about
 supported data format and data types</h2>
 <p>Most of the data format and data types supported by the ReDaMoR and
 the TKCat packages are taken into account in the examples described in
 the main sections of this vignette. Nevertheless, one specific data
 format (matrix) and one specific data type (base64) are not exemplified.
 This appendix provides a short description of these format and type.</p>
-<div id="matrices-of-values" class="section level3" number="5.3.1">
-<h3><span class="header-section-number">5.3.1</span> Matrices of
+<div id="matrices-of-values" class="section level3" number="6.3.1">
+<h3><span class="header-section-number">6.3.1</span> Matrices of
 values</h3>
 <p>ReDaMoR and TKCat support data frame and matrix objectq. Data frame
 is the most used data format from far. However, matrices of values can
@@ -9257,8 +9275,8 @@ plot(data_model(md))</code></pre>
 <div class="visNetwork html-widget html-fill-item" id="htmlwidget-c05de92212159e8ec31a" style="width:672px;height:480px;"></div>
 <script type="application/json" data-for="htmlwidget-c05de92212159e8ec31a">{"x":{"nodes":{"tableName":["d"],"label":["<b>d []<\/b>\n    - <b>gene<\/b> {row - uidx.1}\n    - <b>sample<\/b> {column - uidx.1}\n    - expression {numeric}"],"title":["<div style=\"max-width:400px; max-height:300px;overflow:scroll;\"><p><strong style=\"text-decoration:underline;\">d<\/strong><\/p> <ul> <li><strong>gene<\/strong>: Gene identifier<\/li> <li><strong>sample<\/strong>: Sample identifier<\/li> <li><strong>expression<\/strong>: Gene expression value<\/li> <\/ul><\/div>"],"shape":["box"],"font.multi":[true],"font.align":["left"],"x":[null],"y":[null],"color.background":["lightgrey"],"color.border":["black"],"color.highlight.border":["orange"],"color.highlight.background":["lightgrey"],"id":["d"]},"edges":{"id":[],"from":[],"to":[]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","borderWidth":2,"labelHighlightBold":false},"manipulation":{"enabled":false},"edges":{"width":2,"selectionWidth":2},"interaction":{"multiselect":true,"zoomSpeed":1},"layout":{"randomSeed":2},"physics":{"enabled":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
-<div id="documents-stored-as-base64-values" class="section level3" number="5.3.2">
-<h3><span class="header-section-number">5.3.2</span> Documents stored as
+<div id="documents-stored-as-base64-values" class="section level3" number="6.3.2">
+<h3><span class="header-section-number">6.3.2</span> Documents stored as
 base64 values</h3>
 <p>Whole documents can be stored in MDB as “base64” character values.
 The example below shows how a document can be put in a table and the
@@ -9293,11 +9311,6 @@ plot(data_model(md))</code></pre>
 <script type="application/json" data-for="htmlwidget-768b9b980a0668c2e42a">{"x":{"nodes":{"tableName":["ch_config_files"],"label":["<b>ch_config_files<\/b>\n    - *name {base64}\n    - file {base64}"],"title":["<div style=\"max-width:400px; max-height:300px;overflow:scroll;\"><p><strong style=\"text-decoration:underline;\">ch_config_files<\/strong><\/p> <ul> <li><strong>name<\/strong>: Name of the config file<\/li> <li><strong>file<\/strong>: Config file in base64 format<\/li> <\/ul><\/div>"],"shape":["box"],"font.multi":[true],"font.align":["left"],"x":[null],"y":[null],"color.background":["lightgrey"],"color.border":["black"],"color.highlight.border":["orange"],"color.highlight.background":["lightgrey"],"id":["ch_config_files"]},"edges":{"id":[],"from":[],"to":[]},"nodesToDataframe":true,"edgesToDataframe":true,"options":{"width":"100%","height":"100%","nodes":{"shape":"dot","borderWidth":2,"labelHighlightBold":false},"manipulation":{"enabled":false},"edges":{"width":2,"selectionWidth":2},"interaction":{"multiselect":true,"zoomSpeed":1},"layout":{"randomSeed":2},"physics":{"enabled":false}},"groups":null,"width":null,"height":null,"idselection":{"enabled":false},"byselection":{"enabled":false},"main":null,"submain":null,"footer":null,"background":"rgba(0, 0, 0, 0)","tooltipStay":300,"tooltipStyle":"position: fixed;visibility:hidden;padding: 5px;white-space: nowrap;font-family: verdana;font-size:14px;font-color:#000000;background-color: #f5f4ed;-moz-border-radius: 3px;-webkit-border-radius: 3px;border-radius: 3px;border: 1px solid #808074;box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
-</div>
-<div id="acknowledgments" class="section level1 unnumbered">
-<h1 class="unnumbered">Acknowledgments</h1>
-<p>This work was entirely supported by <a href="https://www.ucb.com/">UCB Pharma</a> (Early Solutions
-department).</p>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="unnumbered">References</h1>

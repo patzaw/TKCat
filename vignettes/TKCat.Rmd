@@ -1086,7 +1086,22 @@ get_query(
 ## The following line is to avoid building errors on CRAN
 knitr::opts_chunk$set(eval=TRUE)
 ```
+# Defining and using Requirements for Knowledge Management (KMR)
 
+Beside the relational model, no additional constraints are applied to
+an MDB. This allows for high flexibility in the data that can be managed.
+However, in some cases, it could be useful to add further constraints to ensure
+that the data is compatible with specific analysis or integration workflows.
+In TKCat, this feature is supported by KMR (Knowledge Management Requirements).
+A KMR object is meant to be shared and centrally managed.
+MDBs intended to meet these requirements must contain technical tables
+referring to the corresponding KMR. When grouped in the same TKCat catalog,
+KMRs and MDBs form a coherent corpus of knowledge that can be leveraged
+consistently by KMR-tailored functions.
+
+This set of features is described in the vignette [Defining and using
+Requirements for Knowledge Management (KMR) in
+TKCat](TKCat-KMR-POK.html).
 
 # Appendices
 
@@ -1494,12 +1509,6 @@ md <- memoMDB(
 )
 plot(data_model(md))
 ```
-
-
-# Acknowledgments {-}
-
-This work was entirely supported
-by [UCB Pharma](https://www.ucb.com/) (Early Solutions department).
 
 
 # References {-}

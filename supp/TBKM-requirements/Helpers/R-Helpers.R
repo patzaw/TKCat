@@ -212,6 +212,7 @@ get_collibra_mdb <- function(x=THISMDB){
 #' Get Collibra metadata from all MDBs
 #' 
 #' @param kmr the KMR object with TBKM specifications (by default, the KMR to which the function is attached)
+#' @param tkcon the TKCat object with MDBs (by default, the TKCat to which the function is attached)
 #' 
 #' @return A tibble with Collibra metadata from relevant MDBs
 #' 
@@ -755,6 +756,7 @@ get_beid_lists <- function(
 #' List MDB with DE analyses
 #' 
 #' @param kmr the KMR object with TBKM specifications (by default, the KMR to which the function is attached). This KMR must also be a chMDB object.
+#' @param tkcon the TKCat object with MDBs (by default, the TKCat to which the function is attached)
 #' 
 #' @return  a tibble with DE analyses description tables
 #'   

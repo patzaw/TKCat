@@ -3,7 +3,6 @@ title: "Defining and using Requirements for Knowledge Management (KMR) in TKCat"
 author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
 package: "TKCat (version `r packageVersion('TKCat')`)"
-bibliography: TKCat.bib
 link-citations: yes
 output:
    rmarkdown::html_document:
@@ -13,7 +12,7 @@ output:
       fig_width: 7
       fig_height: 5
 vignette: >
-   %\VignetteIndexEntry{TKCat-KMR}
+   %\VignetteIndexEntry{TKCat-KMR-POK}
    %\VignetteEncoding{UTF-8}
    %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
@@ -39,7 +38,7 @@ with a general description of the resource and a detail data model documenting
 the tables, their fields and their relationships.
 These MDB are then gathered in TKCat catalogs that can be explored an shared.
 
-In addition to the relational model, no additional constraints are applied to
+Beside the relational model, no additional constraints are applied to
 an MDB. This allows for high flexibility in the data that can be managed.
 However, in some cases, it could be useful to add further constraints to ensure
 that the data is compatible with specific analysis or integration workflows.
@@ -52,7 +51,8 @@ consistently by KMR-tailored functions.
 
 The first part of this document describes how to create a KMR object.
 The second part shows how to refer to these requirements in an MDB object.
-Finally, the third part describes how to use KMR and MDB together.
+Finally, the third part describes how to use KMR and MDB together to leverage
+pieces of knowledge (POK).
 
 
 # Defining KMR
@@ -230,7 +230,7 @@ is also controlled.
    ebkm <- add_property_values(
       kmr = ebkm, feature = "tissue", property = "reference",
       values=c(
-         "Uberon" = "http://obofoundry.org/ontology/uberon.html"
+         "Uberon" = "https://obophenotype.github.io/uberon/"
       )
    )
    ebkm <- add_property_values(
@@ -343,6 +343,9 @@ those requirements can be explored using different functions.
 
 ### Simple example
 
+Let's create a simple MDB with only one table with biological samples
+information.
+
 ```{r}
 samples <- tibble(
    name = c("S1", "S2", "S3", "S4"),
@@ -357,7 +360,8 @@ samples <- tibble(
    tissue_name = rep("hippocampus", 4),
    tissue_id = rep("UBERON_0002421", 4),
    tissue_ref = rep("Uberon", 4),
-   tissue_side = rep("left", 4)
+   tissue_side = rep("left", 4),
+   seizures = c(31, 64, 12, 29)
 )
 model <- ReDaMoR::df_to_model(samples) %>% 
    ReDaMoR::auto_layout()
@@ -370,6 +374,10 @@ mdb <- memoMDB(
 )
 ```
 
+The specifications of the sample table fitting the EBKM requirement defined
+above can be document as following. Additional columns not part of the KMR
+requirements (e.g.  "seizures") can still be used in the MDB but are not part
+of specifications.
 
 ```{r}
 mdb <- add_km_spec(mdb, ebkm)
@@ -399,8 +407,104 @@ mdb <- add_km_table(
 ```
 
 
-
 # Piece Of Knowledge (POK)
+
+## Helpers
+
+Helpers are R functions that are attached to a KMR or an MDB object to
+leverage the provided information.
+
+### KMR helpers
+
+Helpers are written in .R script that are then attach to the object of interest.
+For example the following function has been saved the "EBKM-helpers.R" file.
+
+```{r, results='asis', echo=FALSE}
+ec <- readLines("EBKM-helpers.R")
+cat('```r', sep="\n")
+cat(ec, sep="\n")
+cat('```', sep="\n")
+```
+
+It can be attached to the KMR object as follows:
+
+```{r}
+ebkm <- add_helpers(
+   ebkm,
+   code="EBKM-helpers.R",
+   name="R-Helpers",
+   language = "R"
+)
+```
+
+Then the helpers can be retrieved and used as follows:
+
+```{r}
+ebkm_helpers <- get_R_helpers(ebkm)
+ebkm_helpers$help()
+ebkm_helpers$help("get_tissue_ref_url")
+ebkm_helpers$get_tissue_ref_url(c("UBERON_0002421", "UBERON_0001876"))
+```
+
+### MDB helpers
+
+Helpers can also be added to MDB with KM specifications. For example the
+following function summarizes the number of seizures associated to biological
+samples:
+
+```{r, results='asis', echo=FALSE}
+ec <- readLines("MDB-helpers.R")
+cat('```r', sep="\n")
+cat(ec, sep="\n")
+cat('```', sep="\n")
+```
+
+When associating and retrieving MDB helpers, KMR object need to be provided:
+
+```{r}
+mdb <- add_helpers(
+   mdb,
+   kmr = ebkm,
+   code="MDB-helpers.R",
+   name="R-Helpers",
+   language = "R"
+)
+```
+
+MDB helpers can be retrieved and used similarly as KMR helpers:
+
+```{r}
+mdb_helpers <- get_R_helpers(mdb, kmr = ebkm)
+mdb_helpers$help("summarize_seizures")
+mdb_helpers$summarize_seizures()
+```
+
+## POK objects
+
+MDB can be combined with relevant KMR to create POK (Piece Of Knowledge)
+objects:
+
+```{r}
+pok <- create_POK(mdb, ebkm)
+pok
+```
+
+A POK object is a list with the following slots:
+
+- mdb: the provided MDB object
+- kmr: the provided KMR object
+- helpers (optional): functions found in mdb and kmr helpers
+- tkcat (optional): a TKCat or chTKCat object from mdb or kmr or directly
+provided to the constructor.
+
+POK can be retrieved directly from a TKCat or chTKCat object as examplified
+below:
+
+```{r}
+tkcat <- TKCat(Test=mdb, EBKM=ebkm)
+get_POK(tkcat, "Test", "EBKM")
+```
+
 
 
 

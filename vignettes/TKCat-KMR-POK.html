@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2024-05-06" />
+<meta name="date" content="2024-05-07" />
 
 <title>Defining and using Requirements for Knowledge Management (KMR) in TKCat</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Defining and using Requirements for
 Knowledge Management (KMR) in TKCat</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">May 06, 2024</h4>
+<h4 class="date">May 07, 2024</h4>
 
 </div>
 
@@ -380,7 +380,15 @@ properties</a></li>
 <li><a href="#simple-example" id="toc-simple-example"><span class="toc-section-number">2.2.1</span> Simple example</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#peaces-of-knowledge-pok" id="toc-peaces-of-knowledge-pok"><span class="toc-section-number">3</span> Peaces Of Knowledge (POK)</a></li>
+<li><a href="#piece-of-knowledge-pok" id="toc-piece-of-knowledge-pok"><span class="toc-section-number">3</span> Piece Of Knowledge (POK)</a>
+<ul>
+<li><a href="#helpers" id="toc-helpers"><span class="toc-section-number">3.1</span> Helpers</a>
+<ul>
+<li><a href="#kmr-helpers" id="toc-kmr-helpers"><span class="toc-section-number">3.1.1</span> KMR helpers</a></li>
+<li><a href="#mdb-helpers" id="toc-mdb-helpers"><span class="toc-section-number">3.1.2</span> MDB helpers</a></li>
+</ul></li>
+<li><a href="#pok-objects" id="toc-pok-objects"><span class="toc-section-number">3.2</span> POK objects</a></li>
+</ul></li>
 </ul>
 </div>
 
@@ -389,9 +397,9 @@ properties</a></li>
 with a general description of the resource and a detail data model
 documenting the tables, their fields and their relationships. These MDB
 are then gathered in TKCat catalogs that can be explored an shared.</p>
-<p>In addition to the relational model, no additional constraints are
-applied to an MDB. This allows for high flexibility in the data that can
-be managed. However, in some cases, it could be useful to add further
+<p>Beside the relational model, no additional constraints are applied to
+an MDB. This allows for high flexibility in the data that can be
+managed. However, in some cases, it could be useful to add further
 constraints to ensure that the data is compatible with specific analysis
 or integration workflows. In TKCat, this feature is supported by KMR
 (Knowledge Management Requirements). A KMR object is meant to be shared
@@ -403,7 +411,7 @@ functions.</p>
 <p>The first part of this document describes how to create a KMR object.
 The second part shows how to refer to these requirements in an MDB
 object. Finally, the third part describes how to use KMR and MDB
-together.</p>
+together to leverage pieces of knowledge (POK).</p>
 <div id="defining-kmr" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Defining KMR</h1>
 <div id="kmr-organization" class="section level2" number="1.1">
@@ -555,7 +563,7 @@ reference, is also controlled.</p>
 <pre class="r"><code>ebkm &lt;- add_property_values(
    kmr = ebkm, feature = &quot;tissue&quot;, property = &quot;reference&quot;,
    values=c(
-      &quot;Uberon&quot; = &quot;http://obofoundry.org/ontology/uberon.html&quot;
+      &quot;Uberon&quot; = &quot;https://obophenotype.github.io/uberon/&quot;
    )
 )
 ebkm &lt;- add_property_values(
@@ -689,6 +697,8 @@ functions.</p>
 specifications</h2>
 <div id="simple-example" class="section level3" number="2.2.1">
 <h3><span class="header-section-number">2.2.1</span> Simple example</h3>
+<p>Let’s create a simple MDB with only one table with biological samples
+information.</p>
 <pre class="r"><code>samples &lt;- tibble(
    name = c(&quot;S1&quot;, &quot;S2&quot;, &quot;S3&quot;, &quot;S4&quot;),
    description = c(
@@ -702,7 +712,8 @@ specifications</h2>
    tissue_name = rep(&quot;hippocampus&quot;, 4),
    tissue_id = rep(&quot;UBERON_0002421&quot;, 4),
    tissue_ref = rep(&quot;Uberon&quot;, 4),
-   tissue_side = rep(&quot;left&quot;, 4)
+   tissue_side = rep(&quot;left&quot;, 4),
+   seizures = c(31, 64, 12, 29)
 )
 model &lt;- ReDaMoR::df_to_model(samples) %&gt;% 
    ReDaMoR::auto_layout()
@@ -713,6 +724,10 @@ mdb &lt;- memoMDB(
       name=&quot;Test&quot;
    )
 )</code></pre>
+<p>The specifications of the sample table fitting the EBKM requirement
+defined above can be document as following. Additional columns not part
+of the KMR requirements (e.g. “seizures”) can still be used in the MDB
+but are not part of specifications.</p>
 <pre class="r"><code>mdb &lt;- add_km_spec(mdb, ebkm)
 mdb &lt;- add_km_table(
    mdb, ebkm,
@@ -740,9 +755,138 @@ mdb &lt;- add_km_table(
 </div>
 </div>
 </div>
-<div id="peaces-of-knowledge-pok" class="section level1" number="3">
-<h1><span class="header-section-number">3</span> Peaces Of Knowledge
+<div id="piece-of-knowledge-pok" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Piece Of Knowledge
 (POK)</h1>
+<div id="helpers" class="section level2" number="3.1">
+<h2><span class="header-section-number">3.1</span> Helpers</h2>
+<p>Helpers are R functions that are attached to a KMR or an MDB object
+to leverage the provided information.</p>
+<div id="kmr-helpers" class="section level3" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> KMR helpers</h3>
+<p>Helpers are written in .R script that are then attach to the object
+of interest. For example the following function has been saved the
+“EBKM-helpers.R” file.</p>
+<pre class="r"><code>###############################################################################@
+#&#39; Get reference URLs of biological tissues
+#&#39; 
+#&#39; @param ids tissue identifiers
+#&#39; @param reference reference database (default: &quot;Uberon&quot;)
+#&#39; 
+#&#39; @return URLs corresponding to provided ids
+#&#39;   
+#&#39; @export
+#&#39; 
+get_tissue_ref_url &lt;- function(ids, reference=&quot;Uberon&quot;){
+   reference &lt;- match.arg(reference)
+   url_templates &lt;- c(&quot;Uberon&quot;=&quot;https://purl.obolibrary.org/obo/%s&quot;)
+   return(sprintf(url_templates[reference], ids))
+}</code></pre>
+<p>It can be attached to the KMR object as follows:</p>
+<pre class="r"><code>ebkm &lt;- add_helpers(
+   ebkm,
+   code=&quot;EBKM-helpers.R&quot;,
+   name=&quot;R-Helpers&quot;,
+   language = &quot;R&quot;
+)</code></pre>
+<p>Then the helpers can be retrieved and used as follows:</p>
+<pre class="r"><code>ebkm_helpers &lt;- get_R_helpers(ebkm)
+ebkm_helpers$help()</code></pre>
+<pre><code>## - get_tissue_ref_url: Get reference URLs of biological tissues
+## - help: Display documentation regarding an helper function</code></pre>
+<pre class="r"><code>ebkm_helpers$help(&quot;get_tissue_ref_url&quot;)</code></pre>
+<pre><code>## 
+## get_tissue_ref_url: Get reference URLs of biological tissues
+## 
+## Usage: get_tissue_ref_url(ids, reference = &quot;Uberon&quot;)
+## 
+## Parameters:
+##   - ids: tissue identifiers
+##   - reference: reference database (default: &quot;Uberon&quot;)
+## 
+## Result: URLs corresponding to provided ids</code></pre>
+<pre class="r"><code>ebkm_helpers$get_tissue_ref_url(c(&quot;UBERON_0002421&quot;, &quot;UBERON_0001876&quot;))</code></pre>
+<pre><code>## [1] &quot;https://purl.obolibrary.org/obo/UBERON_0002421&quot;
+## [2] &quot;https://purl.obolibrary.org/obo/UBERON_0001876&quot;</code></pre>
+</div>
+<div id="mdb-helpers" class="section level3" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> MDB helpers</h3>
+<p>Helpers can also be added to MDB with KM specifications. For example
+the following function summarizes the number of seizures associated to
+biological samples:</p>
+<pre class="r"><code>###############################################################################@
+#&#39; Summarize the number of seizures observed in samples
+#&#39; 
+#&#39; @param x MDB object (by default, the MDB to which the function is attached).
+#&#39; 
+#&#39; @return A table with Min., 1st Qu., Median, Mean, 3rd Qu. and Max. values
+#&#39;   
+#&#39; @export
+#&#39; 
+summarize_seizures &lt;- function(x=THISMDB){
+   return(summary(x$samples$seizures))
+}</code></pre>
+<p>When associating and retrieving MDB helpers, KMR object need to be
+provided:</p>
+<pre class="r"><code>mdb &lt;- add_helpers(
+   mdb,
+   kmr = ebkm,
+   code=&quot;MDB-helpers.R&quot;,
+   name=&quot;R-Helpers&quot;,
+   language = &quot;R&quot;
+)</code></pre>
+<p>MDB helpers can be retrieved and used similarly as KMR helpers:</p>
+<pre class="r"><code>mdb_helpers &lt;- get_R_helpers(mdb, kmr = ebkm)
+mdb_helpers$help(&quot;summarize_seizures&quot;)</code></pre>
+<pre><code>## 
+## summarize_seizures: Summarize the number of seizures observed in samples
+## 
+## Usage: summarize_seizures(x = THISMDB)
+## 
+## Parameters:
+##   - x: MDB object (by default, the MDB to which the function is attached).
+## 
+## Result: A table with Min., 1st Qu., Median, Mean, 3rd Qu. and Max. values</code></pre>
+<pre class="r"><code>mdb_helpers$summarize_seizures()</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   12.00   24.75   30.00   34.00   39.25   64.00</code></pre>
+</div>
+</div>
+<div id="pok-objects" class="section level2" number="3.2">
+<h2><span class="header-section-number">3.2</span> POK objects</h2>
+<p>MDB can be combined with relevant KMR to create POK (Piece Of
+Knowledge) objects:</p>
+<pre class="r"><code>pok &lt;- create_POK(mdb, ebkm)
+pok</code></pre>
+<pre><code>## Test POK with EBKM requirements.
+## This POK comes with 4 helpers: 
+##    - summarize_seizures
+##    - help
+##    - get_tissue_ref_url
+##    - EBKM_help
+## 
+## You can get further information with x$helpers$help() and x$helpers$EBKM_help() functions</code></pre>
+<p>A POK object is a list with the following slots:</p>
+<ul>
+<li>mdb: the provided MDB object</li>
+<li>kmr: the provided KMR object</li>
+<li>helpers (optional): functions found in mdb and kmr helpers</li>
+<li>tkcat (optional): a TKCat or chTKCat object from mdb or kmr or
+directly provided to the constructor.</li>
+</ul>
+<p>POK can be retrieved directly from a TKCat or chTKCat object as
+examplified below:</p>
+<pre class="r"><code>tkcat &lt;- TKCat(Test=mdb, EBKM=ebkm)
+get_POK(tkcat, &quot;Test&quot;, &quot;EBKM&quot;)</code></pre>
+<pre><code>## Test POK with EBKM requirements.
+## This POK comes with 4 helpers: 
+##    - summarize_seizures
+##    - help
+##    - get_tissue_ref_url
+##    - EBKM_help
+## 
+## You can get further information with x$helpers$help() and x$helpers$EBKM_help() functions</code></pre>
+</div>
 </div>
 
 

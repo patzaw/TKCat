@@ -1,15 +1,7 @@
 README
 ================
 
-- [Installation](#installation)
-  - [From CRAN](#from-cran)
-  - [Dependencies](#dependencies)
-  - [From github](#from-github)
-- [Documentation](#documentation)
-- [Alternatives](#alternatives)
-- [Acknowledgments](#acknowledgments)
-
-<img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" width="100px"/>
+# Tailored Knowledge Catalog <img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" align="right" alt="" width="120" />
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
 [![](http://cranlogs.r-pkg.org/badges/TKCat)](https://cran.r-project.org/package=TKCat)
@@ -117,8 +109,13 @@ devtools::install_github("patzaw/TKCat")
 
 # Documentation
 
-Documentation is available in the following vignette: [TKCat user
-guide](https://patzaw.github.io/TKCat/articles/TKCat-User-guide.html)
+- [Introduction to
+  TKCat](https://patzaw.github.io/TKCat/articles/TKCat.html)
+  (`vignette("TKCat")`)
+
+- [Defining and using Requirements for Knowledge
+  Management](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html)
+  (`vignette("TKCat-KMR-POK")`)
 
 # Alternatives
 
@@ -146,8 +143,3 @@ guide](https://patzaw.github.io/TKCat/articles/TKCat-User-guide.html)
     through the automatic identification of similar concepts
     (Collections) and the automatic conversion of the different
     vocabulary on which they rely.
-
-# Acknowledgments
-
-This work was entirely supported by [UCB Pharma](https://www.ucb.com/)
-(Early Solutions department).

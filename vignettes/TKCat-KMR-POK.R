@@ -120,7 +120,7 @@ ebkm <- add_property_values(
 ebkm <- add_property_values(
    kmr = ebkm, feature = "tissue", property = "reference",
    values=c(
-      "Uberon" = "http://obofoundry.org/ontology/uberon.html"
+      "Uberon" = "https://obophenotype.github.io/uberon/"
    )
 )
 ebkm <- add_property_values(
@@ -212,7 +212,8 @@ samples <- tibble(
    tissue_name = rep("hippocampus", 4),
    tissue_id = rep("UBERON_0002421", 4),
    tissue_ref = rep("Uberon", 4),
-   tissue_side = rep("left", 4)
+   tissue_side = rep("left", 4),
+   seizures = c(31, 64, 12, 29)
 )
 model <- ReDaMoR::df_to_model(samples) %>% 
    ReDaMoR::auto_layout()
@@ -249,4 +250,52 @@ mdb <- add_km_table(
       )
    )
 )
+
+## ----results='asis', echo=FALSE-----------------------------------------------
+ec <- readLines("EBKM-helpers.R")
+cat('```r', sep="\n")
+cat(ec, sep="\n")
+cat('```', sep="\n")
+
+## -----------------------------------------------------------------------------
+ebkm <- add_helpers(
+   ebkm,
+   code="EBKM-helpers.R",
+   name="R-Helpers",
+   language = "R"
+)
+
+## -----------------------------------------------------------------------------
+ebkm_helpers <- get_R_helpers(ebkm)
+ebkm_helpers$help()
+ebkm_helpers$help("get_tissue_ref_url")
+ebkm_helpers$get_tissue_ref_url(c("UBERON_0002421", "UBERON_0001876"))
+
+## ----results='asis', echo=FALSE-----------------------------------------------
+ec <- readLines("MDB-helpers.R")
+cat('```r', sep="\n")
+cat(ec, sep="\n")
+cat('```', sep="\n")
+
+## -----------------------------------------------------------------------------
+mdb <- add_helpers(
+   mdb,
+   kmr = ebkm,
+   code="MDB-helpers.R",
+   name="R-Helpers",
+   language = "R"
+)
+
+## -----------------------------------------------------------------------------
+mdb_helpers <- get_R_helpers(mdb, kmr = ebkm)
+mdb_helpers$help("summarize_seizures")
+mdb_helpers$summarize_seizures()
+
+## -----------------------------------------------------------------------------
+pok <- create_POK(mdb, ebkm)
+pok
+
+## -----------------------------------------------------------------------------
+tkcat <- TKCat(Test=mdb, EBKM=ebkm)
+get_POK(tkcat, "Test", "EBKM")
 

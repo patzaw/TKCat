@@ -31,7 +31,9 @@ create_KMR <- function(
       value <- dplyr::tibble()
       for(i in 1:nrow(tm$fields)){
          toAdd <- integer()
-         class(toAdd) <- tm$fields$type[i]
+         dcl <- tm$fields$type[i]
+         dcl <- ifelse(dcl == "base64", "character", dcl)
+         class(toAdd) <- dcl
          value[,tm$fields$name[i]] <- toAdd
       }
       dataTables[[n]] <- value

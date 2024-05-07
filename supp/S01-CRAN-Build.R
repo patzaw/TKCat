@@ -26,12 +26,12 @@ for(f in list.files(here("doc"))){
    }
    file.remove(file.path(here("doc"), f))
 }
-file.remove("doc")
+file.remove(here("doc"))
 
 ##############################@
 ## Build website ----
-unlink("docs", recursive=TRUE, force=TRUE)
-pkgdown::build_site()
+# unlink(here("docs"), recursive=TRUE, force=TRUE)
+# pkgdown::build_site()
 
 ##############################@
 ## Build and check package ----
@@ -39,7 +39,7 @@ pv <- desc::desc_get_version(here())
 system(paste(
    sprintf("cd %s", here("..")),
    "R CMD build TKCat",
-   sprintf("R CMD check --as-cran TKCat_%s.tar.gz", pv),
+   sprintf("R CMD check --as-cran --no-build-vignettes TKCat_%s.tar.gz", pv),
    sep=" ; "
 ))
 # install.packages(here(sprintf("../TKCat_%s.tar.gz", pv)), repos=NULL)
