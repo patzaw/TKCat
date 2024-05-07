@@ -447,7 +447,8 @@ explore_MDBs.TKCat <- function(
    x,
    subSetSize=100,
    ddir=NULL,
-   title=NULL
+   title=NULL,
+   ...
 ){
    .build_etkc_server_default(
       x=x, subSetSize=subSetSize,

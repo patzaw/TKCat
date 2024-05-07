@@ -2848,7 +2848,8 @@ explore_MDBs.chTKCat <- function(
    ddir=NULL,
    userManager=NULL,
    title=NULL,
-   skinColors=c("blue", "yellow")
+   skinColors=c("blue", "yellow"),
+   ...
 ){
    .build_etkc_server_default(
       x=x, subSetSize=subSetSize, xparams=list(host=host),

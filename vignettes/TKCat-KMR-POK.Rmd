@@ -363,8 +363,7 @@ samples <- tibble(
    tissue_side = rep("left", 4),
    seizures = c(31, 64, 12, 29)
 )
-model <- ReDaMoR::df_to_model(samples) %>% 
-   ReDaMoR::auto_layout()
+model <- ReDaMoR::df_to_model(samples)
 mdb <- memoMDB(
    list(samples=samples),
    model,

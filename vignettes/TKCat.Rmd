@@ -1,5 +1,5 @@
 ---
-title: "Introduction to TKCat (Tailored Knowledge Catalog)"
+title: "Introduction to TKCat"
 author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
 package: "TKCat (version `r packageVersion('TKCat')`)"
