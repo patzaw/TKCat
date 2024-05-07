@@ -30,8 +30,8 @@ file.remove(here("doc"))
 
 ##############################@
 ## Build website ----
-# unlink(here("docs"), recursive=TRUE, force=TRUE)
-# pkgdown::build_site()
+unlink(here("docs"), recursive=TRUE, force=TRUE)
+pkgdown::build_site()
 
 ##############################@
 ## Build and check package ----

@@ -7,10 +7,16 @@
     <loc>https://patzaw.github.io/TKCat/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>https://patzaw.github.io/TKCat/TKCat-User-guide.html</loc>
+    <loc>https://patzaw.github.io/TKCat/TKCat-KMR-POK.html</loc>
   </url>
   <url>
-    <loc>https://patzaw.github.io/TKCat/articles/TKCat-User-guide.html</loc>
+    <loc>https://patzaw.github.io/TKCat/TKCat.html</loc>
+  </url>
+  <url>
+    <loc>https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html</loc>
+  </url>
+  <url>
+    <loc>https://patzaw.github.io/TKCat/articles/TKCat.html</loc>
   </url>
   <url>
     <loc>https://patzaw.github.io/TKCat/articles/index.html</loc>
@@ -100,9 +106,6 @@
     <loc>https://patzaw.github.io/TKCat/reference/check_chTKCat.html</loc>
   </url>
   <url>
-    <loc>https://patzaw.github.io/TKCat/reference/check_km_spec.html</loc>
-  </url>
-  <url>
     <loc>https://patzaw.github.io/TKCat/reference/collection_members.html</loc>
   </url>
   <url>
@@ -113,6 +116,9 @@
   </url>
   <url>
     <loc>https://patzaw.github.io/TKCat/reference/create_KMR.html</loc>
+  </url>
+  <url>
+    <loc>https://patzaw.github.io/TKCat/reference/create_POK.html</loc>
   </url>
   <url>
     <loc>https://patzaw.github.io/TKCat/reference/create_chMDB.html</loc>
@@ -199,6 +205,9 @@
     <loc>https://patzaw.github.io/TKCat/reference/get_MDB.html</loc>
   </url>
   <url>
+    <loc>https://patzaw.github.io/TKCat/reference/get_POK.html</loc>
+  </url>
+  <url>
     <loc>https://patzaw.github.io/TKCat/reference/get_R_helpers.html</loc>
   </url>
   <url>
@@ -224,9 +233,6 @@
   </url>
   <url>
     <loc>https://patzaw.github.io/TKCat/reference/get_local_collection.html</loc>
-  </url>
-  <url>
-    <loc>https://patzaw.github.io/TKCat/reference/get_pok.html</loc>
   </url>
   <url>
     <loc>https://patzaw.github.io/TKCat/reference/get_query.html</loc>
@@ -259,6 +265,9 @@
     <loc>https://patzaw.github.io/TKCat/reference/is.MDB.html</loc>
   </url>
   <url>
+    <loc>https://patzaw.github.io/TKCat/reference/is.POK.html</loc>
+  </url>
+  <url>
     <loc>https://patzaw.github.io/TKCat/reference/is.TKCat.html</loc>
   </url>
   <url>
@@ -287,6 +296,9 @@
   </url>
   <url>
     <loc>https://patzaw.github.io/TKCat/reference/list_MDBs.html</loc>
+  </url>
+  <url>
+    <loc>https://patzaw.github.io/TKCat/reference/list_POKs.html</loc>
   </url>
   <url>
     <loc>https://patzaw.github.io/TKCat/reference/list_chMDB_timestamps.html</loc>
@@ -344,6 +356,9 @@
   </url>
   <url>
     <loc>https://patzaw.github.io/TKCat/reference/parse_R_helpers.html</loc>
+  </url>
+  <url>
+    <loc>https://patzaw.github.io/TKCat/reference/read_KMR.html</loc>
   </url>
   <url>
     <loc>https://patzaw.github.io/TKCat/reference/read_collection_members.html</loc>
