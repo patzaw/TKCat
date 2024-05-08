@@ -2825,7 +2825,8 @@ explore_MDBs.chTKCat <- function(
             sysInterface=TRUE,
             userManager=userManager,
             manList=c(
-               "TKCat user guide"="doc/TKCat-User-guide.html"
+               "Introduction to TKCat"="doc/TKCat.html",
+               "Requirements for Knowledge Management"="doc/TKCat-KMR-POK.html"
             ),
             logoDiv=logoDiv,
             totalSize=TRUE

@@ -9,7 +9,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          height="120px",
          id="mainLogo"
       ),
-      href="https://github.com/patzaw/TKCat",
+      href="https://patzaw.github.io/TKCat/",
       target="_blank"
    ),
    style=paste(
