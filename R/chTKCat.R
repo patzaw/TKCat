@@ -2950,7 +2950,10 @@ manage_chTKCat_users <- function(x, pwdFile=NULL){
                chTKCat(
                   host=x$chcon@host, port=x$chcon@port,
                   user=l, password=p,
-                  settings=x$settings
+                  settings=x$settings,
+                  https=x$chcon@https,
+                  ssl_verifypeer=x$chcon@ssl_verifypeer,
+                  reset_handle=x$chcon@reset_handle
                ),
                silent=TRUE
             ))
