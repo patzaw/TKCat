@@ -1073,19 +1073,33 @@ To avoid pulling a whole table from ClickHouse (which can take time
 if the table is big), SQL queries can be made on the *chMDB* object as
 shown below.
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 get_query(
    ch_hpo,
    query="SELECT * from HPO_diseases WHERE lower(label) LIKE '%epilep%'"
 )
 ```
 
-
+```{r, echo=FALSE, eval=TRUE}
+get_query(
+   ch_hpo,
+   query=sprintf(
+      "SELECT * from %s WHERE lower(label) LIKE '%s'",
+      ifelse(
+         "HPO_diseases" %in% names(ch_hpo),
+         "HPO_diseases",
+         "Diseases"
+      ),
+      "%epilep%"
+   )
+)
+```
 
 ```{r, echo=FALSE}
 ## The following line is to avoid building errors on CRAN
 knitr::opts_chunk$set(eval=TRUE)
 ```
+
 # Defining and using Requirements for Knowledge Management (KMR)
 
 Beside the relational model, no additional constraints are applied to

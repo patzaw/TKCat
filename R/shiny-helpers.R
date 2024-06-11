@@ -1524,7 +1524,8 @@ TKCAT_LOGO_DIV <- shiny::div(
                      NULL
                   },
                   shiny::tags$li(
-                     shiny::tags$strong("Current user"), ":", k$chcon@user
+                     shiny::tags$strong("Current user"), ":",
+                     k$chcon@user
                   ),
                   shiny::tags$li(
                      shiny::tags$strong("Instance"), ":", k$instance,
@@ -1627,7 +1628,11 @@ TKCAT_LOGO_DIV <- shiny::div(
                   shiny::HTML(paste(c(
                      ifelse(
                         instance$tkcat$chcon@user!="default",
-                        instance$tkcat$chcon@user,
+                        ifelse(
+                           nchar(instance$tkcat$chcon@user) > 22,
+                           paste0(substr(instance$tkcat$chcon@user, 1, 20), "..."),
+                           instance$tkcat$chcon@user
+                        ),
                         "Public access"
                      ),
                      ifelse(
