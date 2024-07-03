@@ -116,7 +116,7 @@ compare_MDB(former=mhpo_db, new=f_mhpo_db) %>%
 ## -----------------------------------------------------------------------------
 db_info(mhpo_db)$title <- "Very small extract of the human phenotype ontology"
 db_info(mhpo_db)$description <- "For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted"
-db_info(mhpo_db)$url <- "https://hpo.jax.org/app/"
+db_info(mhpo_db)$url <- "https://hpo.jax.org/"
 
 ## -----------------------------------------------------------------------------
 db_info(mhpo_db)$version <- "0.1"
@@ -392,10 +392,24 @@ collection_members(k)
 ## -----------------------------------------------------------------------------
 ch_hpo <- get_MDB(k, "HPO")
 
-## -----------------------------------------------------------------------------
+## ----echo=TRUE, eval=FALSE----------------------------------------------------
+#  get_query(
+#     ch_hpo,
+#     query="SELECT * from HPO_diseases WHERE lower(label) LIKE '%epilep%'"
+#  )
+
+## ----echo=FALSE---------------------------------------------------------------
 get_query(
    ch_hpo,
-   query="SELECT * from HPO_diseases WHERE lower(label) LIKE '%epilep%'"
+   query=sprintf(
+      "SELECT * from %s WHERE lower(label) LIKE '%s'",
+      ifelse(
+         "HPO_diseases" %in% names(ch_hpo),
+         "HPO_diseases",
+         "Diseases"
+      ),
+      "%epilep%"
+   )
 )
 
 ## ----echo=FALSE---------------------------------------------------------------
