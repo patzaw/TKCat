@@ -10,7 +10,7 @@ list_table_types(kmr)
 \item{kmr}{a \link{KMR} object}
 }
 \value{
-A \link{tibble} with the names of table types, their descriptions and
+A \link[dplyr:reexports]{dplyr::tibble} with the names of table types, their descriptions and
 the related collections
 }
 \description{

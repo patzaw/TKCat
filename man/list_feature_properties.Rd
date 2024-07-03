@@ -12,7 +12,7 @@ list_feature_properties(kmr, feature)
 \item{feature}{the name of the feature}
 }
 \value{
-A \link{tibble} with the description of feature properties
+A \link[dplyr:reexports]{dplyr::tibble} with the description of feature properties
 }
 \description{
 List properties of a feature

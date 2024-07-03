@@ -14,7 +14,7 @@ list_property_values(kmr, feature, property)
 \item{property}{the name of the property}
 }
 \value{
-A \link{tibble} with value and their description (if available)
+A \link[dplyr:reexports]{dplyr::tibble} with value and their description (if available)
 }
 \description{
 List of supported values for an integer or a character property

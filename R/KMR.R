@@ -564,7 +564,7 @@ get_KMR <- function(...){
 #' 
 #' @param kmr a [KMR] object
 #' 
-#' @return A [tibble] with the names of table types, their descriptions and
+#' @return A [dplyr::tibble] with the names of table types, their descriptions and
 #' the related collections
 #' 
 #' @export
@@ -582,7 +582,7 @@ list_table_types <- function(kmr){
 #' @param tables the name of the tables. If NULL (default), all the features
 #' are listed.
 #' 
-#' @return A [tibble] with feature description and properties
+#' @return A [dplyr::tibble] with feature description and properties
 #' 
 #' @export
 #' 
@@ -648,7 +648,7 @@ list_table_features <- function(kmr, tables=NULL){
 #' @param kmr a [KMR] object
 #' @param feature the name of the feature
 #' 
-#' @return A [tibble] with the description of feature properties
+#' @return A [dplyr::tibble] with the description of feature properties
 #' 
 #' @export
 #' 
@@ -686,7 +686,7 @@ list_measurements <- function(kmr){
 #' @param kmr a [KMR] object
 #' @param measurement the type of measurement
 #' 
-#' @return A [tibble] with the description of supported units
+#' @return A [dplyr::tibble] with the description of supported units
 #' 
 #' @export
 #' 
@@ -710,7 +710,7 @@ list_measurement_units <- function(kmr, measurement){
 #' @param feature the name of the feature
 #' @param property the name of the property
 #' 
-#' @return A [tibble] with value and their description (if available)
+#' @return A [dplyr::tibble] with value and their description (if available)
 #' 
 #' @export
 #' 

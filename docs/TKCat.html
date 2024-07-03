@@ -7692,7 +7692,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2024-07-03 13:14:23.400944
+## Timestamp: 2024-07-03 15:34:59.560973
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -7730,7 +7730,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2024-07-03 13:14:23.400944
+## Timestamp: 2024-07-03 15:34:59.560973
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -7823,7 +7823,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2024-07-03 13:14:23.400944
+## Timestamp: 2024-07-03 15:34:59.560973
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -7882,7 +7882,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2024-07-03 13:14:23
+## Timestamp: 2024-07-03 15:34:59
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -8662,18 +8662,18 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 ## # ℹ 15 more rows</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 48 × 7
-##    resource   table                  name          comment type  nullable unique
-##    &lt;chr&gt;      &lt;chr&gt;                  &lt;chr&gt;         &lt;chr&gt;   &lt;chr&gt; &lt;lgl&gt;    &lt;lgl&gt; 
-##  1 brainSCOPE CT_group_conditions    condition     Condit… char… TRUE     FALSE 
-##  2 brainSCOPE Cell_type_conditions   condition     Condit… char… TRUE     FALSE 
-##  3 brainSCOPE Samples                condition     Condit… char… TRUE     FALSE 
-##  4 brainSCOPE Condition_by_CT_group  exp_condition Experi… char… FALSE    FALSE 
-##  5 brainSCOPE Condition_by_cell_type exp_condition Experi… char… FALSE    FALSE 
-##  6 brainSCOPE Cell_type_conditions   name          Concat… char… FALSE    TRUE  
-##  7 HPO        Disease_HP             db            Diseas… char… FALSE    FALSE 
-##  8 HPO        Disease_synonyms       db            Diseas… char… FALSE    FALSE 
-##  9 HPO        Diseases               db            Diseas… char… FALSE    FALSE 
-## 10 HPO        Disease_HP             id            Diseas… char… FALSE    FALSE 
+##    resource   table                name      comment       type  nullable unique
+##    &lt;chr&gt;      &lt;chr&gt;                &lt;chr&gt;     &lt;chr&gt;         &lt;chr&gt; &lt;lgl&gt;    &lt;lgl&gt; 
+##  1 HPO        Disease_HP           db        Disease data… char… FALSE    FALSE 
+##  2 HPO        Disease_synonyms     db        Disease data… char… FALSE    FALSE 
+##  3 HPO        Diseases             db        Disease data… char… FALSE    FALSE 
+##  4 HPO        Disease_HP           id        Disease ID    char… FALSE    FALSE 
+##  5 HPO        Disease_synonyms     id        Disease ID    char… FALSE    FALSE 
+##  6 HPO        Diseases             id        Disease ID    char… FALSE    FALSE 
+##  7 HPO        Diseases             label     Disease labl… char… FALSE    FALSE 
+##  8 HPO        Disease_synonyms     synonym   Disease syno… char… FALSE    FALSE 
+##  9 brainSCOPE CT_group_conditions  condition Condition (d… char… TRUE     FALSE 
+## 10 brainSCOPE Cell_type_conditions condition Condition (d… char… TRUE     FALSE 
 ## # ℹ 38 more rows</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 13 × 3

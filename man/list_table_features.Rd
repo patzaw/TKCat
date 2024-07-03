@@ -13,7 +13,7 @@ list_table_features(kmr, tables = NULL)
 are listed.}
 }
 \value{
-A \link{tibble} with feature description and properties
+A \link[dplyr:reexports]{dplyr::tibble} with feature description and properties
 }
 \description{
 List the features provided by a set of tables

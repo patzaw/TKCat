@@ -12,7 +12,7 @@ list_measurement_units(kmr, measurement)
 \item{measurement}{the type of measurement}
 }
 \value{
-A \link{tibble} with the description of supported units
+A \link[dplyr:reexports]{dplyr::tibble} with the description of supported units
 }
 \description{
 List possible units for a type of measurement
