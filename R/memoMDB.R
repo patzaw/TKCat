@@ -884,6 +884,14 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
             )
             
             ## Values
+            nullable <- dm[[tn]]$fields %>% 
+               dplyr::filter(!.data$type %in% c("column", "row")) %>% 
+               dplyr::pull("nullable")
+            if(nullable){
+               nullable <- "x"
+            }else{
+               nullable <- NULL
+            }
             valTable <- modTable$table[which(modTable$info=="values")]
             tw <- dplyr::as_tibble(Matrix::summary(x[[tn]]))
             write_MergeTree(
@@ -892,7 +900,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...){
                tableName=valTable,
                value=tw,
                rtypes=c("i"="integer", "j"="integer", "x"="numeric"),
-               nullable=NULL,
+               nullable=nullable,
                sortKey=c("i", "j")
             )
             

@@ -1440,6 +1440,14 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
             )
             
             ## Values
+            nullable <- dm[[tn]]$fields %>% 
+               dplyr::filter(!.data$type %in% c("column", "row")) %>% 
+               dplyr::pull("nullable")
+            if(nullable){
+               nullable <- "x"
+            }else{
+               nullable <- NULL
+            }
             valTable <- modTable$table[which(modTable$info=="values")]
             write_MergeTree(
                con=con,
@@ -1451,7 +1459,7 @@ DEFAULT_READ_PARAMS <- list(delim='\t', na="NA")
                   x=numeric()
                ),
                rtypes=c("i"="integer", "j"="integer", "x"="numeric"),
-               nullable=NULL,
+               nullable=nullable,
                sortKey=c("i", "j")
             )
             readr::read_delim_chunked(

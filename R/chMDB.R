@@ -2065,6 +2065,14 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             )
             
             ## Values
+            nullable <- dm[[tn]]$fields %>% 
+               dplyr::filter(!.data$type %in% c("column", "row")) %>% 
+               dplyr::pull("nullable")
+            if(nullable){
+               nullable <- "x"
+            }else{
+               nullable <- NULL
+            }
             valTable <- qr$table[which(qr$info=="values")]
             write_MergeTree(
                con=con,
@@ -2076,7 +2084,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                   x=numeric()
                ),
                rtypes=c("i"="integer", "j"="integer", "x"="numeric"),
-               nullable=NULL,
+               nullable=nullable,
                sortKey=c("i", "j")
             )
             chTables <- list_tables(
