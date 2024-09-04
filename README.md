@@ -3,8 +3,8 @@ README
 
 # Tailored Knowledge Catalog <img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" align="right" alt="" width="120" />
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
-[![](http://cranlogs.r-pkg.org/badges/TKCat)](https://cran.r-project.org/package=TKCat)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
+[![](https://cranlogs.r-pkg.org/badges/TKCat)](https://cran.r-project.org/package=TKCat)
 
 The aim of [TKCat](https://patzaw.github.io/TKCat/) (Tailored Knowledge
 Catalog) is to facilitate the management of data from knowledge
