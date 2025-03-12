@@ -1269,6 +1269,28 @@ db_tables <- function(x, host){
 #' @export
 '$.chMDB' <- `[[.chMDB`
 
+###############################################################################@
+#' 
+#' @param x a chMDB object
+#' @param ... additional parameters
+#' 
+#' @return `as.list.chMDB()` returns a simple list of tibbles with all the
+#' data from the tables in x.
+#' 
+#' @rdname chMDB
+#' 
+#' @export
+#'
+as.list.chMDB <- function(x, ...){
+   ## Rstudio hack to avoid DB call when just looking for names
+   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
+   if(length(cc)!=0){
+      invisible(NULL)
+   }else{
+      return(data_tables(x, ...))
+   }
+}
+
 
 ###############################################################################@
 #' 

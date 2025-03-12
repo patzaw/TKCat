@@ -6,6 +6,7 @@
 \alias{rename.chMDB}
 \alias{[.chMDB}
 \alias{[[.chMDB}
+\alias{as.list.chMDB}
 \title{An \link{MDB} (Modeled DataBase) relying on ClickHouse: chMDB}
 \usage{
 chMDB(
@@ -26,6 +27,8 @@ chMDB(
 \method{[}{chMDB}(x, i)
 
 \method{[[}{chMDB}(x, i)
+
+\method{as.list}{chMDB}(x, ...)
 }
 \arguments{
 \item{tkcon}{a \link{chTKCat} object}
@@ -51,18 +54,21 @@ See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}
 
 \item{verbose}{if TRUE display the data confrontation report}
 
-\item{x}{a \link{chMDB} object}
+\item{x}{a chMDB object}
 
 \item{value}{new table names}
 
 \item{.data}{a \link{chMDB} object}
 
-\item{...}{Use new_name = old_name to rename selected tables}
+\item{...}{additional parameters}
 
 \item{i}{the index or the name of the tables to take}
 }
 \value{
 A chMDB object
+
+\code{as.list.chMDB()} returns a simple list of tibbles with all the
+data from the tables in x.
 }
 \description{
 An \link{MDB} (Modeled DataBase) relying on ClickHouse: chMDB

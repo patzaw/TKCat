@@ -8,6 +8,7 @@
 \alias{[.fileMDB}
 \alias{[[.fileMDB}
 \alias{$.fileMDB}
+\alias{as.list.fileMDB}
 \title{An \link{MDB} (Modeled DataBase) based on files: fileMDB}
 \usage{
 \method{$}{chMDB}(x, i)
@@ -32,9 +33,11 @@ fileMDB(
 \method{[[}{fileMDB}(x, i)
 
 \method{$}{fileMDB}(x, i)
+
+\method{as.list}{fileMDB}(x, ...)
 }
 \arguments{
-\item{x}{a \link{fileMDB} object}
+\item{x}{a fileMDB object}
 
 \item{i}{the index or the name of the tables to take}
 
@@ -66,10 +69,13 @@ for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{Re
 
 \item{.data}{a \link{fileMDB} object}
 
-\item{...}{Use new_name = old_name to rename selected tables}
+\item{...}{additional parameters}
 }
 \value{
 A fileMDB object
+
+\code{as.list.fileMDB()} returns a simple list of tibbles with all the
+data from the tables in x.
 }
 \description{
 An \link{MDB} (Modeled DataBase) based on files: fileMDB

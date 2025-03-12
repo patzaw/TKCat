@@ -849,6 +849,28 @@ data_file_size <- function(x, hr=FALSE){
 #' @export
 '$.fileMDB' <- `[[.fileMDB`
 
+###############################################################################@
+#' 
+#' @param x a fileMDB object
+#' @param ... additional parameters
+#' 
+#' @return `as.list.fileMDB()` returns a simple list of tibbles with all the
+#' data from the tables in x.
+#' 
+#' @rdname fileMDB
+#' 
+#' @export
+#'
+as.list.fileMDB <- function(x, ...){
+   ## Rstudio hack to avoid DB call when just looking for names
+   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
+   if(length(cc)!=0){
+      invisible(NULL)
+   }else{
+      return(data_tables(x, ...))
+   }
+}
+
 
 ###############################################################################@
 #' 
