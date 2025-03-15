@@ -5,10 +5,11 @@
 #' @import shiny
 #' @import shinydashboard
 #' @import visNetwork
-#' @import future
 #' @import promises
 #' @import crayon
 #' 
+#' @importFrom future future
+#'
 #' @importFrom ClickHouseHTTP ClickHouseHTTP
 #' @importFrom rlang .data enquo
 #' @importFrom tidyselect eval_select vars_pull eval_rename
