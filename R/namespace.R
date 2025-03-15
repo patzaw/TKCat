@@ -8,7 +8,7 @@
 #' @import promises
 #' @import crayon
 #' 
-#' @importFrom future future
+#' @importFrom future future plan multisession
 #'
 #' @importFrom ClickHouseHTTP ClickHouseHTTP
 #' @importFrom rlang .data enquo
