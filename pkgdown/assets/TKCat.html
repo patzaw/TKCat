@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2025-03-12" />
+<meta name="date" content="2025-03-17" />
 
 <title>Introduction to TKCat</title>
 
@@ -7276,7 +7276,7 @@ display: none;
 
 <h1 class="title toc-ignore">Introduction to TKCat</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">March 12, 2025</h4>
+<h4 class="date">March 17, 2025</h4>
 
 </div>
 
@@ -7692,7 +7692,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-03-12 12:17:30.485673
+## Timestamp: 2025-03-17 14:20:05.954037
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -7730,7 +7730,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-03-12 12:17:30.485673
+## Timestamp: 2025-03-17 14:20:05.954037
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -7823,7 +7823,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-03-12 12:17:30.485673
+## Timestamp: 2025-03-17 14:20:05.954037
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -7882,7 +7882,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-03-12 12:17:30
+## Timestamp: 2025-03-17 14:20:05
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -8643,7 +8643,7 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 ##  1 ChEMBL ChEM… &quot;ChEMBL is… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      
 ##  2 DRE-B… Bulk… &quot;Re-interp… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
 ##  3 GO     The … &quot;Because o… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      
-##  4 Galac… &lt;NA&gt;   &lt;NA&gt;       &lt;NA&gt;  &lt;NA&gt;    &lt;NA&gt;       TRUE   FALSE     TRUE      
+##  4 Galac… Data… &quot;Biorelate… &lt;NA&gt;  1.1.0   [Patrice … TRUE   TRUE      TRUE      
 ##  5 HGNC   Anno… &quot;The HUGO … http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      
 ##  6 HPA    The … &quot;The Human… http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      
 ##  7 HPO    Data… &quot;The Human… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      
@@ -8659,35 +8659,35 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 ## 17 brain… brai… &quot;Data extr… http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      
 ## # ℹ 3 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;, total_size &lt;dbl&gt;</code></pre>
 <pre class="r"><code>search_MDB_tables(k, &quot;disease&quot;)  # Search table about &quot;disease&quot;</code></pre>
-<pre><code>## # A tibble: 42 × 3
+<pre><code>## # A tibble: 44 × 3
 ##    resource name                         comment                                
 ##    &lt;chr&gt;    &lt;chr&gt;                        &lt;chr&gt;                                  
-##  1 ChEMBL   assay_classification         Classification scheme for phenotypic a…
-##  2 Monarch  Diseases                     &lt;NA&gt;                                   
-##  3 Monarch  Diseases_descendants         &lt;NA&gt;                                   
-##  4 Monarch  Diseases_mode_of_inheritance &lt;NA&gt;                                   
-##  5 Monarch  Diseases_parents             &lt;NA&gt;                                   
-##  6 Monarch  Diseases_phenotypes          &lt;NA&gt;                                   
-##  7 Monarch  Diseases_related             &lt;NA&gt;                                   
-##  8 Monarch  Diseases_synonyms            &lt;NA&gt;                                   
-##  9 Monarch  Diseases_xref                &lt;NA&gt;                                   
-## 10 Monarch  Genes_diseases               &lt;NA&gt;                                   
-## # ℹ 32 more rows</code></pre>
+##  1 Galactic status                       &quot;Cause-and-effect interactions can be …
+##  2 HPA      Disease_involvement           &lt;NA&gt;                                  
+##  3 Monarch  Diseases                      &lt;NA&gt;                                  
+##  4 Monarch  Diseases_descendants          &lt;NA&gt;                                  
+##  5 Monarch  Diseases_mode_of_inheritance  &lt;NA&gt;                                  
+##  6 Monarch  Diseases_parents              &lt;NA&gt;                                  
+##  7 Monarch  Diseases_phenotypes           &lt;NA&gt;                                  
+##  8 Monarch  Diseases_related              &lt;NA&gt;                                  
+##  9 Monarch  Diseases_synonyms             &lt;NA&gt;                                  
+## 10 Monarch  Diseases_xref                 &lt;NA&gt;                                  
+## # ℹ 34 more rows</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
-<pre><code>## # A tibble: 99 × 7
+<pre><code>## # A tibble: 111 × 7
 ##    resource              table               name  comment type  nullable unique
 ##    &lt;chr&gt;                 &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; &lt;lgl&gt;    &lt;lgl&gt; 
-##  1 DRE-Bulk-RNA-UMC-2024 conditions          cond… &quot;Disea… char… TRUE     FALSE 
-##  2 DRE-Bulk-RNA-UMC-2024 samples             cond… &quot;Disea… char… TRUE     FALSE 
-##  3 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… &quot;&quot;      char… FALSE    FALSE 
-##  4 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… &quot;&quot;      char… FALSE    FALSE 
-##  5 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… &quot;&quot;      nume… FALSE    FALSE 
-##  6 DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… &quot;&quot;      char… FALSE    FALSE 
-##  7 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… &quot;&quot;      char… FALSE    FALSE 
-##  8 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… &quot;&quot;      char… FALSE    FALSE 
-##  9 HPO                   Disease_HP          db    &quot;Disea… char… FALSE    FALSE 
-## 10 HPO                   Disease_synonyms    db    &quot;Disea… char… FALSE    FALSE 
-## # ℹ 89 more rows</code></pre>
+##  1 MetaBase              ImagemapsEdges      dise… &quot;&quot;      logi… FALSE    FALSE 
+##  2 DRE-Bulk-RNA-UMC-2024 conditions          cond… &quot;Disea… char… TRUE     FALSE 
+##  3 DRE-Bulk-RNA-UMC-2024 samples             cond… &quot;Disea… char… TRUE     FALSE 
+##  4 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… &quot;&quot;      char… FALSE    FALSE 
+##  5 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… &quot;&quot;      char… FALSE    FALSE 
+##  6 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… &quot;&quot;      nume… FALSE    FALSE 
+##  7 DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… &quot;&quot;      char… FALSE    FALSE 
+##  8 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… &quot;&quot;      char… FALSE    FALSE 
+##  9 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… &quot;&quot;      char… FALSE    FALSE 
+## 10 brainSCOPE            CT_group_conditions cond… &quot;Condi… char… TRUE     FALSE 
+## # ℹ 101 more rows</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 35 × 3
 ##    resource              collection table              
