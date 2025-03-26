@@ -1078,7 +1078,7 @@ dims.chMDB <- function(x, ...){
             },
             nrow=if(all(.data$info=="values")){
                if(.data$transposed[1]){
-                  sum(.data$total_columns)
+                  sum(.data$total_columns) - dplyr::n()
                }else{
                   .data$total_rows[1]
                }
@@ -1089,7 +1089,7 @@ dims.chMDB <- function(x, ...){
                if(.data$transposed[1]){
                   .data$total_rows[1]
                }else{
-                  sum(.data$total_columns)
+                  sum(.data$total_columns) - dplyr::n()
                }
             }else{
                .data$total_rows[which(.data$info=="columns")]
@@ -1952,7 +1952,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
             clause
          )
       }
-      query <- tquery
+      # query <- tquery
+      queries <- tquery
       if(length(sel) >0 && length(mtables)>1) for(i in 2:length(mtables)){
          if(is.na(sel[1])){
             tquery <- paste(
@@ -1978,22 +1979,41 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...){
                clause
             )
          }
-         query <- paste0(
-            "SELECT * FROM (",
-            query,
-            ") FULL JOIN (",
-            tquery,
-            ') USING `',
-            dimcol,
-            '`'
-         )
+         # query <- paste0(
+         #    "SELECT * FROM (",
+         #    query,
+         #    ") FULL JOIN (",
+         #    tquery,
+         #    ') USING `',
+         #    dimcol,
+         #    '`'
+         # )
+         queries <- c(queries, tquery)
       }
    
       ## Get the results ----
-      toRet <- get_query(
-         x, query, autoalias=FALSE,
-         format="TabSeparatedWithNamesAndTypes"
+      # toRet <- get_query(
+      #    x, query, autoalias=FALSE,
+      #    format="TabSeparatedWithNamesAndTypes"
+      # )
+      toRet <- lapply(
+         queries,
+         function(q){
+            res <- get_query(
+               x, q, autoalias = FALSE,
+               format="TabSeparatedWithNamesAndTypes"
+            )
+            res[order(res[[dimcol]]),]
+         }
       )
+      if(length(toRet) > 1){
+         toRet <- cbind(
+            toRet[[1]],
+            lapply(toRet[-1], function(r) r[,-1])
+         )
+      }else{
+         toRet <- toRet[[1]]
+      }
       dimname <- toRet[[dimcol]]
       toRet <- toRet[, -which(colnames(toRet)==dimcol), drop=FALSE] %>% 
          as.matrix() %>% 
