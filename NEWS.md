@@ -1,6 +1,15 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 
+## Version 1.1.13
+
+- Avoid some nested joins in ClickHouse
+- Correct query for listing MDBs
+- Correct shiny explorer error with not populated MDB
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+
 ## Version 1.1.12
 
 - In RStudio, avoid calls to `as.list` during autocompletion on `chMDB` and

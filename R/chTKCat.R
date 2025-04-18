@@ -1144,12 +1144,11 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
                paste(
                   sprintf(
                      paste(
-                        "SELECT '%s' AS db, * FROM `%s`.___MDB___ ",
-                        " FULL JOIN ",
-                        " (SELECT '%s' AS db, * FROM `%s`.___Public___)",
-                        "USING db"
+                        "SELECT *, '%s' AS db FROM `%s`.___MDB___ ",
+                        " CROSS JOIN ",
+                        " (SELECT * FROM `%s`.___Public___)"
                      ),
-                     dbNames, dbNames, dbNames, dbNames
+                     dbNames, dbNames, dbNames
                   ),
                   collapse=" UNION ALL "
                ),

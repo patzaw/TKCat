@@ -540,7 +540,7 @@ TKCAT_LOGO_DIV <- shiny::div(
          shiny::withProgress(
             message=sprintf("Getting %s metadata", n),
             expr={
-               if(!is.null(access) && access=="none"){
+               if(!is.null(access) && !is.na(access) && access=="none"){
                   mdb <- tryCatch(
                      get_chMDB_metadata(instance$tkcat, n),
                      error = function(e) e
