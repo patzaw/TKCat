@@ -15,6 +15,7 @@
 
     <!-- Users and ACL. -->
     <users>
+       <default></default>
     </users>
 
     <!-- Quotas. -->

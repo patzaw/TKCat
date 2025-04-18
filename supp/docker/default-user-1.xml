@@ -1,0 +1,14 @@
+<clickhouse>
+  <!-- Docs: <https://clickhouse.com/docs/operations/settings/settings_users/> -->
+  <users>
+    <default>
+      <networks>
+        <ip>::/0</ip>
+      </networks>
+      <password></password>
+      <grants>
+          <query>GRANT ALL ON *.* WITH GRANT OPTION</query>
+      </grants>
+    </default>
+  </users>
+</clickhouse>
