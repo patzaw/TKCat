@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Introduction to TKCat • TKCat</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -33,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">TKCat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.12</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.13</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -79,7 +78,7 @@
                         <h4 data-toc-skip class="author">Patrice
 Godard</h4>
             
-            <h4 data-toc-skip class="date">March 17, 2025</h4>
+            <h4 data-toc-skip class="date">May 15, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/patzaw/TKCat/blob/HEAD/vignettes/TKCat.Rmd" class="external-link"><code>vignettes/TKCat.Rmd</code></a></small>
       <div class="d-none name"><code>TKCat.Rmd</code></div>
@@ -450,7 +449,7 @@ to document the data themselves.</li>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-03-17 14:21:23.765954</span></span>
+<span><span class="co">## Timestamp: 2025-05-15 10:43:28.890189</span></span>
 <span><span class="co">## </span></span></code></pre>
 </div>
 <div class="section level3">
@@ -490,7 +489,7 @@ statement displayed when printing the object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-03-17 14:21:23.765954</span></span>
+<span><span class="co">## Timestamp: 2025-05-15 10:43:28.890189</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -591,7 +590,7 @@ MDB object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-03-17 14:21:23.765954</span></span>
+<span><span class="co">## Timestamp: 2025-05-15 10:43:28.890189</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -653,7 +652,7 @@ the corresponding documentation from it back in R:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-03-17 14:21:23</span></span>
+<span><span class="co">## Timestamp: 2025-05-15 10:43:28</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -1455,75 +1454,69 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <em>TKCat</em> object.</p>
 <div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/list_MDBs.html">list_MDBs</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>             <span class="co"># get a specific MDBs from the catalog</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 17 × 12</span></span></span>
-<span><span class="co">##    name   title description url   version maintainer public populated timestamps</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> ChEMBL ChEM… <span style="color: #949494;">"</span>ChEMBL is… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> DRE-B… Bulk… <span style="color: #949494;">"</span>Re-interp… http… 0.01    [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> GO     The … <span style="color: #949494;">"</span>Because o… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Galac… Data… <span style="color: #949494;">"</span>Biorelate… <span style="color: #BB0000;">NA</span>    1.1.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> HGNC   Anno… <span style="color: #949494;">"</span>The HUGO … http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> HPA    The … <span style="color: #949494;">"</span>The Human… http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> HPO    Data… <span style="color: #949494;">"</span>The Human… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> MetaB… Data… <span style="color: #949494;">"</span>MetaBase … http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Monar… Mona… <span style="color: #949494;">"</span>The Monar… http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> OmniP… Func… <span style="color: #949494;">"</span>OmniPath … http… 0.0.3   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">11</span> OpenT… Data… <span style="color: #949494;">"</span>The Open … http… 1.0.2   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">12</span> PMDB   PMDB… <span style="color: #949494;">"</span>A dump of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">13</span> Pangl… Data… <span style="color: #949494;">"</span>PanglaoDB… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">14</span> PubTa… PubT… <span style="color: #949494;">"</span>PubTator3… http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">15</span> Quive… Prof… <span style="color: #949494;">"</span>#### Goal… <span style="color: #BB0000;">NA</span>    <span style="color: #BB0000;">NA</span>      [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">16</span> RDKM   R&amp;D … <span style="color: #949494;">"</span>Requireme… <span style="color: #BB0000;">NA</span>    0.1     [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">17</span> brain… brai… <span style="color: #949494;">"</span>Data extr… http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 25 × 12</span></span></span>
+<span><span class="co">##    title  description url   version maintainer public name  populated timestamps</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> ChEMB… ChEMBL is … http… 1.0.0   [Patrice … TRUE   ChEM… TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Data … Clarivate … http… 0.0.1   [Patrice … TRUE   Cort… TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Bulk … Re-interpr… http… 0.01    [Patrice … TRUE   DRE-… TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Bulk … Re-interpr… http… 0.01    [Patrice … TRUE   FCD-… TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> The G… Because of… http… 1.0.0   [Patrice … TRUE   GO    TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Genot… The Adult … http… 0.01    [Patrice … TRUE   GTEx  TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Data … Biorelate'… <span style="color: #BB0000;">NA</span>    1.1.0   [Patrice … TRUE   Gala… TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Data … GlobalData… http… 0.0.1   [Patrice … TRUE   Glob… TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Annot… The HUGO G… http… 0.0.1   [Patrice … TRUE   HGNC  TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> The H… The Human … http… 0.0.1   [Patrice … TRUE   HPA   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 15 more rows</span></span></span>
 <span><span class="co">## <span style="color: #949494;"># ℹ 3 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;, total_size &lt;dbl&gt;</span></span></span></code></pre>
 <div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_tables.html">search_MDB_tables</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search table about "disease"</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 44 × 3</span></span></span>
-<span><span class="co">##    resource name                         comment</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> Monarch  Diseases                     <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Monarch  Diseases_descendants         <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Monarch  Diseases_mode_of_inheritance <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Monarch  Diseases_parents             <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> Monarch  Diseases_phenotypes          <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Monarch  Diseases_related             <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Monarch  Diseases_synonyms            <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Monarch  Diseases_xref                <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Monarch  Genes_diseases               <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> Monarch  Models_of_diseases           <span style="color: #BB0000;">NA</span>     </span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 34 more rows</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 48 × 3</span></span></span>
+<span><span class="co">##    resource name                         comment                                </span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> ChEMBL   assay_classification         Classification scheme for phenotypic a…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Monarch  Diseases                     <span style="color: #BB0000;">NA</span>                                     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Monarch  Diseases_descendants         <span style="color: #BB0000;">NA</span>                                     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Monarch  Diseases_mode_of_inheritance <span style="color: #BB0000;">NA</span>                                     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> Monarch  Diseases_parents             <span style="color: #BB0000;">NA</span>                                     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Monarch  Diseases_phenotypes          <span style="color: #BB0000;">NA</span>                                     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Monarch  Diseases_related             <span style="color: #BB0000;">NA</span>                                     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Monarch  Diseases_synonyms            <span style="color: #BB0000;">NA</span>                                     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Monarch  Diseases_xref                <span style="color: #BB0000;">NA</span>                                     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> Monarch  Genes_diseases               <span style="color: #BB0000;">NA</span>                                     </span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 38 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_fields.html">search_MDB_fields</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search a field about "disease"</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 111 × 7</span></span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 126 × 7</span></span></span>
 <span><span class="co">##    resource              table               name  comment type  nullable unique</span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> MetaBase              ImagemapsEdges      dise… <span style="color: #949494;">""</span>      logi… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> brainSCOPE            CT_group_conditions cond… <span style="color: #949494;">"</span>Condi… char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> brainSCOPE            Cell_type_conditio… cond… <span style="color: #949494;">"</span>Condi… char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> brainSCOPE            Samples             cond… <span style="color: #949494;">"</span>Condi… char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> brainSCOPE            Condition_by_CT_gr… exp_… <span style="color: #949494;">"</span>Exper… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> brainSCOPE            Condition_by_cell_… exp_… <span style="color: #949494;">"</span>Exper… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> brainSCOPE            Cell_type_conditio… name  <span style="color: #949494;">"</span>Conca… char… FALSE    TRUE  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> HPA                   Disease_involvement dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> DRE-Bulk-RNA-UMC-2024 conditions          cond… <span style="color: #949494;">"</span>Disea… char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> DRE-Bulk-RNA-UMC-2024 samples             cond… <span style="color: #949494;">"</span>Disea… char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 101 more rows</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> FCD-TLE-Bulk-RNA-2019 conditions          cond… Disease char… TRUE     TRUE  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> FCD-TLE-Bulk-RNA-2019 samples             cond… Disease char… TRUE     FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> OpenTargets           Diseases_and_Pheno… code  Diseas… char… FALSE    TRUE  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> OpenTargets           Diseases_and_Pheno… desc… Descri… char… TRUE     FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> OpenTargets           Associations_by_so… dise… Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> OpenTargets           Associations_by_ty… dise… Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> OpenTargets           Associations_overa… dise… Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> OpenTargets           Diseases_ancestors  dise… Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> OpenTargets           Diseases_children   dise… Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> OpenTargets           Diseases_descendan… dise… Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 116 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/collection_members.html">collection_members</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>  </span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 35 × 3</span></span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 43 × 3</span></span></span>
 <span><span class="co">##    resource              collection table              </span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 1</span> ChEMBL                BE         component_sequences</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 2</span> ChEMBL                Condition  drug_indication    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> DRE-Bulk-RNA-UMC-2024 BE         genes              </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> GO                    BE         Unique_BEIDs       </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> HGNC                  BE         Genes              </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> HGNC                  BE         Ensembl            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> HGNC                  BE         Entrez             </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> HGNC                  BE         OMIM               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> HGNC                  BE         Uniprot            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> HGNC                  BE         MGD                </span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 25 more rows</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Cortellis             BE         target_genes       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> DRE-Bulk-RNA-UMC-2024 BE         genes              </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> FCD-TLE-Bulk-RNA-2019 BE         genes              </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> GO                    BE         Unique_BEIDs       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> GTEx                  BE         genes              </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> GTEx                  BE         transcripts        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> GlobalData            BE         target_genes       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> HGNC                  BE         Genes              </span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 33 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb130"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/explore_MDBs.html">explore_MDBs</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -1602,8 +1595,14 @@ Management (KMR) in TKCat</a>.</p>
 <h5 id="install-clickhouse-initialize-and-configure-the-tkcat-instance">Install ClickHouse, initialize and configure the TKCat instance<a class="anchor" aria-label="anchor" href="#install-clickhouse-initialize-and-configure-the-tkcat-instance"></a>
 </h5>
 <p>The ClickHouse docker container supporting TKCat, its initialization
-and its configuration procedures are implemented here: <a href="https://github.com/patzaw/TKCat/blob/master/ClickHouse/S01-install-and-init.R" class="external-link">S01-install-and-init.R</a>.
-This script should be adapted according to requirements and needs.</p>
+and its configuration procedures are implemented here: <a href="https://github.com/patzaw/TKCat/blob/master/ClickHouse/docker" class="external-link">docker</a>.</p>
+<ol style="list-style-type: decimal">
+<li><p>Update the <em>Dockerfile</em> to select the version of
+ClickHouse to use.</p></li>
+<li><p>Customize and run the following script.</p></li>
+</ol>
+<div class="sourceCode" id="cb135"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb135-1"><a href="#cb135-1" tabindex="-1"></a></span>
+<span id="cb135-2"><a href="#cb135-2" tabindex="-1"></a><span class="fu">sh</span> launch-tkcat-instance.sh</span></code></pre></div>
 <p>Specific attention should be paid on available ports: TCP native port
 (but not TLS wrapping yet) is supported by the <a href="https://github.com/IMSMWU/RClickhouse" class="external-link">RClickhouse</a> R package
 whereas HTTP and HTTP ports are supported by the <a href="https://github.com/patzaw/ClickHouseHTTP" class="external-link">ClickHouseHTTP</a> R
@@ -1613,14 +1612,14 @@ package.</p>
 <div class="section level5">
 <h5 id="cleaning-and-removing-a-tkcat-instance">Cleaning and removing a TKCat instance<a class="anchor" aria-label="anchor" href="#cleaning-and-removing-a-tkcat-instance"></a>
 </h5>
-<p>When no longer needed, stoping and removing the docker container can
+<p>When no longer needed, stooping and removing the docker container can
 be achieved as exemplified below</p>
-<div class="sourceCode" id="cb135"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb135-1"><a href="#cb135-1" tabindex="-1"></a><span class="co"># In shell</span></span>
-<span id="cb135-2"><a href="#cb135-2" tabindex="-1"></a><span class="ex">docker</span> stop tkcat_test</span>
-<span id="cb135-3"><a href="#cb135-3" tabindex="-1"></a><span class="ex">docker</span> rm tkcat_test</span>
-<span id="cb135-4"><a href="#cb135-4" tabindex="-1"></a><span class="ex">docker</span> volume prune <span class="at">-f</span></span>
-<span id="cb135-5"><a href="#cb135-5" tabindex="-1"></a><span class="co"># Remove the folder with all the data: `$TKCAT_HOME`.`</span></span>
-<span id="cb135-6"><a href="#cb135-6" tabindex="-1"></a><span class="fu">sudo</span> rm <span class="at">-rf</span> ~/Documents/Projects/TKCat_Test</span></code></pre></div>
+<div class="sourceCode" id="cb136"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb136-1"><a href="#cb136-1" tabindex="-1"></a><span class="co"># In shell</span></span>
+<span id="cb136-2"><a href="#cb136-2" tabindex="-1"></a><span class="ex">docker</span> stop test_tkcat</span>
+<span id="cb136-3"><a href="#cb136-3" tabindex="-1"></a><span class="ex">docker</span> rm test_tkcat</span>
+<span id="cb136-4"><a href="#cb136-4" tabindex="-1"></a><span class="ex">docker</span> volume prune <span class="at">-f</span></span>
+<span id="cb136-5"><a href="#cb136-5" tabindex="-1"></a><span class="co"># Remove the folder with all the data: `$TKCAT_HOME`.`</span></span>
+<span id="cb136-6"><a href="#cb136-6" tabindex="-1"></a><span class="fu">sudo</span> rm <span class="at">-rf</span> /mnt/data1/pgodard/Services-test/test_tkcat_2025.04.18</span></code></pre></div>
 </div>
 </div>
 <div class="section level4">
@@ -1630,7 +1629,7 @@ be achieved as exemplified below</p>
 <div class="section level5">
 <h5 id="ch-u-create">Creation<a class="anchor" aria-label="anchor" href="#ch-u-create"></a>
 </h5>
-<div class="sourceCode" id="cb136"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb137"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/chTKCat.html">chTKCat</a></span><span class="op">(</span>user<span class="op">=</span><span class="st">"pgodard"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/create_chTKCat_user.html">create_chTKCat_user</a></span><span class="op">(</span></span>
 <span>   <span class="va">k</span>, login<span class="op">=</span><span class="st">"lfrancois"</span>, contact<span class="op">=</span><span class="cn">NA</span>, admin<span class="op">=</span><span class="cn">FALSE</span>, provider<span class="op">=</span><span class="cn">TRUE</span></span>
@@ -1644,12 +1643,12 @@ instance (default: FALSE).</p>
 <div class="section level5">
 <h5 id="update">Update<a class="anchor" aria-label="anchor" href="#update"></a>
 </h5>
-<div class="sourceCode" id="cb137"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb138"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/chTKCat.html">chTKCat</a></span><span class="op">(</span>user<span class="op">=</span><span class="st">"pgodard"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/change_chTKCat_password.html">change_chTKCat_password</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"lfrancois"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/update_chTKCat_user.html">update_chTKCat_user</a></span><span class="op">(</span><span class="va">k</span>, contact<span class="op">=</span><span class="st">"email"</span>, admin<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>A shiny application can be launched for updating user settings:</p>
-<div class="sourceCode" id="cb138"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb139"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/manage_chTKCat_users.html">manage_chTKCat_users</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span></span></code></pre></div>
 <p>If this application is deployed, it can be made directly accessible
 from the <code><a href="../reference/explore_MDBs.html">explore_MDBs()</a></code> Shiny application by providing the
@@ -1658,7 +1657,7 @@ URL as the <code>userManager</code> parameter.</p>
 <div class="section level5">
 <h5 id="drop">Drop<a class="anchor" aria-label="anchor" href="#drop"></a>
 </h5>
-<div class="sourceCode" id="cb139"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb140"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/drop_chTKCat_user.html">drop_chTKCat_user</a></span><span class="op">(</span><span class="va">k</span>, login<span class="op">=</span><span class="st">"lfrancois"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -1670,17 +1669,17 @@ URL as the <code>userManager</code> parameter.</p>
 </h5>
 <p>Before MDB data can be uploaded, the database should be created. This
 operation can only be achieved by data providers (see <a href="#ch-u-create">above</a>).</p>
-<div class="sourceCode" id="cb140"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb141"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_chMDB.html">create_chMDB</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"CHEMBL"</span>, public<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>By default chMDB are not public. It can be changed through the
 <code>public</code> parameter when creating the chMDB or by using the
 <code><a href="../reference/set_chMDB_access.html">set_chMDB_access()</a></code> function afterward.</p>
-<div class="sourceCode" id="cb141"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb142"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/set_chMDB_access.html">set_chMDB_access</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"CHEMBL"</span>, public<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>Then, users having access to the chMDB can be identified with or
 without admin rights on the chMDB. Admin rights allow the user to update
 the chMDB data.</p>
-<div class="sourceCode" id="cb142"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb143"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/add_chMDB_user.html">add_chMDB_user</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"CHEMBL"</span>, <span class="st">"lfrancois"</span>, admin<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="co"># remove_chMDB_user(k, "CHEMBL", "lfrancois")</span></span>
 <span><span class="fu"><a href="../reference/list_chMDB_users.html">list_chMDB_users</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"CHEMBL"</span><span class="op">)</span></span></code></pre></div>
@@ -1698,7 +1697,7 @@ optional). When <code>overwrite</code> parameter of the
 potential existing version is archived before being updated. When
 <code>overwrite</code> is set to TRUE, the potential existing version is
 overwritten without being archived.</p>
-<div class="sourceCode" id="cb143"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb144"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lc</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scan_fileMDBs.html">scan_fileMDBs</a></span><span class="op">(</span><span class="st">"fileMDB_directory"</span><span class="op">)</span></span>
 <span><span class="co">## The commented line below allows the exploration of the data models in lc.</span></span>
 <span><span class="co"># explore_MDBs(lc)</span></span>
@@ -1712,11 +1711,11 @@ overwritten without being archived.</p>
 <h5 id="deleting-a-chmdb">Deleting a chMDB<a class="anchor" aria-label="anchor" href="#deleting-a-chmdb"></a>
 </h5>
 <p>Any admin user of a chMDB can delete the corresponding data.</p>
-<div class="sourceCode" id="cb144"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb145"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/empty_chMDB.html">empty_chMDB</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"CHEMBL"</span><span class="op">)</span></span></code></pre></div>
 <p>But only a system admin can drop the chMDB from the ClickHouse
 database.</p>
-<div class="sourceCode" id="cb145"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb146"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/drop_chMDB.html">drop_chMDB</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"CHEMBL"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -1729,7 +1728,7 @@ support collection members of the different chMDB. They can be taken
 from the TKCat package environment, from a JSON file or directly from a
 JSON text variable. Additional functions are available to list and
 remove chTKCat collections.</p>
-<div class="sourceCode" id="cb146"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb147"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/add_chTKCat_collection.html">add_chTKCat_collection</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"BE"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/list_chTKCat_collections.html">list_chTKCat_collections</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/remove_chTKCat_collection.html">remove_chTKCat_collection</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"BE"</span><span class="op">)</span></span></code></pre></div>
@@ -1778,7 +1777,7 @@ MDBs.</p>
 <p>A collection is defined by a JSON document. This document should
 fulfill the requirements defined by the <a href="https://github.com/patzaw/TKCat/blob/master/inst/Collections/Collection-Schema.json" class="external-link">Collection-Schema.json</a>.
 Two collections are available by default in the TKCat package.</p>
-<div class="sourceCode" id="cb147"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb148"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/list_local_collections.html">list_local_collections</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 2 × 2</span></span></span>
 <span><span class="co">##   title     description                                  </span></span>
@@ -1786,79 +1785,79 @@ Two collections are available by default in the TKCat package.</p>
 <span><span class="co">## <span style="color: #BCBCBC;">1</span> BE        Collection of biological entity (BE) concepts</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">2</span> Condition Collection of condition concepts</span></span></code></pre>
 <p>Here is how the <em>BE</em> collection is defined.</p>
-<div class="sourceCode" id="cb149"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb150"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_local_collection.html">get_local_collection</a></span><span class="op">(</span><span class="st">"BE"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb150"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb150-1"><a href="#cb150-1" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb150-2"><a href="#cb150-2" tabindex="-1"></a>   <span class="dt">"$schema"</span><span class="fu">:</span> <span class="st">"https://json-schema.org/draft/2019-09/schema"</span><span class="fu">,</span></span>
-<span id="cb150-3"><a href="#cb150-3" tabindex="-1"></a>   <span class="dt">"$id"</span><span class="fu">:</span><span class="st">"TKCat_BE_collection_1.0"</span><span class="fu">,</span></span>
-<span id="cb150-4"><a href="#cb150-4" tabindex="-1"></a>    <span class="dt">"title"</span><span class="fu">:</span> <span class="st">"BE collection"</span><span class="fu">,</span></span>
-<span id="cb150-5"><a href="#cb150-5" tabindex="-1"></a>    <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
-<span id="cb150-6"><a href="#cb150-6" tabindex="-1"></a>    <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Collection of biological entity (BE) concepts"</span><span class="fu">,</span></span>
-<span id="cb150-7"><a href="#cb150-7" tabindex="-1"></a>    <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-8"><a href="#cb150-8" tabindex="-1"></a>      <span class="dt">"$schema"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"enum"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"TKCat_BE_collection_1.0"</span><span class="ot">]</span><span class="fu">},</span></span>
-<span id="cb150-9"><a href="#cb150-9" tabindex="-1"></a>      <span class="dt">"$id"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">},</span></span>
-<span id="cb150-10"><a href="#cb150-10" tabindex="-1"></a>        <span class="dt">"collection"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"enum"</span><span class="fu">:</span><span class="ot">[</span><span class="st">"BE"</span><span class="ot">]</span><span class="fu">},</span></span>
-<span id="cb150-11"><a href="#cb150-11" tabindex="-1"></a>        <span class="dt">"resource"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">},</span></span>
-<span id="cb150-12"><a href="#cb150-12" tabindex="-1"></a>        <span class="dt">"tables"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-13"><a href="#cb150-13" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"array"</span><span class="fu">,</span></span>
-<span id="cb150-14"><a href="#cb150-14" tabindex="-1"></a>            <span class="dt">"minItems"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
-<span id="cb150-15"><a href="#cb150-15" tabindex="-1"></a>            <span class="dt">"items"</span><span class="fu">:{</span></span>
-<span id="cb150-16"><a href="#cb150-16" tabindex="-1"></a>                <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
-<span id="cb150-17"><a href="#cb150-17" tabindex="-1"></a>                <span class="dt">"properties"</span><span class="fu">:{</span></span>
-<span id="cb150-18"><a href="#cb150-18" tabindex="-1"></a>                    <span class="dt">"name"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">},</span></span>
-<span id="cb150-19"><a href="#cb150-19" tabindex="-1"></a>                    <span class="dt">"fields"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-20"><a href="#cb150-20" tabindex="-1"></a>                        <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
-<span id="cb150-21"><a href="#cb150-21" tabindex="-1"></a>                        <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-22"><a href="#cb150-22" tabindex="-1"></a>                            <span class="dt">"be"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-23"><a href="#cb150-23" tabindex="-1"></a>                                <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
-<span id="cb150-24"><a href="#cb150-24" tabindex="-1"></a>                                <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-25"><a href="#cb150-25" tabindex="-1"></a>                                    <span class="dt">"static"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"boolean"</span><span class="fu">},</span></span>
-<span id="cb150-26"><a href="#cb150-26" tabindex="-1"></a>                                    <span class="dt">"value"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">}</span></span>
-<span id="cb150-27"><a href="#cb150-27" tabindex="-1"></a>                                <span class="fu">},</span></span>
-<span id="cb150-28"><a href="#cb150-28" tabindex="-1"></a>                                <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"static"</span><span class="ot">,</span> <span class="st">"value"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb150-29"><a href="#cb150-29" tabindex="-1"></a>                                <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
-<span id="cb150-30"><a href="#cb150-30" tabindex="-1"></a>                            <span class="fu">},</span></span>
-<span id="cb150-31"><a href="#cb150-31" tabindex="-1"></a>                            <span class="dt">"source"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-32"><a href="#cb150-32" tabindex="-1"></a>                                <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
-<span id="cb150-33"><a href="#cb150-33" tabindex="-1"></a>                                <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-34"><a href="#cb150-34" tabindex="-1"></a>                                    <span class="dt">"static"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"boolean"</span><span class="fu">},</span></span>
-<span id="cb150-35"><a href="#cb150-35" tabindex="-1"></a>                                    <span class="dt">"value"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">}</span></span>
-<span id="cb150-36"><a href="#cb150-36" tabindex="-1"></a>                                <span class="fu">},</span></span>
-<span id="cb150-37"><a href="#cb150-37" tabindex="-1"></a>                                <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"static"</span><span class="ot">,</span> <span class="st">"value"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb150-38"><a href="#cb150-38" tabindex="-1"></a>                                <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
-<span id="cb150-39"><a href="#cb150-39" tabindex="-1"></a>                            <span class="fu">},</span></span>
-<span id="cb150-40"><a href="#cb150-40" tabindex="-1"></a>                            <span class="dt">"organism"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-41"><a href="#cb150-41" tabindex="-1"></a>                                <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
-<span id="cb150-42"><a href="#cb150-42" tabindex="-1"></a>                                <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-43"><a href="#cb150-43" tabindex="-1"></a>                                    <span class="dt">"static"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"boolean"</span><span class="fu">},</span></span>
-<span id="cb150-44"><a href="#cb150-44" tabindex="-1"></a>                                    <span class="dt">"value"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">},</span></span>
-<span id="cb150-45"><a href="#cb150-45" tabindex="-1"></a>                                    <span class="dt">"type"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"enum"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"Scientific name"</span><span class="ot">,</span> <span class="st">"NCBI taxon identifier"</span><span class="ot">]</span><span class="fu">}</span></span>
-<span id="cb150-46"><a href="#cb150-46" tabindex="-1"></a>                                <span class="fu">},</span></span>
-<span id="cb150-47"><a href="#cb150-47" tabindex="-1"></a>                                <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"static"</span><span class="ot">,</span> <span class="st">"value"</span><span class="ot">,</span> <span class="st">"type"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb150-48"><a href="#cb150-48" tabindex="-1"></a>                                <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
-<span id="cb150-49"><a href="#cb150-49" tabindex="-1"></a>                            <span class="fu">},</span></span>
-<span id="cb150-50"><a href="#cb150-50" tabindex="-1"></a>                            <span class="dt">"identifier"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-51"><a href="#cb150-51" tabindex="-1"></a>                                <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
-<span id="cb150-52"><a href="#cb150-52" tabindex="-1"></a>                                <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb150-53"><a href="#cb150-53" tabindex="-1"></a>                                    <span class="dt">"static"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"boolean"</span><span class="fu">},</span></span>
-<span id="cb150-54"><a href="#cb150-54" tabindex="-1"></a>                                    <span class="dt">"value"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">}</span></span>
-<span id="cb150-55"><a href="#cb150-55" tabindex="-1"></a>                                <span class="fu">},</span></span>
-<span id="cb150-56"><a href="#cb150-56" tabindex="-1"></a>                                <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"static"</span><span class="ot">,</span> <span class="st">"value"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb150-57"><a href="#cb150-57" tabindex="-1"></a>                                <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
-<span id="cb150-58"><a href="#cb150-58" tabindex="-1"></a>                            <span class="fu">}</span></span>
-<span id="cb150-59"><a href="#cb150-59" tabindex="-1"></a>                        <span class="fu">},</span></span>
-<span id="cb150-60"><a href="#cb150-60" tabindex="-1"></a>                        <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"be"</span><span class="ot">,</span> <span class="st">"source"</span><span class="ot">,</span> <span class="st">"identifier"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb150-61"><a href="#cb150-61" tabindex="-1"></a>                        <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
-<span id="cb150-62"><a href="#cb150-62" tabindex="-1"></a>                    <span class="fu">}</span></span>
-<span id="cb150-63"><a href="#cb150-63" tabindex="-1"></a>                <span class="fu">},</span></span>
-<span id="cb150-64"><a href="#cb150-64" tabindex="-1"></a>                <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"name"</span><span class="ot">,</span> <span class="st">"fields"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb150-65"><a href="#cb150-65" tabindex="-1"></a>                <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
-<span id="cb150-66"><a href="#cb150-66" tabindex="-1"></a>            <span class="fu">}</span></span>
-<span id="cb150-67"><a href="#cb150-67" tabindex="-1"></a>        <span class="fu">}</span></span>
-<span id="cb150-68"><a href="#cb150-68" tabindex="-1"></a>    <span class="fu">},</span></span>
-<span id="cb150-69"><a href="#cb150-69" tabindex="-1"></a>    <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"$schema"</span><span class="ot">,</span> <span class="st">"$id"</span><span class="ot">,</span> <span class="st">"collection"</span><span class="ot">,</span> <span class="st">"resource"</span><span class="ot">,</span> <span class="st">"tables"</span><span class="ot">]</span><span class="fu">,</span></span>
-<span id="cb150-70"><a href="#cb150-70" tabindex="-1"></a>    <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
-<span id="cb150-71"><a href="#cb150-71" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb151"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb151-1"><a href="#cb151-1" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb151-2"><a href="#cb151-2" tabindex="-1"></a>   <span class="dt">"$schema"</span><span class="fu">:</span> <span class="st">"https://json-schema.org/draft/2019-09/schema"</span><span class="fu">,</span></span>
+<span id="cb151-3"><a href="#cb151-3" tabindex="-1"></a>   <span class="dt">"$id"</span><span class="fu">:</span><span class="st">"TKCat_BE_collection_1.0"</span><span class="fu">,</span></span>
+<span id="cb151-4"><a href="#cb151-4" tabindex="-1"></a>    <span class="dt">"title"</span><span class="fu">:</span> <span class="st">"BE collection"</span><span class="fu">,</span></span>
+<span id="cb151-5"><a href="#cb151-5" tabindex="-1"></a>    <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
+<span id="cb151-6"><a href="#cb151-6" tabindex="-1"></a>    <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"Collection of biological entity (BE) concepts"</span><span class="fu">,</span></span>
+<span id="cb151-7"><a href="#cb151-7" tabindex="-1"></a>    <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-8"><a href="#cb151-8" tabindex="-1"></a>      <span class="dt">"$schema"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"enum"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"TKCat_BE_collection_1.0"</span><span class="ot">]</span><span class="fu">},</span></span>
+<span id="cb151-9"><a href="#cb151-9" tabindex="-1"></a>      <span class="dt">"$id"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">},</span></span>
+<span id="cb151-10"><a href="#cb151-10" tabindex="-1"></a>        <span class="dt">"collection"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"enum"</span><span class="fu">:</span><span class="ot">[</span><span class="st">"BE"</span><span class="ot">]</span><span class="fu">},</span></span>
+<span id="cb151-11"><a href="#cb151-11" tabindex="-1"></a>        <span class="dt">"resource"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">},</span></span>
+<span id="cb151-12"><a href="#cb151-12" tabindex="-1"></a>        <span class="dt">"tables"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-13"><a href="#cb151-13" tabindex="-1"></a>            <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"array"</span><span class="fu">,</span></span>
+<span id="cb151-14"><a href="#cb151-14" tabindex="-1"></a>            <span class="dt">"minItems"</span><span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span></span>
+<span id="cb151-15"><a href="#cb151-15" tabindex="-1"></a>            <span class="dt">"items"</span><span class="fu">:{</span></span>
+<span id="cb151-16"><a href="#cb151-16" tabindex="-1"></a>                <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
+<span id="cb151-17"><a href="#cb151-17" tabindex="-1"></a>                <span class="dt">"properties"</span><span class="fu">:{</span></span>
+<span id="cb151-18"><a href="#cb151-18" tabindex="-1"></a>                    <span class="dt">"name"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">},</span></span>
+<span id="cb151-19"><a href="#cb151-19" tabindex="-1"></a>                    <span class="dt">"fields"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-20"><a href="#cb151-20" tabindex="-1"></a>                        <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
+<span id="cb151-21"><a href="#cb151-21" tabindex="-1"></a>                        <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-22"><a href="#cb151-22" tabindex="-1"></a>                            <span class="dt">"be"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-23"><a href="#cb151-23" tabindex="-1"></a>                                <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
+<span id="cb151-24"><a href="#cb151-24" tabindex="-1"></a>                                <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-25"><a href="#cb151-25" tabindex="-1"></a>                                    <span class="dt">"static"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"boolean"</span><span class="fu">},</span></span>
+<span id="cb151-26"><a href="#cb151-26" tabindex="-1"></a>                                    <span class="dt">"value"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">}</span></span>
+<span id="cb151-27"><a href="#cb151-27" tabindex="-1"></a>                                <span class="fu">},</span></span>
+<span id="cb151-28"><a href="#cb151-28" tabindex="-1"></a>                                <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"static"</span><span class="ot">,</span> <span class="st">"value"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb151-29"><a href="#cb151-29" tabindex="-1"></a>                                <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb151-30"><a href="#cb151-30" tabindex="-1"></a>                            <span class="fu">},</span></span>
+<span id="cb151-31"><a href="#cb151-31" tabindex="-1"></a>                            <span class="dt">"source"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-32"><a href="#cb151-32" tabindex="-1"></a>                                <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
+<span id="cb151-33"><a href="#cb151-33" tabindex="-1"></a>                                <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-34"><a href="#cb151-34" tabindex="-1"></a>                                    <span class="dt">"static"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"boolean"</span><span class="fu">},</span></span>
+<span id="cb151-35"><a href="#cb151-35" tabindex="-1"></a>                                    <span class="dt">"value"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">}</span></span>
+<span id="cb151-36"><a href="#cb151-36" tabindex="-1"></a>                                <span class="fu">},</span></span>
+<span id="cb151-37"><a href="#cb151-37" tabindex="-1"></a>                                <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"static"</span><span class="ot">,</span> <span class="st">"value"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb151-38"><a href="#cb151-38" tabindex="-1"></a>                                <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb151-39"><a href="#cb151-39" tabindex="-1"></a>                            <span class="fu">},</span></span>
+<span id="cb151-40"><a href="#cb151-40" tabindex="-1"></a>                            <span class="dt">"organism"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-41"><a href="#cb151-41" tabindex="-1"></a>                                <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
+<span id="cb151-42"><a href="#cb151-42" tabindex="-1"></a>                                <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-43"><a href="#cb151-43" tabindex="-1"></a>                                    <span class="dt">"static"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"boolean"</span><span class="fu">},</span></span>
+<span id="cb151-44"><a href="#cb151-44" tabindex="-1"></a>                                    <span class="dt">"value"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">},</span></span>
+<span id="cb151-45"><a href="#cb151-45" tabindex="-1"></a>                                    <span class="dt">"type"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"enum"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"Scientific name"</span><span class="ot">,</span> <span class="st">"NCBI taxon identifier"</span><span class="ot">]</span><span class="fu">}</span></span>
+<span id="cb151-46"><a href="#cb151-46" tabindex="-1"></a>                                <span class="fu">},</span></span>
+<span id="cb151-47"><a href="#cb151-47" tabindex="-1"></a>                                <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"static"</span><span class="ot">,</span> <span class="st">"value"</span><span class="ot">,</span> <span class="st">"type"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb151-48"><a href="#cb151-48" tabindex="-1"></a>                                <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb151-49"><a href="#cb151-49" tabindex="-1"></a>                            <span class="fu">},</span></span>
+<span id="cb151-50"><a href="#cb151-50" tabindex="-1"></a>                            <span class="dt">"identifier"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-51"><a href="#cb151-51" tabindex="-1"></a>                                <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
+<span id="cb151-52"><a href="#cb151-52" tabindex="-1"></a>                                <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb151-53"><a href="#cb151-53" tabindex="-1"></a>                                    <span class="dt">"static"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"boolean"</span><span class="fu">},</span></span>
+<span id="cb151-54"><a href="#cb151-54" tabindex="-1"></a>                                    <span class="dt">"value"</span><span class="fu">:</span> <span class="fu">{</span><span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">}</span></span>
+<span id="cb151-55"><a href="#cb151-55" tabindex="-1"></a>                                <span class="fu">},</span></span>
+<span id="cb151-56"><a href="#cb151-56" tabindex="-1"></a>                                <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"static"</span><span class="ot">,</span> <span class="st">"value"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb151-57"><a href="#cb151-57" tabindex="-1"></a>                                <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb151-58"><a href="#cb151-58" tabindex="-1"></a>                            <span class="fu">}</span></span>
+<span id="cb151-59"><a href="#cb151-59" tabindex="-1"></a>                        <span class="fu">},</span></span>
+<span id="cb151-60"><a href="#cb151-60" tabindex="-1"></a>                        <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"be"</span><span class="ot">,</span> <span class="st">"source"</span><span class="ot">,</span> <span class="st">"identifier"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb151-61"><a href="#cb151-61" tabindex="-1"></a>                        <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb151-62"><a href="#cb151-62" tabindex="-1"></a>                    <span class="fu">}</span></span>
+<span id="cb151-63"><a href="#cb151-63" tabindex="-1"></a>                <span class="fu">},</span></span>
+<span id="cb151-64"><a href="#cb151-64" tabindex="-1"></a>                <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"name"</span><span class="ot">,</span> <span class="st">"fields"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb151-65"><a href="#cb151-65" tabindex="-1"></a>                <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb151-66"><a href="#cb151-66" tabindex="-1"></a>            <span class="fu">}</span></span>
+<span id="cb151-67"><a href="#cb151-67" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb151-68"><a href="#cb151-68" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb151-69"><a href="#cb151-69" tabindex="-1"></a>    <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span><span class="st">"$schema"</span><span class="ot">,</span> <span class="st">"$id"</span><span class="ot">,</span> <span class="st">"collection"</span><span class="ot">,</span> <span class="st">"resource"</span><span class="ot">,</span> <span class="st">"tables"</span><span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb151-70"><a href="#cb151-70" tabindex="-1"></a>    <span class="dt">"additionalProperties"</span><span class="fu">:</span> <span class="kw">false</span></span>
+<span id="cb151-71"><a href="#cb151-71" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <p>A collection should refer to the <code>"TKCat_collections_1.0"</code>
 <strong>$schema</strong>. It should then have the following
 properties:</p>
@@ -1915,7 +1914,7 @@ indicate how organisms are identified: <code>"Scientific name"</code> or
 <p>The main specifications defined in a JSON document can be simply
 displayed in R session by calling the <code><a href="../reference/show_collection_def.html">show_collection_def()</a></code>
 function.</p>
-<div class="sourceCode" id="cb151"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb152"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_local_collection.html">get_local_collection</a></span><span class="op">(</span><span class="st">"BE"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>   <span class="fu"><a href="../reference/show_collection_def.html">show_collection_def</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## BE collection: Collection of biological entity (BE) concepts</span></span>
@@ -1941,46 +1940,46 @@ function.</p>
 using the <code><a href="../reference/add_collection_member.html">add_collection_member()</a></code> function (as <a href="#min-coll-memb">formerly described</a>), or by writing a JSON file
 like the following one which correspond to BE members of the CHEMBL
 MDB.</p>
-<div class="sourceCode" id="cb153"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb154"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
 <span>   <span class="st">"examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json"</span>,</span>
 <span>   package<span class="op">=</span><span class="st">"TKCat"</span></span>
 <span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span>collapse<span class="op">=</span><span class="st">"\n"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb154"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb154-1"><a href="#cb154-1" tabindex="-1"></a><span class="fu">{</span></span>
-<span id="cb154-2"><a href="#cb154-2" tabindex="-1"></a>  <span class="dt">"$schema"</span><span class="fu">:</span> <span class="st">"TKCat_BE_collection_1.0"</span><span class="fu">,</span></span>
-<span id="cb154-3"><a href="#cb154-3" tabindex="-1"></a>  <span class="dt">"$id"</span><span class="fu">:</span> <span class="st">"CHEMBL_BE_1.0"</span><span class="fu">,</span></span>
-<span id="cb154-4"><a href="#cb154-4" tabindex="-1"></a>  <span class="dt">"collection"</span><span class="fu">:</span> <span class="st">"BE"</span><span class="fu">,</span></span>
-<span id="cb154-5"><a href="#cb154-5" tabindex="-1"></a>  <span class="dt">"resource"</span><span class="fu">:</span> <span class="st">"CHEMBL"</span><span class="fu">,</span></span>
-<span id="cb154-6"><a href="#cb154-6" tabindex="-1"></a>  <span class="dt">"tables"</span><span class="fu">:</span> <span class="ot">[</span></span>
-<span id="cb154-7"><a href="#cb154-7" tabindex="-1"></a>    <span class="fu">{</span></span>
-<span id="cb154-8"><a href="#cb154-8" tabindex="-1"></a>      <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"CHEMBL_component_sequence"</span><span class="fu">,</span></span>
-<span id="cb154-9"><a href="#cb154-9" tabindex="-1"></a>      <span class="dt">"fields"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb154-10"><a href="#cb154-10" tabindex="-1"></a>        <span class="dt">"be"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb154-11"><a href="#cb154-11" tabindex="-1"></a>          <span class="dt">"static"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
-<span id="cb154-12"><a href="#cb154-12" tabindex="-1"></a>          <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"Peptide"</span></span>
-<span id="cb154-13"><a href="#cb154-13" tabindex="-1"></a>        <span class="fu">},</span></span>
-<span id="cb154-14"><a href="#cb154-14" tabindex="-1"></a>        <span class="dt">"identifier"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb154-15"><a href="#cb154-15" tabindex="-1"></a>          <span class="dt">"static"</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
-<span id="cb154-16"><a href="#cb154-16" tabindex="-1"></a>          <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"accession"</span></span>
-<span id="cb154-17"><a href="#cb154-17" tabindex="-1"></a>        <span class="fu">},</span></span>
-<span id="cb154-18"><a href="#cb154-18" tabindex="-1"></a>        <span class="dt">"source"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb154-19"><a href="#cb154-19" tabindex="-1"></a>          <span class="dt">"static"</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
-<span id="cb154-20"><a href="#cb154-20" tabindex="-1"></a>          <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"db_source"</span></span>
-<span id="cb154-21"><a href="#cb154-21" tabindex="-1"></a>        <span class="fu">},</span></span>
-<span id="cb154-22"><a href="#cb154-22" tabindex="-1"></a>        <span class="dt">"organism"</span><span class="fu">:</span> <span class="fu">{</span></span>
-<span id="cb154-23"><a href="#cb154-23" tabindex="-1"></a>          <span class="dt">"static"</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
-<span id="cb154-24"><a href="#cb154-24" tabindex="-1"></a>          <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"organism"</span><span class="fu">,</span></span>
-<span id="cb154-25"><a href="#cb154-25" tabindex="-1"></a>          <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"Scientific name"</span></span>
-<span id="cb154-26"><a href="#cb154-26" tabindex="-1"></a>        <span class="fu">}</span></span>
-<span id="cb154-27"><a href="#cb154-27" tabindex="-1"></a>      <span class="fu">}</span></span>
-<span id="cb154-28"><a href="#cb154-28" tabindex="-1"></a>    <span class="fu">}</span></span>
-<span id="cb154-29"><a href="#cb154-29" tabindex="-1"></a>  <span class="ot">]</span></span>
-<span id="cb154-30"><a href="#cb154-30" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb155"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb155-1"><a href="#cb155-1" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb155-2"><a href="#cb155-2" tabindex="-1"></a>  <span class="dt">"$schema"</span><span class="fu">:</span> <span class="st">"TKCat_BE_collection_1.0"</span><span class="fu">,</span></span>
+<span id="cb155-3"><a href="#cb155-3" tabindex="-1"></a>  <span class="dt">"$id"</span><span class="fu">:</span> <span class="st">"CHEMBL_BE_1.0"</span><span class="fu">,</span></span>
+<span id="cb155-4"><a href="#cb155-4" tabindex="-1"></a>  <span class="dt">"collection"</span><span class="fu">:</span> <span class="st">"BE"</span><span class="fu">,</span></span>
+<span id="cb155-5"><a href="#cb155-5" tabindex="-1"></a>  <span class="dt">"resource"</span><span class="fu">:</span> <span class="st">"CHEMBL"</span><span class="fu">,</span></span>
+<span id="cb155-6"><a href="#cb155-6" tabindex="-1"></a>  <span class="dt">"tables"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb155-7"><a href="#cb155-7" tabindex="-1"></a>    <span class="fu">{</span></span>
+<span id="cb155-8"><a href="#cb155-8" tabindex="-1"></a>      <span class="dt">"name"</span><span class="fu">:</span> <span class="st">"CHEMBL_component_sequence"</span><span class="fu">,</span></span>
+<span id="cb155-9"><a href="#cb155-9" tabindex="-1"></a>      <span class="dt">"fields"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb155-10"><a href="#cb155-10" tabindex="-1"></a>        <span class="dt">"be"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb155-11"><a href="#cb155-11" tabindex="-1"></a>          <span class="dt">"static"</span><span class="fu">:</span> <span class="kw">true</span><span class="fu">,</span></span>
+<span id="cb155-12"><a href="#cb155-12" tabindex="-1"></a>          <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"Peptide"</span></span>
+<span id="cb155-13"><a href="#cb155-13" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb155-14"><a href="#cb155-14" tabindex="-1"></a>        <span class="dt">"identifier"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb155-15"><a href="#cb155-15" tabindex="-1"></a>          <span class="dt">"static"</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb155-16"><a href="#cb155-16" tabindex="-1"></a>          <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"accession"</span></span>
+<span id="cb155-17"><a href="#cb155-17" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb155-18"><a href="#cb155-18" tabindex="-1"></a>        <span class="dt">"source"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb155-19"><a href="#cb155-19" tabindex="-1"></a>          <span class="dt">"static"</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb155-20"><a href="#cb155-20" tabindex="-1"></a>          <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"db_source"</span></span>
+<span id="cb155-21"><a href="#cb155-21" tabindex="-1"></a>        <span class="fu">},</span></span>
+<span id="cb155-22"><a href="#cb155-22" tabindex="-1"></a>        <span class="dt">"organism"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb155-23"><a href="#cb155-23" tabindex="-1"></a>          <span class="dt">"static"</span><span class="fu">:</span> <span class="kw">false</span><span class="fu">,</span></span>
+<span id="cb155-24"><a href="#cb155-24" tabindex="-1"></a>          <span class="dt">"value"</span><span class="fu">:</span> <span class="st">"organism"</span><span class="fu">,</span></span>
+<span id="cb155-25"><a href="#cb155-25" tabindex="-1"></a>          <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"Scientific name"</span></span>
+<span id="cb155-26"><a href="#cb155-26" tabindex="-1"></a>        <span class="fu">}</span></span>
+<span id="cb155-27"><a href="#cb155-27" tabindex="-1"></a>      <span class="fu">}</span></span>
+<span id="cb155-28"><a href="#cb155-28" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb155-29"><a href="#cb155-29" tabindex="-1"></a>  <span class="ot">]</span></span>
+<span id="cb155-30"><a href="#cb155-30" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
 <p>The identification of collection members should fulfill the
 requirements defined by the collection JSON document, and therefore pass
 the following validation.</p>
-<div class="sourceCode" id="cb155"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb156"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">jsonvalidate</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/jsonvalidate/reference/json_validate.html" class="external-link">json_validate</a></span><span class="op">(</span></span>
 <span>   json<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span></span>
 <span>      <span class="st">"examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json"</span>,</span>
@@ -2008,9 +2007,9 @@ needs, these functions could be provided using the <code>funs</code>
 pre-recorded in TKCat, one for the <em>BE</em> collection and one for
 the <em>Condition</em> collection. They can be retrieved with the
 <code><a href="../reference/get_collection_mapper.html">get_collection_mapper()</a></code> function.</p>
-<div class="sourceCode" id="cb157"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_collection_mapper.html">get_collection_mapper</a></span><span class="op">(</span><span class="st">"BE"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb158"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_collection_mapper.html">get_collection_mapper</a></span><span class="op">(</span><span class="st">"BE"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb159"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">function</span> <span class="op">(</span><span class="va">x</span>, <span class="va">y</span>, <span class="va">orthologs</span> <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">restricted</span> <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span> </span>
 <span><span class="op">{</span></span>
 <span>    <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BED"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
@@ -2131,7 +2130,7 @@ format are modeled in ReDaMoR as a 3 columns table: one of type “row”
 corresponding to the row names of the matrix, one of type “column”
 corresponding to the column names of the matrix, and one of any type
 (excepted “row”, “column”, or “base64”).</p>
-<div class="sourceCode" id="cb159"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb160"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">40</span><span class="op">)</span>, nrow<span class="op">=</span><span class="fl">10</span>,</span>
 <span>   dimnames<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -2159,7 +2158,7 @@ corresponding to the column names of the matrix, and one of any type
 <p>Whole documents can be stored in MDB as “base64” character values.
 The example below shows how a document can be put in a table and the
 corresponding data model.</p>
-<div class="sourceCode" id="cb160"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb161"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ch_config_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>   name<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"config.xml"</span>, <span class="st">"users.xml"</span><span class="op">)</span>,</span>
 <span>   file<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
@@ -2251,7 +2250,7 @@ MyGene.info: Organizing Online, Gene-Centric Information.”</span>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.2.</p>
 </div>
 
     </footer>

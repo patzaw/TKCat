@@ -1127,8 +1127,17 @@ TKCat](TKCat-KMR-POK.html).
 
 The ClickHouse docker container supporting TKCat, its initialization and its
 configuration procedures are implemented here:
-[S01-install-and-init.R](https://github.com/patzaw/TKCat/blob/master/ClickHouse/S01-install-and-init.R).
-This script should be adapted according to requirements and needs.
+[docker](https://github.com/patzaw/TKCat/blob/master/ClickHouse/docker).
+
+1. Update the *Dockerfile* to select the version of ClickHouse to use.
+
+2. Customize and run the following script.
+
+```{sh, eval=FALSE}
+
+sh launch-tkcat-instance.sh
+
+```
 
 Specific attention should be paid on available ports: TCP native port
 (but not TLS wrapping yet) is supported by the [RClickhouse][rclickhouse] R
@@ -1139,17 +1148,16 @@ The data are stored in the `TKCAT_HOME` folder.
 
 #### Cleaning and removing a TKCat instance
 
-When no longer needed, stoping and removing the docker container can be
+When no longer needed, stooping and removing the docker container can be
 achieved as exemplified below
 
 ```{sh, eval=FALSE}
 # In shell
-docker stop tkcat_test
-docker rm tkcat_test
+docker stop test_tkcat
+docker rm test_tkcat
 docker volume prune -f
 # Remove the folder with all the data: `$TKCAT_HOME`.`
-sudo rm -rf ~/Documents/Projects/TKCat_Test
-
+sudo rm -rf /mnt/data1/pgodard/Services-test/test_tkcat_2025.04.18
 ```
 
 ### User management
