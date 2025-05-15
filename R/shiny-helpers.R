@@ -1523,6 +1523,14 @@ TKCAT_LOGO_DIV <- shiny::div(
                   }else{
                      NULL
                   },
+                  if(!is.na(k$chcon@host_path)){
+                     shiny::tags$li(
+                        shiny::tags$strong("Host path"), ":",
+                        k$chcon@host_path
+                     )
+                  }else{
+                     NULL
+                  },
                   shiny::tags$li(
                      shiny::tags$strong("Current user"), ":",
                      k$chcon@user

@@ -6,6 +6,8 @@
 - Avoid some nested joins in ClickHouse
 - Correct query for listing MDBs
 - Correct shiny explorer error with not populated MDB
+- Update shiny explorer to show host_path in system tab
+- Simplification of ClickHouse instantiation
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->

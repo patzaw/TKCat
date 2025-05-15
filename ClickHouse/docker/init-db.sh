@@ -7,8 +7,8 @@ if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
     touch $CONTAINER_ALREADY_STARTED
     echo "-- First container startup --"
 
-    cp /users-1.xml /etc/clickhouse-server/users.xml
-    cp /default-user-1.xml /etc/clickhouse-server/users.d/default-user.xml
+    cp /users.xml /etc/clickhouse-server/users.xml
+    cp /default-user.xml /etc/clickhouse-server/users.d/default-user.xml
     sleep 2
 
     clickhouse client -q "CREATE TABLE default.System (name String, instance String, version String, contact String, path String) ENGINE = MergeTree() ORDER BY tuple();"
@@ -23,7 +23,6 @@ if [ ! -e $CONTAINER_ALREADY_STARTED ]; then
    if [ -e "/etc/clickhouse-server/users.d/default-user.xml" ]; then
       rm -rf "/etc/clickhouse-server/users.d/default-user.xml"
    fi
-   cp /users-2.xml /etc/clickhouse-server/users.xml
    cp /remove_default_user.yaml /etc/clickhouse-server/users.d/remove_default_user.yaml
    sleep 2
 
