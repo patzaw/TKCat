@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">TKCat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">Patrice
 Godard</h4>
             
-            <h4 data-toc-skip class="date">May 15, 2025</h4>
+            <h4 data-toc-skip class="date">May 19, 2025</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/patzaw/TKCat/blob/HEAD/vignettes/TKCat.Rmd" class="external-link"><code>vignettes/TKCat.Rmd</code></a></small>
       <div class="d-none name"><code>TKCat.Rmd</code></div>
@@ -449,7 +449,7 @@ to document the data themselves.</li>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-05-15 10:43:28.890189</span></span>
+<span><span class="co">## Timestamp: 2025-05-19 18:25:10.027737</span></span>
 <span><span class="co">## </span></span></code></pre>
 </div>
 <div class="section level3">
@@ -489,7 +489,7 @@ statement displayed when printing the object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-05-15 10:43:28.890189</span></span>
+<span><span class="co">## Timestamp: 2025-05-19 18:25:10.027737</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -590,7 +590,7 @@ MDB object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-05-15 10:43:28.890189</span></span>
+<span><span class="co">## Timestamp: 2025-05-19 18:25:10.027737</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -652,7 +652,7 @@ the corresponding documentation from it back in R:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-05-15 10:43:28</span></span>
+<span><span class="co">## Timestamp: 2025-05-19 18:25:10</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -1454,53 +1454,53 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <em>TKCat</em> object.</p>
 <div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/list_MDBs.html">list_MDBs</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>             <span class="co"># get a specific MDBs from the catalog</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 25 × 12</span></span></span>
-<span><span class="co">##    title  description url   version maintainer public name  populated timestamps</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> ChEMB… ChEMBL is … http… 1.0.0   [Patrice … TRUE   ChEM… TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Data … Clarivate … http… 0.0.1   [Patrice … TRUE   Cort… TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Bulk … Re-interpr… http… 0.01    [Patrice … TRUE   DRE-… TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Bulk … Re-interpr… http… 0.01    [Patrice … TRUE   FCD-… TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> The G… Because of… http… 1.0.0   [Patrice … TRUE   GO    TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Genot… The Adult … http… 0.01    [Patrice … TRUE   GTEx  TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Data … Biorelate'… <span style="color: #BB0000;">NA</span>    1.1.0   [Patrice … TRUE   Gala… TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Data … GlobalData… http… 0.0.1   [Patrice … TRUE   Glob… TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Annot… The HUGO G… http… 0.0.1   [Patrice … TRUE   HGNC  TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> The H… The Human … http… 0.0.1   [Patrice … TRUE   HPA   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 15 more rows</span></span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 24 × 12</span></span></span>
+<span><span class="co">##    name   title description url   version maintainer public populated timestamps</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> ChEMBL ChEM… ChEMBL is … http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Corte… Data… Clarivate … http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> DRE-B… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> FCD-T… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> GO     The … Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> GTEx   Geno… The Adult … http… 0.01    [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Galac… Data… Biorelate'… http… 1.1.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Globa… Data… GlobalData… http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> HGNC   Anno… The HUGO G… http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> HPA    The … The Human … http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 14 more rows</span></span></span>
 <span><span class="co">## <span style="color: #949494;"># ℹ 3 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;, total_size &lt;dbl&gt;</span></span></span></code></pre>
 <div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_tables.html">search_MDB_tables</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search table about "disease"</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 48 × 3</span></span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 47 × 3</span></span></span>
 <span><span class="co">##    resource name                         comment                                </span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> ChEMBL   assay_classification         Classification scheme for phenotypic a…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Monarch  Diseases                     <span style="color: #BB0000;">NA</span>                                     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Monarch  Diseases_descendants         <span style="color: #BB0000;">NA</span>                                     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Monarch  Diseases_mode_of_inheritance <span style="color: #BB0000;">NA</span>                                     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> Monarch  Diseases_parents             <span style="color: #BB0000;">NA</span>                                     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Monarch  Diseases_phenotypes          <span style="color: #BB0000;">NA</span>                                     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Monarch  Diseases_related             <span style="color: #BB0000;">NA</span>                                     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Monarch  Diseases_synonyms            <span style="color: #BB0000;">NA</span>                                     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Monarch  Diseases_xref                <span style="color: #BB0000;">NA</span>                                     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> Monarch  Genes_diseases               <span style="color: #BB0000;">NA</span>                                     </span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 38 more rows</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> ChEMBL   assay_classification         <span style="color: #949494;">"</span>Classification scheme for phenotypic …</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Galactic status                       <span style="color: #949494;">"</span>Cause-and-effect interactions can be …</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Monarch  Diseases                      <span style="color: #BB0000;">NA</span>                                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Monarch  Diseases_descendants          <span style="color: #BB0000;">NA</span>                                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> Monarch  Diseases_mode_of_inheritance  <span style="color: #BB0000;">NA</span>                                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Monarch  Diseases_parents              <span style="color: #BB0000;">NA</span>                                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Monarch  Diseases_phenotypes           <span style="color: #BB0000;">NA</span>                                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Monarch  Diseases_related              <span style="color: #BB0000;">NA</span>                                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Monarch  Diseases_synonyms             <span style="color: #BB0000;">NA</span>                                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> Monarch  Diseases_xref                 <span style="color: #BB0000;">NA</span>                                    </span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 37 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_fields.html">search_MDB_fields</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search a field about "disease"</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 126 × 7</span></span></span>
-<span><span class="co">##    resource              table               name  comment type  nullable unique</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> FCD-TLE-Bulk-RNA-2019 conditions          cond… Disease char… TRUE     TRUE  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> FCD-TLE-Bulk-RNA-2019 samples             cond… Disease char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> OpenTargets           Diseases_and_Pheno… code  Diseas… char… FALSE    TRUE  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> OpenTargets           Diseases_and_Pheno… desc… Descri… char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> OpenTargets           Associations_by_so… dise… Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> OpenTargets           Associations_by_ty… dise… Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> OpenTargets           Associations_overa… dise… Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> OpenTargets           Diseases_ancestors  dise… Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> OpenTargets           Diseases_children   dise… Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> OpenTargets           Diseases_descendan… dise… Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 116 more rows</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 124 × 7</span></span></span>
+<span><span class="co">##    resource              table            name     comment type  nullable unique</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> FCD-TLE-Bulk-RNA-2019 conditions       conditi… Disease char… TRUE     TRUE  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> FCD-TLE-Bulk-RNA-2019 samples          conditi… Disease char… TRUE     FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> HPO                   Disease_HP       db       Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> HPO                   Disease_synonyms db       Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> HPO                   Diseases         db       Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> HPO                   Disease_HP       id       Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> HPO                   Disease_synonyms id       Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> HPO                   Diseases         id       Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> HPO                   Diseases         label    Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> HPO                   Disease_synonyms synonym  Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 114 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/collection_members.html">collection_members</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>  </span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 43 × 3</span></span></span>
@@ -1549,7 +1549,7 @@ object as shown below.</p>
 <span>   <span class="va">ch_hpo</span>,</span>
 <span>   query<span class="op">=</span><span class="st">"SELECT * from HPO_diseases WHERE lower(label) LIKE '%epilep%'"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 288 × 3</span></span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 292 × 3</span></span></span>
 <span><span class="co">##    db    id     label                                                           </span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                           </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 1</span> OMIM  117100 Centralopathic epilepsy                                         </span></span>
@@ -1562,7 +1562,7 @@ object as shown below.</p>
 <span><span class="co">## <span style="color: #BCBCBC;"> 8</span> OMIM  213000 Cerebellar hypoplasia/atrophy, epilepsy, and global development…</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 9</span> OMIM  226800 Epilepsy, photogenic, with spastic diplegia and mental retardat…</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span> OMIM  226810 Celiac disease, epilepsy and cerebral calcification syndrome    </span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 278 more rows</span></span></span></code></pre>
+<span><span class="co">## <span style="color: #949494;"># ℹ 282 more rows</span></span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -1595,7 +1595,7 @@ Management (KMR) in TKCat</a>.</p>
 <h5 id="install-clickhouse-initialize-and-configure-the-tkcat-instance">Install ClickHouse, initialize and configure the TKCat instance<a class="anchor" aria-label="anchor" href="#install-clickhouse-initialize-and-configure-the-tkcat-instance"></a>
 </h5>
 <p>The ClickHouse docker container supporting TKCat, its initialization
-and its configuration procedures are implemented here: <a href="https://github.com/patzaw/TKCat/blob/master/ClickHouse/docker" class="external-link">docker</a>.</p>
+and its configuration procedures are implemented here: <a href="https://github.com/patzaw/TKCat/tree/master/ClickHouse/docker" class="external-link">docker</a>.</p>
 <ol style="list-style-type: decimal">
 <li><p>Update the <em>Dockerfile</em> to select the version of
 ClickHouse to use.</p></li>

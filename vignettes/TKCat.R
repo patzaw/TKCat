@@ -365,15 +365,25 @@ c(k, TKCat(file_chembl))         # Merge 2 TKCat objects
 ## The following line is to avoid building errors on CRAN
 knitr::opts_chunk$set(eval=Sys.getenv("USER") %in% c("pgodard"))
 
-## -----------------------------------------------------------------------------
+## ----eval=TRUE, echo=FALSE----------------------------------------------------
 k <- chTKCat(
    host="localhost",                     # default parameter
-   port=9111L,                           # default parameter
+   port=9113L,                           # default parameter
    drv=ClickHouseHTTP::ClickHouseHTTP(), # default parameter
    user="default",                       # default parameter
    password=""                           # if not provided the
                                          # password is requested interactively 
 )
+
+## ----eval=FALSE, echo=TRUE----------------------------------------------------
+# k <- chTKCat(
+#    host="localhost",                     # default parameter
+#    port=9111L,                           # default parameter
+#    drv=ClickHouseHTTP::ClickHouseHTTP(), # default parameter
+#    user="default",                       # default parameter
+#    password=""                           # if not provided the
+#                                          # password is requested interactively
+# )
 
 ## -----------------------------------------------------------------------------
 list_MDBs(k)             # get a specific MDBs from the catalog

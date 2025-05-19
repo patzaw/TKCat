@@ -184,7 +184,7 @@ get_hosts.chMDB <- function(x, ...){
 #' if TRUE, make relevant alias to query the chMDB
 #' using the table names from the data model. If FALSE, the user must know the
 #' table instance name in the remote database. By default, autoalias is set
-#' to TRUE when using a non-current instance of the database.
+#' to TRUE.
 #' @param ... Additional parameters for [dbGetQuery()] function.
 #' For the ClickHouseHTTP DBI, `format` can be set to "Arrow" (default) or
 #' "TabSeparatedWithNamesAndTypes"
@@ -195,13 +195,21 @@ get_hosts.chMDB <- function(x, ...){
 #' 
 #' @export
 #'
-get_query.chMDB <- function(x, query, autoalias=!is_current_chMDB(x), ...){
+get_query.chMDB <- function(
+   x, query,
+   # autoalias=!is_current_chMDB(x),
+   autoalias = TRUE,
+   ...
+){
    con <- unclass(x)$tkcon$chcon
    n <- unclass(x)$dbInfo$name
-   DBI::dbSendQuery(con, sprintf("USE `%s`", n))
-   on.exit(DBI::dbSendQuery(con, "USE default"))
+   if(!is.na(unclass(x)$tkcon$chcon@session)){
+      DBI::dbSendQuery(con, sprintf("USE `%s`", n))
+      on.exit(DBI::dbSendQuery(con, "USE default"))
+   }
    if(is.na(autoalias)){
-      autoalias <- FALSE
+      # autoalias <- FALSE
+      autoalias <- TRUE
    }
    if(autoalias){
       dbt <- db_tables(x)$dbTables

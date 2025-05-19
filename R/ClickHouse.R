@@ -49,14 +49,14 @@ list_tables.DBIConnection <- function(
       "SELECT database, name as table, total_rows, total_bytes",
       "FROM system.tables",
       fquery,
-      ")",
+      ") AS q1",
       "LEFT JOIN",
       "(",
       "SELECT database, table, count() as total_columns",
       ", sum(name='___COLNAMES___') as transposed",
       "FROM system.columns",
       "GROUP BY database, table",
-      ")",
+      ") AS q2",
       "USING database, table"
    )
    toRet <- dplyr::as_tibble(DBI::dbGetQuery(

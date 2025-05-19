@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">TKCat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.13</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.14</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'chMDB'</span></span>
-<span><span class="fu">get_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">query</span>, autoalias <span class="op">=</span> <span class="op">!</span><span class="fu"><a href="is_current_chMDB.html">is_current_chMDB</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">get_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">query</span>, autoalias <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for class 'chTKCat'</span></span>
 <span><span class="fu">get_query</span><span class="op">(</span><span class="va">x</span>, <span class="va">query</span>, <span class="va">...</span><span class="op">)</span></span>
@@ -76,7 +76,7 @@
 if TRUE, make relevant alias to query the chMDB
 using the table names from the data model. If FALSE, the user must know the
 table instance name in the remote database. By default, autoalias is set
-to TRUE when using a non-current instance of the database.</p></dd>
+to TRUE.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

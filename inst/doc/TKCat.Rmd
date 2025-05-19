@@ -1004,7 +1004,18 @@ ready for TKCat are described below in the [appendix](#ch-op).
 The connection to the ClickHouse TKCat database is achieved using
 the `chTKCat()` function.
 
-```{r}
+```{r, eval=TRUE, echo=FALSE}
+k <- chTKCat(
+   host="localhost",                     # default parameter
+   port=9113L,                           # default parameter
+   drv=ClickHouseHTTP::ClickHouseHTTP(), # default parameter
+   user="default",                       # default parameter
+   password=""                           # if not provided the
+                                         # password is requested interactively 
+)
+```
+
+```{r, eval=FALSE, echo=TRUE}
 k <- chTKCat(
    host="localhost",                     # default parameter
    port=9111L,                           # default parameter
@@ -1127,7 +1138,7 @@ TKCat](TKCat-KMR-POK.html).
 
 The ClickHouse docker container supporting TKCat, its initialization and its
 configuration procedures are implemented here:
-[docker](https://github.com/patzaw/TKCat/blob/master/ClickHouse/docker).
+[docker](https://github.com/patzaw/TKCat/tree/master/ClickHouse/docker).
 
 1. Update the *Dockerfile* to select the version of ClickHouse to use.
 

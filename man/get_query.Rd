@@ -6,7 +6,7 @@
 \alias{get_query}
 \title{Get SQL query}
 \usage{
-\method{get_query}{chMDB}(x, query, autoalias = !is_current_chMDB(x), ...)
+\method{get_query}{chMDB}(x, query, autoalias = TRUE, ...)
 
 \method{get_query}{chTKCat}(x, query, ...)
 
@@ -21,7 +21,7 @@ get_query(x, query, ...)
 if TRUE, make relevant alias to query the chMDB
 using the table names from the data model. If FALSE, the user must know the
 table instance name in the remote database. By default, autoalias is set
-to TRUE when using a non-current instance of the database.}
+to TRUE.}
 
 \item{...}{method specific parameters}
 }

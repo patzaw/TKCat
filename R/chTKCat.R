@@ -81,12 +81,14 @@ chTKCat <- function(
       host=host,
       port=port,
       user=user, password=ifelse(is.na(password), "", password),
+      settings = settings,
       ...
    )
    
-   
-   for(s in names(settings)){
-      DBI::dbSendQuery(chcon, sprintf("SET %s='%s'", s, settings[[s]]))
+   if(!inherits(chcon, "ClickHouseHTTPConnection")){
+      for(s in names(settings)){
+         DBI::dbSendQuery(chcon, sprintf("SET %s='%s'", s, settings[[s]]))
+      }
    }
    
    toRet <- list(
@@ -377,7 +379,8 @@ db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
             host=con@host,
             port=con@port,
             user=user,
-            password=""
+            password="",
+            settings = x$settings
          ),
          newPar
       )), silent=TRUE)
@@ -395,7 +398,8 @@ db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
                host=con@host,
                port=con@port,
                user=user,
-               password=password
+               password=password,
+               settings = x$settings
             ),
             newPar
          )), silent=TRUE)
@@ -411,13 +415,16 @@ db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
             host=con@host,
             port=con@port,
             user=user,
-            password=password
+            password=password,
+            settings = x$settings
          ),
          newPar
       )), silent=TRUE)
    }
-   for(s in names(x$settings)){
-      DBI::dbSendQuery(ncon, sprintf("SET %s='%s'", s, x$settings[[s]]))
+   if(!inherits(ncon, "ClickHouseHTTPConnection")){
+      for(s in names(x$settings)){
+         DBI::dbSendQuery(ncon, sprintf("SET %s='%s'", s, x$settings[[s]]))
+      }
    }
    
    nv <- x
@@ -1146,15 +1153,15 @@ list_MDBs.chTKCat <- function(x, withInfo=TRUE){
                      paste(
                         "SELECT *, '%s' AS db FROM `%s`.___MDB___ ",
                         " CROSS JOIN ",
-                        " (SELECT * FROM `%s`.___Public___)"
+                        " (SELECT * FROM `%s`.___Public___) AS q12"
                      ),
                      dbNames, dbNames, dbNames
                   ),
                   collapse=" UNION ALL "
                ),
-               ") LEFT JOIN ",
+               ") AS q1 LEFT JOIN ",
                " (SELECT database AS db, total_rows FROM system.tables ",
-               " WHERE name='___Timestamps___') USING db"
+               " WHERE name='___Timestamps___') AS q2 USING db"
             ),
             format="Arrow"
          ) %>% 
