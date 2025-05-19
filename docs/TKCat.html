@@ -7692,7 +7692,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-05-19 18:24:08.871441
+## Timestamp: 2025-05-19 21:35:12.252239
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -7730,7 +7730,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-05-19 18:24:08.871441
+## Timestamp: 2025-05-19 21:35:12.252239
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -7823,7 +7823,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-05-19 18:24:08.871441
+## Timestamp: 2025-05-19 21:35:12.252239
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -7882,7 +7882,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-05-19 18:24:08
+## Timestamp: 2025-05-19 21:35:12
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -8658,29 +8658,29 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 ##    &lt;chr&gt;    &lt;chr&gt;                        &lt;chr&gt;                                  
 ##  1 ChEMBL   assay_classification         &quot;Classification scheme for phenotypic …
 ##  2 Galactic status                       &quot;Cause-and-effect interactions can be …
-##  3 Monarch  Diseases                      &lt;NA&gt;                                  
-##  4 Monarch  Diseases_descendants          &lt;NA&gt;                                  
-##  5 Monarch  Diseases_mode_of_inheritance  &lt;NA&gt;                                  
-##  6 Monarch  Diseases_parents              &lt;NA&gt;                                  
-##  7 Monarch  Diseases_phenotypes           &lt;NA&gt;                                  
-##  8 Monarch  Diseases_related              &lt;NA&gt;                                  
-##  9 Monarch  Diseases_synonyms             &lt;NA&gt;                                  
-## 10 Monarch  Diseases_xref                 &lt;NA&gt;                                  
+##  3 HPA      Disease_involvement           &lt;NA&gt;                                  
+##  4 HPO      Disease_HP                   &quot;HP presented by diseases&quot;             
+##  5 HPO      Disease_synonyms             &quot;Disease synonyms&quot;                     
+##  6 HPO      Diseases                     &quot;Diseases&quot;                             
+##  7 Monarch  Diseases                      &lt;NA&gt;                                  
+##  8 Monarch  Diseases_descendants          &lt;NA&gt;                                  
+##  9 Monarch  Diseases_mode_of_inheritance  &lt;NA&gt;                                  
+## 10 Monarch  Diseases_parents              &lt;NA&gt;                                  
 ## # ℹ 37 more rows</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 124 × 7
 ##    resource              table               name  comment type  nullable unique
 ##    &lt;chr&gt;                 &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; &lt;lgl&gt;    &lt;lgl&gt; 
-##  1 FCD-TLE-Bulk-RNA-2019 conditions          cond… &quot;Disea… char… TRUE     TRUE  
-##  2 FCD-TLE-Bulk-RNA-2019 samples             cond… &quot;Disea… char… TRUE     FALSE 
-##  3 DRE-Bulk-RNA-UMC-2024 conditions          cond… &quot;Disea… char… TRUE     FALSE 
-##  4 DRE-Bulk-RNA-UMC-2024 samples             cond… &quot;Disea… char… TRUE     FALSE 
-##  5 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… &quot;&quot;      char… FALSE    FALSE 
-##  6 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… &quot;&quot;      char… FALSE    FALSE 
-##  7 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… &quot;&quot;      nume… FALSE    FALSE 
-##  8 DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… &quot;&quot;      char… FALSE    FALSE 
-##  9 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… &quot;&quot;      char… FALSE    FALSE 
-## 10 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… &quot;&quot;      char… FALSE    FALSE 
+##  1 FCD-TLE-Bulk-RNA-2019 conditions          cond… Disease char… TRUE     TRUE  
+##  2 FCD-TLE-Bulk-RNA-2019 samples             cond… Disease char… TRUE     FALSE 
+##  3 OpenTargets           Diseases_and_Pheno… code  Diseas… char… FALSE    TRUE  
+##  4 OpenTargets           Diseases_and_Pheno… desc… Descri… char… TRUE     FALSE 
+##  5 OpenTargets           Associations_by_so… dise… Diseas… char… FALSE    FALSE 
+##  6 OpenTargets           Associations_by_ty… dise… Diseas… char… FALSE    FALSE 
+##  7 OpenTargets           Associations_overa… dise… Diseas… char… FALSE    FALSE 
+##  8 OpenTargets           Diseases_ancestors  dise… Diseas… char… FALSE    FALSE 
+##  9 OpenTargets           Diseases_children   dise… Diseas… char… FALSE    FALSE 
+## 10 OpenTargets           Diseases_descendan… dise… Diseas… char… FALSE    FALSE 
 ## # ℹ 114 more rows</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 43 × 3

@@ -203,7 +203,7 @@ get_query.chMDB <- function(
 ){
    con <- unclass(x)$tkcon$chcon
    n <- unclass(x)$dbInfo$name
-   if(!is.na(unclass(x)$tkcon$chcon@session)){
+   if(!is.na(con@session)){
       DBI::dbSendQuery(con, sprintf("USE `%s`", n))
       on.exit(DBI::dbSendQuery(con, "USE default"))
    }

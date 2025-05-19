@@ -449,7 +449,7 @@ to document the data themselves.</li>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-05-19 18:25:10.027737</span></span>
+<span><span class="co">## Timestamp: 2025-05-19 21:36:30.830812</span></span>
 <span><span class="co">## </span></span></code></pre>
 </div>
 <div class="section level3">
@@ -489,7 +489,7 @@ statement displayed when printing the object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-05-19 18:25:10.027737</span></span>
+<span><span class="co">## Timestamp: 2025-05-19 21:36:30.830812</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -590,7 +590,7 @@ MDB object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-05-19 18:25:10.027737</span></span>
+<span><span class="co">## Timestamp: 2025-05-19 21:36:30.830812</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -652,7 +652,7 @@ the corresponding documentation from it back in R:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2025-05-19 18:25:10</span></span>
+<span><span class="co">## Timestamp: 2025-05-19 21:36:30</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -1472,34 +1472,34 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_tables.html">search_MDB_tables</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search table about "disease"</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 47 × 3</span></span></span>
-<span><span class="co">##    resource name                         comment                                </span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> ChEMBL   assay_classification         <span style="color: #949494;">"</span>Classification scheme for phenotypic …</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Galactic status                       <span style="color: #949494;">"</span>Cause-and-effect interactions can be …</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Monarch  Diseases                      <span style="color: #BB0000;">NA</span>                                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Monarch  Diseases_descendants          <span style="color: #BB0000;">NA</span>                                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> Monarch  Diseases_mode_of_inheritance  <span style="color: #BB0000;">NA</span>                                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Monarch  Diseases_parents              <span style="color: #BB0000;">NA</span>                                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Monarch  Diseases_phenotypes           <span style="color: #BB0000;">NA</span>                                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Monarch  Diseases_related              <span style="color: #BB0000;">NA</span>                                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Monarch  Diseases_synonyms             <span style="color: #BB0000;">NA</span>                                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> Monarch  Diseases_xref                 <span style="color: #BB0000;">NA</span>                                    </span></span>
+<span><span class="co">##    resource    name                   comment                                   </span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                     </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> Galactic    status                 <span style="color: #949494;">"</span>Cause-and-effect interactions can be bet…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> ChEMBL      assay_classification   <span style="color: #949494;">"</span>Classification scheme for phenotypic ass…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> HPA         Disease_involvement     <span style="color: #BB0000;">NA</span>                                       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> HPO         Disease_HP             <span style="color: #949494;">"</span>HP presented by diseases<span style="color: #949494;">"</span>                </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> HPO         Disease_synonyms       <span style="color: #949494;">"</span>Disease synonyms<span style="color: #949494;">"</span>                        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> HPO         Diseases               <span style="color: #949494;">"</span>Diseases<span style="color: #949494;">"</span>                                </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> OpenTargets Associations_by_source <span style="color: #949494;">"</span>Disease target association by data sourc…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> OpenTargets Associations_by_type   <span style="color: #949494;">"</span>Disease target association by data type<span style="color: #949494;">"</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> OpenTargets Associations_overall   <span style="color: #949494;">"</span>Overall disease target association<span style="color: #949494;">"</span>      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> OpenTargets Diseases_ancestors     <span style="color: #949494;">"</span>Diseases/Phenotypes ancestors<span style="color: #949494;">"</span>           </span></span>
 <span><span class="co">## <span style="color: #949494;"># ℹ 37 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_fields.html">search_MDB_fields</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search a field about "disease"</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 124 × 7</span></span></span>
-<span><span class="co">##    resource              table            name     comment type  nullable unique</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> FCD-TLE-Bulk-RNA-2019 conditions       conditi… Disease char… TRUE     TRUE  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> FCD-TLE-Bulk-RNA-2019 samples          conditi… Disease char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> HPO                   Disease_HP       db       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> HPO                   Disease_synonyms db       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> HPO                   Diseases         db       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> HPO                   Disease_HP       id       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> HPO                   Disease_synonyms id       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> HPO                   Diseases         id       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> HPO                   Diseases         label    Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> HPO                   Disease_synonyms synonym  Diseas… char… FALSE    FALSE </span></span>
+<span><span class="co">##    resource              table               name  comment type  nullable unique</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> HPA                   Disease_involvement dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> DRE-Bulk-RNA-UMC-2024 conditions          cond… <span style="color: #949494;">"</span>Disea… char… TRUE     FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> DRE-Bulk-RNA-UMC-2024 samples             cond… <span style="color: #949494;">"</span>Disea… char… TRUE     FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… <span style="color: #949494;">""</span>      nume… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> FCD-TLE-Bulk-RNA-2019 conditions          cond… <span style="color: #949494;">"</span>Disea… char… TRUE     TRUE  </span></span>
 <span><span class="co">## <span style="color: #949494;"># ℹ 114 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/collection_members.html">collection_members</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>  </span></code></pre></div>
