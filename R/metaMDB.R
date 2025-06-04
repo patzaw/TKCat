@@ -609,26 +609,38 @@ dims.metaMDB <- function(x, ...){
    stopifnot(
       length(i)==1
    )
-   ## Rstudio hack to avoid DB call when just looking for names
-   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
-   if(length(cc)!=0){
-      invisible(NULL)
+   ## Rstudio hack to avoid calls when just looking for names
+   if(.is_called_by_rs_function()){
+      return(.get_virtual_tables(x, i)[[1]])
    }else{
-      cc <- c(
-         grep('.rs.valueContents', deparse(sys.calls()), value=FALSE),
-         grep('.rs.explorer.inspectObject', deparse(sys.calls()), value=FALSE)
-      )
-      if(length(cc)!=0){
-         invisible(as.character(data_files(x)$dataFiles[i]))
-      }else{
-         return(data_tables(x, dplyr::all_of(i))[[1]])
-      }
+      return(data_tables(x, dplyr::all_of(i))[[1]])
    }
 }
 #' @rdname metaMDB
 #' 
 #' @export
 '$.metaMDB' <- `[[.metaMDB`
+
+###############################################################################@
+#' 
+#' @param x a metaMDB object
+#' @param ... additional parameters
+#' 
+#' @return `as.list.metaMDB()` returns a simple list of tibbles with all the
+#' data from the tables in x.
+#' 
+#' @rdname metaMDB
+#' 
+#' @export
+#'
+as.list.metaMDB <- function(x, ...){
+   ## Rstudio hack to avoid call when just looking for names
+   if(.is_called_by_rs_function()){
+      return(.get_virtual_tables(x, ...))
+   }else{
+      return(data_tables(x, ...))
+   }
+}
 
 
 ###############################################################################@

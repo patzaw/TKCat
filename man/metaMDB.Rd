@@ -7,6 +7,7 @@
 \alias{[.metaMDB}
 \alias{[[.metaMDB}
 \alias{$.metaMDB}
+\alias{as.list.metaMDB}
 \title{A metaMDB object}
 \usage{
 metaMDB(MDBs, relationalTables, dataModel, dbInfo, check = TRUE)
@@ -20,6 +21,8 @@ metaMDB(MDBs, relationalTables, dataModel, dbInfo, check = TRUE)
 \method{[[}{metaMDB}(x, i)
 
 \method{$}{metaMDB}(x, i)
+
+\method{as.list}{metaMDB}(x, ...)
 }
 \arguments{
 \item{MDBs}{a list of \link{MDB} objects}
@@ -37,18 +40,21 @@ data model of all the MDBs plus the relational tables}
 \item{check}{logical: if TRUE (default) the data are confronted to the
 data model}
 
-\item{x}{a \link{metaMDB} object}
+\item{x}{a metaMDB object}
 
 \item{value}{new table names}
 
 \item{.data}{a \link{metaMDB} object}
 
-\item{...}{Use new_name = old_name to rename selected tables}
+\item{...}{additional parameters}
 
 \item{i}{the index or the name of the tables to take}
 }
 \value{
 A metaMDB object
+
+\code{as.list.metaMDB()} returns a simple list of tibbles with all the
+data from the tables in x.
 }
 \description{
 A metaMDB object is an \link{MDB} gathering several other MDBs glued by

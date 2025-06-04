@@ -1124,3 +1124,45 @@ get_confrontation_report <- function(){
    toWrite <- jsonlite::toJSON(lapply(x, jsonlite::unbox), pretty=TRUE)
    writeLines(toWrite, file)
 }
+
+.get_virtual_tables <- function(x, ...){
+   lapply(data_model(x)[..., rmForeignKeys = TRUE], function(tm){
+      fields <- tm$fields
+      if("row" %in% fields$type){
+         to_ret <- matrix(ReDaMoR::as_type(
+            c() ,
+            setdiff(fields$type, c("row", "column"))
+         ))
+      }else{
+         to_ret <- do.call(cbind, apply(
+            fields, 1, function(f){
+               stats::setNames(data.frame(
+                  V = ReDaMoR::as_type(c() , f[2])
+               ), f[1])
+            }
+         ))
+      }
+      return(to_ret)
+   })
+}
+
+.is_called_by_rs_function <- function() {
+   calls <- sys.calls()
+   any(sapply(calls, function(call) {
+      fn_name <- tryCatch(
+         as.character(call[[1]]),
+         error = function(e) "NA"
+      )
+      any(fn_name %in% c(
+         ".rs.rpc.get_completions", ".rs.getCompletionsDollar", ".rs.getNames", 
+         ".rs.getNamesImpl", ".rs.getCompletionType", ".rs.rpc.get_help", 
+         ".rs.getHelpRpcImpl", ".rs.getHelpDataFrame", ".rs.getAnywhere", 
+         ".rs.getHelpColumn", ".rs.getHelpColumnImpl"
+      ))
+      # if(any(grepl("^\\.rs\\.", fn_name))){
+      #    print(fn_name)
+      # }
+      # any(grepl("^\\.rs\\.", fn_name))
+   }))
+}
+

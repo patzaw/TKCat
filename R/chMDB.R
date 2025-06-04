@@ -1258,19 +1258,10 @@ db_tables <- function(x, host){
       length(i)==1
    )
    ## Rstudio hack to avoid DB call when just looking for names
-   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
-   if(length(cc)!=0){
-      invisible(NULL)
+   if(.is_called_by_rs_function()){
+      return(.get_virtual_tables(x, i)[[1]])
    }else{
-      cc <- c(
-         grep('.rs.valueContents', deparse(sys.calls()), value=FALSE),
-         grep('.rs.explorer.inspectObject', deparse(sys.calls()), value=FALSE)
-      )
-      if(length(cc)!=0){
-         invisible()
-      }else{
-         return(data_tables(x, dplyr::all_of(i))[[1]])
-      }
+      return(data_tables(x, dplyr::all_of(i))[[1]])
    }
 }
 #' @rdname fileMDB
@@ -1291,9 +1282,8 @@ db_tables <- function(x, host){
 #'
 as.list.chMDB <- function(x, ...){
    ## Rstudio hack to avoid DB call when just looking for names
-   cc <- grep('.rs.getCompletionsDollar', deparse(sys.calls()), value=FALSE)
-   if(length(cc)!=0){
-      invisible(NULL)
+   if(.is_called_by_rs_function()){
+      return(.get_virtual_tables(x, ...))
    }else{
       return(data_tables(x, ...))
    }

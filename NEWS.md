@@ -4,6 +4,7 @@
 ## Version 1.1.14
 
 - Update queries for compatibility with ClickHouseHTTP version >= 0.3.4
+- Better handling of Rstudio hidden calls to `as.list` and `$`
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
