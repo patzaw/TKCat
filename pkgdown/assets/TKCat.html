@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2025-06-04" />
+<meta name="date" content="2025-06-05" />
 
 <title>Introduction to TKCat</title>
 
@@ -7276,7 +7276,7 @@ display: none;
 
 <h1 class="title toc-ignore">Introduction to TKCat</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">June 04, 2025</h4>
+<h4 class="date">June 05, 2025</h4>
 
 </div>
 
@@ -7692,7 +7692,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-06-04 20:27:49.063741
+## Timestamp: 2025-06-05 06:02:58.189973
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -7730,7 +7730,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-06-04 20:27:49.063741
+## Timestamp: 2025-06-05 06:02:58.189973
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -7823,7 +7823,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-06-04 20:27:49.063741
+## Timestamp: 2025-06-05 06:02:58.189973
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -7882,7 +7882,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2025-06-04 20:27:49
+## Timestamp: 2025-06-05 06:02:58
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -8654,18 +8654,18 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 ## # ℹ 3 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;, total_size &lt;dbl&gt;</code></pre>
 <pre class="r"><code>search_MDB_tables(k, &quot;disease&quot;)  # Search table about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 47 × 3
-##    resource    name                    comment                                  
-##    &lt;chr&gt;       &lt;chr&gt;                   &lt;chr&gt;                                    
-##  1 HPO         Disease_HP              HP presented by diseases                 
-##  2 HPO         Disease_synonyms        Disease synonyms                         
-##  3 HPO         Diseases                Diseases                                 
-##  4 OpenTargets Associations_by_source  Disease target association by data source
-##  5 OpenTargets Associations_by_type    Disease target association by data type  
-##  6 OpenTargets Associations_overall    Overall disease target association       
-##  7 OpenTargets Diseases_ancestors      Diseases/Phenotypes ancestors            
-##  8 OpenTargets Diseases_and_Phenotypes Core annotation for diseases and phenoty…
-##  9 OpenTargets Diseases_children       Diseases/Phenotypes children             
-## 10 OpenTargets Diseases_descendants    Diseases/Phenotypes descendants          
+##    resource name                         comment                                
+##    &lt;chr&gt;    &lt;chr&gt;                        &lt;chr&gt;                                  
+##  1 ChEMBL   assay_classification         &quot;Classification scheme for phenotypic …
+##  2 Galactic status                       &quot;Cause-and-effect interactions can be …
+##  3 HPO      Disease_HP                   &quot;HP presented by diseases&quot;             
+##  4 HPO      Disease_synonyms             &quot;Disease synonyms&quot;                     
+##  5 HPO      Diseases                     &quot;Diseases&quot;                             
+##  6 Monarch  Diseases                      &lt;NA&gt;                                  
+##  7 Monarch  Diseases_descendants          &lt;NA&gt;                                  
+##  8 Monarch  Diseases_mode_of_inheritance  &lt;NA&gt;                                  
+##  9 Monarch  Diseases_parents              &lt;NA&gt;                                  
+## 10 Monarch  Diseases_phenotypes           &lt;NA&gt;                                  
 ## # ℹ 37 more rows</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 124 × 7
@@ -8679,8 +8679,8 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 ##  6 DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… &quot;&quot;      char… FALSE    FALSE 
 ##  7 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… &quot;&quot;      char… FALSE    FALSE 
 ##  8 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… &quot;&quot;      char… FALSE    FALSE 
-##  9 MetaBase              ImagemapsEdges      dise… &quot;&quot;      logi… FALSE    FALSE 
-## 10 HPO                   Disease_HP          db    &quot;Disea… char… FALSE    FALSE 
+##  9 FCD-TLE-Bulk-RNA-2019 conditions          cond… &quot;Disea… char… TRUE     TRUE  
+## 10 FCD-TLE-Bulk-RNA-2019 samples             cond… &quot;Disea… char… TRUE     FALSE 
 ## # ℹ 114 more rows</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 43 × 3
