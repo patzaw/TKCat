@@ -817,6 +817,13 @@ create_chTKCat_user <- function(
             elogin
          )
       )
+      DBI::dbSendQuery(
+         con,
+         sprintf(
+            "GRANT SELECT(value, name) ON system.build_options TO '%s'",
+            elogin
+         )
+      )
    }
    for(db in list_MDBs(x, withInfo=TRUE)$name){
       update_chMDB_grants(x, db)
@@ -1024,12 +1031,20 @@ update_chTKCat_user <- function(
                )
             )
             DBI::dbSendQuery(
-               con, sprintf("GRANT SELECT ON default.Collections TO '%s'", elogin)
+               con,
+               sprintf("GRANT SELECT ON default.Collections TO '%s'", elogin)
             )
             DBI::dbSendQuery(
                con,
                sprintf(
                   "GRANT SELECT(login, admin, provider) ON default.Users TO '%s'",
+                  elogin
+               )
+            )
+            DBI::dbSendQuery(
+               con,
+               sprintf(
+                  "GRANT SELECT(value, name) ON system.build_options TO '%s'",
                   elogin
                )
             )
