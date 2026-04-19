@@ -24,6 +24,7 @@ CONTAINER=${TKCAT_INSTANCE}_${TKCAT_VERSION}
 TKCAT_HOME=${TKCAT_HOSTDIR}/${CONTAINER}
 
 TKCAT_DATA=${TKCAT_HOME}/data
+TKCAT_CONFIG=${TKCAT_HOME}/config
 TKCAT_LOG=${TKCAT_HOME}/log
 
 if [ -e "$TKCAT_HOME" ]; then
@@ -51,6 +52,7 @@ docker run -d \
 	--publish=${TKCAT_NAT_PORT}:9000 \
    --publish=${TKCAT_HTTP_PORT}:8123 \
 	--volume ${TKCAT_DATA}:/var/lib/clickhouse \
+	--volume ${TKCAT_CONFIG}:/etc/clickhouse-server \
 	--volume ${TKCAT_LOG}:/var/log/clickhouse-server \
 	-e TKCAT_INSTANCE="${TKCAT_INSTANCE}" \
 	-e TKCAT_VERSION="${TKCAT_VERSION}" \
