@@ -86,9 +86,17 @@ list_tables.DBIConnection <- function(
 #' columns. If NULL (default), types are guessed from value.
 #' @param nullable a character vector indicating the name of the columns
 #' which are nullable (default: NULL)
+#' @param lowCardinality a character vector indicating the name of the columns
+#' with low cardinality (default: NULL)
 #' @param sortKey a character vector indicating the name of the columns
 #' used in the sort key. If NULL (default), all the non-nullable columns
 #' are used in the key.
+#' @param indexes a data.frame with 3 columns:
+#' - idx: index name,
+#' - field: field name,
+#' - type: 'bloom_filter(0.01)', 'minmax'...
+#' (see https://clickhouse.com/docs/optimize/skipping-indexes)
+#' - granularity: index granularity
 #' 
 #' @return No return value, called for side effects
 #' 
@@ -101,7 +109,9 @@ write_MergeTree <- function(
    value,
    rtypes=NULL,
    nullable=NULL,
-   sortKey=NULL
+   lowCardinality=NULL,
+   sortKey=NULL,
+   indexes=NULL
 ){
    stopifnot(
       inherits(con, "DBIConnection"),
@@ -123,36 +133,50 @@ write_MergeTree <- function(
       all(colnames(value) %in% names(rtypes))
    )
    
-   if(length(sortKey)==0){
-      sortKey <- setdiff(colnames(value), nullable)[1]
-   }else{
-      sortKey <- setdiff(sortKey, nullable)
-   }
-   if(length(sortKey) > 5){
-      sortKey <- sortKey[1:5]
-   }
-   
    chtypes <- ReDaMoR::conv_type_ref(rtypes, to="ClickHouse")
+  
+
+   chtypes <- ifelse(
+      names(rtypes) %in% nullable & chtypes!="Array(String)",
+      sprintf("Nullable(%s)", chtypes),
+      chtypes
+   )
+  
+  chtypes <- ifelse(
+   names(rtypes) %in% lowCardinality,
+   sprintf("LowCardinality(%s)", chtypes),
+   chtypes
+  )
    names(chtypes) <- names(rtypes)
    
-   tst <- paste(
-      sprintf("CREATE TABLE `%s`.`%s` (", dbName, tableName),
+  
+  if(!is.null(indexes) && nrow(indexes) > 0){
+    idxq <- paste(
+         sprintf(
+            ',\nINDEX %s (%s) TYPE %s GRANULARITY %s',
+            indexes$idx, indexes$field, indexes$type, indexes$granularity
+         ),
+         collapse = ""
+      )
+   }else{
+    idxq <- ""
+  }
+  
+   tst <- paste0(
+      sprintf("CREATE TABLE `%s`.`%s` (\n", dbName, tableName),
       paste(unlist(lapply(
          colnames(value),
          function(cn){
             toRet <- sprintf(
                "`%s` %s",
                cn,
-               ifelse(
-                  cn %in% nullable & chtypes[cn]!="Array(String)",
-                  sprintf("Nullable(%s)", chtypes[cn]),
-                  chtypes[cn]
-               )
+               chtypes[cn]
             )
             return(toRet)
          }
       )), collapse=",\n"),
-      ") ENGINE = MergeTree()"
+      idxq,
+      "\n) ENGINE = MergeTree()"
    )
    if(length(sortKey) > 0){
       tst <- paste(
@@ -160,12 +184,14 @@ write_MergeTree <- function(
          sprintf(
             "ORDER BY (`%s`)",
             paste(sortKey, collapse="`, `")
-         )
+         ),
+         sep = "\n"
       )
    }else{
       tst <- paste(
          tst,
-         "ORDER BY tuple()"
+         "ORDER BY tuple()",
+         sep= "\n"
       )
    }
    
@@ -318,6 +344,15 @@ mergeTree_from_RelTableModel <- function(
    }else{
       rtypes <- tm$fields$type
       names(rtypes) <- tm$fields$name
+     nullable <- tm$fields %>%
+            dplyr::filter(.data$nullable) %>%
+            dplyr::pull("name")
+     lowCardinality <- tm$fields %>%
+       dplyr::filter(
+         .data$type %in% c("character"),
+         stringr::str_detect(.data$comment, stringr::fixed('{ch_LowCardinality}'))
+      ) %>%
+       dplyr::pull("name")
       value <- dplyr::tibble()
       for(i in 1:nrow(tm$fields)){
          toAdd <- integer()
@@ -330,10 +365,10 @@ mergeTree_from_RelTableModel <- function(
          tableName=tm$tableName,
          value=value,
          rtypes=rtypes,
-         nullable=tm$fields %>%
-            dplyr::filter(.data$nullable) %>%
-            dplyr::pull("name"),
-         sortKey=.get_tm_sortKey(tm)
+         nullable=nullable,
+         lowCardinality = lowCardinality,
+         sortKey=.get_tm_sortKey(tm),
+         indexes=.get_tm_indexes(tm)
       ) 
    }
    invisible()
@@ -347,36 +382,116 @@ mergeTree_from_RelTableModel <- function(
    tm, # a [ReDaMoR::RelTableModel] object
    quoted=FALSE, # if TRUE, returns a single character value CH compatible
                  # if FALSE, returns a vector of character
-   nsc=5         # Maximum number of columns to use for sorting if no index
-                 # is available
+   nsc=5         # Maximum number of columns to use for sorting
 ){
-   # By default: sort by primary key
-   if(length(tm$primaryKey)>0){
-      toRet <- tm$primaryKey
-   }else{
-      it <- ReDaMoR::index_table(tm)
-      if(!is.null(it) && nrow(it)>0){
-         uit <- dplyr::filter(it, .data$uniqueIndex)
+   # # By default: sort by primary key
+   # if(length(tm$primaryKey)>0){
+   #    toRet <- tm$primaryKey
+   # }else{
+   #    it <- ReDaMoR::index_table(tm)
+   #    if(!is.null(it) && nrow(it)>0){
+   #       uit <- dplyr::filter(it, .data$uniqueIndex)
          
-         # If no primary key, sort by the first unique index
-         if(nrow(uit)>0){
-            toRet <- dplyr::filter(uit, .data$index==min(uit$index)) %>% 
-               dplyr::pull("field")
-         }else{
+   #       # If no primary key, sort by the first unique index
+   #       if(nrow(uit)>0){
+   #          toRet <- dplyr::filter(uit, .data$index==min(uit$index)) %>% 
+   #             dplyr::pull("field")
+   #       }else{
             
-            # If no unique index, sort by index and the remaining columns
-            toRet <- unique(c(it$field, tm$fields$name))
-         }
-      }else{
+   #          # If no unique index, sort by index and the remaining columns
+   #          toRet <- unique(c(it$field, tm$fields$name))
+   #       }
+   #    }else{
          
-         # If no index, sort by nsc first columns
-         toRet <- tm$fields$name[1:min(nsc, nrow(tm$fields))]
-      }
-   }
+   #       # If no index, sort by nsc first columns
+   #       toRet <- tm$fields$name[1:min(nsc, nrow(tm$fields))]
+   #    }
+   # }
+  
+   nullable <- tm$fields %>%
+      dplyr::filter(.data$nullable) %>%
+      dplyr::pull("name")
+  
+  toRet <- c()
+  
+  indexes <- ReDaMoR::index_table(tm)
+  if(length(toRet) == 0 && 1 %in% indexes$index){
+    toRet <- indexes %>%
+      dplyr::filter(.data$index == 1) %>%
+      dplyr::pull("field")
+  }
+  if(length(toRet) == 0 && 0 %in% indexes$index){
+    toRet <- indexes %>%
+      dplyr::filter(.data$index == 0) %>%
+      dplyr::pull("field")
+  }
+
+  foreign_keys <- ReDaMoR::get_foreign_keys(tm)
+  if(length(toRet) == 0 && !is.null(foreign_keys) && nrow(foreign_keys) > 0){
+    toRet <- unique(unlist(foreign_keys$ff))
+  }
+
+   if(length(toRet) == 0){
+    toRet <- tm$fields %>%
+      dplyr::filter(!.data$nullable) %>%
+      dplyr::pull("name") %>%
+      head(1)
+  }
+  
+  toRet <- setdiff(toRet, c(NA, nullable))
+
+  if(length(toRet) > nsc){
+    toRet <- toRet[1:nsc]
+  }
+  
    if(quoted){
       toRet <- paste(sprintf("`%s`", toRet), collapse=", ")
    }
    return(toRet)
+}
+
+.get_tm_indexes <- function(
+   tm # a [ReDaMoR::RelTableModel] object
+){
+  indexes <- ReDaMoR::index_table(tm)
+  if(all(indexes$index <= 1)){
+    return(NULL)
+  }
+
+  toRet <- c()
+  ifields <- indexes %>%
+    dplyr::filter(.data$index > 1) %>%
+    dplyr::arrange(.data$index) %>%
+    dplyr::distinct(.data$index, .keep_all = TRUE) %>%
+    dplyr::pull("field") %>%
+    unique()
+  for(f in ifields){
+    if(tm$fields$type[which(tm$fields$name==f)] == "character"){
+      toRet <- dplyr::bind_rows(
+         toRet,
+         dplyr::tibble(
+            idx = paste0("idx_", f),
+            field = f,
+            type = "bloom_filter(0.01)",
+            granularity = 1
+         )
+      )
+    }
+    if(tm$fields$type[which(tm$fields$name==f)] %in% c("numeric", "integer")){
+      toRet <- dplyr::bind_rows(
+         toRet,
+         dplyr::tibble(
+            idx = paste0("idx_", f),
+            field = f,
+            type = "minmax",
+            granularity = 1
+         )
+      )
+    }
+  }
+
+  return(toRet)
+
 }
 
 ###############################################################################@
@@ -405,3 +520,4 @@ CH_MAX_COL <- 1000
 ###############################################################################@
 ## Maximum length of base64 data ----
 CH_DOC_CHUNK <- 10^6
+  

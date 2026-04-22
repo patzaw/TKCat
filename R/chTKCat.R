@@ -51,7 +51,10 @@ chTKCat <- function(
       "allow_introspection_functions"=1,
       # Force joined subqueries and table functions to have aliases for correct
       # name qualification. Zero means FALSE.
-      "joined_subquery_requires_alias"=0
+      "joined_subquery_requires_alias"=0,
+      # Restriction on deleting tables in query time. The value 0 means that
+      # you can delete all tables without any restrictions.
+      "max_table_size_to_drop" = 0
    ),
    ports=NULL,
    drv=ClickHouseHTTP::ClickHouseHTTP(),
@@ -67,9 +70,8 @@ chTKCat <- function(
    }
    
    if(missing(password)){
-      password <- getPass::getPass(
-         sprintf("%s password (press escape or cancel if no password)", user),
-         noblank=TRUE
+      password <- askpass::askpass(
+         sprintf("%s password (press escape or cancel if no password)", user)
       )
       if(is.null(password)){
          password=""
@@ -386,8 +388,8 @@ db_reconnect.chTKCat <- function(x, user, password, ntries=3, ...){
       )), silent=TRUE)
       n <- 0
       while(inherits(ncon, "try-error") & n < ntries){
-         password <- getPass::getPass(
-            msg=paste0(user, " password on ", con@host, ":", con@port)
+         password <- askpass::askpass(
+            prompt =paste0(user, " password on ", con@host, ":", con@port)
          )
          if(is.null(password)){
             stop("Canceled by the user")
@@ -488,12 +490,15 @@ list_tables.chTKCat <- function(
 
 
 .create_password <- function(login){
-   pw1 <- getPass::getPass(sprintf("Set %s password", login), noblank=TRUE)
+   pw1 <- askpass::askpass(sprintf("Set %s password", login))
    if(is.null(pw1)){
       stop("Canceled by the user")
    }
-   pw2 <- getPass::getPass(sprintf("Confirm %s password", login), noblank=TRUE)
-   if(is.null(pw2)){
+  if(pw1 == ""){
+    stop("Password cannot be empty")
+  }
+   pw2 <- askpass::askpass(sprintf("Confirm %s password", login))
+   if(is.null(pw2) || pw2 == ""){
       stop("Canceled by the user")
    }
    if(pw1!=pw2){

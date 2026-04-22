@@ -1,7 +1,7 @@
 Package: TKCat
 Type: Package
 Title: Tailored Knowledge Catalog
-Version: 1.1.15
+Version: 1.2.0
 Authors@R: c(
     person(
         "Patrice", "Godard",
@@ -35,7 +35,7 @@ Imports:
    ClickHouseHTTP,
    rlang,
    tidyselect,
-   getPass,
+   askpass,
    shiny,
    shinydashboard,
    DT,
@@ -50,12 +50,12 @@ Imports:
    xml2,
    Matrix,
    uuid,
+   stringr,
    crayon,
    roxygen2
 Suggests:
    knitr,
    rmarkdown,
-   stringr,
    RClickhouse,
    data.tree,
    BED

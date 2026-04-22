@@ -7,6 +7,7 @@
 #' @import visNetwork
 #' @import promises
 #' @import crayon
+#' @import stringr
 #' 
 #' @importFrom future future plan multisession
 #'
@@ -18,7 +19,7 @@
 #' @importFrom jsonvalidate json_validate
 #' 
 #' @importFrom readr read_delim write_tsv read_delim_chunked DataFrameCallback
-#' @importFrom getPass getPass
+#' @importFrom askpass askpass
 #' @importFrom utils packageName zip object.size str write.table head
 #' @importFrom graphics plot
 #' 

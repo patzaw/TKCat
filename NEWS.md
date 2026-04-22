@@ -1,6 +1,32 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 
+## Version 1.2.0
+
+- Move from {getPass} to {askpass} package to get input masked in positron.
+
+### Changes in table creation
+
+- LowCardinality: information taken from field comment
+containing '{ch_LowCardinality}'. It only applies to character data.
+
+- ORDER BY:
+   - The first index in the table data model
+   - if no index, order by primary key
+   - if no primary key, order by foreign keys
+   - if none of the above take the first column
+   - Matrices and Sparse Matrices are ordered as before on rows and/or columns
+
+- INDEX:
+   - Use all the indexes but the first one
+   - character: TYPE bloom_filter(0.01) GRANULARITY 1
+   - numeric or integer: TYPE minmax GRANULARITY 1
+   - other data type: skip
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+
 ## Version 1.1.15
 
 - Correction of GRANTS
