@@ -11,7 +11,7 @@ chTKCat(
   password,
   settings = list(max_query_size = 1073741824, use_uncompressed_cache = 0, load_balancing
     = "random", max_memory_usage = 0, allow_introspection_functions = 1,
-    joined_subquery_requires_alias = 0),
+    joined_subquery_requires_alias = 0, max_table_size_to_drop = 0),
   ports = NULL,
   drv = ClickHouseHTTP::ClickHouseHTTP(),
   ...

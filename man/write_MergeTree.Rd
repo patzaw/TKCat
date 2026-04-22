@@ -13,7 +13,9 @@ write_MergeTree(
   value,
   rtypes = NULL,
   nullable = NULL,
-  sortKey = NULL
+  lowCardinality = NULL,
+  sortKey = NULL,
+  indexes = NULL
 )
 }
 \arguments{
@@ -31,9 +33,21 @@ columns. If NULL (default), types are guessed from value.}
 \item{nullable}{a character vector indicating the name of the columns
 which are nullable (default: NULL)}
 
+\item{lowCardinality}{a character vector indicating the name of the columns
+with low cardinality (default: NULL)}
+
 \item{sortKey}{a character vector indicating the name of the columns
 used in the sort key. If NULL (default), all the non-nullable columns
 are used in the key.}
+
+\item{indexes}{a data.frame with 3 columns:
+\itemize{
+\item idx: index name,
+\item field: field name,
+\item type: 'bloom_filter(0.01)', 'minmax'...
+(see https://clickhouse.com/docs/optimize/skipping-indexes)
+\item granularity: index granularity
+}}
 }
 \value{
 No return value, called for side effects

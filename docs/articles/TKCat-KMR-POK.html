@@ -32,7 +32,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">TKCat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.14</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,7 @@
                         <h4 data-toc-skip class="author">Patrice
 Godard</h4>
             
-            <h4 data-toc-skip class="date">June 05, 2025</h4>
+            <h4 data-toc-skip class="date">April 22, 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/patzaw/TKCat/blob/HEAD/vignettes/TKCat-KMR-POK.Rmd" class="external-link"><code>vignettes/TKCat-KMR-POK.Rmd</code></a></small>
       <div class="d-none name"><code>TKCat-KMR-POK.Rmd</code></div>
@@ -495,18 +495,18 @@ of interest. For example the following function has been saved the
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">###############################################################################@</span></span>
 <span><span class="co">#' Get reference URLs of biological tissues</span></span>
-<span><span class="co">#' </span></span>
+<span><span class="co">#'</span></span>
 <span><span class="co">#' @param ids tissue identifiers</span></span>
 <span><span class="co">#' @param reference reference database (default: "Uberon")</span></span>
-<span><span class="co">#' </span></span>
+<span><span class="co">#'</span></span>
 <span><span class="co">#' @return URLs corresponding to provided ids</span></span>
-<span><span class="co">#'   </span></span>
+<span><span class="co">#'</span></span>
 <span><span class="co">#' @export</span></span>
-<span><span class="co">#' </span></span>
-<span><span class="va">get_tissue_ref_url</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ids</span>, <span class="va">reference</span><span class="op">=</span><span class="st">"Uberon"</span><span class="op">)</span><span class="op">{</span></span>
-<span>   <span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.arg.html" class="external-link">match.arg</a></span><span class="op">(</span><span class="va">reference</span><span class="op">)</span></span>
-<span>   <span class="va">url_templates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Uberon"</span><span class="op">=</span><span class="st">"https://purl.obolibrary.org/obo/%s"</span><span class="op">)</span></span>
-<span>   <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="va">url_templates</span><span class="op">[</span><span class="va">reference</span><span class="op">]</span>, <span class="va">ids</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="va">get_tissue_ref_url</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">ids</span>, <span class="va">reference</span> <span class="op">=</span> <span class="st">"Uberon"</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">reference</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/match.arg.html" class="external-link">match.arg</a></span><span class="op">(</span><span class="va">reference</span><span class="op">)</span></span>
+<span>  <span class="va">url_templates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Uberon"</span> <span class="op">=</span> <span class="st">"https://purl.obolibrary.org/obo/%s"</span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="va">url_templates</span><span class="op">[</span><span class="va">reference</span><span class="op">]</span>, <span class="va">ids</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>It can be attached to the KMR object as follows:</p>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
@@ -548,15 +548,15 @@ biological samples:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">###############################################################################@</span></span>
 <span><span class="co">#' Summarize the number of seizures observed in samples</span></span>
-<span><span class="co">#' </span></span>
+<span><span class="co">#'</span></span>
 <span><span class="co">#' @param x MDB object (by default, the MDB to which the function is attached).</span></span>
-<span><span class="co">#' </span></span>
+<span><span class="co">#'</span></span>
 <span><span class="co">#' @return A table with Min., 1st Qu., Median, Mean, 3rd Qu. and Max. values</span></span>
-<span><span class="co">#'   </span></span>
+<span><span class="co">#'</span></span>
 <span><span class="co">#' @export</span></span>
-<span><span class="co">#' </span></span>
-<span><span class="va">summarize_seizures</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">=</span><span class="va">THISMDB</span><span class="op">)</span><span class="op">{</span></span>
-<span>   <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">seizures</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#'</span></span>
+<span><span class="va">summarize_seizures</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span> <span class="op">=</span> <span class="va">THISMDB</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">x</span><span class="op">$</span><span class="va">samples</span><span class="op">$</span><span class="va">seizures</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>When associating and retrieving MDB helpers, KMR object need to be
 provided:</p>
@@ -637,7 +637,7 @@ examplified below:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

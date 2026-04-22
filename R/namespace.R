@@ -7,7 +7,6 @@
 #' @import visNetwork
 #' @import promises
 #' @import crayon
-#' @import stringr
 #'
 #' @importFrom future future plan multisession
 #'

@@ -50,17 +50,17 @@ Imports:
    xml2,
    Matrix,
    uuid,
-   stringr,
    crayon,
    roxygen2
 Suggests:
    knitr,
    rmarkdown,
    RClickhouse,
+   stringr,
    data.tree,
    BED
 License: GPL-3
 Encoding: UTF-8
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3

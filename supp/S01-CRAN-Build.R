@@ -6,12 +6,13 @@ devtools::document(
   pkg = here::here(),
   roclets = c('rd', 'collate', 'namespace')
 )
-# install.packages(here::here(), repos=NULL)
+install.packages(here::here(), repos=NULL)
 
 ##############################@
 ## Build and copy vignettes ----
 rmarkdown::render(here("README.Rmd"))
 devtools::build_vignettes(clean = FALSE, quiet = TRUE, install = TRUE)
+dir.create(here("inst/doc"), showWarnings = FALSE)
 for (f in list.files(here("doc"))) {
   file.copy(
     file.path(here("doc"), f),
@@ -36,8 +37,8 @@ file.remove(here("doc"))
 
 ##############################@
 ## Build website ----
-unlink(here("docs"), recursive = TRUE, force = TRUE)
-pkgdown::build_site()
+unlink(here::here("docs"), recursive=TRUE, force=TRUE)
+pkgdown::build_site(pkg=here::here(), preview = FALSE)
 
 ##############################@
 ## Build and check package ----
@@ -48,4 +49,4 @@ system(paste(
   sprintf("R CMD check --as-cran --no-build-vignettes TKCat_%s.tar.gz", pv),
   sep = " ; "
 ))
-# install.packages(here(sprintf("../TKCat_%s.tar.gz", pv)), repos=NULL)
+install.packages(here(sprintf("../TKCat_%s.tar.gz", pv)), repos=NULL)

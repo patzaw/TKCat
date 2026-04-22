@@ -29,29 +29,29 @@ tags and only functions with the '@export' tag are returned.
 code <- "
    a <- 2
    #' Set the 'a' value to use in the add_a function
-   #' 
+   #'
    #' @param v a numeric value
-   #' 
+   #'
    #' @return Does not return anything
-   #' 
+   #'
    #' @export
    set_a <- function(v) a <<- v
-   
+
    #' Add a 'a' value defined separately
-   #' 
+   #'
    #' @param x a numeric value
-   #' 
+   #'
    #' @return x + a
-   #' 
+   #'
    #' @export
    add_a <- function(x) x + a
-   
+
    #' Add a 'a' value defined separately to a b value made available
    #' in environment
-   #' 
-   #' 
+   #'
+   #'
    #' @return b + a
-   #' 
+   #'
    #' @export
    add_a_to_b <- function() b + a
 "

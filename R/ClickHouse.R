@@ -371,10 +371,7 @@ mergeTree_from_RelTableModel <- function(
     lowCardinality <- tm$fields %>%
       dplyr::filter(
         .data$type %in% c("character"),
-        stringr::str_detect(
-          .data$comment,
-          stringr::fixed('{ch_LowCardinality}')
-        )
+        grepl('{ch_LowCardinality}', .data$comment, fixed = TRUE)
       ) %>%
       dplyr::pull("name")
     value <- dplyr::tibble()

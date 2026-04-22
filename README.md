@@ -52,8 +52,8 @@ The following R packages available on CRAN are required:
   Types and Core R and ‘Tidyverse’ Features
 - [tidyselect](https://CRAN.R-project.org/package=tidyselect): Select
   from a Set of Strings
-- [getPass](https://CRAN.R-project.org/package=getPass): Masked User
-  Input
+- [askpass](https://CRAN.R-project.org/package=askpass): Password Entry
+  Utilities for R, Git, and SSH
 - [shiny](https://CRAN.R-project.org/package=shiny): Web Application
   Framework for R
 - [shinydashboard](https://CRAN.R-project.org/package=shinydashboard):
@@ -69,7 +69,7 @@ The following R packages available on CRAN are required:
 - [jsonvalidate](https://CRAN.R-project.org/package=jsonvalidate):
   Validate ‘JSON’ Schema
 - [base64enc](https://CRAN.R-project.org/package=base64enc): Tools for
-  base64 encoding
+  ‘base64’ Encoding
 - [markdown](https://CRAN.R-project.org/package=markdown): Render
   Markdown with ‘commonmark’
 - [promises](https://CRAN.R-project.org/package=promises): Abstractions
@@ -92,10 +92,10 @@ And those are suggested:
   Package for Dynamic Report Generation in R
 - [rmarkdown](https://CRAN.R-project.org/package=rmarkdown): Dynamic
   Documents for R
-- [stringr](https://CRAN.R-project.org/package=stringr): Simple,
-  Consistent Wrappers for Common String Operations
 - [RClickhouse](https://CRAN.R-project.org/package=RClickhouse): ‘Yandex
   Clickhouse’ Interface for R with Basic ‘dplyr’ Support
+- [stringr](https://CRAN.R-project.org/package=stringr): Simple,
+  Consistent Wrappers for Common String Operations
 - [data.tree](https://CRAN.R-project.org/package=data.tree): General
   Purpose Hierarchical Data Structure
 - [BED](https://CRAN.R-project.org/package=BED): Biological Entity
