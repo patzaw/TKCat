@@ -1,10 +1,10 @@
 library(TKCat)
 
 x <- chTKCat(
-   host = "localhost",
-   port = 9111,
-   user = "default",
-   password = NA
+  host = "localhost",
+  port = 9111,
+  user = "default",
+  password = NA
 )
 
 subSetSize <- 100
@@ -20,57 +20,71 @@ tabIcon <- 'www/TKCat-small.png'
 rDirs <- NULL
 
 stopifnot(
-   is.logical(download), length(download)==1, !is.na(download),
-   is.character(skinColors), length(skinColors)>0, all(!is.na(skinColors))
+  is.logical(download),
+  length(download) == 1,
+  !is.na(download),
+  is.character(skinColors),
+  length(skinColors) > 0,
+  all(!is.na(skinColors))
 )
-if(length(skinColors)==1){
-   skinColors <- rep(skinColors, 2)
+if (length(skinColors) == 1) {
+  skinColors <- rep(skinColors, 2)
 }
 skinColors <- skinColors[1:2]
-if(!is.null(userManager)){
-   stopifnot(
-      is.character(userManager), length(userManager)==1, !is.na(userManager)
-   )
+if (!is.null(userManager)) {
+  stopifnot(
+    is.character(userManager),
+    length(userManager) == 1,
+    !is.na(userManager)
+  )
 }
-if(download){
-   ddir <- tempfile()
-   dir.create(ddir)
-   oplan <- future::plan(
-      future::multisession, workers=workers
-   )
-}else{
-   ddir <- NULL
+if (download) {
+  ddir <- tempfile()
+  dir.create(ddir)
+  oplan <- future::plan(
+    future::multisession,
+    workers = workers
+  )
+} else {
+  ddir <- NULL
 }
-on.exit({
-   if(interactive()){
+on.exit(
+  {
+    if (interactive()) {
       warning(
-         "Disconnected from clickhouse database. ",
-         "Use the db_reconnect(x) function to reconnect x."
+        "Disconnected from clickhouse database. ",
+        "Use the db_reconnect(x) function to reconnect x."
       )
-   }
-}, add=TRUE)
+    }
+  },
+  add = TRUE
+)
 shiny::shinyApp(
-   ui=TKCat:::.build_etkc_ui.chTKCat(
-      x=x, ddir=ddir, userManager=!is.null(userManager),
-      logoDiv=logoDiv, rDirs=rDirs,
-      tabTitle=tabTitle, tabIcon=tabIcon
-   ),
-   server=TKCat:::.build_etkc_server.chTKCat(
-      x=x,
-      subSetSize=subSetSize,
-      host=host,
-      ddir=ddir,
-      userManager=userManager,
-      title=title,
-      skinColors=skinColors
-   ),
-   enableBookmarking="url",
-   onStart=function(){
-      shiny::onStop(function(){
-         unlink(ddir, recursive=TRUE, force=TRUE)
-         if(exists("oplan")){
-            future::plan(oplan)
-         }
-      })
-   }
+  ui = TKCat:::.build_etkc_ui.chTKCat(
+    x = x,
+    ddir = ddir,
+    userManager = !is.null(userManager),
+    logoDiv = logoDiv,
+    rDirs = rDirs,
+    tabTitle = tabTitle,
+    tabIcon = tabIcon
+  ),
+  server = TKCat:::.build_etkc_server.chTKCat(
+    x = x,
+    subSetSize = subSetSize,
+    host = host,
+    ddir = ddir,
+    userManager = userManager,
+    title = title,
+    skinColors = skinColors
+  ),
+  enableBookmarking = "url",
+  onStart = function() {
+    shiny::onStop(function() {
+      unlink(ddir, recursive = TRUE, force = TRUE)
+      if (exists("oplan")) {
+        future::plan(oplan)
+      }
+    })
+  }
 )

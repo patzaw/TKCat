@@ -24,7 +24,6 @@ library(shinyjs)
 
 ################################################@
 
-
 #------------------------------------------------------------------------------#
 #------------------------------------------------------------------------------#
 ## UI ----
@@ -36,39 +35,37 @@ library(shinyjs)
 ## keeping the call to shinyjs::useShinyjs()
 
 ui <- fluidPage(
-   shinyjs::useShinyjs(),
-   verbatimTextOutput("token")
+  shinyjs::useShinyjs(),
+  verbatimTextOutput("token")
 )
 
 ################################################@
 
 ### Final ui function ----
-ui_func <- function(req){
-   opts <- shiny::parseQueryString(req$QUERY_STRING)
-   if(is.null(opts$code)){
-      auth_uri <- build_authorization_uri(
-         resource=`_azure_resource_`,
-         tenant=`_azure_tenant_`,
-         app=`_azure_app_`,
-         redirect_uri=`_azure_redirect_`,
-         version=2
-      )
-      redir_js <- sprintf("location.replace(\"%s\");", auth_uri)
-      tags$script(HTML(redir_js))
-   }
-   else{
-      ui
-   }
+ui_func <- function(req) {
+  opts <- shiny::parseQueryString(req$QUERY_STRING)
+  if (is.null(opts$code)) {
+    auth_uri <- build_authorization_uri(
+      resource = `_azure_resource_`,
+      tenant = `_azure_tenant_`,
+      app = `_azure_app_`,
+      redirect_uri = `_azure_redirect_`,
+      version = 2
+    )
+    redir_js <- sprintf("location.replace(\"%s\");", auth_uri)
+    tags$script(HTML(redir_js))
+  } else {
+    ui
+  }
 }
 
 #------------------------------------------------------------------------------#
 #------------------------------------------------------------------------------#
 ## Server ----
-server <- function(input, output, session)
-{
-   ### Clean URL after authentication ----
-   shinyjs::runjs(sprintf(
-      "
+server <- function(input, output, session) {
+  ### Clean URL after authentication ----
+  shinyjs::runjs(sprintf(
+    "
       $(document).ready(function(event) {
          const nextURL = '%s';
          const nextTitle = '%s';
@@ -78,35 +75,36 @@ server <- function(input, output, session)
          window.history.pushState(nextState, nextTitle, nextURL);
       });
       ",
-      `_azure_redirect_`, `_shiny_appTitle_`
-   ))
-   opts <- shiny::parseQueryString(shiny::isolate(
-      session$clientData$url_search
-   ))
-   if(is.null(opts$code)){
-      return()
-   }
+    `_azure_redirect_`,
+    `_shiny_appTitle_`
+  ))
+  opts <- shiny::parseQueryString(shiny::isolate(
+    session$clientData$url_search
+  ))
+  if (is.null(opts$code)) {
+    return()
+  }
 
-   ### Authentication ----
-   auth_cred <- AzureAuth::get_azure_token(
-      resource=c(`_azure_resource_`, "offline_access"),
-      tenant=`_azure_tenant_`,
-      app=`_azure_app_`,
-      version=2,
-      auth_type="authorization_code",
-      use_cache = FALSE,
-      authorize_args=list(redirect_uri=`_azure_redirect_`),
-      auth_code=opts$code
-   )
+  ### Authentication ----
+  auth_cred <- AzureAuth::get_azure_token(
+    resource = c(`_azure_resource_`, "offline_access"),
+    tenant = `_azure_tenant_`,
+    app = `_azure_app_`,
+    version = 2,
+    auth_type = "authorization_code",
+    use_cache = FALSE,
+    authorize_args = list(redirect_uri = `_azure_redirect_`),
+    auth_code = opts$code
+  )
 
-   ################################################@
-   ### TO EDIT: Server logic ----
+  ################################################@
+  ### TO EDIT: Server logic ----
 
-   ## Replace the following lines with your own logic
+  ## Replace the following lines with your own logic
 
-   output$token <- renderPrint(auth_cred)
+  output$token <- renderPrint(auth_cred)
 
-   ################################################@
+  ################################################@
 }
 
 #------------------------------------------------------------------------------#

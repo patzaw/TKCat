@@ -1,8 +1,8 @@
 source("~/opt/KMT.R")
 
 last_queries <- get_query(
-   .tkcon,
-   "
+  .tkcon,
+  "
    SELECT user, event_date, event_time, read_rows, current_database,
       databases, tables
    FROM system.query_log ORDER BY event_time DESC
@@ -10,6 +10,5 @@ last_queries <- get_query(
    "
 )
 last_queries %>%
-   distinct(user, current_database, .keep_all = TRUE) %>% 
-   View()
-
+  distinct(user, current_database, .keep_all = TRUE) %>%
+  View()
