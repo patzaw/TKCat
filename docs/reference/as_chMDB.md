@@ -6,7 +6,14 @@ a ClickHouse database
 ## Usage
 
 ``` r
-as_chMDB(x, tkcon, timestamp = Sys.time(), overwrite = FALSE, by = 10^5)
+as_chMDB(
+  x,
+  tkcon,
+  timestamp = Sys.time(),
+  overwrite = FALSE,
+  by = 10^5,
+  materializeProjections = TRUE
+)
 ```
 
 ## Arguments
@@ -37,6 +44,11 @@ as_chMDB(x, tkcon, timestamp = Sys.time(), overwrite = FALSE, by = 10^5)
 
   the size of the batch: number of records to write together (default:
   10^5)
+
+- materializeProjections:
+
+  a logical indicating if projections should be materialize (default:
+  TRUE)
 
 ## Value
 

@@ -101,6 +101,10 @@ list_tables.DBIConnection <- function(
 #' - type: 'bloom_filter(0.01)', 'minmax'...
 #' (see https://clickhouse.com/docs/optimize/skipping-indexes)
 #' - granularity: index granularity
+#' @param projections a data.frame with 3 columns:
+#' - projection: projection name (e.g., "prj_tn_cn"),
+#' - select: select statement (e.g., "SELECT *"),
+#' - clause: clause for the projection (e.g., "ORDER BY (cn)")
 #'
 #' @return No return value, called for side effects
 #'
@@ -115,7 +119,8 @@ write_MergeTree <- function(
   nullable = NULL,
   lowCardinality = NULL,
   sortKey = NULL,
-  indexes = NULL
+  indexes = NULL,
+  projections = NULL
 ) {
   stopifnot(
     inherits(con, "DBIConnection"),
@@ -159,7 +164,7 @@ write_MergeTree <- function(
   if (!is.null(indexes) && nrow(indexes) > 0) {
     idxq <- paste(
       sprintf(
-        ',\nINDEX %s (%s) TYPE %s GRANULARITY %s',
+        ',\nINDEX `%s` (`%s`) TYPE %s GRANULARITY %s',
         indexes$idx,
         indexes$field,
         indexes$type,
@@ -169,6 +174,20 @@ write_MergeTree <- function(
     )
   } else {
     idxq <- ""
+  }
+
+  if (!is.null(projections) && nrow(projections) > 0) {
+    prjq <- paste(
+      sprintf(
+        ',\nPROJECTION %s (%s %s) ',
+        projections$name,
+        projections$select,
+        projections$clause
+      ),
+      collapse = ""
+    )
+  } else {
+    prjq <- ""
   }
 
   tst <- paste0(
@@ -188,6 +207,7 @@ write_MergeTree <- function(
       collapse = ",\n"
     ),
     idxq,
+    prjq,
     "\n) ENGINE = MergeTree()"
   )
   if (length(sortKey) > 0) {
@@ -349,6 +369,7 @@ mergeTree_from_RelTableModel <- function(
     !is.na(dbName),
     ReDaMoR::is.RelTableModel(tm)
   )
+  projections = .get_tm_projections(tm)
   if (ReDaMoR::is.MatrixModel(tm)) {
     write_MergeTree(
       con = con,
@@ -439,17 +460,21 @@ mergeTree_from_RelTableModel <- function(
   if (length(toRet) == 0 && 1 %in% indexes$index) {
     toRet <- indexes %>%
       dplyr::filter(.data$index == 1) %>%
-      dplyr::pull("field")
+      dplyr::pull("field") %>%
+      setdiff(c(NA, nullable))
   }
-  if (length(toRet) == 0 && 0 %in% indexes$index) {
+  if (length(toRet) == 0 && !is.null(indexes) && nrow(indexes) > 0) {
+    # && 0 %in% indexes$index) {
     toRet <- indexes %>%
-      dplyr::filter(.data$index == 0) %>%
-      dplyr::pull("field")
+      # dplyr::filter(.data$index == 0) %>%
+      dplyr::pull("field") %>%
+      setdiff(c(NA, nullable))
   }
 
   foreign_keys <- ReDaMoR::get_foreign_keys(tm)
   if (length(toRet) == 0 && !is.null(foreign_keys) && nrow(foreign_keys) > 0) {
-    toRet <- unique(unlist(foreign_keys$ff))
+    toRet <- unique(unlist(foreign_keys$ff)) %>%
+      setdiff(c(NA, nullable))
   }
 
   if (length(toRet) == 0) {
@@ -459,8 +484,6 @@ mergeTree_from_RelTableModel <- function(
       head(1)
   }
 
-  toRet <- setdiff(toRet, c(NA, nullable))
-
   if (length(toRet) > nsc) {
     toRet <- toRet[1:nsc]
   }
@@ -468,6 +491,61 @@ mergeTree_from_RelTableModel <- function(
   if (quoted) {
     toRet <- paste(sprintf("`%s`", toRet), collapse = ", ")
   }
+  return(toRet)
+}
+
+.get_tm_projections <- function(
+  tm
+) {
+  projections <- unlist(regmatches(
+    tm$display$comment,
+    gregexpr("\\{ch_Projection:[^{]*\\}", tm$display$comment)
+  ))
+
+  if (length(projections) == 0) {
+    return(NULL)
+  }
+
+  not_nullable <- tm$fields %>%
+    dplyr::filter(!.data$nullable) %>%
+    dplyr::pull("name")
+
+  projections <- gsub(
+    "\\}",
+    "",
+    x = gsub("\\{ch_Projection:", "", projections)
+  ) %>%
+    strsplit(split = ",")
+
+  projections <- projections[which(lengths(projections) > 0)]
+
+  if (length(projections) == 0) {
+    return(NULL)
+  }
+
+  lapply(projections, function(x) stopifnot(all(x %in% not_nullable)))
+
+  toRet <- do.call(
+    rbind,
+    lapply(
+      projections,
+      function(fields) {
+        dplyr::tibble(
+          name = sprintf(
+            "`proj_%s_%s`",
+            tm$tableName,
+            paste(fields, collapse = "_")
+          ),
+          select = "SELECT *",
+          clause = sprintf(
+            "ORDER BY (`%s`)",
+            paste(fields, collapse = "`,`")
+          )
+        )
+      }
+    )
+  )
+
   return(toRet)
 }
 

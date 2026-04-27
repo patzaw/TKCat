@@ -53,6 +53,7 @@
 <url><loc>https://patzaw.github.io/TKCat/reference/dims.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/dot-format_bytes.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/drop_chMDB.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/drop_chMDB_projections.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/drop_chTKCat_user.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/empty_chMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/encode_bin.html</loc></url>
@@ -113,6 +114,7 @@
 <url><loc>https://patzaw.github.io/TKCat/reference/list_tables.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/manage_chTKCat_users.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/map_collection_members.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/materialize_chMDB_projections.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/memoMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/mergeTree_from_RelTableModel.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/mergeTrees_from_RelDataModel.html</loc></url>

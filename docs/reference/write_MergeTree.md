@@ -16,7 +16,8 @@ write_MergeTree(
   nullable = NULL,
   lowCardinality = NULL,
   sortKey = NULL,
-  indexes = NULL
+  indexes = NULL,
+  projections = NULL
 )
 ```
 
@@ -71,6 +72,16 @@ write_MergeTree(
     https://clickhouse.com/docs/optimize/skipping-indexes)
 
   - granularity: index granularity
+
+- projections:
+
+  a data.frame with 3 columns:
+
+  - projection: projection name (e.g., "prj_tn_cn"),
+
+  - select: select statement (e.g., "SELECT \*"),
+
+  - clause: clause for the projection (e.g., "ORDER BY (cn)")
 
 ## Value
 

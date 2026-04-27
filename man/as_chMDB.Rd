@@ -4,7 +4,14 @@
 \alias{as_chMDB}
 \title{Push an \link{MDB} object in a ClickHouse database}
 \usage{
-as_chMDB(x, tkcon, timestamp = Sys.time(), overwrite = FALSE, by = 10^5)
+as_chMDB(
+  x,
+  tkcon,
+  timestamp = Sys.time(),
+  overwrite = FALSE,
+  by = 10^5,
+  materializeProjections = TRUE
+)
 }
 \arguments{
 \item{x}{an \link{MDB} object}
@@ -24,6 +31,9 @@ the existing timestamp.}
 
 \item{by}{the size of the batch: number of records to write
 together (default: 10^5)}
+
+\item{materializeProjections}{a logical indicating if projections should be
+materialize (default: TRUE)}
 }
 \value{
 A \link{chMDB} object.

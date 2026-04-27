@@ -65,6 +65,7 @@ A subset of the HPO is provided within the
 of the tables as follow:
 
 ``` r
+
 library(readr)
 hpo_data_dir <- system.file("examples/HPO-subset", package="ReDaMoR")
 ```
@@ -73,6 +74,7 @@ The `HPO_hp` table gathers human phenotype identifiers, names and
 descriptions:
 
 ``` r
+
 HPO_hp <- readr::read_tsv(
    file.path(hpo_data_dir, "HPO_hp.txt")
 )
@@ -98,6 +100,7 @@ The `HPO_diseases` table gathers disease identifiers and labels from
 different disease database.
 
 ``` r
+
 HPO_diseases <- readr::read_tsv(
    file.path(hpo_data_dir, "HPO_diseases.txt")
 )
@@ -123,6 +126,7 @@ The `HPO_diseaseHP` table indicates which phenotype is triggered by each
 disease.
 
 ``` r
+
 HPO_diseaseHP <- readr::read_tsv(
    file.path(hpo_data_dir, "HPO_diseaseHP.txt")
 )
@@ -150,6 +154,7 @@ The [ReDaMoR](https://patzaw.github.io/ReDaMoR/) package can be used for
 drafting a data model from a set of table:
 
 ``` r
+
 mhpo_dm <- ReDaMoR::df_to_model(HPO_hp, HPO_diseases, HPO_diseaseHP)
 if(igraph_available){
    mhpo_dm %>%
@@ -173,12 +178,14 @@ manipulating and modifying the data model (see [ReDaMoR
 documentation](https://patzaw.github.io/ReDaMoR/articles/ReDaMoR.html)).
 
 ``` r
+
 mhpo_dm <- ReDaMoR::model_relational_data(mhpo_dm)
 ```
 
 Below is the model we get after completing it using the function above.
 
 ``` r
+
 plot(mhpo_dm)
 ```
 
@@ -207,6 +214,7 @@ object with the tables we’ve read and the data model we have edited, we
 get the following error message.
 
 ``` r
+
 mhpo_db <- memoMDB(
    dataTables=list(
       HPO_hp=HPO_hp, HPO_diseases=HPO_diseases, HPO_diseaseHP=HPO_diseaseHP
@@ -262,6 +270,7 @@ To avoid this error, we can either change the type of the columns of the
 data tables:
 
 ``` r
+
 HPO_hp <- mutate(HPO_hp, level=as.integer(level))
 HPO_diseases <- mutate(HPO_diseases, id=as.character(id))
 HPO_diseaseHP <- mutate(HPO_diseaseHP, id=as.character(id))
@@ -277,6 +286,7 @@ mhpo_db <- memoMDB(
 Or we can use the data model to read the data in a fileMDB object:
 
 ``` r
+
 f_mhpo_db <- read_fileMDB(
    path=hpo_data_dir,
    dbInfo=list(name="miniHPO"),
@@ -308,18 +318,21 @@ user. The object is then smaller than the memoMDB object even if they
 gather the same information.
 
 ``` r
+
 print(object.size(mhpo_db), units="Kb")
 ```
 
     ## 691.9 Kb
 
 ``` r
+
 print(object.size(f_mhpo_db), units="Kb")
 ```
 
     ## 23.5 Kb
 
 ``` r
+
 compare_MDB(former=mhpo_db, new=f_mhpo_db) %>% 
    DT::datatable(
       rownames=FALSE,
@@ -341,6 +354,7 @@ or added afterward:
   the scope of the data and their origin.
 
 ``` r
+
 db_info(mhpo_db)$title <- "Very small extract of the human phenotype ontology"
 db_info(mhpo_db)$description <- "For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted"
 db_info(mhpo_db)$url <- "https://hpo.jax.org/"
@@ -351,6 +365,7 @@ db_info(mhpo_db)$url <- "https://hpo.jax.org/"
   themselves.
 
 ``` r
+
 db_info(mhpo_db)$version <- "0.1"
 db_info(mhpo_db)$maintainer <- "Patrice Godard"
 db_info(mhpo_db)$timestamp <- Sys.time()
@@ -359,6 +374,7 @@ db_info(mhpo_db)$timestamp <- Sys.time()
 All this information is displayed when printing the object:
 
 ``` r
+
 mhpo_db
 ```
 
@@ -370,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-04-22 15:57:14.178065
+    ## Timestamp: 2026-04-27 10:15:14.265807
     ## 
 
 ### Documenting collection members
@@ -388,6 +404,7 @@ documented according to this definition. There are currently two
 collections provided within the TKCat package:
 
 ``` r
+
 list_local_collections()
 ```
 
@@ -406,6 +423,7 @@ described above, as indicated by the *“No collection member”* statement
 displayed when printing the object:
 
 ``` r
+
 mhpo_db
 ```
 
@@ -417,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-04-22 15:57:14.178065
+    ## Timestamp: 2026-04-27 10:15:14.265807
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -444,6 +462,7 @@ and
 can be used together to identify valid arguments:
 
 ``` r
+
 get_local_collection("Condition") %>%
    show_collection_def()
 ```
@@ -472,6 +491,7 @@ The example below shows how the *HPO_hp* table is documented as a member
 of the *Condition* collection.
 
 ``` r
+
 mhpo_db$HPO_hp
 ```
 
@@ -491,6 +511,7 @@ mhpo_db$HPO_hp
     ## # ℹ 490 more rows
 
 ``` r
+
 mhpo_db <- add_collection_member(
    mhpo_db, collection="Condition", table="HPO_hp",
    condition=list(value="Phenotype", static=TRUE),
@@ -512,6 +533,7 @@ disease identifier can be different from one row to the other and is
 provided in the “db” column (`source=list(value="db", static=FALSE)`).
 
 ``` r
+
 mhpo_db <- add_collection_member(
    mhpo_db, collection="Condition", table="HPO_diseases",
    condition=list(value="Disease", static=TRUE),
@@ -524,6 +546,7 @@ Now, the existence of collection members is shown when printing the MDB
 object:
 
 ``` r
+
 mhpo_db
 ```
 
@@ -536,13 +559,14 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-04-22 15:57:14.178065
+    ## Timestamp: 2026-04-27 10:15:14.265807
     ## 
 
 And the documented collection members of an MDB can be displayed as
 following:
 
 ``` r
+
 collection_members(mhpo_db)
 ```
 
@@ -565,6 +589,7 @@ Once an MDB has been created and documented in can be written in a
 directory:
 
 ``` r
+
 tmpDir <- tempdir()
 as_fileMDB(mhpo_db, path=tmpDir, htmlModel=FALSE)
 ```
@@ -591,6 +616,7 @@ This folder can be shared and it’s then easy to get all the data and the
 corresponding documentation from it back in R:
 
 ``` r
+
 read_fileMDB(file.path(tmpDir, "miniHPO"))
 ```
 
@@ -610,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-04-22 15:57:14
+    ## Timestamp: 2026-04-27 10:15:14
     ## 
 
 Also writing these data and related information in text files make them
@@ -655,6 +681,7 @@ documented with a model (`dataModel` parameter) and general information
 (`dbInfo` parameter).
 
 ``` r
+
 file_hpo <- read_fileMDB(
    path=system.file("examples/HPO-subset", package="ReDaMoR"),
    dataModel=system.file("examples/HPO-model.json", package="ReDaMoR"),
@@ -685,6 +712,7 @@ functions and check by default the first 10 rows of each file.
 The data model can then be drawn.
 
 ``` r
+
 plot(data_model(file_hpo))
 ```
 
@@ -696,6 +724,7 @@ collection and can be documented as such, as [explained
 above](#min-coll-memb).
 
 ``` r
+
 file_hpo <- file_hpo %>% 
    add_collection_member(
       collection="Condition", table="HPO_hp",
@@ -723,6 +752,7 @@ information is included in the resource directory, making it easier to
 read as [explained above](#min-writing).
 
 ``` r
+
 file_clinvar <- read_fileMDB(
    path=system.file("examples/ClinVar", package="TKCat")
 )
@@ -736,6 +766,7 @@ file_clinvar <- read_fileMDB(
     ##    - Maximum number of records: 10
 
 ``` r
+
 file_clinvar
 ```
 
@@ -758,6 +789,7 @@ Similarly, a self-documented subset of the
 TKCat package. It can be read the same way.
 
 ``` r
+
 file_chembl <- read_fileMDB(
    path=system.file("examples/CHEMBL", package="TKCat")
 )
@@ -775,6 +807,7 @@ with drug-like properties ([Mendez et al.
 2019](#ref-mendez_chembl_2019)).
 
 ``` r
+
 file_chembl
 ```
 
@@ -813,6 +846,7 @@ and [`as_chMDB()`](https://patzaw.github.io/TKCat/reference/as_chMDB.md)
 functions.
 
 ``` r
+
 memo_clinvar <- as_memoMDB(file_clinvar)
 object.size(file_clinvar) %>% print(units="Kb")
 ```
@@ -820,6 +854,7 @@ object.size(file_clinvar) %>% print(units="Kb")
     ## 155.2 Kb
 
 ``` r
+
 object.size(memo_clinvar) %>% print(units="Kb")
 ```
 
@@ -839,6 +874,7 @@ General information can be retrieved (and potentialy updated) using the
 function.
 
 ``` r
+
 db_info(file_clinvar)
 ```
 
@@ -867,6 +903,7 @@ As shown above the data model of an MDB can be retrieved and plot the
 following way.
 
 ``` r
+
 plot(data_model(file_clinvar))
 ```
 
@@ -878,6 +915,7 @@ functions (the tables have been renamed here to improve the readability
 of the following examples).
 
 ``` r
+
 names(file_clinvar)
 ```
 
@@ -894,6 +932,7 @@ names(file_clinvar)
     ## [21] "ClinVar_entrezNames"
 
 ``` r
+
 file_clinvar <- file_clinvar %>% 
    set_names(sub("ClinVar_", "", names(.))) 
 names(file_clinvar)
@@ -916,6 +955,7 @@ The different collection members of an MDBs are listed with the
 function.
 
 ``` r
+
 collection_members(file_clinvar)
 ```
 
@@ -937,12 +977,14 @@ The following functions are use to get the number of tables, the number
 of fields per table and the number of records.
 
 ``` r
+
 length(file_clinvar)        # Number of tables
 ```
 
     ## [1] 21
 
 ``` r
+
 lengths(file_clinvar)       # Number of fields per table
 ```
 
@@ -962,6 +1004,7 @@ lengths(file_clinvar)       # Number of fields per table
     ##                         4                         3                         3
 
 ``` r
+
 count_records(file_clinvar) # Number of records per table
 ```
 
@@ -987,6 +1030,7 @@ the data files are very large. In such case it could be more efficient
 to list data file size instead.
 
 ``` r
+
 data_file_size(file_clinvar, hr=TRUE)
 ```
 
@@ -1011,6 +1055,7 @@ There are several possible ways to pull data tables from MDBs. The
 following lines return the same result displayed below (only once).
 
 ``` r
+
 data_tables(file_clinvar, "traitNames")[[1]]
 file_clinvar[["traitNames"]]
 file_clinvar$"traitNames"
@@ -1036,6 +1081,7 @@ MDBs can also be subset and combined. The corresponding functions ensure
 that the data model is fulfilled by the data tables.
 
 ``` r
+
 file_clinvar[1:3]
 ```
 
@@ -1050,6 +1096,7 @@ file_clinvar[1:3]
     ## 
 
 ``` r
+
 if(igraph_available){
    c(file_clinvar[1:3], file_hpo[c(1,5,7)]) %>% 
       data_model() %>% auto_layout(force=TRUE) %>% plot()
@@ -1076,6 +1123,7 @@ focus on a few genes with pathogenic variants. The table below compares
 the number of rows before (“ori”) and after (“filt”) filtering.
 
 ``` r
+
 filtered_clinvar <- file_clinvar %>%
    filter(
       entrezNames = symbol %in% c("PIK3R2", "UGT1A8")
@@ -1116,6 +1164,7 @@ Tables can be easily joined to get diseases associated to the genes of
 interest in a single table as shown below.
 
 ``` r
+
 gene_traits <- filtered_clinvar %>% 
    join_mdb_tables(
       "entrezNames", "varEntrez", "variants", "rcvaVariant",
@@ -1155,6 +1204,7 @@ genes. CHEMBL refers to drug target in the *CHEMBL_component_sequence*
 table using mainly Uniprot peptide identifiers from different species.
 
 ``` r
+
 file_chembl$CHEMBL_component_sequence
 ```
 
@@ -1177,6 +1227,7 @@ Whereas ClinVar refers to causal genes in the *entrezNames* table using
 human Entrez gene identifiers.
 
 ``` r
+
 file_clinvar$entrezNames
 ```
 
@@ -1210,7 +1261,7 @@ BE identifiers from one scope to the other
 (e.g. [BED](https://github.com/patzaw/BED) ([Godard and Eyll
 2018](#ref-godard_bed:_2018)),
 [mygene](https://bioconductor.org/packages/release/bioc/html/mygene.html)
-([Wu, MacLeod, and Su 2012](#ref-wu2012)),
+([Wu et al. 2012](#ref-wu2012)),
 [biomaRt](https://bioconductor.org/packages/release/bioc/html/biomaRt.html)
 ([Kinsella et al. 2011](#ref-kinsella2011))).
 
@@ -1223,6 +1274,7 @@ are provided within the TKCat package and other can be imported with the
 function.
 
 ``` r
+
 list_local_collections()
 ```
 
@@ -1236,6 +1288,7 @@ Here are the definition of the BE collection members provided by the
 *CHEMBL_component_sequence* and the *entrezNames* tables.
 
 ``` r
+
 collection_members(file_chembl, "BE")
 ```
 
@@ -1248,6 +1301,7 @@ collection_members(file_chembl, "BE")
     ## 4 BE         CHEMBL_BE_1.0 CHEMBL       1 CHEMBL_compo… orga… FALSE  orga… Scie…
 
 ``` r
+
 collection_members(file_clinvar, "BE")
 ```
 
@@ -1297,6 +1351,7 @@ The `get_shared_collection()` function is used to list all the
 collections shared by two MDBs.
 
 ``` r
+
 get_shared_collections(filtered_clinvar, file_chembl)
 ```
 
@@ -1326,12 +1381,14 @@ package](https://github.com/patzaw/BED) ([Godard and Eyll
 with a connection to BED database in order to run the code below.
 
 ``` r
+
 try(BED::connectToBed(a))
 ```
 
     ## Error in eval(expr, envir) : object 'a' not found
 
 ``` r
+
 bedCheck <- try(BED::checkBedConn())
 if(!inherits(bedCheck, "try-error") && bedCheck){
    sel_coll <- get_shared_collections(file_clinvar, file_chembl) %>% 
@@ -1361,6 +1418,7 @@ table.y (No conversion occurs). For example, *file_hpo* and
 the *HPO_diseases* and the *traitCref* tables respectively.
 
 ``` r
+
 get_shared_collections(file_hpo, file_clinvar)
 ```
 
@@ -1374,12 +1432,13 @@ get_shared_collections(file_hpo, file_clinvar)
 
 These conditions could be converted using a function provided with TKCat
 (`get_collection_mapper("Condition")`) and which rely on the [DODO
-package](https://github.com/Elysheba/DODO) ([François, Eyll, and Godard
+package](https://github.com/Elysheba/DODO) ([François et al.
 2020](#ref-fran%C3%A7ois2020)). The two tables can also be simply
 concatenated without applying any conversion (loosing the advantage of
 such conversion obviously).
 
 ``` r
+
 sel_coll <- get_shared_collections(file_hpo, file_clinvar) %>% 
    filter(table.x=="HPO_diseases", table.y=="traitCref") %>% 
    mutate(collection=NA)
@@ -1398,6 +1457,7 @@ displayed in yellow in the data model of the created *metaMDB* as shown
 below.
 
 ``` r
+
 hpo_clinvar <- merge(
    file_hpo, file_clinvar, by=sel_coll, dmAutoLayout=igraph_available
 )
@@ -1405,6 +1465,7 @@ plot(data_model(hpo_clinvar))
 ```
 
 ``` r
+
 hpo_clinvar$HPO_diseases_traitCref
 ```
 
@@ -1430,6 +1491,7 @@ hpo_clinvar$HPO_diseases_traitCref
 MDB can be gathered in a *TKCat* (Tailored Knowledge Catalog) object.
 
 ``` r
+
 k <- TKCat(file_hpo, file_clinvar)
 ```
 
@@ -1438,6 +1500,7 @@ preparation for potential integration. Several functions are available
 to achieve this goal.
 
 ``` r
+
 list_MDBs(k)                     # list all the MDBs in a TKCat object
 ```
 
@@ -1448,6 +1511,7 @@ list_MDBs(k)                     # list all the MDBs in a TKCat object
     ## 2 ClinVar Data extract… ClinVar is… http… 0.9     Patrice G… NA
 
 ``` r
+
 get_MDB(k, "HPO")                # get a specific MDBs from the catalog
 ```
 
@@ -1463,6 +1527,7 @@ get_MDB(k, "HPO")                # get a specific MDBs from the catalog
     ## 
 
 ``` r
+
 search_MDB_tables(k, "disease")  # Search table about "disease"
 ```
 
@@ -1474,6 +1539,7 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
     ## 3 HPO      HPO_diseaseSynonyms Disease synonyms
 
 ``` r
+
 search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
@@ -1490,6 +1556,7 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
     ## 8 HPO      HPO_diseaseSynonyms synonym character FALSE    FALSE  Disease synonym
 
 ``` r
+
 collection_members(k)            # Get collection members of the different MDBs
 ```
 
@@ -1503,6 +1570,7 @@ collection_members(k)            # Get collection members of the different MDBs
     ## 5 ClinVar  BE         entrezNames
 
 ``` r
+
 c(k, TKCat(file_chembl))         # Merge 2 TKCat objects
 ```
 
@@ -1515,6 +1583,7 @@ exploration interface can be easily deployed using an *app.R* file with
 content similar to the one below.
 
 ``` r
+
 library(TKCat)
 explore_MDBs(k, download=TRUE)
 ```
@@ -1542,6 +1611,7 @@ The connection to the ClickHouse TKCat database is achieved using the
 function.
 
 ``` r
+
 k <- chTKCat(
    host="localhost",                     # default parameter
    port=9111L,                           # default parameter
@@ -1569,10 +1639,11 @@ is not supported yet by the RClickhouse package.
 Once connected, this *chTKCat* object can be used as a *TKCat* object.
 
 ``` r
+
 list_MDBs(k)             # get a specific MDBs from the catalog
 ```
 
-    ## # A tibble: 30 × 12
+    ## # A tibble: 31 × 12
     ##    name   title description url   version maintainer public populated timestamps
     ##    <chr>  <chr> <chr>       <chr> <chr>   <chr>      <lgl>  <lgl>     <lgl>     
     ##  1 AP-Di… Ange… Ressources… NA    0.0.2   [Patrice … FALSE  TRUE      TRUE      
@@ -1585,14 +1656,15 @@ list_MDBs(k)             # get a specific MDBs from the catalog
     ##  8 FCD-T… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
     ##  9 GO     The … Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      
     ## 10 GTEx   Geno… The Adult … http… 0.01    [Patrice … TRUE   TRUE      TRUE      
-    ## # ℹ 20 more rows
+    ## # ℹ 21 more rows
     ## # ℹ 3 more variables: timestamp <dttm>, access <fct>, total_size <dbl>
 
 ``` r
+
 search_MDB_tables(k, "disease")  # Search table about "disease"
 ```
 
-    ## # A tibble: 53 × 3
+    ## # A tibble: 54 × 3
     ##    resource            name                               comment               
     ##    <chr>               <chr>                              <chr>                 
     ##  1 AP-Disease-Strategy diseases                           NA                    
@@ -1602,16 +1674,17 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
     ##  5 AP-Disease-Strategy diseases_parents                   NA                    
     ##  6 AP-Disease-Strategy diseases_synonyms                  NA                    
     ##  7 AP-Disease-Strategy general_disease_groups_identifiers General group of dise…
-    ##  8 ChEMBL              assay_classification               Classification scheme…
-    ##  9 HPA                 Disease_involvement                NA                    
-    ## 10 HPO                 Disease_HP                         HP presented by disea…
-    ## # ℹ 43 more rows
+    ##  8 HPA                 Disease_involvement                NA                    
+    ##  9 ChEMBL              assay_classification               Classification scheme…
+    ## 10 Monarch             Diseases                           NA                    
+    ## # ℹ 44 more rows
 
 ``` r
+
 search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
-    ## # A tibble: 155 × 7
+    ## # A tibble: 157 × 7
     ##    resource            table                 name  comment type  nullable unique
     ##    <chr>               <chr>                 <chr> <chr>   <chr> <lgl>    <lgl> 
     ##  1 AP-Disease-Strategy strategic_indications cate… "pheno… char… FALSE    FALSE 
@@ -1624,9 +1697,10 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
     ##  8 AP-Disease-Strategy cci_target_indicatio… dise… ""      char… TRUE     FALSE 
     ##  9 AP-Disease-Strategy cddi_drug_indications dise… ""      char… TRUE     FALSE 
     ## 10 AP-Disease-Strategy cddi_drug_indication… dise… ""      char… TRUE     FALSE 
-    ## # ℹ 145 more rows
+    ## # ℹ 147 more rows
 
 ``` r
+
 collection_members(k)  
 ```
 
@@ -1646,6 +1720,7 @@ collection_members(k)
     ## # ℹ 40 more rows
 
 ``` r
+
 explore_MDBs(k)
 ```
 
@@ -1655,6 +1730,7 @@ Any `MDB` object can be imported in a TKCat ClickHouse instance as
 following:
 
 ``` r
+
 kw <- chTKCat(host="localhost", port=9111L, user="pgodard")
 create_chMDB(kw, "HPO", public=TRUE)
 ch_hpo <- as_chMDB(file_hpo, kw)
@@ -1672,6 +1748,7 @@ returns a *chMDB* object that can be used as any *MDB* object. The data
 are located in the ClickHouse database and pulled on request.
 
 ``` r
+
 ch_hpo <- get_MDB(k, "HPO")
 ```
 
@@ -1680,6 +1757,7 @@ the table is big), SQL queries can be made on the *chMDB* object as
 shown below.
 
 ``` r
+
 get_query(
    ch_hpo,
    query="SELECT * from HPO_diseases WHERE lower(label) LIKE '%epilep%'"
@@ -1735,6 +1813,7 @@ its configuration procedures are implemented here:
 2.  Customize and run the following script.
 
 ``` sh
+
 sh launch-tkcat-instance.sh
 ```
 
@@ -1767,6 +1846,7 @@ User management requires admin rights on the database.
 ##### Creation
 
 ``` r
+
 k <- chTKCat(user="pgodard")
 create_chTKCat_user(
    k, login="lfrancois", contact=NA, admin=FALSE, provider=TRUE
@@ -1782,6 +1862,7 @@ instance (default: FALSE).
 ##### Update
 
 ``` r
+
 k <- chTKCat(user="pgodard")
 change_chTKCat_password(k, "lfrancois")
 update_chTKCat_user(k, contact="email", admin=FALSE)
@@ -1790,6 +1871,7 @@ update_chTKCat_user(k, contact="email", admin=FALSE)
 A shiny application can be launched for updating user settings:
 
 ``` r
+
 manage_chTKCat_users(k)
 ```
 
@@ -1801,6 +1883,7 @@ Shiny application by providing the URL as the `userManager` parameter.
 ##### Drop
 
 ``` r
+
 drop_chTKCat_user(k, login="lfrancois")
 ```
 
@@ -1813,6 +1896,7 @@ operation can only be achieved by data providers (see
 [above](#ch-u-create)).
 
 ``` r
+
 create_chMDB(k, "CHEMBL", public=FALSE)
 ```
 
@@ -1822,6 +1906,7 @@ parameter when creating the chMDB or by using the
 function afterward.
 
 ``` r
+
 set_chMDB_access(k, "CHEMBL", public=TRUE)
 ```
 
@@ -1830,6 +1915,7 @@ admin rights on the chMDB. Admin rights allow the user to update the
 chMDB data.
 
 ``` r
+
 add_chMDB_user(k, "CHEMBL", "lfrancois", admin=TRUE)
 # remove_chMDB_user(k, "CHEMBL", "lfrancois")
 list_chMDB_users(k, "CHEMBL")
@@ -1851,6 +1937,7 @@ archived before being updated. When `overwrite` is set to TRUE, the
 potential existing version is overwritten without being archived.
 
 ``` r
+
 lc <- scan_fileMDBs("fileMDB_directory")
 ## The commented line below allows the exploration of the data models in lc.
 # explore_MDBs(lc)
@@ -1866,12 +1953,14 @@ for(r in toFeed){
 Any admin user of a chMDB can delete the corresponding data.
 
 ``` r
+
 empty_chMDB(k, "CHEMBL")
 ```
 
 But only a system admin can drop the chMDB from the ClickHouse database.
 
 ``` r
+
 drop_chMDB(k, "CHEMBL")
 ```
 
@@ -1887,6 +1976,7 @@ variable. Additional functions are available to list and remove chTKCat
 collections.
 
 ``` r
+
 add_chTKCat_collection(k, "BE")
 list_chTKCat_collections(k)
 remove_chTKCat_collection(k, "BE")
@@ -1927,6 +2017,7 @@ the requirements defined by the
 Two collections are available by default in the TKCat package.
 
 ``` r
+
 list_local_collections()
 ```
 
@@ -1939,6 +2030,7 @@ list_local_collections()
 Here is how the *BE* collection is defined.
 
 ``` r
+
 get_local_collection("BE")
 ```
 
@@ -2065,6 +2157,7 @@ displayed in R session by calling the
 function.
 
 ``` r
+
 get_local_collection("BE") %>%
    show_collection_def()
 ```
@@ -2094,6 +2187,7 @@ file like the following one which correspond to BE members of the CHEMBL
 MDB.
 
 ``` r
+
 system.file(
    "examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json",
    package="TKCat"
@@ -2139,6 +2233,7 @@ defined by the collection JSON document, and therefore pass the
 following validation.
 
 ``` r
+
 jsonvalidate::json_validate(
    json=system.file(
       "examples/CHEMBL/model/Collections/BE-CHEMBL_BE_1.0.json",
@@ -2177,10 +2272,12 @@ with the
 function.
 
 ``` r
+
 get_collection_mapper("BE")
 ```
 
 ``` r
+
 function (x, y, orthologs = FALSE, restricted = FALSE, ...) 
 {
     if (!requireNamespace("BED")) {
@@ -2303,6 +2400,7 @@ corresponding to the column names of the matrix, and one of any type
 (excepted “row”, “column”, or “base64”).
 
 ``` r
+
 d <- matrix(
    rnorm(40), nrow=10,
    dimnames=list(
@@ -2330,6 +2428,7 @@ example below shows how a document can be put in a table and the
 corresponding data model.
 
 ``` r
+
 ch_config_files <- tibble(
    name=c("config.xml", "users.xml"),
    file=c(
@@ -2370,27 +2469,23 @@ Godard, Patrice, and Jonathan van Eyll. 2018. “BED: A Biological Entity
 Dictionary Based on a Graph Data Model.” *F1000Research* 7: 195.
 <https://doi.org/10.12688/f1000research.13925.3>.
 
-Kinsella, R. J., A. Kahari, S. Haider, J. Zamora, G. Proctor, G.
-Spudich, J. Almeida-King, et al. 2011. “Ensembl BioMarts: A Hub for Data
-Retrieval Across Taxonomic Space.” *Database* 2011 (0): bar030–30.
-<https://doi.org/10.1093/database/bar030>.
+Kinsella, R. J., A. Kahari, S. Haider, et al. 2011. “Ensembl BioMarts: A
+Hub for Data Retrieval Across Taxonomic Space.” *Database* 2011 (0):
+bar030–30. <https://doi.org/10.1093/database/bar030>.
 
-Köhler, Sebastian, Leigh Carmody, Nicole Vasilevsky, Julius O B
-Jacobsen, Daniel Danis, Jean-Philippe Gourdine, Michael Gargano, et al.
-2019. “Expansion of the Human Phenotype Ontology (HPO) Knowledge Base
-and Resources.” *Nucleic Acids Research* 47 (D1): D1018–27.
+Köhler, Sebastian, Leigh Carmody, Nicole Vasilevsky, et al. 2019.
+“Expansion of the Human Phenotype Ontology (HPO) Knowledge Base and
+Resources.” *Nucleic Acids Research* 47 (D1): D1018–27.
 <https://doi.org/10.1093/nar/gky1105>.
 
-Landrum, Melissa J., Jennifer M. Lee, Mark Benson, Garth R. Brown, Chen
-Chao, Shanmuga Chitipiralla, Baoshan Gu, et al. 2018. “ClinVar:
-Improving Access to Variant Interpretations and Supporting Evidence.”
-*Nucleic Acids Research* 46 (D1): D1062–67.
+Landrum, Melissa J., Jennifer M. Lee, Mark Benson, et al. 2018.
+“ClinVar: Improving Access to Variant Interpretations and Supporting
+Evidence.” *Nucleic Acids Research* 46 (D1): D1062–67.
 <https://doi.org/10.1093/nar/gkx1153>.
 
-Mendez, David, Anna Gaulton, A Patrícia Bento, Jon Chambers, Marleen De
-Veij, Eloy Félix, María Paula Magariños, et al. 2019. “ChEMBL: Towards
-Direct Deposition of Bioassay Data.” *Nucleic Acids Research* 47 (D1):
-D930–40. <https://doi.org/10.1093/nar/gky1075>.
+Mendez, David, Anna Gaulton, A Patrícia Bento, et al. 2019. “ChEMBL:
+Towards Direct Deposition of Bioassay Data.” *Nucleic Acids Research* 47
+(D1): D930–40. <https://doi.org/10.1093/nar/gky1075>.
 
 Wu, Chunlei, Ian MacLeod, and Andrew I. Su. 2012. “BioGPS and
 MyGene.info: Organizing Online, Gene-Centric Information.” *Nucleic

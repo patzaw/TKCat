@@ -26,6 +26,13 @@
   - numeric or integer: TYPE minmax GRANULARITY 1
   - other data type: skip
 
+- PROJECTION:
+
+  - Projections are created with
+    [`materialize_chMDB_projections()`](https://patzaw.github.io/TKCat/reference/materialize_chMDB_projections.md)
+  - Projections are identifed in the comment of the table data model:
+    ‘{ch_Projection:field1,field2…}’
+
 ## Version 1.1.15
 
 - Correction of GRANTS

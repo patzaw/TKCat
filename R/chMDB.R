@@ -477,6 +477,8 @@ is_current_chMDB <- function(x) {
 #' (default: FALSE)
 #' @param by the size of the batch: number of records to write
 #' together (default: 10^5)
+#' @param materializeProjections a logical indicating if projections should be
+#' materialize (default: TRUE)
 #'
 #' @return A [chMDB] object.
 #'
@@ -487,7 +489,8 @@ as_chMDB <- function(
   tkcon,
   timestamp = Sys.time(),
   overwrite = FALSE,
-  by = 10^5
+  by = 10^5,
+  materializeProjections = TRUE
 ) {
   timestamp <- as.POSIXct(timestamp)
   stopifnot(
@@ -773,10 +776,83 @@ as_chMDB <- function(
   ## Update grants ----
   update_chMDB_grants(tkcon, dbName)
 
+  ## Materialize Projections ----
+  toRet <- get_MDB(x = tkcon, dbName = dbName)
+  if (materializeProjections) {
+    message("Materialize projections")
+    materialize_chMDB_projections(toRet)
+  }
+
   ## Return the chMDB object ----
-  return(get_MDB(x = tkcon, dbName = dbName))
+  return(toRet)
 }
 
+###############################################################################@
+#' Materialize in ClickHouse any projection documented in the data model
+#'
+#' @param x a [chMDB] object
+#'
+#' @return Nothing: materialize projections in ClickHouse.
+#'
+#' @export
+#'
+materialize_chMDB_projections <- function(x) {
+  stopifnot(is.chMDB(x))
+  dm <- data_model(x)
+  projections <- lapply(dm, .get_tm_projections)
+  projections <- projections[which(lengths(projections) > 0)]
+  dbt <- db_tables(x)
+  for (tn in names(projections)) {
+    tp <- as.character(dbt$dbTables[tn])
+    for (i in 1:nrow(projections[[tn]])) {
+      p <- projections[[tn]][i, ]
+      cq <- sprintf(
+        'ALTER TABLE %s ADD PROJECTION %s (%s %s)',
+        tp,
+        p$name,
+        p$select,
+        p$clause
+      )
+      mq <- sprintf(
+        'ALTER TABLE %s MATERIALIZE PROJECTION %s',
+        tp,
+        p$name
+      )
+      DBI::dbSendQuery(dbt$tkcon$chcon, cq)
+      DBI::dbSendQuery(dbt$tkcon$chcon, mq)
+    }
+  }
+}
+
+
+###############################################################################@
+#' Drop in ClickHouse any projection documented in the data model
+#'
+#' @param x a [chMDB] object
+#'
+#' @return Nothing: drop projections in ClickHouse.
+#'
+#' @export
+#'
+drop_chMDB_projections <- function(x) {
+  stopifnot(is.chMDB(x))
+  dm <- data_model(x)
+  projections <- lapply(dm, .get_tm_projections)
+  projections <- projections[which(lengths(projections) > 0)]
+  dbt <- db_tables(x)
+  for (tn in names(projections)) {
+    tp <- as.character(dbt$dbTables[tn])
+    for (i in 1:nrow(projections[[tn]])) {
+      p <- projections[[tn]][i, ]
+      dq <- sprintf(
+        'ALTER TABLE %s DROP PROJECTION IF EXISTS %s',
+        tp,
+        p$name
+      )
+      DBI::dbSendQuery(dbt$tkcon$chcon, dq)
+    }
+  }
+}
 
 ###############################################################################@
 #'
@@ -2616,13 +2692,18 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
   } else {
     ## Table ----
 
-    query <- "SELECT * FROM %s ORDER BY %s LIMIT %s, %s"
+    sk <- .get_tm_sortKey(tableModel, quoted = TRUE)
+    query <- "SELECT * FROM %s %s LIMIT %s, %s"
     toRet <- get_query(
       x,
       sprintf(
         query,
         tablePath,
-        .get_tm_sortKey(tableModel, quoted = TRUE),
+        ifelse(
+          sk == "",
+          "",
+          paste("ORDER BY", sk)
+        ),
         skip,
         n_max
       ),

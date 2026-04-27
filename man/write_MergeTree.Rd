@@ -15,7 +15,8 @@ write_MergeTree(
   nullable = NULL,
   lowCardinality = NULL,
   sortKey = NULL,
-  indexes = NULL
+  indexes = NULL,
+  projections = NULL
 )
 }
 \arguments{
@@ -47,6 +48,13 @@ are used in the key.}
 \item type: 'bloom_filter(0.01)', 'minmax'...
 (see https://clickhouse.com/docs/optimize/skipping-indexes)
 \item granularity: index granularity
+}}
+
+\item{projections}{a data.frame with 3 columns:
+\itemize{
+\item projection: projection name (e.g., "prj_tn_cn"),
+\item select: select statement (e.g., "SELECT *"),
+\item clause: clause for the projection (e.g., "ORDER BY (cn)")
 }}
 }
 \value{

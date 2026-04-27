@@ -23,6 +23,11 @@ containing '{ch_LowCardinality}'. It only applies to character data.
    - numeric or integer: TYPE minmax GRANULARITY 1
    - other data type: skip
 
+- PROJECTION:
+   - Projections are created with `materialize_chMDB_projections()`
+   - Projections are identifed in the comment of the table data model:
+   '{ch_Projection:field1,field2...}'
+
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->

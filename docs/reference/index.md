@@ -153,6 +153,9 @@
 - [`drop_chMDB()`](https://patzaw.github.io/TKCat/reference/drop_chMDB.md)
   : Drop a database from a chTKCat
 
+- [`drop_chMDB_projections()`](https://patzaw.github.io/TKCat/reference/drop_chMDB_projections.md)
+  : Drop in ClickHouse any projection documented in the data model
+
 - [`drop_chTKCat_user()`](https://patzaw.github.io/TKCat/reference/drop_chTKCat_user.md)
   : Drop a user from a chTKCat object
 
@@ -337,6 +340,10 @@
 
 - [`map_collection_members()`](https://patzaw.github.io/TKCat/reference/map_collection_members.md)
   : Map different collection members
+
+- [`materialize_chMDB_projections()`](https://patzaw.github.io/TKCat/reference/materialize_chMDB_projections.md)
+  : Materialize in ClickHouse any projection documented in the data
+  model
 
 - [`memoMDB()`](https://patzaw.github.io/TKCat/reference/memoMDB.md)
   [`` `names<-`( ``*`<memoMDB>`*`)`](https://patzaw.github.io/TKCat/reference/memoMDB.md)

@@ -32,6 +32,7 @@ created by calling the
 function which takes some metadata as arguments.
 
 ``` r
+
 ebkm <- create_KMR(
    name="EBKM",
    title="Experimental and Biological Knowledge Management",
@@ -61,6 +62,7 @@ It’s also possible to store helpers in a KMR object. These helpers are
 typically functions used to query MDBs fitting KMR requirements.
 
 ``` r
+
 data_model(ebkm) %>% 
    plot()
 ```
@@ -78,6 +80,7 @@ sample name and a sample description.
 It is specified by first defining the features,
 
 ``` r
+
 ebkm <- add_feature_def(
    kmr = ebkm,
    name = "name",
@@ -105,6 +108,7 @@ ebkm <- add_feature_def(
 and then by defining the table.
 
 ``` r
+
 ebkm <- add_table_def(
    kmr = ebkm,
    name = "samples",
@@ -120,6 +124,7 @@ samples, we can define the sex and tissue features and add them to the
 table definition:
 
 ``` r
+
 ebkm <- add_feature_def(
    kmr = ebkm,
    name = "sex",
@@ -183,6 +188,7 @@ that we want to standardize as shown below.
 - Possible values for sex
 
   ``` r
+
   ebkm <- add_property_values(
      kmr = ebkm, feature = "sex", property = "value",
      values = c("female", "male")
@@ -195,6 +201,7 @@ that we want to standardize as shown below.
   also controlled.
 
   ``` r
+
   ebkm <- add_property_values(
      kmr = ebkm, feature = "tissue", property = "reference",
      values=c(
@@ -219,6 +226,7 @@ units. For example, “age” “value” is a “duration” that can be expres
 using different units, such as “m” (months) or “y” (years).
 
 ``` r
+
 ebkm <- add_unit_def(
    kmr = ebkm,
    measurement = "duration", unit = "s", description = "seconds"
@@ -280,6 +288,7 @@ functions.
 - Get supported table types:
 
   ``` r
+
   list_table_types(ebkm)
   ```
 
@@ -291,6 +300,7 @@ functions.
 - Get supported features:
 
   ``` r
+
   list_table_features(ebkm, "samples")
   ```
 
@@ -306,6 +316,7 @@ functions.
 - Details about feature properties:
 
   ``` r
+
   list_feature_properties(ebkm, "tissue")
   ```
 
@@ -322,6 +333,7 @@ functions.
 - Get property supported values:
 
   ``` r
+
   list_property_values(ebkm, "sex", "value")
   ```
 
@@ -334,12 +346,14 @@ functions.
 - Get measurements and units:
 
   ``` r
+
   list_measurements(ebkm)
   ```
 
       ## [1] "duration"
 
   ``` r
+
   list_measurement_units(ebkm, "duration")
   ```
 
@@ -362,6 +376,7 @@ Let’s create a simple MDB with only one table with biological samples
 information.
 
 ``` r
+
 samples <- tibble(
    name = c("S1", "S2", "S3", "S4"),
    description = c(
@@ -394,6 +409,7 @@ of the KMR requirements (e.g. “seizures”) can still be used in the MDB
 but are not part of specifications.
 
 ``` r
+
 mdb <- add_km_spec(mdb, ebkm)
 mdb <- add_km_table(
    mdb, ebkm,
@@ -434,6 +450,7 @@ interest. For example the following function has been saved the
 “EBKM-helpers.R” file.
 
 ``` r
+
 ###############################################################################@
 #' Get reference URLs of biological tissues
 #'
@@ -454,6 +471,7 @@ get_tissue_ref_url <- function(ids, reference = "Uberon") {
 It can be attached to the KMR object as follows:
 
 ``` r
+
 ebkm <- add_helpers(
    ebkm,
    code="EBKM-helpers.R",
@@ -465,6 +483,7 @@ ebkm <- add_helpers(
 Then the helpers can be retrieved and used as follows:
 
 ``` r
+
 ebkm_helpers <- get_R_helpers(ebkm)
 ebkm_helpers$help()
 ```
@@ -473,6 +492,7 @@ ebkm_helpers$help()
     ## - help: Display documentation regarding an helper function
 
 ``` r
+
 ebkm_helpers$help("get_tissue_ref_url")
 ```
 
@@ -488,6 +508,7 @@ ebkm_helpers$help("get_tissue_ref_url")
     ## Result: URLs corresponding to provided ids
 
 ``` r
+
 ebkm_helpers$get_tissue_ref_url(c("UBERON_0002421", "UBERON_0001876"))
 ```
 
@@ -501,6 +522,7 @@ following function summarizes the number of seizures associated to
 biological samples:
 
 ``` r
+
 ###############################################################################@
 #' Summarize the number of seizures observed in samples
 #'
@@ -519,6 +541,7 @@ When associating and retrieving MDB helpers, KMR object need to be
 provided:
 
 ``` r
+
 mdb <- add_helpers(
    mdb,
    kmr = ebkm,
@@ -531,6 +554,7 @@ mdb <- add_helpers(
 MDB helpers can be retrieved and used similarly as KMR helpers:
 
 ``` r
+
 mdb_helpers <- get_R_helpers(mdb, kmr = ebkm)
 mdb_helpers$help("summarize_seizures")
 ```
@@ -546,6 +570,7 @@ mdb_helpers$help("summarize_seizures")
     ## Result: A table with Min., 1st Qu., Median, Mean, 3rd Qu. and Max. values
 
 ``` r
+
 mdb_helpers$summarize_seizures()
 ```
 
@@ -558,6 +583,7 @@ MDB can be combined with relevant KMR to create POK (Piece Of Knowledge)
 objects:
 
 ``` r
+
 pok <- create_POK(mdb, ebkm)
 pok
 ```
@@ -583,6 +609,7 @@ POK can be retrieved directly from a TKCat or chTKCat object as
 examplified below:
 
 ``` r
+
 tkcat <- TKCat(Test=mdb, EBKM=ebkm)
 get_POK(tkcat, "Test", "EBKM")
 ```

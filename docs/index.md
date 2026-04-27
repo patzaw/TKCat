@@ -29,6 +29,7 @@ The TKCat R package is licensed under
 ## From CRAN
 
 ``` r
+
 install.packages("TKCat")
 ```
 
@@ -103,6 +104,7 @@ And those are suggested:
 ## From github
 
 ``` r
+
 devtools::install_github("patzaw/TKCat")
 ```
 

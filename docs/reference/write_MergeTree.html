@@ -65,7 +65,8 @@ table</p>
 <span>  nullable <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lowCardinality <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sortKey <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  indexes <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  indexes <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  projections <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -116,6 +117,13 @@ are used in the key.</p></dd>
 <li><p>type: 'bloom_filter(0.01)', 'minmax'...
 (see https://clickhouse.com/docs/optimize/skipping-indexes)</p></li>
 <li><p>granularity: index granularity</p></li>
+</ul></dd>
+
+
+<dt id="arg-projections">projections<a class="anchor" aria-label="anchor" href="#arg-projections"></a></dt>
+<dd><p>a data.frame with 3 columns:</p><ul><li><p>projection: projection name (e.g., "prj_tn_cn"),</p></li>
+<li><p>select: select statement (e.g., "SELECT *"),</p></li>
+<li><p>clause: clause for the projection (e.g., "ORDER BY (cn)")</p></li>
 </ul></dd>
 
 </dl></div>
