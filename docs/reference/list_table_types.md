@@ -17,6 +17,6 @@ list_table_types(kmr)
 
 ## Value
 
-A [dplyr::tibble](https://dplyr.tidyverse.org/reference/reexports.html)
+A [dplyr::tibble](https://tibble.tidyverse.org/reference/tibble.html)
 with the names of table types, their descriptions and the related
 collections

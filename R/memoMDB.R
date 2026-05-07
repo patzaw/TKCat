@@ -475,7 +475,7 @@ dims.memoMDB <- function(x, ...) {
 #'
 #' @export
 #'
-'[.memoMDB' <- function(x, i) {
+`[.memoMDB` <- function(x, i) {
   if (missing(i)) {
     return(x)
   }
@@ -528,7 +528,7 @@ dims.memoMDB <- function(x, ...) {
 #'
 #' @export
 #'
-'[[.memoMDB' <- function(x, i) {
+`[[.memoMDB` <- function(x, i) {
   stopifnot(
     length(i) == 1
   )
@@ -542,7 +542,7 @@ dims.memoMDB <- function(x, ...) {
 #' @rdname memoMDB
 #'
 #' @export
-'$.memoMDB' <- `[[.memoMDB`
+`$.memoMDB` <- `[[.memoMDB`
 
 
 ###############################################################################@
@@ -558,7 +558,7 @@ as_fileMDB.memoMDB <- function(
   readParameters = list(delim = "\t", na = "<NA>"),
   htmlModel = TRUE,
   compress = TRUE,
-  by = 10^5,
+  by = 10^7,
   ...
 ) {
   stopifnot(is.character(path), length(path) == 1, !is.na(path))
@@ -855,6 +855,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
 .write_chTables.memoMDB <- function(x, con, dbName, by, ...) {
   dm <- data_model(x)
   for (tn in names(x)) {
+    message(tn)
     if (ReDaMoR::is.MatrixModel(dm[[tn]])) {
       if (inherits(x[[tn]], c("dgCMatrix", "dgTMatrix"))) {
         ## Sparse matrix ----
@@ -879,7 +880,8 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
           value = rowTable,
           rtypes = c("i" = "integer", name = "character"),
           nullable = NULL,
-          sortKey = "i"
+          sortKey = "i",
+          by = by
         )
         write_MergeTree(
           con = con,
@@ -888,7 +890,8 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
           value = colTable,
           rtypes = c("j" = "integer", name = "character"),
           nullable = NULL,
-          sortKey = "j"
+          sortKey = "j",
+          by = by
         )
 
         ## Values
@@ -909,7 +912,8 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
           value = tw,
           rtypes = c("i" = "integer", "j" = "integer", "x" = "numeric"),
           nullable = nullable,
-          sortKey = c("i", "j")
+          sortKey = c("i", "j"),
+          by = by
         )
 
         ## Reference table
@@ -920,21 +924,106 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
           value = modTable
         )
       } else {
-        ## Matrix ----
+        if (ncol(x[[tn]]) > CH_MAX_COL) {
+          ## Large Matrix ----
 
-        if (ncol(x[[tn]]) > CH_MAX_COL && nrow(x[[tn]]) < ncol(x[[tn]])) {
-          tw <- x[[tn]]
-          gc()
-          transposed <- TRUE
-          scn <- sort(rownames(tw))
-          colList <- seq(1, nrow(tw), by = CH_MAX_COL)
-          colList <- lapply(
-            colList,
-            function(i) {
-              scn[i:min(i + CH_MAX_COL - 1, nrow(tw))]
-            }
+          ## Rownames and colnames
+          rowTable <- dplyr::tibble(
+            i = 1:nrow(x[[tn]]),
+            name = rownames(x[[tn]])
+          )
+          colTable <- dplyr::tibble(
+            j = 1:ncol(x[[tn]]),
+            name = colnames(x[[tn]])
+          )
+          modTable <- dplyr::tibble(
+            table = uuid::UUIDgenerate(n = 3),
+            info = c("rows", "columns", "all_values")
+          )
+          write_MergeTree(
+            con = con,
+            dbName = dbName,
+            tableName = modTable$table[which(modTable$info == "rows")],
+            value = rowTable,
+            rtypes = c("i" = "integer", name = "character"),
+            nullable = NULL,
+            sortKey = "i",
+            by = by
+          )
+          write_MergeTree(
+            con = con,
+            dbName = dbName,
+            tableName = modTable$table[which(modTable$info == "columns")],
+            value = colTable,
+            rtypes = c("j" = "integer", name = "character"),
+            nullable = NULL,
+            sortKey = "j",
+            by = by
+          )
+
+          ## Values
+          nullable <- dm[[tn]]$fields %>%
+            dplyr::filter(!.data$type %in% c("column", "row")) %>%
+            dplyr::pull("nullable")
+          if (nullable) {
+            nullable <- "x"
+          } else {
+            nullable <- NULL
+          }
+          valTable <- modTable$table[which(modTable$info == "all_values")]
+
+          vtype <- setdiff(dm[[tn]]$fields$type, c("row", "column"))
+          tw <- dplyr::tibble(
+            i = integer(),
+            j = integer(),
+            x = ReDaMoR::as_type(c(), vtype)
+          )
+
+          write_MergeTree(
+            con = con,
+            dbName = dbName,
+            tableName = valTable,
+            value = tw,
+            rtypes = c(
+              "i" = "integer",
+              "j" = "integer",
+              "x" = vtype
+            ),
+            nullable = nullable,
+            sortKey = c("i", "j")
+          )
+
+          by_n <- max(floor(by / ncol(x[[tn]])), 1)
+          processed <- 0
+          while (processed < nrow(x[[tn]])) {
+            to_process <- c(processed + 1, min(processed + by_n, nrow(x[[tn]])))
+            tw <- x[[tn]][to_process[1]:to_process[2], ]
+            print(dim(tw))
+            tw <- dplyr::tibble(
+              i = rep(to_process[1]:to_process[2], ncol(tw)),
+              j = rep(1:ncol(tw), each = to_process[2] - to_process[1] + 1),
+              x = ReDaMoR::as_type(tw, vtype)
+            )
+            message("   ", to_process[2], " rows uploaded")
+            ch_insert(
+              con = con,
+              dbName = dbName,
+              tableName = valTable,
+              value = tw,
+              by = by
+            )
+            processed <- to_process[2]
+          }
+
+          ## Reference table
+          ch_insert(
+            con = con,
+            dbName = dbName,
+            tableName = tn,
+            value = modTable
           )
         } else {
+          ## Matrix ----
           tw <- x[[tn]]
           transposed <- FALSE
           scn <- sort(colnames(tw))
@@ -945,72 +1034,78 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
               scn[i:min(i + CH_MAX_COL - 1, ncol(tw))]
             }
           )
-        }
-        names(colList) <- uuid::UUIDgenerate(n = length(colList))
-        nullable <- dm[[tn]]$fields %>%
-          dplyr::filter(!.data$type %in% c("column", "row")) %>%
-          dplyr::pull("nullable")
-        vtype <- dm[[tn]]$fields %>%
-          dplyr::filter(!.data$type %in% c("column", "row")) %>%
-          dplyr::pull("type")
-        for (stn in names(colList)) {
-          if (transposed) {
-            stw <- tw[colList[[stn]], , drop = FALSE] %>%
-              t() %>%
-              dplyr::as_tibble(rownames = "___COLNAMES___")
-          } else {
-            stw <- tw[, colList[[stn]], drop = FALSE] %>%
-              dplyr::as_tibble(rownames = "___ROWNAMES___")
+
+          names(colList) <- uuid::UUIDgenerate(n = length(colList))
+          nullable <- dm[[tn]]$fields %>%
+            dplyr::filter(!.data$type %in% c("column", "row")) %>%
+            dplyr::pull("nullable")
+          vtype <- dm[[tn]]$fields %>%
+            dplyr::filter(!.data$type %in% c("column", "row")) %>%
+            dplyr::pull("type")
+          for (stn in names(colList)) {
+            if (transposed) {
+              stw <- tw[colList[[stn]], , drop = FALSE] %>%
+                t() %>%
+                dplyr::as_tibble(rownames = "___COLNAMES___")
+            } else {
+              stw <- tw[, colList[[stn]], drop = FALSE] %>%
+                dplyr::as_tibble(rownames = "___ROWNAMES___")
+            }
+            nulcol <- NULL
+            if (nullable) {
+              nulcol <- colList[[stn]]
+            }
+            write_MergeTree(
+              con = con,
+              dbName = dbName,
+              tableName = stn,
+              value = stw,
+              rtypes = c("character", rep(vtype, ncol(stw) - 1)) %>%
+                magrittr::set_names(colnames(stw)),
+              nullable = nulcol,
+              sortKey = colnames(stw)[1],
+              by = by
+            )
+            rm(stw)
+            gc()
           }
-          nulcol <- NULL
-          if (nullable) {
-            nulcol <- colList[[stn]]
-          }
-          write_MergeTree(
+          ch_insert(
             con = con,
             dbName = dbName,
-            tableName = stn,
-            value = stw,
-            rtypes = c("character", rep(vtype, ncol(stw) - 1)) %>%
-              magrittr::set_names(colnames(stw)),
-            nullable = nulcol,
-            sortKey = colnames(stw)[1]
+            tableName = tn,
+            value = dplyr::tibble(table = names(colList), info = "values")
           )
-          rm(stw)
-          gc()
         }
-        ch_insert(
-          con = con,
-          dbName = dbName,
-          tableName = tn,
-          value = dplyr::tibble(table = names(colList), info = "values")
-        )
       }
     } else {
-      {
-        ## Table ----
+      ## Table ----
 
-        toWrite <- x[[tn]]
-        b64_fields <- dm[[tn]]$fields %>%
-          dplyr::filter(.data$type == "base64") %>%
-          dplyr::pull("name")
-        for (b64f in b64_fields) {
-          toWrite[[b64f]] <- lapply(
-            toWrite[[b64f]],
-            function(v) {
-              if (is.na(v)) {
-                return(character())
-              }
-              sl <- c(
-                seq(1, nchar(v), by = CH_DOC_CHUNK),
-                nchar(v) + 1
-              )
-              return(substring(v, sl[-length(sl)], sl[-1] - 1))
+      toWrite <- x[[tn]]
+      b64_fields <- dm[[tn]]$fields %>%
+        dplyr::filter(.data$type == "base64") %>%
+        dplyr::pull("name")
+      for (b64f in b64_fields) {
+        toWrite[[b64f]] <- lapply(
+          toWrite[[b64f]],
+          function(v) {
+            if (is.na(v)) {
+              return(character())
             }
-          )
-        }
-        ch_insert(con = con, dbName = dbName, tableName = tn, value = toWrite)
+            sl <- c(
+              seq(1, nchar(v), by = CH_DOC_CHUNK),
+              nchar(v) + 1
+            )
+            return(substring(v, sl[-length(sl)], sl[-1] - 1))
+          }
+        )
       }
+      ch_insert(
+        con = con,
+        dbName = dbName,
+        tableName = tn,
+        value = toWrite,
+        by = by
+      )
     }
   }
 }

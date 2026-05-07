@@ -559,7 +559,7 @@ dims.metaMDB <- function(x, ...) {
 #'
 #' @export
 #'
-'[.metaMDB' <- function(x, i) {
+`[.metaMDB` <- function(x, i) {
   if (missing(i)) {
     return(x)
   }
@@ -618,7 +618,7 @@ dims.metaMDB <- function(x, ...) {
 #'
 #' @export
 #'
-'[[.metaMDB' <- function(x, i) {
+`[[.metaMDB` <- function(x, i) {
   stopifnot(
     length(i) == 1
   )
@@ -632,7 +632,7 @@ dims.metaMDB <- function(x, ...) {
 #' @rdname metaMDB
 #'
 #' @export
-'$.metaMDB' <- `[[.metaMDB`
+`$.metaMDB` <- `[[.metaMDB`
 
 ###############################################################################@
 #'
@@ -669,7 +669,7 @@ as_fileMDB.metaMDB <- function(
   readParameters = list(delim = "\t", na = "<NA>"),
   htmlModel = TRUE,
   compress = TRUE,
-  by = 10^5,
+  by = 10^7,
   ...
 ) {
   stopifnot(is.character(path), length(path) == 1, !is.na(path))

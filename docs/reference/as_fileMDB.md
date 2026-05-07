@@ -12,7 +12,7 @@ as_fileMDB(
   readParameters = list(delim = "\t", na = "<NA>"),
   htmlModel = TRUE,
   compress = TRUE,
-  by = 10^5,
+  by = 10^7,
   ...
 )
 
@@ -23,7 +23,7 @@ as_fileMDB(
   readParameters = list(delim = "\t", na = "<NA>"),
   htmlModel = TRUE,
   compress = TRUE,
-  by = 10^5,
+  by = 10^7,
   ...
 )
 
@@ -33,7 +33,7 @@ as_fileMDB(
   readParameters = list(delim = "\t", na = "<NA>"),
   htmlModel = TRUE,
   compress = TRUE,
-  by = 10^5,
+  by = 10^7,
   ...
 )
 
@@ -44,7 +44,7 @@ as_fileMDB(
   readParameters = list(delim = "\t", na = "<NA>"),
   htmlModel = TRUE,
   compress = TRUE,
-  by = 10^5,
+  by = 10^7,
   ...
 )
 
@@ -55,7 +55,7 @@ as_fileMDB(
   readParameters = list(delim = "\t", na = "<NA>"),
   htmlModel = TRUE,
   compress = TRUE,
-  by = 10^5,
+  by = 10^7,
   ...
 )
 ```
@@ -99,7 +99,7 @@ as_fileMDB(
 - by:
 
   the size of the batch: number of records to write together (default:
-  10^5)
+  10^7)
 
 - ...:
 

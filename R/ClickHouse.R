@@ -105,6 +105,8 @@ list_tables.DBIConnection <- function(
 #' - projection: projection name (e.g., "prj_tn_cn"),
 #' - select: select statement (e.g., "SELECT *"),
 #' - clause: clause for the projection (e.g., "ORDER BY (cn)")
+#' @param by the size of the batch: number of records to import
+#' together (default: 10^7)
 #'
 #' @return No return value, called for side effects
 #'
@@ -120,7 +122,8 @@ write_MergeTree <- function(
   lowCardinality = NULL,
   sortKey = NULL,
   indexes = NULL,
-  projections = NULL
+  projections = NULL,
+  by = 10^7
 ) {
   stopifnot(
     inherits(con, "DBIConnection"),
@@ -229,7 +232,7 @@ write_MergeTree <- function(
 
   DBI::dbSendQuery(con, tst)
 
-  ch_insert(con, dbName, tableName, value)
+  ch_insert(con, dbName, tableName, value, by = by)
 
   invisible()
 }
@@ -242,7 +245,7 @@ write_MergeTree <- function(
 #' @param tableName the name of the table
 #' @param value the table to import
 #' @param by the size of the batch: number of records to import
-#' together (default: 10^6)
+#' together (default: 10^7)
 #'
 #' @return No return value, called for side effects
 #'
@@ -253,7 +256,7 @@ ch_insert <- function(
   dbName,
   tableName,
   value,
-  by = 10^6
+  by = 10^7
 ) {
   stopifnot(
     inherits(con, "DBIConnection"),

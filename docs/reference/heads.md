@@ -37,5 +37,5 @@ heads(x, ..., n = 6L)
 ## Value
 
 A list of
-[dplyr::tibble](https://dplyr.tidyverse.org/reference/reexports.html)
-and [matrix](https://rdrr.io/r/base/matrix.html)
+[dplyr::tibble](https://tibble.tidyverse.org/reference/tibble.html) and
+[matrix](https://rdrr.io/r/base/matrix.html)

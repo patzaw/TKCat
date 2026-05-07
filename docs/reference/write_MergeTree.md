@@ -17,7 +17,8 @@ write_MergeTree(
   lowCardinality = NULL,
   sortKey = NULL,
   indexes = NULL,
-  projections = NULL
+  projections = NULL,
+  by = 10^7
 )
 ```
 
@@ -82,6 +83,11 @@ write_MergeTree(
   - select: select statement (e.g., "SELECT \*"),
 
   - clause: clause for the projection (e.g., "ORDER BY (cn)")
+
+- by:
+
+  the size of the batch: number of records to import together (default:
+  10^7)
 
 ## Value
 

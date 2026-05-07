@@ -792,7 +792,7 @@ data_file_size <- function(x, hr = FALSE) {
 #'
 #' @export
 #'
-'[.fileMDB' <- function(x, i) {
+`[.fileMDB` <- function(x, i) {
   if (missing(i)) {
     return(x)
   }
@@ -849,7 +849,7 @@ data_file_size <- function(x, hr = FALSE) {
 #'
 #' @rdname fileMDB
 #'
-'[[.fileMDB' <- function(x, i) {
+`[[.fileMDB` <- function(x, i) {
   stopifnot(
     length(i) == 1
   )
@@ -862,7 +862,7 @@ data_file_size <- function(x, hr = FALSE) {
 }
 #' @rdname fileMDB
 #' @export
-'$.fileMDB' <- `[[.fileMDB`
+`$.fileMDB` <- `[[.fileMDB`
 
 ###############################################################################@
 #'
@@ -892,7 +892,7 @@ as.list.fileMDB <- function(x, ...) {
 #' @method as_fileMDB fileMDB
 #'
 #' @param by the size of the batch: number of records to write
-#' together (default: 10^5)
+#' together (default: 10^7)
 #'
 #' @export
 #'
@@ -902,7 +902,7 @@ as_fileMDB.fileMDB <- function(
   readParameters = list(delim = "\t", na = "<NA>"),
   htmlModel = TRUE,
   compress = TRUE,
-  by = 10^5,
+  by = 10^7,
   ...
 ) {
   stopifnot(is.character(path), length(path) == 1, !is.na(path))
@@ -1442,12 +1442,13 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
 
 ###############################################################################@
 ## Helpers ----
-.write_chTables.fileMDB <- function(x, con, dbName, by = 10^5, ...) {
+.write_chTables.fileMDB <- function(x, con, dbName, by = 10^7, ...) {
   dm <- data_model(x)
   df <- data_files(x)
   rp <- df$readParameters
   df <- df$dataFiles
   for (tn in names(x)) {
+    message(tn)
     if (ReDaMoR::is.MatrixModel(dm[[tn]])) {
       if (ReDaMoR::is_MM(df[tn])) {
         ## Sparse matrix ----
@@ -1535,65 +1536,141 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
           value = modTable
         )
       } else {
-        ## Matrix ----
-
         nullable <- dm[[tn]]$fields %>%
           dplyr::filter(!.data$type %in% c("column", "row")) %>%
           dplyr::pull("nullable")
         vtype <- setdiff(dm[[tn]]$fields$type, c("column", "row"))
-        ddim <- dims(x, dplyr::all_of(tn), showWarnings = FALSE)
+        cnames <- data_tables(x, dplyr::all_of(tn), n_max = 1)[[1]] %>%
+          colnames()
+        n_col <- length(cnames)
 
-        if (ddim$ncol > CH_MAX_COL && ddim$nrow < ddim$ncol) {
-          transposed <- TRUE
-          tlist <- do.call(
-            .read_td_chunked,
-            c(
-              list(tm = dm[[tn]], f = df[tn]),
-              rp,
-              list(
-                callback = readr::DataFrameCallback$new(function(y, pos) {
-                  rn <- y$"___ROWNAMES___"
-                  y <- t(y[, -1]) %>%
-                    magrittr::set_colnames(rn) %>%
-                    dplyr::as_tibble(rownames = "___COLNAMES___")
-                  tname <- uuid::UUIDgenerate(n = 1)
-                  nulcol <- NULL
-                  if (nullable) {
-                    nulcol <- setdiff(colnames(y), "___COLNAMES___")
-                  }
-                  write_MergeTree(
-                    con = con,
-                    dbName = dbName,
-                    tableName = tname,
-                    value = y,
-                    rtypes = c("character", rep(vtype, ncol(y) - 1)) %>%
-                      magrittr::set_names(colnames(y)),
-                    nullable = nulcol,
-                    sortKey = colnames(y)[1]
-                  )
-                  return(tname)
-                }),
-                chunk_size = CH_MAX_COL
-              )
+        if (n_col > CH_MAX_COL) {
+          ## Large matrix ----
+          ## Colnames
+          colTable <- dplyr::tibble(
+            j = 1:length(cnames),
+            name = cnames
+          )
+          modTable <- dplyr::tibble(
+            table = uuid::UUIDgenerate(n = 3),
+            info = c("rows", "columns", "all_values")
+          )
+          write_MergeTree(
+            con = con,
+            dbName = dbName,
+            tableName = modTable$table[which(modTable$info == "columns")],
+            value = colTable,
+            rtypes = c("j" = "integer", name = "character"),
+            nullable = NULL,
+            sortKey = "j"
+          )
+
+          ## Rows (prepare empty table)
+          rowTable <- dplyr::tibble(
+            i = integer(),
+            name = character()
+          )
+          write_MergeTree(
+            con = con,
+            dbName = dbName,
+            tableName = modTable$table[which(modTable$info == "rows")],
+            value = rowTable,
+            rtypes = c("i" = "integer", name = "character"),
+            nullable = NULL,
+            sortKey = "i"
+          )
+
+          ## Values (prepare empty table)
+          nullable <- dm[[tn]]$fields %>%
+            dplyr::filter(!.data$type %in% c("column", "row")) %>%
+            dplyr::pull("nullable")
+          if (nullable) {
+            nullable <- "x"
+          } else {
+            nullable <- NULL
+          }
+          valTable <- modTable$table[which(modTable$info == "all_values")]
+          write_MergeTree(
+            con = con,
+            dbName = dbName,
+            tableName = valTable,
+            value = dplyr::tibble(
+              i = integer(),
+              j = integer(),
+              x = ReDaMoR::as_type(c(), vtype)
+            ),
+            rtypes = c("i" = "integer", "j" = "integer", "x" = vtype),
+            nullable = nullable,
+            sortKey = c("i", "j")
+          )
+          ## Values (fill table and rows)
+          fcon <- file(df[tn], open = "r")
+          header <- readLines(fcon, n = 1)
+          # col_names <- strsplit(header, "\t")[[1]]
+
+          chunk_size <- max(floor(by / n_col), 1)
+          si <- 1
+
+          repeat {
+            chunk <- utils::read.delim(
+              fcon,
+              sep = rp$delim,
+              na.strings = ifelse(is.na(rp$na), "NA", rp$na),
+              header = FALSE,
+              nrows = chunk_size,
+              col.names = c("___ROWNAMES___", cnames),
+              colClasses = c("character", rep(vtype, length(cnames))),
+              check.names = FALSE
             )
-          ) %>%
-            as.character()
+            if (nrow(chunk) == 0) {
+              break
+            }
+            i <- si:(si + nrow(chunk) - 1)
+            message("   ", si + nrow(chunk) - 1, " rows uploaded")
+            vToAdd <- dplyr::tibble(
+              i = rep(i, n_col),
+              j = rep(1:n_col, each = length(!!i)),
+              x = stats::setNames(unlist(chunk[, -1, drop = FALSE]), c())
+            )
+            ch_insert(
+              con = con,
+              dbName = dbName,
+              tableName = valTable,
+              value = vToAdd
+            )
+            rToAdd <- dplyr::tibble(
+              i = i,
+              name = chunk[["___ROWNAMES___"]]
+            )
+            ch_insert(
+              con = con,
+              dbName = dbName,
+              tableName = modTable$table[which(modTable$info == "rows")],
+              value = rToAdd
+            )
+            si <- si + nrow(chunk)
+          }
+          close(fcon)
+
+          ## Reference table
           ch_insert(
             con = con,
             dbName = dbName,
             tableName = tn,
-            value = dplyr::tibble(table = tlist, info = "values")
+            value = modTable
           )
+
         } else {
+          
+          ## Matrix ----
           transposed <- FALSE
-          cnames <- data_tables(x, dplyr::all_of(tn), n_max = 1)[[1]] %>%
-            colnames() %>%
+          cnames <- cnames %>%
             sort()
-          colList <- seq(1, ddim$ncol, by = CH_MAX_COL)
+          colList <- seq(1, n_col, by = CH_MAX_COL)
           colList <- lapply(
             colList,
             function(i) {
-              cnames[i:min(i + CH_MAX_COL - 1, ddim$ncol)]
+              cnames[i:min(i + CH_MAX_COL - 1, n_col)]
             }
           )
           names(colList) <- uuid::UUIDgenerate(n = length(colList))
@@ -1936,6 +2013,7 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
   delim,
   skip = 0,
   n_max = Inf,
+  na = "NA",
   ... # additional parameters for read_delim()
 ) {
   if (ReDaMoR::is.MatrixModel(tm)) {
@@ -1965,38 +2043,18 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
       vt <- tm$fields %>%
         dplyr::filter(!.data$type %in% c("row", "column")) %>%
         dplyr::pull("type")
-      ctypes <- do.call(
-        readr::cols,
-        structure(
-          list(
-            readr::col_character(),
-            .default = switch(
-              vt,
-              "integer" = readr::col_integer(),
-              "numeric" = readr::col_double(),
-              "logical" = readr::col_logical(),
-              "character" = readr::col_character(),
-              "Date" = readr::col_date(),
-              "POSIXct" = readr::col_datetime(),
-              "base64" = readr::col_character()
-            )
-          ),
-          .Names = c("___ROWNAMES___", ".default")
-        )
-      )
-      td <- readr::read_delim(
+
+      cclasses <- c("character", rep(vt, length(cn) - 1))
+      td <- utils::read.delim(
         f,
-        delim = delim,
-        n_max = n_max,
+        sep = delim,
+        na.strings = na,
         skip = skip + 1,
-        col_types = ctypes,
-        col_names = c("___ROWNAMES___", cn[-1]),
-        ...
-      ) %>%
-        as.data.frame(stringsAsFactors = FALSE)
-      stopifnot(
-        !any(duplicated(colnames(td))),
-        !any(duplicated(td[[1]]))
+        nrows = n_max,
+        header = FALSE,
+        col.names = c("___ROWNAMES___", cn)[-1],
+        colClasses = cclasses,
+        check.names = FALSE
       )
       rownames(td) <- td[[1]]
       td <- as.matrix(td[, -1, drop = FALSE])
@@ -2008,6 +2066,7 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
       skip = skip,
       n_max = n_max,
       col_types = ReDaMoR::col_types(tm),
+      na = na,
       ...
     )
   }

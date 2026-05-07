@@ -75,9 +75,10 @@ explore_MDBs(x, ...)
 
 - logoDiv:
 
-  a [shiny::div](https://rdrr.io/pkg/shiny/man/reexports.html) object
-  with a logo to display in side bar. The default is the TKCat hex
-  sticker with a link to TKCat github repository.
+  a
+  [shiny::div](https://rstudio.github.io/htmltools/reference/builder.html)
+  object with a logo to display in side bar. The default is the TKCat
+  hex sticker with a link to TKCat github repository.
 
 - rDirs:
 

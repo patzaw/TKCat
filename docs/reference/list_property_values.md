@@ -24,5 +24,5 @@ list_property_values(kmr, feature, property)
 
 ## Value
 
-A [dplyr::tibble](https://dplyr.tidyverse.org/reference/reexports.html)
+A [dplyr::tibble](https://tibble.tidyverse.org/reference/tibble.html)
 with value and their description (if available)

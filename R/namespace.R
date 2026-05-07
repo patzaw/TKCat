@@ -19,8 +19,9 @@
 #'
 #' @importFrom readr read_delim write_tsv read_delim_chunked DataFrameCallback
 #' @importFrom askpass askpass
-#' @importFrom utils packageName zip object.size str write.table head
+#' @importFrom utils packageName zip object.size str write.table head read.delim
 #' @importFrom graphics plot
+#' @importFrom stats setNames
 #'
 #' @importFrom markdown renderMarkdown
 #'

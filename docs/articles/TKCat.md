@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-04-27 10:15:14.265807
+    ## Timestamp: 2026-05-07 15:24:15.200089
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-04-27 10:15:14.265807
+    ## Timestamp: 2026-05-07 15:24:15.200089
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-04-27 10:15:14.265807
+    ## Timestamp: 2026-05-07 15:24:15.200089
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-04-27 10:15:14
+    ## Timestamp: 2026-05-07 15:24:15
     ## 
 
 Also writing these data and related information in text files make them
@@ -1643,7 +1643,7 @@ Once connected, this *chTKCat* object can be used as a *TKCat* object.
 list_MDBs(k)             # get a specific MDBs from the catalog
 ```
 
-    ## # A tibble: 31 × 12
+    ## # A tibble: 30 × 12
     ##    name   title description url   version maintainer public populated timestamps
     ##    <chr>  <chr> <chr>       <chr> <chr>   <chr>      <lgl>  <lgl>     <lgl>     
     ##  1 AP-Di… Ange… Ressources… NA    0.0.2   [Patrice … FALSE  TRUE      TRUE      
@@ -1656,7 +1656,7 @@ list_MDBs(k)             # get a specific MDBs from the catalog
     ##  8 FCD-T… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
     ##  9 GO     The … Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      
     ## 10 GTEx   Geno… The Adult … http… 0.01    [Patrice … TRUE   TRUE      TRUE      
-    ## # ℹ 21 more rows
+    ## # ℹ 20 more rows
     ## # ℹ 3 more variables: timestamp <dttm>, access <fct>, total_size <dbl>
 
 ``` r
@@ -1665,18 +1665,18 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
 ```
 
     ## # A tibble: 54 × 3
-    ##    resource            name                               comment               
-    ##    <chr>               <chr>                              <chr>                 
-    ##  1 AP-Disease-Strategy diseases                           NA                    
-    ##  2 AP-Disease-Strategy diseases_descendants               NA                    
-    ##  3 AP-Disease-Strategy diseases_groups                    NA                    
-    ##  4 AP-Disease-Strategy diseases_groups_identifiers        NA                    
-    ##  5 AP-Disease-Strategy diseases_parents                   NA                    
-    ##  6 AP-Disease-Strategy diseases_synonyms                  NA                    
-    ##  7 AP-Disease-Strategy general_disease_groups_identifiers General group of dise…
-    ##  8 HPA                 Disease_involvement                NA                    
-    ##  9 ChEMBL              assay_classification               Classification scheme…
-    ## 10 Monarch             Diseases                           NA                    
+    ##    resource name                         comment                 
+    ##    <chr>    <chr>                        <chr>                   
+    ##  1 HPO      Disease_HP                   HP presented by diseases
+    ##  2 HPO      Disease_synonyms             Disease synonyms        
+    ##  3 HPO      Diseases                     Diseases                
+    ##  4 Monarch  Diseases                     NA                      
+    ##  5 Monarch  Diseases_descendants         NA                      
+    ##  6 Monarch  Diseases_mode_of_inheritance NA                      
+    ##  7 Monarch  Diseases_parents             NA                      
+    ##  8 Monarch  Diseases_phenotypes          NA                      
+    ##  9 Monarch  Diseases_related             NA                      
+    ## 10 Monarch  Diseases_synonyms            NA                      
     ## # ℹ 44 more rows
 
 ``` r
@@ -1684,20 +1684,20 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
 search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
-    ## # A tibble: 157 × 7
-    ##    resource            table                 name  comment type  nullable unique
-    ##    <chr>               <chr>                 <chr> <chr>   <chr> <lgl>    <lgl> 
-    ##  1 AP-Disease-Strategy strategic_indications cate… "pheno… char… FALSE    FALSE 
-    ##  2 AP-Disease-Strategy strategic_indications class "sympt… char… FALSE    FALSE 
-    ##  3 AP-Disease-Strategy general_disease_grou… dise… ""      char… FALSE    FALSE 
-    ##  4 AP-Disease-Strategy strategic_indications dise… "Can i… logi… FALSE    FALSE 
-    ##  5 AP-Disease-Strategy cci_drug_indications  dise… ""      char… TRUE     FALSE 
-    ##  6 AP-Disease-Strategy cci_drug_indications… dise… ""      char… TRUE     FALSE 
-    ##  7 AP-Disease-Strategy cci_target_indicatio… dise… ""      char… TRUE     FALSE 
-    ##  8 AP-Disease-Strategy cci_target_indicatio… dise… ""      char… TRUE     FALSE 
-    ##  9 AP-Disease-Strategy cddi_drug_indications dise… ""      char… TRUE     FALSE 
-    ## 10 AP-Disease-Strategy cddi_drug_indication… dise… ""      char… TRUE     FALSE 
-    ## # ℹ 147 more rows
+    ## # A tibble: 155 × 7
+    ##    resource    table                         name  comment type  nullable unique
+    ##    <chr>       <chr>                         <chr> <chr>   <chr> <lgl>    <lgl> 
+    ##  1 MetaBase    ImagemapsEdges                dise… ""      logi… FALSE    FALSE 
+    ##  2 OpenTargets Diseases_and_Phenotypes       code  "Disea… char… FALSE    TRUE  
+    ##  3 OpenTargets Associations                  curr… "Novel… nume… FALSE    FALSE 
+    ##  4 OpenTargets Diseases_and_Phenotypes       desc… "Descr… char… TRUE     FALSE 
+    ##  5 OpenTargets Associations                  dise… "Disea… char… FALSE    FALSE 
+    ##  6 OpenTargets Clinical_reports_diseases     dise… ""      char… TRUE     FALSE 
+    ##  7 OpenTargets Clinical_reports_side_effects dise… ""      char… TRUE     FALSE 
+    ##  8 OpenTargets Diseases_ancestors            dise… "Disea… char… FALSE    FALSE 
+    ##  9 OpenTargets Diseases_children             dise… "Disea… char… FALSE    FALSE 
+    ## 10 OpenTargets Diseases_cross_references     dise… "Disea… char… FALSE    FALSE 
+    ## # ℹ 145 more rows
 
 ``` r
 
@@ -1764,7 +1764,7 @@ get_query(
 )
 ```
 
-    ## # A tibble: 294 × 3
+    ## # A tibble: 296 × 3
     ##    db    id     label                                                           
     ##    <chr> <chr>  <chr>                                                           
     ##  1 OMIM  117100 Centralopathic epilepsy                                         
@@ -1777,7 +1777,7 @@ get_query(
     ##  8 OMIM  213000 Cerebellar hypoplasia/atrophy, epilepsy, and global development…
     ##  9 OMIM  226810 Celiac disease, epilepsy and cerebral calcification syndrome    
     ## 10 OMIM  226850 EPILEPSY-TELANGIECTASIA                                         
-    ## # ℹ 284 more rows
+    ## # ℹ 286 more rows
 
 ## Defining and using Requirements for Knowledge Management (KMR)
 

@@ -4,7 +4,7 @@
 \alias{ch_insert}
 \title{Insert records by batches in a Clickhouse table}
 \usage{
-ch_insert(con, dbName, tableName, value, by = 10^6)
+ch_insert(con, dbName, tableName, value, by = 10^7)
 }
 \arguments{
 \item{con}{the clickhouse connection}
@@ -16,7 +16,7 @@ ch_insert(con, dbName, tableName, value, by = 10^6)
 \item{value}{the table to import}
 
 \item{by}{the size of the batch: number of records to import
-together (default: 10^6)}
+together (default: 10^7)}
 }
 \value{
 No return value, called for side effects

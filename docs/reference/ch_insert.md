@@ -5,7 +5,7 @@ Insert records by batches in a Clickhouse table
 ## Usage
 
 ``` r
-ch_insert(con, dbName, tableName, value, by = 10^6)
+ch_insert(con, dbName, tableName, value, by = 10^7)
 ```
 
 ## Arguments
@@ -29,7 +29,7 @@ ch_insert(con, dbName, tableName, value, by = 10^6)
 - by:
 
   the size of the batch: number of records to import together (default:
-  10^6)
+  10^7)
 
 ## Value
 

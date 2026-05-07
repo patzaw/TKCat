@@ -77,7 +77,7 @@ collection_members(x, ...)
 
 ## Value
 
-A [dplyr::tibble](https://dplyr.tidyverse.org/reference/reexports.html)
+A [dplyr::tibble](https://tibble.tidyverse.org/reference/tibble.html)
 with the following columns:
 
 - **collection** (character): The name of the collection

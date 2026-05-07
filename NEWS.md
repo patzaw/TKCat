@@ -5,7 +5,7 @@
 
 - Move from {getPass} to {askpass} package to get input masked in positron.
 
-### Changes in table creation
+### Changes in ClickHouse table creation
 
 - LowCardinality: information taken from field comment
 containing '{ch_LowCardinality}'. It only applies to character data.
@@ -27,6 +27,9 @@ containing '{ch_LowCardinality}'. It only applies to character data.
    - Projections are created with `materialize_chMDB_projections()`
    - Projections are identifed in the comment of the table data model:
    '{ch_Projection:field1,field2...}'
+   
+- Large matrices (with more than 1000 columns) are now stored as a long
+pivoted table in ClickHouse: filtering is much more efficient this way.
 
 
 <!----------------------------------------------------------------------------->

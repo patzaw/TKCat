@@ -27,7 +27,7 @@ heads(x, ..., n = 6L)
 \item{n}{maximum number of records to return (default: 6)}
 }
 \value{
-A list of \link[dplyr:reexports]{dplyr::tibble} and \link{matrix}
+A list of \link[dplyr:tibble]{dplyr::tibble} and \link{matrix}
 }
 \description{
 Get the first records of each object data tables

@@ -11,7 +11,7 @@ as_chMDB(
   tkcon,
   timestamp = Sys.time(),
   overwrite = FALSE,
-  by = 10^5,
+  by = 10^7,
   materializeProjections = TRUE
 )
 ```
@@ -43,7 +43,7 @@ as_chMDB(
 - by:
 
   the size of the batch: number of records to write together (default:
-  10^5)
+  10^7)
 
 - materializeProjections:
 

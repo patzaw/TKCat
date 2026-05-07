@@ -16,7 +16,8 @@ write_MergeTree(
   lowCardinality = NULL,
   sortKey = NULL,
   indexes = NULL,
-  projections = NULL
+  projections = NULL,
+  by = 10^7
 )
 }
 \arguments{
@@ -56,6 +57,9 @@ are used in the key.}
 \item select: select statement (e.g., "SELECT *"),
 \item clause: clause for the projection (e.g., "ORDER BY (cn)")
 }}
+
+\item{by}{the size of the batch: number of records to import
+together (default: 10^7)}
 }
 \value{
 No return value, called for side effects

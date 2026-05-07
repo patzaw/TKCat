@@ -58,11 +58,11 @@ connection ("blue" by default) and one for user
 connection ("yellow" by default).
 Working values: "blue", "black", "purple", "green", "red", "yellow".}
 
-\item{logoDiv}{a \link[shiny:reexports]{shiny::div} object with a logo to display in side bar.
+\item{logoDiv}{a \link[shiny:div]{shiny::div} object with a logo to display in side bar.
 The default is the TKCat hex sticker with a link to TKCat github repository.}
 
 \item{rDirs}{a named character vector with resource path
-for \link[shiny:resourcePaths]{shiny::addResourcePath}}
+for \link[shiny:addResourcePath]{shiny::addResourcePath}}
 
 \item{tabTitle}{a title to display in tab (default: "chTKCat")}
 

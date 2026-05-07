@@ -36,10 +36,10 @@ database is listening (default: 9111)}
 
 \item{drv}{a DBI driver for connecting to ClickHouse
 (default: \code{\link[ClickHouseHTTP:ClickHouseHTTP]{ClickHouseHTTP::ClickHouseHTTP()}};
-other supported driver: \code{\link[RClickhouse:ClickhouseDriver-class]{RClickhouse::clickhouse()}})}
+other supported driver: \code{\link[RClickhouse:clickhouse]{RClickhouse::clickhouse()}})}
 
 \item{...}{additional parameters for connection
-(see \link[ClickHouseHTTP:ClickHouseHTTPDriver-class]{ClickHouseHTTP::dbConnect,ClickHouseHTTPDriver-method}
+(see \link[ClickHouseHTTP:dbConnect,ClickHouseHTTPDriver-method]{ClickHouseHTTP::dbConnect,ClickHouseHTTPDriver-method}
 for the default driver)}
 }
 \value{

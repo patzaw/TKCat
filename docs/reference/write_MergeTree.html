@@ -66,7 +66,8 @@ table</p>
 <span>  lowCardinality <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  sortKey <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  indexes <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  projections <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  projections <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  by <span class="op">=</span> <span class="fl">10</span><span class="op">^</span><span class="fl">7</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -125,6 +126,11 @@ are used in the key.</p></dd>
 <li><p>select: select statement (e.g., "SELECT *"),</p></li>
 <li><p>clause: clause for the projection (e.g., "ORDER BY (cn)")</p></li>
 </ul></dd>
+
+
+<dt id="arg-by">by<a class="anchor" aria-label="anchor" href="#arg-by"></a></dt>
+<dd><p>the size of the batch: number of records to import
+together (default: 10^7)</p></dd>
 
 </dl></div>
     <div class="section level2">

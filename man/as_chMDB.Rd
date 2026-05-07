@@ -9,7 +9,7 @@ as_chMDB(
   tkcon,
   timestamp = Sys.time(),
   overwrite = FALSE,
-  by = 10^5,
+  by = 10^7,
   materializeProjections = TRUE
 )
 }
@@ -30,7 +30,7 @@ the existing timestamp.}
 (default: FALSE)}
 
 \item{by}{the size of the batch: number of records to write
-together (default: 10^5)}
+together (default: 10^7)}
 
 \item{materializeProjections}{a logical indicating if projections should be
 materialize (default: TRUE)}
