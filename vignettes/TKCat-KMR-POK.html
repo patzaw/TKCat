@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2026-05-07" />
+<meta name="date" content="2026-05-08" />
 
 <title>Defining and using Requirements for Knowledge Management (KMR) in TKCat</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Defining and using Requirements for
 Knowledge Management (KMR) in TKCat</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">May 07, 2026</h4>
+<h4 class="date">May 08, 2026</h4>
 
 </div>
 
@@ -651,24 +651,24 @@ functions.</p>
 <li><p>Get supported features:</p>
 <pre class="r"><code>list_table_features(ebkm, &quot;samples&quot;)</code></pre>
 <pre><code>## # A tibble: 5 × 5
-##   table   feature     mandatory feature.description         properties          
-##   &lt;chr&gt;   &lt;chr&gt;       &lt;lgl&gt;     &lt;chr&gt;                       &lt;chr&gt;               
-## 1 samples description TRUE      description of a record     value               
-## 2 samples name        TRUE      name/identifier of a record value               
-## 3 samples age         FALSE     Elapsed time since birth    value               
-## 4 samples sex         FALSE     Subject sex                 value               
-## 5 samples tissue      FALSE     Name of a biological tissue identifier, referen…</code></pre></li>
+##   table   feature     mandatory feature.description         properties                                                             
+##   &lt;chr&gt;   &lt;chr&gt;       &lt;lgl&gt;     &lt;chr&gt;                       &lt;chr&gt;                                                                  
+## 1 samples description TRUE      description of a record     value                                                                  
+## 2 samples name        TRUE      name/identifier of a record value                                                                  
+## 3 samples age         FALSE     Elapsed time since birth    value                                                                  
+## 4 samples sex         FALSE     Subject sex                 value                                                                  
+## 5 samples tissue      FALSE     Name of a biological tissue identifier, reference, value, (relative side), (side), (side reference)</code></pre></li>
 <li><p>Details about feature properties:</p>
 <pre class="r"><code>list_feature_properties(ebkm, &quot;tissue&quot;)</code></pre>
 <pre><code>## # A tibble: 6 × 6
-##   feature property       type      mandatory measurement description            
-##   &lt;chr&gt;   &lt;chr&gt;          &lt;chr&gt;     &lt;lgl&gt;     &lt;chr&gt;       &lt;chr&gt;                  
-## 1 tissue  identifier     character TRUE      &lt;NA&gt;        Identifier in referenc…
-## 2 tissue  reference      character TRUE      &lt;NA&gt;        Reference database     
-## 3 tissue  value          character TRUE      &lt;NA&gt;        &lt;NA&gt;                   
-## 4 tissue  relative side  character FALSE     &lt;NA&gt;        Sampling relative side 
-## 5 tissue  side           character FALSE     &lt;NA&gt;        Sampling side          
-## 6 tissue  side reference character FALSE     &lt;NA&gt;        Reference for relative…</code></pre></li>
+##   feature property       type      mandatory measurement description                                                 
+##   &lt;chr&gt;   &lt;chr&gt;          &lt;chr&gt;     &lt;lgl&gt;     &lt;chr&gt;       &lt;chr&gt;                                                       
+## 1 tissue  identifier     character TRUE      &lt;NA&gt;        Identifier in reference database                            
+## 2 tissue  reference      character TRUE      &lt;NA&gt;        Reference database                                          
+## 3 tissue  value          character TRUE      &lt;NA&gt;        &lt;NA&gt;                                                        
+## 4 tissue  relative side  character FALSE     &lt;NA&gt;        Sampling relative side                                      
+## 5 tissue  side           character FALSE     &lt;NA&gt;        Sampling side                                               
+## 6 tissue  side reference character FALSE     &lt;NA&gt;        Reference for relative side (e.g., Handedness, treatment...)</code></pre></li>
 <li><p>Get property supported values:</p>
 <pre class="r"><code>list_property_values(ebkm, &quot;sex&quot;, &quot;value&quot;)</code></pre>
 <pre><code>## # A tibble: 2 × 4
@@ -805,8 +805,7 @@ ebkm_helpers$help()</code></pre>
 ## 
 ## Result: URLs corresponding to provided ids</code></pre>
 <pre class="r"><code>ebkm_helpers$get_tissue_ref_url(c(&quot;UBERON_0002421&quot;, &quot;UBERON_0001876&quot;))</code></pre>
-<pre><code>## [1] &quot;https://purl.obolibrary.org/obo/UBERON_0002421&quot;
-## [2] &quot;https://purl.obolibrary.org/obo/UBERON_0001876&quot;</code></pre>
+<pre><code>## [1] &quot;https://purl.obolibrary.org/obo/UBERON_0002421&quot; &quot;https://purl.obolibrary.org/obo/UBERON_0001876&quot;</code></pre>
 </div>
 <div id="mdb-helpers" class="section level3" number="3.1.2">
 <h3><span class="header-section-number">3.1.2</span> MDB helpers</h3>

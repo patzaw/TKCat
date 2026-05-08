@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2026-05-07" />
+<meta name="date" content="2026-05-08" />
 
 <title>Introduction to TKCat</title>
 
@@ -7275,7 +7275,7 @@ display: none;
 
 <h1 class="title toc-ignore">Introduction to TKCat</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">May 07, 2026</h4>
+<h4 class="date">May 08, 2026</h4>
 
 </div>
 
@@ -7327,6 +7327,8 @@ ClickHouse (chTKCat)</a>
 instance</a></li>
 <li><a href="#specific-operations-on-chmdb-objects" id="toc-specific-operations-on-chmdb-objects"><span class="toc-section-number">4.4</span> Specific operations on chMDB
 objects</a></li>
+<li><a href="#data-organization-in-clickhouse" id="toc-data-organization-in-clickhouse"><span class="toc-section-number">4.5</span> Data organization in
+ClickHouse</a></li>
 </ul></li>
 <li><a href="#defining-and-using-requirements-for-knowledge-management-kmr" id="toc-defining-and-using-requirements-for-knowledge-management-kmr"><span class="toc-section-number">5</span> Defining and using Requirements for
 Knowledge Management (KMR)</a></li>
@@ -7429,18 +7431,18 @@ names and descriptions:</p>
 )
 HPO_hp</code></pre>
 <pre><code>## # A tibble: 500 × 4
-##    id      name                                              description   level
-##    &lt;chr&gt;   &lt;chr&gt;                                             &lt;chr&gt;         &lt;dbl&gt;
-##  1 0000002 Abnormality of body height                        Deviation fr…     3
-##  2 0000009 Functional abnormality of the bladder             Dysfunction …     6
-##  3 0000014 Abnormality of the bladder                        An abnormali…     5
-##  4 0000017 Nocturia                                          Abnormally i…     7
-##  5 0000019 Urinary hesitancy                                 Difficulty i…     7
-##  6 0000021 Megacystis                                        Dilatation o…     8
-##  7 0000022 Abnormality of male internal genitalia            An abnormali…     6
-##  8 0000024 Prostatitis                                       The presence…     8
-##  9 0000025 Functional abnormality of male internal genitalia &lt;NA&gt;              6
-## 10 0000030 Testicular gonadoblastoma                         The presence…     9
+##    id      name                                              description                                                                                                 level
+##    &lt;chr&gt;   &lt;chr&gt;                                             &lt;chr&gt;                                                                                                       &lt;dbl&gt;
+##  1 0000002 Abnormality of body height                        Deviation from the norm of height with respect to that which is expected according to age and gender norms.     3
+##  2 0000009 Functional abnormality of the bladder             Dysfunction of the urinary bladder.                                                                             6
+##  3 0000014 Abnormality of the bladder                        An abnormality of the urinary bladder.                                                                          5
+##  4 0000017 Nocturia                                          Abnormally increased production of urine during the night leading to an unusually frequent need to urinate.     7
+##  5 0000019 Urinary hesitancy                                 Difficulty in beginning the process of urination.                                                               7
+##  6 0000021 Megacystis                                        Dilatation of the bladder postnatally.                                                                          8
+##  7 0000022 Abnormality of male internal genitalia            An abnormality of the male internal genitalia.                                                                  6
+##  8 0000024 Prostatitis                                       The presence of inflammation of the prostate.                                                                   8
+##  9 0000025 Functional abnormality of male internal genitalia &lt;NA&gt;                                                                                                            6
+## 10 0000030 Testicular gonadoblastoma                         The presence of a gonadoblastoma of the testis.                                                                 9
 ## # ℹ 490 more rows</code></pre>
 <p>The <code>HPO_diseases</code> table gathers disease identifiers and
 labels from different disease database.</p>
@@ -7449,18 +7451,18 @@ labels from different disease database.</p>
 )
 HPO_diseases</code></pre>
 <pre><code>## # A tibble: 1,903 × 3
-##    db           id label                                                        
-##    &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;                                                        
-##  1 DECIPHER     15 NF1-microdeletion syndrome                                   
-##  2 DECIPHER     45 Xq28 (MECP2) duplication                                     
-##  3 DECIPHER     65 ATR-16 syndrome                                              
-##  4 OMIM     100050 AARSKOG SYNDROME, AUTOSOMAL DOMINANT                         
-##  5 OMIM     100650 ALDEHYDE DEHYDROGENASE 2 FAMILY                              
-##  6 OMIM     101800 ACRODYSOSTOSIS 1, WITH OR WITHOUT HORMONE RESISTANCE; ACRDYS1
-##  7 OMIM     102500 HAJDU-CHENEY SYNDROME; HJCYS                                 
-##  8 OMIM     102510 ACROPECTOROVERTEBRAL DYSPLASIA, F-FORM OF                    
-##  9 OMIM     102700 SEVERE COMBINED IMMUNODEFICIENCY, AUTOSOMAL RECESSIVE, T CEL…
-## 10 OMIM     102800 ADENOSINE TRIPHOSPHATASE DEFICIENCY, ANEMIA DUE TO           
+##    db           id label                                                                                                                                           
+##    &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;                                                                                                                                           
+##  1 DECIPHER     15 NF1-microdeletion syndrome                                                                                                                      
+##  2 DECIPHER     45 Xq28 (MECP2) duplication                                                                                                                        
+##  3 DECIPHER     65 ATR-16 syndrome                                                                                                                                 
+##  4 OMIM     100050 AARSKOG SYNDROME, AUTOSOMAL DOMINANT                                                                                                            
+##  5 OMIM     100650 ALDEHYDE DEHYDROGENASE 2 FAMILY                                                                                                                 
+##  6 OMIM     101800 ACRODYSOSTOSIS 1, WITH OR WITHOUT HORMONE RESISTANCE; ACRDYS1                                                                                   
+##  7 OMIM     102500 HAJDU-CHENEY SYNDROME; HJCYS                                                                                                                    
+##  8 OMIM     102510 ACROPECTOROVERTEBRAL DYSPLASIA, F-FORM OF                                                                                                       
+##  9 OMIM     102700 SEVERE COMBINED IMMUNODEFICIENCY, AUTOSOMAL RECESSIVE, T CELL-NEGATIVE, B CELL-NEGATIVE, NK CELL-NEGATIVE, DUE TO ADENOSINE DEAMINASE DEFICIENCY
+## 10 OMIM     102800 ADENOSINE TRIPHOSPHATASE DEFICIENCY, ANEMIA DUE TO                                                                                              
 ## # ℹ 1,893 more rows</code></pre>
 <p>The <code>HPO_diseaseHP</code> table indicates which phenotype is
 triggered by each disease.</p>
@@ -7691,7 +7693,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-07 15:23:03.262865
+## Timestamp: 2026-05-08 09:30:31.570638
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -7729,7 +7731,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-07 15:23:03.262865
+## Timestamp: 2026-05-08 09:30:31.570638
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -7774,18 +7776,18 @@ information for each row.</p>
 as a member of the <em>Condition</em> collection.</p>
 <pre class="r"><code>mhpo_db$HPO_hp</code></pre>
 <pre><code>## # A tibble: 500 × 4
-##    id      name                                              description   level
-##    &lt;chr&gt;   &lt;chr&gt;                                             &lt;chr&gt;         &lt;int&gt;
-##  1 0000002 Abnormality of body height                        Deviation fr…     3
-##  2 0000009 Functional abnormality of the bladder             Dysfunction …     6
-##  3 0000014 Abnormality of the bladder                        An abnormali…     5
-##  4 0000017 Nocturia                                          Abnormally i…     7
-##  5 0000019 Urinary hesitancy                                 Difficulty i…     7
-##  6 0000021 Megacystis                                        Dilatation o…     8
-##  7 0000022 Abnormality of male internal genitalia            An abnormali…     6
-##  8 0000024 Prostatitis                                       The presence…     8
-##  9 0000025 Functional abnormality of male internal genitalia &lt;NA&gt;              6
-## 10 0000030 Testicular gonadoblastoma                         The presence…     9
+##    id      name                                              description                                                                                                 level
+##    &lt;chr&gt;   &lt;chr&gt;                                             &lt;chr&gt;                                                                                                       &lt;int&gt;
+##  1 0000002 Abnormality of body height                        Deviation from the norm of height with respect to that which is expected according to age and gender norms.     3
+##  2 0000009 Functional abnormality of the bladder             Dysfunction of the urinary bladder.                                                                             6
+##  3 0000014 Abnormality of the bladder                        An abnormality of the urinary bladder.                                                                          5
+##  4 0000017 Nocturia                                          Abnormally increased production of urine during the night leading to an unusually frequent need to urinate.     7
+##  5 0000019 Urinary hesitancy                                 Difficulty in beginning the process of urination.                                                               7
+##  6 0000021 Megacystis                                        Dilatation of the bladder postnatally.                                                                          8
+##  7 0000022 Abnormality of male internal genitalia            An abnormality of the male internal genitalia.                                                                  6
+##  8 0000024 Prostatitis                                       The presence of inflammation of the prostate.                                                                   8
+##  9 0000025 Functional abnormality of male internal genitalia &lt;NA&gt;                                                                                                            6
+## 10 0000030 Testicular gonadoblastoma                         The presence of a gonadoblastoma of the testis.                                                                 9
 ## # ℹ 490 more rows</code></pre>
 <pre class="r"><code>mhpo_db &lt;- add_collection_member(
    mhpo_db, collection=&quot;Condition&quot;, table=&quot;HPO_hp&quot;,
@@ -7822,20 +7824,20 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-07 15:23:03.262865
+## Timestamp: 2026-05-08 09:30:31.570638
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
 <pre class="r"><code>collection_members(mhpo_db)</code></pre>
 <pre><code>## # A tibble: 6 × 9
-##   collection cid                   resource   mid table field static value type 
-##   &lt;chr&gt;      &lt;chr&gt;                 &lt;chr&gt;    &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;
-## 1 Condition  miniHPO_Condition_1.0 miniHPO      1 HPO_… cond… TRUE   Phen… &lt;NA&gt; 
-## 2 Condition  miniHPO_Condition_1.0 miniHPO      1 HPO_… sour… TRUE   HP    &lt;NA&gt; 
-## 3 Condition  miniHPO_Condition_1.0 miniHPO      1 HPO_… iden… FALSE  id    &lt;NA&gt; 
-## 4 Condition  miniHPO_Condition_1.0 miniHPO      2 HPO_… cond… TRUE   Dise… &lt;NA&gt; 
-## 5 Condition  miniHPO_Condition_1.0 miniHPO      2 HPO_… sour… FALSE  db    &lt;NA&gt; 
-## 6 Condition  miniHPO_Condition_1.0 miniHPO      2 HPO_… iden… FALSE  id    &lt;NA&gt;</code></pre>
+##   collection cid                   resource   mid table        field      static value     type 
+##   &lt;chr&gt;      &lt;chr&gt;                 &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;      &lt;lgl&gt;  &lt;chr&gt;     &lt;chr&gt;
+## 1 Condition  miniHPO_Condition_1.0 miniHPO      1 HPO_hp       condition  TRUE   Phenotype &lt;NA&gt; 
+## 2 Condition  miniHPO_Condition_1.0 miniHPO      1 HPO_hp       source     TRUE   HP        &lt;NA&gt; 
+## 3 Condition  miniHPO_Condition_1.0 miniHPO      1 HPO_hp       identifier FALSE  id        &lt;NA&gt; 
+## 4 Condition  miniHPO_Condition_1.0 miniHPO      2 HPO_diseases condition  TRUE   Disease   &lt;NA&gt; 
+## 5 Condition  miniHPO_Condition_1.0 miniHPO      2 HPO_diseases source     FALSE  db        &lt;NA&gt; 
+## 6 Condition  miniHPO_Condition_1.0 miniHPO      2 HPO_diseases identifier FALSE  id        &lt;NA&gt;</code></pre>
 <p>The use of collection members to link or integrate different MDBs
 will be described <a href="#merging-with-collections">later</a> in this
 document</p>
@@ -7881,7 +7883,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-07 15:23:03
+## Timestamp: 2026-05-08 09:30:31
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -8096,79 +8098,55 @@ potentially renamed with <code>names()&lt;-</code> or
 <code>rename()</code> functions (the tables have been renamed here to
 improve the readability of the following examples).</p>
 <pre class="r"><code>names(file_clinvar)</code></pre>
-<pre><code>##  [1] &quot;ClinVar_ReferenceClinVarAssertion&quot; &quot;ClinVar_rcvaVariant&quot;              
-##  [3] &quot;ClinVar_ClinVarAssertions&quot;         &quot;ClinVar_rcvaInhMode&quot;              
-##  [5] &quot;ClinVar_rcvaObservedIn&quot;            &quot;ClinVar_rcvaTraits&quot;               
-##  [7] &quot;ClinVar_clinSigOrder&quot;              &quot;ClinVar_revStatOrder&quot;             
-##  [9] &quot;ClinVar_variants&quot;                  &quot;ClinVar_cvaObservedIn&quot;            
-## [11] &quot;ClinVar_cvaSubmitters&quot;             &quot;ClinVar_traits&quot;                   
-## [13] &quot;ClinVar_varEntrez&quot;                 &quot;ClinVar_varAttributes&quot;            
-## [15] &quot;ClinVar_varCytoLoc&quot;                &quot;ClinVar_varNames&quot;                 
-## [17] &quot;ClinVar_varSeqLoc&quot;                 &quot;ClinVar_varXRef&quot;                  
-## [19] &quot;ClinVar_traitCref&quot;                 &quot;ClinVar_traitNames&quot;               
+<pre><code>##  [1] &quot;ClinVar_ReferenceClinVarAssertion&quot; &quot;ClinVar_rcvaVariant&quot;               &quot;ClinVar_ClinVarAssertions&quot;         &quot;ClinVar_rcvaInhMode&quot;              
+##  [5] &quot;ClinVar_rcvaObservedIn&quot;            &quot;ClinVar_rcvaTraits&quot;                &quot;ClinVar_clinSigOrder&quot;              &quot;ClinVar_revStatOrder&quot;             
+##  [9] &quot;ClinVar_variants&quot;                  &quot;ClinVar_cvaObservedIn&quot;             &quot;ClinVar_cvaSubmitters&quot;             &quot;ClinVar_traits&quot;                   
+## [13] &quot;ClinVar_varEntrez&quot;                 &quot;ClinVar_varAttributes&quot;             &quot;ClinVar_varCytoLoc&quot;                &quot;ClinVar_varNames&quot;                 
+## [17] &quot;ClinVar_varSeqLoc&quot;                 &quot;ClinVar_varXRef&quot;                   &quot;ClinVar_traitCref&quot;                 &quot;ClinVar_traitNames&quot;               
 ## [21] &quot;ClinVar_entrezNames&quot;</code></pre>
 <pre class="r"><code>file_clinvar &lt;- file_clinvar %&gt;% 
    set_names(sub(&quot;ClinVar_&quot;, &quot;&quot;, names(.))) 
 names(file_clinvar)</code></pre>
-<pre><code>##  [1] &quot;ReferenceClinVarAssertion&quot; &quot;rcvaVariant&quot;              
-##  [3] &quot;ClinVarAssertions&quot;         &quot;rcvaInhMode&quot;              
-##  [5] &quot;rcvaObservedIn&quot;            &quot;rcvaTraits&quot;               
-##  [7] &quot;clinSigOrder&quot;              &quot;revStatOrder&quot;             
-##  [9] &quot;variants&quot;                  &quot;cvaObservedIn&quot;            
-## [11] &quot;cvaSubmitters&quot;             &quot;traits&quot;                   
-## [13] &quot;varEntrez&quot;                 &quot;varAttributes&quot;            
-## [15] &quot;varCytoLoc&quot;                &quot;varNames&quot;                 
-## [17] &quot;varSeqLoc&quot;                 &quot;varXRef&quot;                  
-## [19] &quot;traitCref&quot;                 &quot;traitNames&quot;               
-## [21] &quot;entrezNames&quot;</code></pre>
+<pre><code>##  [1] &quot;ReferenceClinVarAssertion&quot; &quot;rcvaVariant&quot;               &quot;ClinVarAssertions&quot;         &quot;rcvaInhMode&quot;               &quot;rcvaObservedIn&quot;            &quot;rcvaTraits&quot;               
+##  [7] &quot;clinSigOrder&quot;              &quot;revStatOrder&quot;              &quot;variants&quot;                  &quot;cvaObservedIn&quot;             &quot;cvaSubmitters&quot;             &quot;traits&quot;                   
+## [13] &quot;varEntrez&quot;                 &quot;varAttributes&quot;             &quot;varCytoLoc&quot;                &quot;varNames&quot;                  &quot;varSeqLoc&quot;                 &quot;varXRef&quot;                  
+## [19] &quot;traitCref&quot;                 &quot;traitNames&quot;                &quot;entrezNames&quot;</code></pre>
 <p>The different collection members of an MDBs are listed with the
 <code>collection_members()</code> function.</p>
 <pre class="r"><code>collection_members(file_clinvar)</code></pre>
 <pre><code>## # A tibble: 10 × 9
-##    collection cid                  resource   mid table field static value type 
-##    &lt;chr&gt;      &lt;chr&gt;                &lt;chr&gt;    &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;
-##  1 Condition  ClinVar_conditions_… ClinVar      2 trai… cond… TRUE   Dise… &lt;NA&gt; 
-##  2 Condition  ClinVar_conditions_… ClinVar      2 trai… iden… FALSE  id    &lt;NA&gt; 
-##  3 Condition  ClinVar_conditions_… ClinVar      2 trai… sour… TRUE   Clin… &lt;NA&gt; 
-##  4 Condition  ClinVar_conditions_… ClinVar      1 trai… cond… TRUE   Dise… &lt;NA&gt; 
-##  5 Condition  ClinVar_conditions_… ClinVar      1 trai… iden… FALSE  id    &lt;NA&gt; 
-##  6 Condition  ClinVar_conditions_… ClinVar      1 trai… sour… FALSE  db    &lt;NA&gt; 
-##  7 BE         ClinVar_BE_1.0       ClinVar      1 entr… be    TRUE   Gene  &lt;NA&gt; 
-##  8 BE         ClinVar_BE_1.0       ClinVar      1 entr… iden… FALSE  entr… &lt;NA&gt; 
-##  9 BE         ClinVar_BE_1.0       ClinVar      1 entr… orga… TRUE   Homo… Scie…
-## 10 BE         ClinVar_BE_1.0       ClinVar      1 entr… sour… TRUE   Entr… &lt;NA&gt;</code></pre>
+##    collection cid                    resource   mid table       field      static value        type           
+##    &lt;chr&gt;      &lt;chr&gt;                  &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;      &lt;lgl&gt;  &lt;chr&gt;        &lt;chr&gt;          
+##  1 Condition  ClinVar_conditions_1.0 ClinVar      2 traits      condition  TRUE   Disease      &lt;NA&gt;           
+##  2 Condition  ClinVar_conditions_1.0 ClinVar      2 traits      identifier FALSE  id           &lt;NA&gt;           
+##  3 Condition  ClinVar_conditions_1.0 ClinVar      2 traits      source     TRUE   ClinVar      &lt;NA&gt;           
+##  4 Condition  ClinVar_conditions_1.0 ClinVar      1 traitCref   condition  TRUE   Disease      &lt;NA&gt;           
+##  5 Condition  ClinVar_conditions_1.0 ClinVar      1 traitCref   identifier FALSE  id           &lt;NA&gt;           
+##  6 Condition  ClinVar_conditions_1.0 ClinVar      1 traitCref   source     FALSE  db           &lt;NA&gt;           
+##  7 BE         ClinVar_BE_1.0         ClinVar      1 entrezNames be         TRUE   Gene         &lt;NA&gt;           
+##  8 BE         ClinVar_BE_1.0         ClinVar      1 entrezNames identifier FALSE  entrez       &lt;NA&gt;           
+##  9 BE         ClinVar_BE_1.0         ClinVar      1 entrezNames organism   TRUE   Homo sapiens Scientific name
+## 10 BE         ClinVar_BE_1.0         ClinVar      1 entrezNames source     TRUE   EntrezGene   &lt;NA&gt;</code></pre>
 <p>The following functions are use to get the number of tables, the
 number of fields per table and the number of records.</p>
 <pre class="r"><code>length(file_clinvar)        # Number of tables</code></pre>
 <pre><code>## [1] 21</code></pre>
 <pre class="r"><code>lengths(file_clinvar)       # Number of fields per table</code></pre>
-<pre><code>## ReferenceClinVarAssertion               rcvaVariant         ClinVarAssertions 
-##                         8                         2                         4 
-##               rcvaInhMode            rcvaObservedIn                rcvaTraits 
-##                         2                         6                         3 
-##              clinSigOrder              revStatOrder                  variants 
-##                         2                         2                         3 
-##             cvaObservedIn             cvaSubmitters                    traits 
-##                         4                         3                         2 
-##                 varEntrez             varAttributes                varCytoLoc 
-##                         3                         5                         2 
-##                  varNames                 varSeqLoc                   varXRef 
-##                         3                        18                         4 
+<pre><code>## ReferenceClinVarAssertion               rcvaVariant         ClinVarAssertions               rcvaInhMode            rcvaObservedIn                rcvaTraits 
+##                         8                         2                         4                         2                         6                         3 
+##              clinSigOrder              revStatOrder                  variants             cvaObservedIn             cvaSubmitters                    traits 
+##                         2                         2                         3                         4                         3                         2 
+##                 varEntrez             varAttributes                varCytoLoc                  varNames                 varSeqLoc                   varXRef 
+##                         3                         5                         2                         3                        18                         4 
 ##                 traitCref                traitNames               entrezNames 
 ##                         4                         3                         3</code></pre>
 <pre class="r"><code>count_records(file_clinvar) # Number of records per table</code></pre>
-<pre><code>## ReferenceClinVarAssertion               rcvaVariant         ClinVarAssertions 
-##                       166                       166                       409 
-##               rcvaInhMode            rcvaObservedIn                rcvaTraits 
-##                        16                       337                       166 
-##              clinSigOrder              revStatOrder                  variants 
-##                        11                         2                       138 
-##             cvaObservedIn             cvaSubmitters                    traits 
-##                       412                       416                        18 
-##                 varEntrez             varAttributes                varCytoLoc 
-##                       145                      2262                       138 
-##                  varNames                 varSeqLoc                   varXRef 
-##                       188                       280                       244 
+<pre><code>## ReferenceClinVarAssertion               rcvaVariant         ClinVarAssertions               rcvaInhMode            rcvaObservedIn                rcvaTraits 
+##                       166                       166                       409                        16                       337                       166 
+##              clinSigOrder              revStatOrder                  variants             cvaObservedIn             cvaSubmitters                    traits 
+##                        11                         2                       138                       412                       416                        18 
+##                 varEntrez             varAttributes                varCytoLoc                  varNames                 varSeqLoc                   varXRef 
+##                       145                      2262                       138                       188                       280                       244 
 ##                 traitCref                traitNames               entrezNames 
 ##                        50                        44                        20</code></pre>
 <p>The <code>count_records()</code> function can take a lot of time when
@@ -8201,18 +8179,18 @@ file_clinvar[[&quot;traitNames&quot;]]
 file_clinvar$&quot;traitNames&quot;
 file_clinvar %&gt;% pull(traitNames)</code></pre>
 <pre><code>## # A tibble: 44 × 3
-##     t.id name                                                              type 
-##    &lt;int&gt; &lt;chr&gt;                                                             &lt;chr&gt;
-##  1   912 Chudley-McCullough syndrome                                       Pref…
-##  2   912 Deafness, autosomal recessive 82                                  Alte…
-##  3   912 Deafness, bilateral sensorineural, and hydrocephalus due to fora… Alte…
-##  4   912 Deafness, sensorineural, with partial agenesis of the corpus cal… Alte…
-##  5  1352 CTSD-Related Neuronal Ceroid-Lipofuscinosis                       Alte…
-##  6  1352 Ceroid lipofuscinosis neuronal Cathepsin D-deficient              Alte…
-##  7  1352 Neuronal ceroid lipofuscinosis 10                                 Pref…
-##  8  1352 Neuronal ceroid lipofuscinosis due to Cathepsin D deficiency      Alte…
-##  9  1481 Diabetes mellitus, neonatal, with congenital hypothyroidism       Pref…
-## 10  1481 NDH SYNDROME                                                      Alte…
+##     t.id name                                                                                      type     
+##    &lt;int&gt; &lt;chr&gt;                                                                                     &lt;chr&gt;    
+##  1   912 Chudley-McCullough syndrome                                                               Preferred
+##  2   912 Deafness, autosomal recessive 82                                                          Alternate
+##  3   912 Deafness, bilateral sensorineural, and hydrocephalus due to foramen of monro obstruction  Alternate
+##  4   912 Deafness, sensorineural, with partial agenesis of the corpus callosum and arachnoid cysts Alternate
+##  5  1352 CTSD-Related Neuronal Ceroid-Lipofuscinosis                                               Alternate
+##  6  1352 Ceroid lipofuscinosis neuronal Cathepsin D-deficient                                      Alternate
+##  7  1352 Neuronal ceroid lipofuscinosis 10                                                         Preferred
+##  8  1352 Neuronal ceroid lipofuscinosis due to Cathepsin D deficiency                              Alternate
+##  9  1481 Diabetes mellitus, neonatal, with congenital hypothyroidism                               Preferred
+## 10  1481 NDH SYNDROME                                                                              Alternate
 ## # ℹ 34 more rows</code></pre>
 <p>MDBs can also be subset and combined. The corresponding functions
 ensure that the data model is fulfilled by the data tables.</p>
@@ -8292,12 +8270,12 @@ of interest in a single table as shown below.</p>
 gene_traits$entrezNames %&gt;%
    select(symbol, name, variants.type, variants.name, traitType, traits.name)</code></pre>
 <pre><code>## # A tibble: 4 × 6
-##   symbol name                  variants.type variants.name traitType traits.name
-##   &lt;chr&gt;  &lt;chr&gt;                 &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;     &lt;chr&gt;      
-## 1 PIK3R2 phosphoinositide-3-k… single nucle… NM_005027.4(… Disease   Megalencep…
-## 2 PIK3R2 phosphoinositide-3-k… single nucle… NM_005027.4(… Disease   not provid…
-## 3 PIK3R2 phosphoinositide-3-k… single nucle… NM_005027.4(… Disease   not provid…
-## 4 UGT1A8 UDP glucuronosyltran… Microsatelli… UGT1A1*28     Disease   Gilbert&#39;s …</code></pre>
+##   symbol name                                           variants.type             variants.name                               traitType traits.name                               
+##   &lt;chr&gt;  &lt;chr&gt;                                          &lt;chr&gt;                     &lt;chr&gt;                                       &lt;chr&gt;     &lt;chr&gt;                                     
+## 1 PIK3R2 phosphoinositide-3-kinase regulatory subunit 2 single nucleotide variant NM_005027.4(PIK3R2):c.1117G&gt;A (p.Gly373Arg) Disease   Megalencephaly-polymicrogyria-polydactyly…
+## 2 PIK3R2 phosphoinositide-3-kinase regulatory subunit 2 single nucleotide variant NM_005027.4(PIK3R2):c.1117G&gt;A (p.Gly373Arg) Disease   not provided                              
+## 3 PIK3R2 phosphoinositide-3-kinase regulatory subunit 2 single nucleotide variant NM_005027.4(PIK3R2):c.1694C&gt;G (p.Pro565Arg) Disease   not provided                              
+## 4 UGT1A8 UDP glucuronosyltransferase family 1 member A8 Microsatellite            UGT1A1*28                                   Disease   Gilbert&#39;s syndrome</code></pre>
 </div>
 <div id="merging-with-collections" class="section level2" number="3.6">
 <h2><span class="header-section-number">3.6</span> Merging MDBs with
@@ -8337,28 +8315,28 @@ Uniprot peptide identifiers from different species.</p>
 table using human Entrez gene identifiers.</p>
 <pre class="r"><code>file_clinvar$entrezNames</code></pre>
 <pre><code>## # A tibble: 20 × 3
-##       entrez name                                                         symbol
-##        &lt;int&gt; &lt;chr&gt;                                                        &lt;chr&gt; 
-##  1      1509 cathepsin D                                                  CTSD  
-##  2      1903 sphingosine-1-phosphate receptor 3                           S1PR3 
-##  3      3300 DnaJ heat shock protein family (Hsp40) member B2             DNAJB2
-##  4      3423 iduronate 2-sulfatase                                        IDS   
-##  5      3910 laminin subunit alpha 4                                      LAMA4 
-##  6      5296 phosphoinositide-3-kinase regulatory subunit 2               PIK3R2
-##  7      6748 signal sequence receptor subunit 4                           SSR4  
-##  8      7633 zinc finger protein 79                                       ZNF79 
-##  9     22906 trafficking kinesin protein 1                                TRAK1 
-## 10     23155 chloride channel CLIC like 1                                 CLCC1 
-## 11     26251 potassium voltage-gated channel modifier subfamily G member… KCNG2 
-## 12     29851 inducible T cell costimulator                                ICOS  
-## 13     54576 UDP glucuronosyltransferase family 1 member A8               UGT1A8
-## 14     57684 zinc finger and BTB domain containing 26                     ZBTB26
-## 15    115948 outer dynein arm docking complex subunit 3                   ODAD3 
-## 16    139716 GRB2 associated binding protein 3                            GAB3  
-## 17    169792 GLIS family zinc finger 3                                    GLIS3 
-## 18    407054 microRNA 98                                                  MIR98 
-## 19    441531 phosphoglycerate mutase family member 4                      PGAM4 
-## 20 105373557 serous ovarian cancer associated RNA                         SOCAR</code></pre>
+##       entrez name                                                          symbol
+##        &lt;int&gt; &lt;chr&gt;                                                         &lt;chr&gt; 
+##  1      1509 cathepsin D                                                   CTSD  
+##  2      1903 sphingosine-1-phosphate receptor 3                            S1PR3 
+##  3      3300 DnaJ heat shock protein family (Hsp40) member B2              DNAJB2
+##  4      3423 iduronate 2-sulfatase                                         IDS   
+##  5      3910 laminin subunit alpha 4                                       LAMA4 
+##  6      5296 phosphoinositide-3-kinase regulatory subunit 2                PIK3R2
+##  7      6748 signal sequence receptor subunit 4                            SSR4  
+##  8      7633 zinc finger protein 79                                        ZNF79 
+##  9     22906 trafficking kinesin protein 1                                 TRAK1 
+## 10     23155 chloride channel CLIC like 1                                  CLCC1 
+## 11     26251 potassium voltage-gated channel modifier subfamily G member 2 KCNG2 
+## 12     29851 inducible T cell costimulator                                 ICOS  
+## 13     54576 UDP glucuronosyltransferase family 1 member A8                UGT1A8
+## 14     57684 zinc finger and BTB domain containing 26                      ZBTB26
+## 15    115948 outer dynein arm docking complex subunit 3                    ODAD3 
+## 16    139716 GRB2 associated binding protein 3                             GAB3  
+## 17    169792 GLIS family zinc finger 3                                     GLIS3 
+## 18    407054 microRNA 98                                                   MIR98 
+## 19    441531 phosphoglycerate mutase family member 4                       PGAM4 
+## 20 105373557 serous ovarian cancer associated RNA                          SOCAR</code></pre>
 <p>Since peptides are coded by genes, there is a biological relationship
 between these two types of BE, and several tools exist to convert such
 BE identifiers from one scope to the other (e.g. <a href="https://github.com/patzaw/BED">BED</a> <span class="citation">(<a href="#ref-godard_bed:_2018">Godard and Eyll 2018</a>)</span>, <a href="https://bioconductor.org/packages/release/bioc/html/mygene.html">mygene</a>
@@ -8384,20 +8362,20 @@ function.</p>
 tables.</p>
 <pre class="r"><code>collection_members(file_chembl, &quot;BE&quot;)</code></pre>
 <pre><code>## # A tibble: 4 × 9
-##   collection cid           resource   mid table         field static value type 
-##   &lt;chr&gt;      &lt;chr&gt;         &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;         &lt;chr&gt; &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;
-## 1 BE         CHEMBL_BE_1.0 CHEMBL       1 CHEMBL_compo… be    TRUE   Pept… &lt;NA&gt; 
-## 2 BE         CHEMBL_BE_1.0 CHEMBL       1 CHEMBL_compo… iden… FALSE  acce… &lt;NA&gt; 
-## 3 BE         CHEMBL_BE_1.0 CHEMBL       1 CHEMBL_compo… sour… FALSE  db_s… &lt;NA&gt; 
-## 4 BE         CHEMBL_BE_1.0 CHEMBL       1 CHEMBL_compo… orga… FALSE  orga… Scie…</code></pre>
+##   collection cid           resource   mid table                     field      static value     type           
+##   &lt;chr&gt;      &lt;chr&gt;         &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;                     &lt;chr&gt;      &lt;lgl&gt;  &lt;chr&gt;     &lt;chr&gt;          
+## 1 BE         CHEMBL_BE_1.0 CHEMBL       1 CHEMBL_component_sequence be         TRUE   Peptide   &lt;NA&gt;           
+## 2 BE         CHEMBL_BE_1.0 CHEMBL       1 CHEMBL_component_sequence identifier FALSE  accession &lt;NA&gt;           
+## 3 BE         CHEMBL_BE_1.0 CHEMBL       1 CHEMBL_component_sequence source     FALSE  db_source &lt;NA&gt;           
+## 4 BE         CHEMBL_BE_1.0 CHEMBL       1 CHEMBL_component_sequence organism   FALSE  organism  Scientific name</code></pre>
 <pre class="r"><code>collection_members(file_clinvar, &quot;BE&quot;)</code></pre>
 <pre><code>## # A tibble: 4 × 9
-##   collection cid            resource   mid table       field  static value type 
-##   &lt;chr&gt;      &lt;chr&gt;          &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;  &lt;lgl&gt;  &lt;chr&gt; &lt;chr&gt;
-## 1 BE         ClinVar_BE_1.0 ClinVar      1 entrezNames be     TRUE   Gene  &lt;NA&gt; 
-## 2 BE         ClinVar_BE_1.0 ClinVar      1 entrezNames ident… FALSE  entr… &lt;NA&gt; 
-## 3 BE         ClinVar_BE_1.0 ClinVar      1 entrezNames organ… TRUE   Homo… Scie…
-## 4 BE         ClinVar_BE_1.0 ClinVar      1 entrezNames source TRUE   Entr… &lt;NA&gt;</code></pre>
+##   collection cid            resource   mid table       field      static value        type           
+##   &lt;chr&gt;      &lt;chr&gt;          &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;      &lt;lgl&gt;  &lt;chr&gt;        &lt;chr&gt;          
+## 1 BE         ClinVar_BE_1.0 ClinVar      1 entrezNames be         TRUE   Gene         &lt;NA&gt;           
+## 2 BE         ClinVar_BE_1.0 ClinVar      1 entrezNames identifier FALSE  entrez       &lt;NA&gt;           
+## 3 BE         ClinVar_BE_1.0 ClinVar      1 entrezNames organism   TRUE   Homo sapiens Scientific name
+## 4 BE         ClinVar_BE_1.0 ClinVar      1 entrezNames source     TRUE   EntrezGene   &lt;NA&gt;</code></pre>
 <p>The <em>Collection</em> column indicates the collection to which the
 table refers. The <em>cid</em> column indicates the version of the
 collection definition which should correspond to the <code>$id</code> of
@@ -8458,7 +8436,8 @@ TKCat along with BE collection definition (to get the function:
 2018</a>)</span> and you need this package to be installed with a
 connection to BED database in order to run the code below.</p>
 <pre class="r"><code>try(BED::connectToBed(a))</code></pre>
-<pre><code>## Error in eval(expr, envir) : object &#39;a&#39; not found</code></pre>
+<pre><code>## Error in as.character(x) : 
+##   cannot coerce type &#39;closure&#39; to vector of type &#39;character&#39;</code></pre>
 <pre class="r"><code>bedCheck &lt;- try(BED::checkBedConn())
 if(!inherits(bedCheck, &quot;try-error&quot;) &amp;&amp; bedCheck){
    sel_coll &lt;- get_shared_collections(file_clinvar, file_chembl) %&gt;% 
@@ -8548,10 +8527,10 @@ their preparation for potential integration. Several functions are
 available to achieve this goal.</p>
 <pre class="r"><code>list_MDBs(k)                     # list all the MDBs in a TKCat object</code></pre>
 <pre><code>## # A tibble: 2 × 7
-##   name    title         description url   version maintainer timestamp
-##   &lt;chr&gt;   &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dttm&gt;   
-## 1 HPO     Data extract… This is a … http… &lt;NA&gt;    &lt;NA&gt;       NA       
-## 2 ClinVar Data extract… ClinVar is… http… 0.9     Patrice G… NA</code></pre>
+##   name    title                                    description                                                                        url   version maintainer timestamp
+##   &lt;chr&gt;   &lt;chr&gt;                                    &lt;chr&gt;                                                                              &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dttm&gt;   
+## 1 HPO     Data extracted from the HPO database     This is a very small subset of the HPO! Visit the reference URL for more informat… http… &lt;NA&gt;    &lt;NA&gt;       NA       
+## 2 ClinVar Data extracted from the ClinVar database ClinVar is a freely accessible, public archive of reports of the relationships am… http… 0.9     Patrice G… NA</code></pre>
 <pre class="r"><code>get_MDB(k, &quot;HPO&quot;)                # get a specific MDBs from the catalog</code></pre>
 <pre><code>## fileMDB HPO: Data extracted from the HPO database
 ##    - 9 tables with 25 fields
@@ -8572,15 +8551,15 @@ available to achieve this goal.</p>
 ## 3 HPO      HPO_diseaseSynonyms Disease synonyms</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 8 × 7
-##   resource table               name    type      nullable unique comment        
-##   &lt;chr&gt;    &lt;chr&gt;               &lt;chr&gt;   &lt;chr&gt;     &lt;lgl&gt;    &lt;lgl&gt;  &lt;chr&gt;          
-## 1 HPO      HPO_diseases        db      character FALSE    FALSE  Disease databa…
-## 2 HPO      HPO_diseases        id      character FALSE    FALSE  Disease ID     
-## 3 HPO      HPO_diseases        label   character FALSE    FALSE  Disease lable …
-## 4 HPO      HPO_diseaseHP       db      character FALSE    FALSE  Disease databa…
-## 5 HPO      HPO_diseaseHP       id      character FALSE    FALSE  Disease ID     
-## 6 HPO      HPO_diseaseSynonyms db      character FALSE    FALSE  Disease databa…
-## 7 HPO      HPO_diseaseSynonyms id      character FALSE    FALSE  Disease ID     
+##   resource table               name    type      nullable unique comment                          
+##   &lt;chr&gt;    &lt;chr&gt;               &lt;chr&gt;   &lt;chr&gt;     &lt;lgl&gt;    &lt;lgl&gt;  &lt;chr&gt;                            
+## 1 HPO      HPO_diseases        db      character FALSE    FALSE  Disease database                 
+## 2 HPO      HPO_diseases        id      character FALSE    FALSE  Disease ID                       
+## 3 HPO      HPO_diseases        label   character FALSE    FALSE  Disease lable (preferred synonym)
+## 4 HPO      HPO_diseaseHP       db      character FALSE    FALSE  Disease database                 
+## 5 HPO      HPO_diseaseHP       id      character FALSE    FALSE  Disease ID                       
+## 6 HPO      HPO_diseaseSynonyms db      character FALSE    FALSE  Disease database                 
+## 7 HPO      HPO_diseaseSynonyms id      character FALSE    FALSE  Disease ID                       
 ## 8 HPO      HPO_diseaseSynonyms synonym character FALSE    FALSE  Disease synonym</code></pre>
 <pre class="r"><code>collection_members(k)            # Get collection members of the different MDBs</code></pre>
 <pre><code>## # A tibble: 5 × 3
@@ -8637,49 +8616,48 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <em>TKCat</em> object.</p>
 <pre class="r"><code>list_MDBs(k)             # get a specific MDBs from the catalog</code></pre>
 <pre><code>## # A tibble: 30 × 12
-##    name   title description url   version maintainer public populated timestamps
-##    &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;lgl&gt;  &lt;lgl&gt;     &lt;lgl&gt;     
-##  1 AP-Di… Ange… Ressources… &lt;NA&gt;  0.0.2   [Patrice … FALSE  TRUE      TRUE      
-##  2 AP-RD… Info… Informatio… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE      
-##  3 Carav… New … Informatio… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE      
-##  4 ChEMBL ChEM… ChEMBL is … http… 1.1.0   [Patrice … TRUE   TRUE      TRUE      
-##  5 Corte… Data… Clarivate … http… 0.0.3   [Patrice … FALSE  TRUE      TRUE      
-##  6 Count… Gene… General in… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE      
-##  7 DRE-B… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
-##  8 FCD-T… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
-##  9 GO     The … Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      
-## 10 GTEx   Geno… The Adult … http… 0.01    [Patrice … TRUE   TRUE      TRUE      
-## # ℹ 20 more rows
-## # ℹ 3 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;, total_size &lt;dbl&gt;</code></pre>
+##    name                  title                                              description url   version maintainer public populated timestamps timestamp           access total_size
+##    &lt;chr&gt;                 &lt;chr&gt;                                              &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;lgl&gt;  &lt;lgl&gt;     &lt;lgl&gt;      &lt;dttm&gt;              &lt;fct&gt;       &lt;dbl&gt;
+##  1 AP-Disease-Strategy   Angelini Pharma disease strategy                   Ressources… &lt;NA&gt;  0.0.2   [Patrice … FALSE  TRUE      TRUE       2026-05-03 11:50:51 none      3.85e 8
+##  2 AP-RD-Scouting        Information from R&amp;D scouting activites at Angeli… Informatio… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2026-04-12 13:32:45 read …    2.16e 5
+##  3 Caravelle             New internal target candidate reviewed in the fra… Informatio… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2026-02-24 04:29:46 read …    2.48e 4
+##  4 ChEMBL                ChEMBL: a manually curated database of bioactive … ChEMBL is … http… 1.1.0   [Patrice … TRUE   TRUE      TRUE       2025-11-24 15:34:12 read …    6.73e 9
+##  5 Cortellis             Data extracted from Clarivate Cortellis databases  Clarivate … http… 0.0.3   [Patrice … FALSE  TRUE      TRUE       2026-05-03 03:53:55 none      1.81e 8
+##  6 Countries             General information about countries                General in… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2025-08-22 14:24:17 read …    2.06e 6
+##  7 DRE-Bulk-RNA-UMC-2024 Bulk RNA-Seq of Brain Samples from Patients with … Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE       2025-04-08 09:40:08 read …    7.06e 8
+##  8 FCD-TLE-Bulk-RNA-2019 Bulk RNA-Seq of Brain Samples from Patients with … Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE       2025-04-04 06:05:51 read …    9.34e 6
+##  9 GO                    The Gene Ontology                                  Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE       2026-05-01 04:59:18 read …    2.04e 8
+## 10 GTEx                  Genotype Tissue Expression                         The Adult … http… 0.01    [Patrice … TRUE   TRUE      TRUE       2026-05-06 05:25:03 read …    5.30e10
+## # ℹ 20 more rows</code></pre>
 <pre class="r"><code>search_MDB_tables(k, &quot;disease&quot;)  # Search table about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 54 × 3
-##    resource            name                               comment               
-##    &lt;chr&gt;               &lt;chr&gt;                              &lt;chr&gt;                 
-##  1 AP-Disease-Strategy diseases                           &lt;NA&gt;                  
-##  2 AP-Disease-Strategy diseases_descendants               &lt;NA&gt;                  
-##  3 AP-Disease-Strategy diseases_groups                    &lt;NA&gt;                  
-##  4 AP-Disease-Strategy diseases_groups_identifiers        &lt;NA&gt;                  
-##  5 AP-Disease-Strategy diseases_parents                   &lt;NA&gt;                  
-##  6 AP-Disease-Strategy diseases_synonyms                  &lt;NA&gt;                  
-##  7 AP-Disease-Strategy general_disease_groups_identifiers General group of dise…
-##  8 ChEMBL              assay_classification               Classification scheme…
-##  9 HPA                 Disease_involvement                &lt;NA&gt;                  
-## 10 Monarch             Diseases                           &lt;NA&gt;                  
+##    resource name                         comment
+##    &lt;chr&gt;    &lt;chr&gt;                        &lt;chr&gt;  
+##  1 HPA      Disease_involvement          &lt;NA&gt;   
+##  2 Monarch  Diseases                     &lt;NA&gt;   
+##  3 Monarch  Diseases_descendants         &lt;NA&gt;   
+##  4 Monarch  Diseases_mode_of_inheritance &lt;NA&gt;   
+##  5 Monarch  Diseases_parents             &lt;NA&gt;   
+##  6 Monarch  Diseases_phenotypes          &lt;NA&gt;   
+##  7 Monarch  Diseases_related             &lt;NA&gt;   
+##  8 Monarch  Diseases_synonyms            &lt;NA&gt;   
+##  9 Monarch  Diseases_xref                &lt;NA&gt;   
+## 10 Monarch  Genes_diseases               &lt;NA&gt;   
 ## # ℹ 44 more rows</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 155 × 7
-##    resource            table                 name  comment type  nullable unique
-##    &lt;chr&gt;               &lt;chr&gt;                 &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt; &lt;lgl&gt;    &lt;lgl&gt; 
-##  1 AP-Disease-Strategy strategic_indications cate… &quot;pheno… char… FALSE    FALSE 
-##  2 AP-Disease-Strategy strategic_indications class &quot;sympt… char… FALSE    FALSE 
-##  3 AP-Disease-Strategy general_disease_grou… dise… &quot;&quot;      char… FALSE    FALSE 
-##  4 AP-Disease-Strategy strategic_indications dise… &quot;Can i… logi… FALSE    FALSE 
-##  5 AP-Disease-Strategy cci_drug_indications  dise… &quot;&quot;      char… TRUE     FALSE 
-##  6 AP-Disease-Strategy cci_drug_indications… dise… &quot;&quot;      char… TRUE     FALSE 
-##  7 AP-Disease-Strategy cci_target_indicatio… dise… &quot;&quot;      char… TRUE     FALSE 
-##  8 AP-Disease-Strategy cci_target_indicatio… dise… &quot;&quot;      char… TRUE     FALSE 
-##  9 AP-Disease-Strategy cddi_drug_indications dise… &quot;&quot;      char… TRUE     FALSE 
-## 10 AP-Disease-Strategy cddi_drug_indication… dise… &quot;&quot;      char… TRUE     FALSE 
+##    resource            table                              name          comment                                  type      nullable unique
+##    &lt;chr&gt;               &lt;chr&gt;                              &lt;chr&gt;         &lt;chr&gt;                                    &lt;chr&gt;     &lt;lgl&gt;    &lt;lgl&gt; 
+##  1 AP-Disease-Strategy strategic_indications              category      &quot;phenotype or disease&quot;                   character FALSE    FALSE 
+##  2 AP-Disease-Strategy strategic_indications              class         &quot;symptom, disease, disorder or syndrome&quot; character FALSE    FALSE 
+##  3 AP-Disease-Strategy general_disease_groups_identifiers disease       &quot;&quot;                                       character FALSE    FALSE 
+##  4 AP-Disease-Strategy strategic_indications              disease       &quot;Can it be considered as a disease&quot;      logical   FALSE    FALSE 
+##  5 AP-Disease-Strategy cci_drug_indications               disease_group &quot;&quot;                                       character TRUE     FALSE 
+##  6 AP-Disease-Strategy cci_drug_indications_summary       disease_group &quot;&quot;                                       character TRUE     FALSE 
+##  7 AP-Disease-Strategy cci_target_indications             disease_group &quot;&quot;                                       character TRUE     FALSE 
+##  8 AP-Disease-Strategy cci_target_indications_summary     disease_group &quot;&quot;                                       character TRUE     FALSE 
+##  9 AP-Disease-Strategy cddi_drug_indications              disease_group &quot;&quot;                                       character TRUE     FALSE 
+## 10 AP-Disease-Strategy cddi_drug_indications_summary      disease_group &quot;&quot;                                       character TRUE     FALSE 
 ## # ℹ 145 more rows</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 50 × 3
@@ -8725,19 +8703,79 @@ object as shown below.</p>
    query=&quot;SELECT * from HPO_diseases WHERE lower(label) LIKE &#39;%epilep%&#39;&quot;
 )</code></pre>
 <pre><code>## # A tibble: 296 × 3
-##    db    id     label                                                           
-##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;                                                           
-##  1 OMIM  117100 Centralopathic epilepsy                                         
-##  2 OMIM  121201 Epilepsy, benign neonatal, 2                                    
-##  3 OMIM  132090 Epilepsy, benign occipital                                      
-##  4 OMIM  132300 Epilepsy, reading                                               
-##  5 OMIM  159600 Myoclonic epilepsy, Hartung type                                
-##  6 OMIM  159950 Spinal muscular atrophy with progressive myoclonic epilepsy     
-##  7 OMIM  208700 Ataxia with myoclonic epilepsy and presenile dementia           
-##  8 OMIM  213000 Cerebellar hypoplasia/atrophy, epilepsy, and global development…
-##  9 OMIM  226810 Celiac disease, epilepsy and cerebral calcification syndrome    
-## 10 OMIM  226850 EPILEPSY-TELANGIECTASIA                                         
+##    db    id     label                                                                  
+##    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;                                                                  
+##  1 OMIM  117100 Centralopathic epilepsy                                                
+##  2 OMIM  121201 Epilepsy, benign neonatal, 2                                           
+##  3 OMIM  132090 Epilepsy, benign occipital                                             
+##  4 OMIM  132300 Epilepsy, reading                                                      
+##  5 OMIM  159600 Myoclonic epilepsy, Hartung type                                       
+##  6 OMIM  159950 Spinal muscular atrophy with progressive myoclonic epilepsy            
+##  7 OMIM  208700 Ataxia with myoclonic epilepsy and presenile dementia                  
+##  8 OMIM  213000 Cerebellar hypoplasia/atrophy, epilepsy, and global developmental delay
+##  9 OMIM  226810 Celiac disease, epilepsy and cerebral calcification syndrome           
+## 10 OMIM  226850 EPILEPSY-TELANGIECTASIA                                                
 ## # ℹ 286 more rows</code></pre>
+</div>
+<div id="data-organization-in-clickhouse" class="section level2" number="4.5">
+<h2><span class="header-section-number">4.5</span> Data organization in
+ClickHouse</h2>
+<p>Several mechanisms have been put in place to take advantage of
+ClickHouse capabilities to store and query big data tables. They rely on
+the MDB data model and its documentation.</p>
+<ol style="list-style-type: decimal">
+<li><p>Table order is very important to optimize data access. When
+feeding a chMDB the order is defined as follows:</p>
+<ul>
+<li>using the first index in the table data model;</li>
+<li>if no index, order by primary key;</li>
+<li>if no primary key, order by foreign keys;</li>
+<li>if none of the above, take the first column;</li>
+<li>Matrices and Sparse Matrices are ordered by rows and columns.</li>
+</ul></li>
+<li><p>Table indexes can accelerate data retrieval, though less
+efficiently than table order. Indexes are also created according to the
+MDB data model:</p>
+<ul>
+<li>Use all the indexes but the first one</li>
+<li>for character, the index type is:
+<code>TYPE bloom_filter(0.01) GRANULARITY 1</code></li>
+<li>numeric or integer, the index type is: TYPE minmax GRANULARITY
+1</li>
+<li>indexes are not created for other data types</li>
+</ul></li>
+<li><p>Projections are copies of a whole table but ordered according to
+other rules. They can accelerate some queries on huge tables, but at the
+cost of disk space usage. chMDB projections are defined using the
+following syntax in the table comment of the data model:
+<code>{ch_Projection:field2,field1,...}</code> (the projection should be
+ordered on another field than the one used to order the table).
+Projections are created by default at the end of <code>as_chMDB()</code>
+function. However, in some cases it could be more efficient to postpone
+their materialization until the tables are completely fed, by setting
+the <code>materializeProjections = FALSE</code> and calling the
+<code>materialize_chMDB_projections()</code> function when
+relevant.</p></li>
+<li><p>When <code>{LowCardinality}</code> is added to the comment of a
+field in the chMDB data model, a dictionary will be created on this
+field in ClickHouse. It can optimize queries on such fields with low
+cardinality on many records.</p></li>
+<li><p>Matrices are not stored directly into one table. Depending on
+their features they are organized differently:</p>
+<ul>
+<li>regular matrices are stored in a table with an additional column
+“<strong><em>ROWNAMES</em></strong>”. The table with the matrix name
+contains only a pointer to this table.</li>
+<li>sparse and large (more than 1000 columns) are stored as a long
+pivoted table in ClickHouse. The table with the matrix name contains
+pointers to 3 tables: one with row names, one with column names and one
+with values.</li>
+<li>This data organization is transparent for TKCat users when calling
+the functions <code>data_tables()</code>, <code>heads()</code>,
+<code>[[()</code>, <code>$</code> or <code>filter_mdb_matrix()</code> on
+chMDB objects.</li>
+</ul></li>
+</ol>
 </div>
 </div>
 <div id="defining-and-using-requirements-for-knowledge-management-kmr" class="section level1" number="5">

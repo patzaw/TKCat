@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-07 15:24:15.200089
+    ## Timestamp: 2026-05-08 09:31:42.185964
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-07 15:24:15.200089
+    ## Timestamp: 2026-05-08 09:31:42.185964
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-07 15:24:15.200089
+    ## Timestamp: 2026-05-08 09:31:42.185964
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-07 15:24:15
+    ## Timestamp: 2026-05-08 09:31:42
     ## 
 
 Also writing these data and related information in text files make them
@@ -1665,18 +1665,18 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
 ```
 
     ## # A tibble: 54 × 3
-    ##    resource name                         comment                 
-    ##    <chr>    <chr>                        <chr>                   
-    ##  1 HPO      Disease_HP                   HP presented by diseases
-    ##  2 HPO      Disease_synonyms             Disease synonyms        
-    ##  3 HPO      Diseases                     Diseases                
-    ##  4 Monarch  Diseases                     NA                      
-    ##  5 Monarch  Diseases_descendants         NA                      
-    ##  6 Monarch  Diseases_mode_of_inheritance NA                      
-    ##  7 Monarch  Diseases_parents             NA                      
-    ##  8 Monarch  Diseases_phenotypes          NA                      
-    ##  9 Monarch  Diseases_related             NA                      
-    ## 10 Monarch  Diseases_synonyms            NA                      
+    ##    resource            name                               comment               
+    ##    <chr>               <chr>                              <chr>                 
+    ##  1 AP-Disease-Strategy diseases                           NA                    
+    ##  2 AP-Disease-Strategy diseases_descendants               NA                    
+    ##  3 AP-Disease-Strategy diseases_groups                    NA                    
+    ##  4 AP-Disease-Strategy diseases_groups_identifiers        NA                    
+    ##  5 AP-Disease-Strategy diseases_parents                   NA                    
+    ##  6 AP-Disease-Strategy diseases_synonyms                  NA                    
+    ##  7 AP-Disease-Strategy general_disease_groups_identifiers General group of dise…
+    ##  8 ChEMBL              assay_classification               Classification scheme…
+    ##  9 Monarch             Diseases                           NA                    
+    ## 10 Monarch             Diseases_descendants               NA                    
     ## # ℹ 44 more rows
 
 ``` r
@@ -1685,18 +1685,18 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
     ## # A tibble: 155 × 7
-    ##    resource    table                         name  comment type  nullable unique
-    ##    <chr>       <chr>                         <chr> <chr>   <chr> <lgl>    <lgl> 
-    ##  1 MetaBase    ImagemapsEdges                dise… ""      logi… FALSE    FALSE 
-    ##  2 OpenTargets Diseases_and_Phenotypes       code  "Disea… char… FALSE    TRUE  
-    ##  3 OpenTargets Associations                  curr… "Novel… nume… FALSE    FALSE 
-    ##  4 OpenTargets Diseases_and_Phenotypes       desc… "Descr… char… TRUE     FALSE 
-    ##  5 OpenTargets Associations                  dise… "Disea… char… FALSE    FALSE 
-    ##  6 OpenTargets Clinical_reports_diseases     dise… ""      char… TRUE     FALSE 
-    ##  7 OpenTargets Clinical_reports_side_effects dise… ""      char… TRUE     FALSE 
-    ##  8 OpenTargets Diseases_ancestors            dise… "Disea… char… FALSE    FALSE 
-    ##  9 OpenTargets Diseases_children             dise… "Disea… char… FALSE    FALSE 
-    ## 10 OpenTargets Diseases_cross_references     dise… "Disea… char… FALSE    FALSE 
+    ##    resource          table            name      comment    type  nullable unique
+    ##    <chr>             <chr>            <chr>     <chr>      <chr> <lgl>    <lgl> 
+    ##  1 TLE-Bulk-RNA-2017 conditions       condition Disease    char… TRUE     TRUE  
+    ##  2 TLE-Bulk-RNA-2017 samples          condition Disease    char… TRUE     FALSE 
+    ##  3 HPO               Disease_HP       db        Disease d… char… FALSE    FALSE 
+    ##  4 HPO               Disease_synonyms db        Disease d… char… FALSE    FALSE 
+    ##  5 HPO               Diseases         db        Disease d… char… FALSE    FALSE 
+    ##  6 HPO               Disease_HP       id        Disease ID char… FALSE    FALSE 
+    ##  7 HPO               Disease_synonyms id        Disease ID char… FALSE    FALSE 
+    ##  8 HPO               Diseases         id        Disease ID char… FALSE    FALSE 
+    ##  9 HPO               Diseases         label     Disease l… char… FALSE    FALSE 
+    ## 10 HPO               Disease_synonyms synonym   Disease s… char… FALSE    FALSE 
     ## # ℹ 145 more rows
 
 ``` r
@@ -1778,6 +1778,68 @@ get_query(
     ##  9 OMIM  226810 Celiac disease, epilepsy and cerebral calcification syndrome    
     ## 10 OMIM  226850 EPILEPSY-TELANGIECTASIA                                         
     ## # ℹ 286 more rows
+
+### Data organization in ClickHouse
+
+Several mechanisms have been put in place to take advantage of
+ClickHouse capabilities to store and query big data tables. They rely on
+the MDB data model and its documentation.
+
+1.  Table order is very important to optimize data access. When feeding
+    a chMDB the order is defined as follows:
+
+    - using the first index in the table data model;
+    - if no index, order by primary key;
+    - if no primary key, order by foreign keys;
+    - if none of the above, take the first column;
+    - Matrices and Sparse Matrices are ordered by rows and columns.
+
+2.  Table indexes can accelerate data retrieval, though less efficiently
+    than table order. Indexes are also created according to the MDB data
+    model:
+
+    - Use all the indexes but the first one
+    - for character, the index type is:
+      `TYPE bloom_filter(0.01) GRANULARITY 1`
+    - numeric or integer, the index type is: TYPE minmax GRANULARITY 1
+    - indexes are not created for other data types
+
+3.  Projections are copies of a whole table but ordered according to
+    other rules. They can accelerate some queries on huge tables, but at
+    the cost of disk space usage. chMDB projections are defined using
+    the following syntax in the table comment of the data model:
+    `{ch_Projection:field2,field1,...}` (the projection should be
+    ordered on another field than the one used to order the table).
+    Projections are created by default at the end of
+    [`as_chMDB()`](https://patzaw.github.io/TKCat/reference/as_chMDB.md)
+    function. However, in some cases it could be more efficient to
+    postpone their materialization until the tables are completely fed,
+    by setting the `materializeProjections = FALSE` and calling the
+    [`materialize_chMDB_projections()`](https://patzaw.github.io/TKCat/reference/materialize_chMDB_projections.md)
+    function when relevant.
+
+4.  When `{LowCardinality}` is added to the comment of a field in the
+    chMDB data model, a dictionary will be created on this field in
+    ClickHouse. It can optimize queries on such fields with low
+    cardinality on many records.
+
+5.  Matrices are not stored directly into one table. Depending on their
+    features they are organized differently:
+
+    - regular matrices are stored in a table with an additional column
+      “***ROWNAMES***”. The table with the matrix name contains only a
+      pointer to this table.
+    - sparse and large (more than 1000 columns) are stored as a long
+      pivoted table in ClickHouse. The table with the matrix name
+      contains pointers to 3 tables: one with row names, one with column
+      names and one with values.
+    - This data organization is transparent for TKCat users when calling
+      the functions
+      [`data_tables()`](https://patzaw.github.io/TKCat/reference/data_tables.md),
+      [`heads()`](https://patzaw.github.io/TKCat/reference/heads.md),
+      `[[()`, `$` or
+      [`filter_mdb_matrix()`](https://patzaw.github.io/TKCat/reference/filter_mdb_matrix.md)
+      on chMDB objects.
 
 ## Defining and using Requirements for Knowledge Management (KMR)
 

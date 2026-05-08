@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">Patrice
 Godard</h4>
             
-            <h4 data-toc-skip class="date">May 07, 2026</h4>
+            <h4 data-toc-skip class="date">May 08, 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/patzaw/TKCat/blob/HEAD/vignettes/TKCat.Rmd" class="external-link"><code>vignettes/TKCat.Rmd</code></a></small>
       <div class="d-none name"><code>TKCat.Rmd</code></div>
@@ -449,7 +449,7 @@ to document the data themselves.</li>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2026-05-07 15:24:15.200089</span></span>
+<span><span class="co">## Timestamp: 2026-05-08 09:31:42.185964</span></span>
 <span><span class="co">## </span></span></code></pre>
 </div>
 <div class="section level3">
@@ -489,7 +489,7 @@ statement displayed when printing the object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2026-05-07 15:24:15.200089</span></span>
+<span><span class="co">## Timestamp: 2026-05-08 09:31:42.185964</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -590,7 +590,7 @@ MDB object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2026-05-07 15:24:15.200089</span></span>
+<span><span class="co">## Timestamp: 2026-05-08 09:31:42.185964</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -652,7 +652,7 @@ the corresponding documentation from it back in R:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2026-05-07 15:24:15</span></span>
+<span><span class="co">## Timestamp: 2026-05-08 09:31:42</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -1472,34 +1472,34 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_tables.html">search_MDB_tables</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search table about "disease"</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 54 × 3</span></span></span>
-<span><span class="co">##    resource name                         comment                 </span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                   </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> HPO      Disease_HP                   HP presented by diseases</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> HPO      Disease_synonyms             Disease synonyms        </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> HPO      Diseases                     Diseases                </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Monarch  Diseases                     <span style="color: #BB0000;">NA</span>                      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> Monarch  Diseases_descendants         <span style="color: #BB0000;">NA</span>                      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Monarch  Diseases_mode_of_inheritance <span style="color: #BB0000;">NA</span>                      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Monarch  Diseases_parents             <span style="color: #BB0000;">NA</span>                      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> Monarch  Diseases_phenotypes          <span style="color: #BB0000;">NA</span>                      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Monarch  Diseases_related             <span style="color: #BB0000;">NA</span>                      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> Monarch  Diseases_synonyms            <span style="color: #BB0000;">NA</span>                      </span></span>
+<span><span class="co">##    resource            name                               comment               </span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> AP-Disease-Strategy diseases                           <span style="color: #BB0000;">NA</span>                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> AP-Disease-Strategy diseases_descendants               <span style="color: #BB0000;">NA</span>                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> AP-Disease-Strategy diseases_groups                    <span style="color: #BB0000;">NA</span>                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> AP-Disease-Strategy diseases_groups_identifiers        <span style="color: #BB0000;">NA</span>                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> AP-Disease-Strategy diseases_parents                   <span style="color: #BB0000;">NA</span>                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> AP-Disease-Strategy diseases_synonyms                  <span style="color: #BB0000;">NA</span>                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> AP-Disease-Strategy general_disease_groups_identifiers General group of dise…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> ChEMBL              assay_classification               Classification scheme…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Monarch             Diseases                           <span style="color: #BB0000;">NA</span>                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> Monarch             Diseases_descendants               <span style="color: #BB0000;">NA</span>                    </span></span>
 <span><span class="co">## <span style="color: #949494;"># ℹ 44 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_fields.html">search_MDB_fields</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search a field about "disease"</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 155 × 7</span></span></span>
-<span><span class="co">##    resource    table                         name  comment type  nullable unique</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> MetaBase    ImagemapsEdges                dise… <span style="color: #949494;">""</span>      logi… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> OpenTargets Diseases_and_Phenotypes       code  <span style="color: #949494;">"</span>Disea… char… FALSE    TRUE  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> OpenTargets Associations                  curr… <span style="color: #949494;">"</span>Novel… nume… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> OpenTargets Diseases_and_Phenotypes       desc… <span style="color: #949494;">"</span>Descr… char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> OpenTargets Associations                  dise… <span style="color: #949494;">"</span>Disea… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> OpenTargets Clinical_reports_diseases     dise… <span style="color: #949494;">""</span>      char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> OpenTargets Clinical_reports_side_effects dise… <span style="color: #949494;">""</span>      char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> OpenTargets Diseases_ancestors            dise… <span style="color: #949494;">"</span>Disea… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> OpenTargets Diseases_children             dise… <span style="color: #949494;">"</span>Disea… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> OpenTargets Diseases_cross_references     dise… <span style="color: #949494;">"</span>Disea… char… FALSE    FALSE </span></span>
+<span><span class="co">##    resource          table            name      comment    type  nullable unique</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> TLE-Bulk-RNA-2017 conditions       condition Disease    char… TRUE     TRUE  </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> TLE-Bulk-RNA-2017 samples          condition Disease    char… TRUE     FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> HPO               Disease_HP       db        Disease d… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> HPO               Disease_synonyms db        Disease d… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> HPO               Diseases         db        Disease d… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> HPO               Disease_HP       id        Disease ID char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> HPO               Disease_synonyms id        Disease ID char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> HPO               Diseases         id        Disease ID char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> HPO               Diseases         label     Disease l… char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> HPO               Disease_synonyms synonym   Disease s… char… FALSE    FALSE </span></span>
 <span><span class="co">## <span style="color: #949494;"># ℹ 145 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb128"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/collection_members.html">collection_members</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>  </span></code></pre></div>
@@ -1563,6 +1563,73 @@ object as shown below.</p>
 <span><span class="co">## <span style="color: #BCBCBC;"> 9</span> OMIM  226810 Celiac disease, epilepsy and cerebral calcification syndrome    </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span> OMIM  226850 EPILEPSY-TELANGIECTASIA                                         </span></span>
 <span><span class="co">## <span style="color: #949494;"># ℹ 286 more rows</span></span></span></code></pre>
+</div>
+<div class="section level3">
+<h3 id="data-organization-in-clickhouse">Data organization in ClickHouse<a class="anchor" aria-label="anchor" href="#data-organization-in-clickhouse"></a>
+</h3>
+<p>Several mechanisms have been put in place to take advantage of
+ClickHouse capabilities to store and query big data tables. They rely on
+the MDB data model and its documentation.</p>
+<ol style="list-style-type: decimal">
+<li>
+<p>Table order is very important to optimize data access. When
+feeding a chMDB the order is defined as follows:</p>
+<ul>
+<li>using the first index in the table data model;</li>
+<li>if no index, order by primary key;</li>
+<li>if no primary key, order by foreign keys;</li>
+<li>if none of the above, take the first column;</li>
+<li>Matrices and Sparse Matrices are ordered by rows and columns.</li>
+</ul>
+</li>
+<li>
+<p>Table indexes can accelerate data retrieval, though less
+efficiently than table order. Indexes are also created according to the
+MDB data model:</p>
+<ul>
+<li>Use all the indexes but the first one</li>
+<li>for character, the index type is:
+<code>TYPE bloom_filter(0.01) GRANULARITY 1</code>
+</li>
+<li>numeric or integer, the index type is: TYPE minmax GRANULARITY
+1</li>
+<li>indexes are not created for other data types</li>
+</ul>
+</li>
+<li><p>Projections are copies of a whole table but ordered according to
+other rules. They can accelerate some queries on huge tables, but at the
+cost of disk space usage. chMDB projections are defined using the
+following syntax in the table comment of the data model:
+<code>{ch_Projection:field2,field1,...}</code> (the projection should be
+ordered on another field than the one used to order the table).
+Projections are created by default at the end of <code><a href="../reference/as_chMDB.html">as_chMDB()</a></code>
+function. However, in some cases it could be more efficient to postpone
+their materialization until the tables are completely fed, by setting
+the <code>materializeProjections = FALSE</code> and calling the
+<code><a href="../reference/materialize_chMDB_projections.html">materialize_chMDB_projections()</a></code> function when
+relevant.</p></li>
+<li><p>When <code>{LowCardinality}</code> is added to the comment of a
+field in the chMDB data model, a dictionary will be created on this
+field in ClickHouse. It can optimize queries on such fields with low
+cardinality on many records.</p></li>
+<li>
+<p>Matrices are not stored directly into one table. Depending on
+their features they are organized differently:</p>
+<ul>
+<li>regular matrices are stored in a table with an additional column
+“<strong><em>ROWNAMES</em></strong>”. The table with the matrix name
+contains only a pointer to this table.</li>
+<li>sparse and large (more than 1000 columns) are stored as a long
+pivoted table in ClickHouse. The table with the matrix name contains
+pointers to 3 tables: one with row names, one with column names and one
+with values.</li>
+<li>This data organization is transparent for TKCat users when calling
+the functions <code><a href="../reference/data_tables.html">data_tables()</a></code>, <code><a href="../reference/heads.html">heads()</a></code>,
+<code>[[()</code>, <code>$</code> or <code><a href="../reference/filter_mdb_matrix.html">filter_mdb_matrix()</a></code> on
+chMDB objects.</li>
+</ul>
+</li>
+</ol>
 </div>
 </div>
 <div class="section level2">
