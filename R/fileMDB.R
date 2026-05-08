@@ -1659,9 +1659,7 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
             tableName = tn,
             value = modTable
           )
-
         } else {
-          
           ## Matrix ----
           transposed <- FALSE
           cnames <- cnames %>%

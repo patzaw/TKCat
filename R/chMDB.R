@@ -2395,7 +2395,6 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
     message(tn)
     tm <- dm[[tn]]
     if (ReDaMoR::is.MatrixModel(tm)) {
-
       nullable <- dm[[tn]]$fields %>%
         dplyr::filter(!.data$type %in% c("column", "row")) %>%
         dplyr::pull("nullable")

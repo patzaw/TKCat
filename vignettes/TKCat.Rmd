@@ -4,7 +4,7 @@ author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
 package: "TKCat (version `r packageVersion('TKCat')`)"
 bibliography: TKCat.bib
-link-citations: yes
+link-citations: true
 output:
    rmarkdown::html_document:
       number_sections: yes
@@ -1110,6 +1110,57 @@ get_query(
 ## The following line is to avoid building errors on CRAN
 knitr::opts_chunk$set(eval=TRUE)
 ```
+
+## Data organization in ClickHouse
+
+Several mechanisms have been put in place to take advantage of ClickHouse
+capabilities to store and query big data tables. They rely on the MDB data
+model and its documentation.
+
+1. Table order is very important to optimize data access. When feeding a
+chMDB the order is defined as follows:
+
+   - using the first index in the table data model;
+   - if no index, order by primary key;
+   - if no primary key, order by foreign keys;
+   - if none of the above, take the first column;
+   - Matrices and Sparse Matrices are ordered by rows and columns.
+
+2. Table indexes can accelerate data retrieval, though less efficiently than
+table order. Indexes are also created according to the MDB data model:
+
+   - Use all the indexes but the first one
+   - for character, the index type is: `TYPE bloom_filter(0.01) GRANULARITY 1`
+   - numeric or integer, the index type is: TYPE minmax GRANULARITY 1
+   - indexes are not created for other data types
+
+3. Projections are copies of a whole table but ordered according to other rules.
+They can accelerate some queries on huge tables, but at the cost of disk
+space usage. chMDB projections are defined using the following syntax in the
+table comment of the data model: `{ch_Projection:field2,field1,...}`
+(the projection should be ordered on another field than the one used to
+order the table). Projections are created by default at the end of `as_chMDB()`
+function. However, in some cases it could be more efficient to postpone their
+materialization until the tables are completely fed, by setting
+the `materializeProjections = FALSE` and calling
+the `materialize_chMDB_projections()` function when relevant.
+
+4. When `{LowCardinality}` is added to the comment of a field in the chMDB data
+model, a dictionary will be created on this field in ClickHouse. It can optimize
+queries on such fields with low cardinality on many records.
+
+5. Matrices are not stored directly into one table. Depending on their features
+they are organized differently:
+
+   - regular matrices are stored in a table with an additional
+   column "___ROWNAMES___". The table with the matrix name contains only a
+   pointer to this table.
+   - sparse and large (more than 1000 columns) are stored as a long pivoted
+   table in ClickHouse. The table with the matrix name contains pointers to
+   3 tables: one with row names, one with column names and one with values.
+   - This data organization is transparent for TKCat users when calling the
+   functions `data_tables()`, `heads()`, `[[()`, `$` or `filter_mdb_matrix()`
+   on chMDB objects.
 
 # Defining and using Requirements for Knowledge Management (KMR)
 
