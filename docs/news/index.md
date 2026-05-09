@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 1.2.1
+
+- Remove dependency to {base64enc} library.
+
 ## Version 1.2.0
 
 - Move from {getPass} to {askpass} package to get input masked in

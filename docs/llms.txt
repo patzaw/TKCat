@@ -68,8 +68,6 @@ The following R packages available on CRAN are required:
   Robust JSON Parser and Generator for R
 - [jsonvalidate](https://CRAN.R-project.org/package=jsonvalidate):
   Validate ‘JSON’ Schema
-- [base64enc](https://CRAN.R-project.org/package=base64enc): Tools for
-  ‘base64’ Encoding
 - [markdown](https://CRAN.R-project.org/package=markdown): Render
   Markdown with ‘commonmark’
 - [promises](https://CRAN.R-project.org/package=promises): Abstractions

@@ -9,7 +9,10 @@
 #'
 #'
 encode_bin <- function(what) {
-  base64enc::base64encode(what)
+  if (is.character(what)) {
+    what <- readBin(what, raw(), file.size(what))
+  }
+  jsonlite::base64_enc(what)
 }
 
 ###############################################################################@
@@ -22,7 +25,7 @@ encode_bin <- function(what) {
 #' @export
 #'
 decode_bin <- function(text) {
-  base64enc::base64decode(paste(unlist(text), collapse = ""))
+  jsonlite::base64_dec(paste(unlist(text), collapse = ""))
 }
 
 ###############################################################################@

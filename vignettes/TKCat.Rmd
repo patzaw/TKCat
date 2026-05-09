@@ -1569,10 +1569,10 @@ corresponding data model.
 ch_config_files <- tibble(
    name=c("config.xml", "users.xml"),
    file=c(
-      base64enc::base64encode(
+      encode_bin(
          system.file("ClickHouse/config.xml", package="TKCat")
       ),
-      base64enc::base64encode(
+      encode_bin(
          system.file("ClickHouse/users.xml", package="TKCat")
       )
    )

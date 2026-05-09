@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2026-05-08" />
+<meta name="date" content="2026-05-09" />
 
 <title>Introduction to TKCat</title>
 
@@ -7275,7 +7275,7 @@ display: none;
 
 <h1 class="title toc-ignore">Introduction to TKCat</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">May 08, 2026</h4>
+<h4 class="date">May 09, 2026</h4>
 
 </div>
 
@@ -7693,7 +7693,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-08 09:30:31.570638
+## Timestamp: 2026-05-09 05:57:09.133938
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -7731,7 +7731,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-08 09:30:31.570638
+## Timestamp: 2026-05-09 05:57:09.133938
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -7824,7 +7824,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-08 09:30:31.570638
+## Timestamp: 2026-05-09 05:57:09.133938
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -7883,7 +7883,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-08 09:30:31
+## Timestamp: 2026-05-09 05:57:09
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -8618,7 +8618,7 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <pre><code>## # A tibble: 30 × 12
 ##    name                  title                                              description url   version maintainer public populated timestamps timestamp           access total_size
 ##    &lt;chr&gt;                 &lt;chr&gt;                                              &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;lgl&gt;  &lt;lgl&gt;     &lt;lgl&gt;      &lt;dttm&gt;              &lt;fct&gt;       &lt;dbl&gt;
-##  1 AP-Disease-Strategy   Angelini Pharma disease strategy                   Ressources… &lt;NA&gt;  0.0.2   [Patrice … FALSE  TRUE      TRUE       2026-05-03 11:50:51 none      3.85e 8
+##  1 AP-Disease-Strategy   Angelini Pharma disease strategy                   Ressources… &lt;NA&gt;  0.0.2   [Patrice … FALSE  TRUE      TRUE       2026-05-03 11:50:51 none      3.84e 8
 ##  2 AP-RD-Scouting        Information from R&amp;D scouting activites at Angeli… Informatio… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2026-04-12 13:32:45 read …    2.16e 5
 ##  3 Caravelle             New internal target candidate reviewed in the fra… Informatio… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2026-02-24 04:29:46 read …    2.48e 4
 ##  4 ChEMBL                ChEMBL: a manually curated database of bioactive … ChEMBL is … http… 1.1.0   [Patrice … TRUE   TRUE      TRUE       2025-11-24 15:34:12 read …    6.73e 9
@@ -8631,18 +8631,18 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 ## # ℹ 20 more rows</code></pre>
 <pre class="r"><code>search_MDB_tables(k, &quot;disease&quot;)  # Search table about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 54 × 3
-##    resource name                         comment
-##    &lt;chr&gt;    &lt;chr&gt;                        &lt;chr&gt;  
-##  1 HPA      Disease_involvement          &lt;NA&gt;   
-##  2 Monarch  Diseases                     &lt;NA&gt;   
-##  3 Monarch  Diseases_descendants         &lt;NA&gt;   
-##  4 Monarch  Diseases_mode_of_inheritance &lt;NA&gt;   
-##  5 Monarch  Diseases_parents             &lt;NA&gt;   
-##  6 Monarch  Diseases_phenotypes          &lt;NA&gt;   
-##  7 Monarch  Diseases_related             &lt;NA&gt;   
-##  8 Monarch  Diseases_synonyms            &lt;NA&gt;   
-##  9 Monarch  Diseases_xref                &lt;NA&gt;   
-## 10 Monarch  Genes_diseases               &lt;NA&gt;   
+##    resource            name                               comment                                                                                                                 
+##    &lt;chr&gt;               &lt;chr&gt;                              &lt;chr&gt;                                                                                                                   
+##  1 ChEMBL              assay_classification               Classification scheme for phenotypic assays e.g., by therapeutic area, phenotype/process and assay type. Can be used to…
+##  2 AP-Disease-Strategy diseases                           &lt;NA&gt;                                                                                                                    
+##  3 AP-Disease-Strategy diseases_descendants               &lt;NA&gt;                                                                                                                    
+##  4 AP-Disease-Strategy diseases_groups                    &lt;NA&gt;                                                                                                                    
+##  5 AP-Disease-Strategy diseases_groups_identifiers        &lt;NA&gt;                                                                                                                    
+##  6 AP-Disease-Strategy diseases_parents                   &lt;NA&gt;                                                                                                                    
+##  7 AP-Disease-Strategy diseases_synonyms                  &lt;NA&gt;                                                                                                                    
+##  8 AP-Disease-Strategy general_disease_groups_identifiers General group of diseases                                                                                               
+##  9 HPA                 Disease_involvement                &lt;NA&gt;                                                                                                                    
+## 10 HPO                 Disease_HP                         HP presented by diseases                                                                                                
 ## # ℹ 44 more rows</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 155 × 7
@@ -9341,10 +9341,10 @@ corresponding data model.</p>
 <pre class="r"><code>ch_config_files &lt;- tibble(
    name=c(&quot;config.xml&quot;, &quot;users.xml&quot;),
    file=c(
-      base64enc::base64encode(
+      encode_bin(
          system.file(&quot;ClickHouse/config.xml&quot;, package=&quot;TKCat&quot;)
       ),
-      base64enc::base64encode(
+      encode_bin(
          system.file(&quot;ClickHouse/users.xml&quot;, package=&quot;TKCat&quot;)
       )
    )

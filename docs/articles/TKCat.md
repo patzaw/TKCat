@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-08 09:31:42.185964
+    ## Timestamp: 2026-05-09 05:58:14.109771
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-08 09:31:42.185964
+    ## Timestamp: 2026-05-09 05:58:14.109771
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-08 09:31:42.185964
+    ## Timestamp: 2026-05-09 05:58:14.109771
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-08 09:31:42
+    ## Timestamp: 2026-05-09 05:58:14
     ## 
 
 Also writing these data and related information in text files make them
@@ -1685,18 +1685,18 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
     ## # A tibble: 155 × 7
-    ##    resource          table            name      comment    type  nullable unique
-    ##    <chr>             <chr>            <chr>     <chr>      <chr> <lgl>    <lgl> 
-    ##  1 TLE-Bulk-RNA-2017 conditions       condition Disease    char… TRUE     TRUE  
-    ##  2 TLE-Bulk-RNA-2017 samples          condition Disease    char… TRUE     FALSE 
-    ##  3 HPO               Disease_HP       db        Disease d… char… FALSE    FALSE 
-    ##  4 HPO               Disease_synonyms db        Disease d… char… FALSE    FALSE 
-    ##  5 HPO               Diseases         db        Disease d… char… FALSE    FALSE 
-    ##  6 HPO               Disease_HP       id        Disease ID char… FALSE    FALSE 
-    ##  7 HPO               Disease_synonyms id        Disease ID char… FALSE    FALSE 
-    ##  8 HPO               Diseases         id        Disease ID char… FALSE    FALSE 
-    ##  9 HPO               Diseases         label     Disease l… char… FALSE    FALSE 
-    ## 10 HPO               Disease_synonyms synonym   Disease s… char… FALSE    FALSE 
+    ##    resource              table               name  comment type  nullable unique
+    ##    <chr>                 <chr>               <chr> <chr>   <chr> <lgl>    <lgl> 
+    ##  1 DRE-Bulk-RNA-UMC-2024 conditions          cond… "Disea… char… TRUE     FALSE 
+    ##  2 DRE-Bulk-RNA-UMC-2024 samples             cond… "Disea… char… TRUE     FALSE 
+    ##  3 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
+    ##  4 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      char… FALSE    FALSE 
+    ##  5 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      nume… FALSE    FALSE 
+    ##  6 DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… ""      char… FALSE    FALSE 
+    ##  7 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
+    ##  8 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      char… FALSE    FALSE 
+    ##  9 AP-Disease-Strategy   strategic_indicati… cate… "pheno… char… FALSE    FALSE 
+    ## 10 AP-Disease-Strategy   strategic_indicati… class "sympt… char… FALSE    FALSE 
     ## # ℹ 145 more rows
 
 ``` r
@@ -2494,10 +2494,10 @@ corresponding data model.
 ch_config_files <- tibble(
    name=c("config.xml", "users.xml"),
    file=c(
-      base64enc::base64encode(
+      encode_bin(
          system.file("ClickHouse/config.xml", package="TKCat")
       ),
-      base64enc::base64encode(
+      encode_bin(
          system.file("ClickHouse/users.xml", package="TKCat")
       )
    )

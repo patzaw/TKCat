@@ -1201,7 +1201,7 @@ TKCAT_LOGO_DIV <- shiny::div(
         tabss <- tabSubSet()
         cs <- input$dataSample_cells_selected
         d <- tabss[cs[1], cs[2] + 1, drop = TRUE]
-        writeBin(base64enc::base64decode(d), file)
+        writeBin(jsonlite::base64_dec(d), file)
       }
     )
 
