@@ -14,10 +14,10 @@ Description: Facilitate the management of data from knowledge
    in research environments.
    In 'TKCat', knowledge resources are manipulated as modeled database (MDB)
    objects. These objects provide access to the data tables along with a general
-   description of the resource and a detail data model documenting the
+   description of the resource and a detailed data model documenting the
    tables, their fields and their relationships.
    These MDBs are then gathered in catalogs that can be easily
-   explored an shared.
+   explored and shared.
    Finally, 'TKCat' provides tools to easily subset, filter and combine MDBs and
    create new catalogs suited for specific needs.
 URL:

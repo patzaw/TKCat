@@ -532,7 +532,7 @@ c.MDB <- function(...) {
     function(x) db_info(x)$name
   ))
   if (any(duplicated(dbNames))) {
-    "MDBs to combine cannot have the same names"
+    stop("MDBs to combine cannot have the same names")
   }
   names(MDBs) <- dbNames
   dbModels <- lapply(MDBs, data_model) |>
@@ -854,8 +854,8 @@ merge.MDB <- function(
 #' - `"right"`: includes all rows of the last provided table
 #' - `"inner"`: includes all rows in all provided tables
 #' - `"full"`: includes all rows in at least one provide table
-#' @param jtName the name of the joint. IF NA (default), the name
-#' is then the name is the first provided table name.
+#' @param jtName the name of the joint table. If NA (default), it is
+#' the first provided table name.
 #'
 #' @return A [metaMDB] corresponding to x with the
 #' joined tables replaced by the joint.
@@ -1148,7 +1148,8 @@ get_confrontation_report <- function() {
         dbInfo[[f]] == ""
     ) {
       stop(sprintf(
-        "%s in dbInfo should be a non-empty character"
+        "%s in dbInfo should be a non-empty character",
+        f
       ))
     }
   }

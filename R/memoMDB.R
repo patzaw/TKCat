@@ -435,6 +435,7 @@ dims.memoMDB <- function(x, ...) {
       ncol = numeric(),
       nrow = numeric(),
       records = numeric(),
+      bytes = numeric(),
       transposed = logical()
     ))
   }
