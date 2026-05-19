@@ -15,10 +15,10 @@ combination in research environments.
 
 In TKCat, knowledge resources are manipulated as modeled database (MDB)
 objects. These objects provide access to the data tables along with a
-general description of the resource and a detail data model generated
+general description of the resource and a detailed data model generated
 with [ReDaMoR](https://patzaw.github.io/ReDaMoR/) documenting the
 tables, their fields and their relationships. These MDB are then
-gathered in catalogs that can be easily explored an shared. TKCat
+gathered in catalogs that can be easily explored and shared. TKCat
 provides tools to easily subset, filter and combine MDBs and create new
 catalogs suited for specific needs.
 
@@ -26,7 +26,7 @@ Currently, there are 3 different implementations of MDBs which are
 supported by TKCat: in R memory (memoMDB), in files (fileMDB) and in
 [ClickHouse](https://clickhouse.com/) (chMDB).
 
-This is document is divided in four main sections:
+This document is divided into four main sections:
 
 - The first one describes how to build an MDB object, starting with a
   minimal example
@@ -167,7 +167,7 @@ if(igraph_available){
 ```
 
 This data model is minimal: only the name of the tables, their fields
-and their types are documented. There is no additional constrain
+and their types are documented. There is no additional constraint
 regarding the uniqueness or the completeness of the fields. Also there
 is no information regarding the relationships between the different
 tables. The
@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-09 05:58:14.109771
+    ## Timestamp: 2026-05-19 17:23:46.306466
     ## 
 
 ### Documenting collection members
@@ -435,13 +435,13 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-09 05:58:14.109771
+    ## Timestamp: 2026-05-19 17:23:46.306466
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
-phenotypes and the *HPO_diseases* table to human diseases. These concept
-corresponds to conditions and those tables can be documented as member
-of the *Condition* collection.
+phenotypes and the *HPO_diseases* table to human diseases. These
+concepts correspond to conditions and those tables can be documented as
+members of the *Condition* collection.
 
 *Condition* members are documented calling the
 [`add_collection_member()`](https://patzaw.github.io/TKCat/reference/add_collection_member.md)
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-09 05:58:14.109771
+    ## Timestamp: 2026-05-19 17:23:46.306466
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -585,7 +585,7 @@ be described [later](#merging-with-collections) in this document
 
 ### Writing an MDB in files
 
-Once an MDB has been created and documented in can be written in a
+Once an MDB has been created and documented, it can be written to a
 directory:
 
 ``` r
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-09 05:58:14
+    ## Timestamp: 2026-05-19 17:23:46
     ## 
 
 Also writing these data and related information in text files make them
@@ -719,7 +719,7 @@ plot(data_model(file_hpo))
 The data model shows that this MDB contains the 3 tables taken into
 account in the minimal example. The additional tables provides mainly
 supplementary details regarding phenotype and diseases. Still, the
-*HPO_hp* and the *HPO_disease* table are members of the *Condition*
+*HPO_hp* and the *HPO_diseases* table are members of the *Condition*
 collection and can be documented as such, as [explained
 above](#min-coll-memb).
 
@@ -869,7 +869,7 @@ and a few functions are specific to each implementation.
 
 ### Exploring information
 
-General information can be retrieved (and potentialy updated) using the
+General information can be retrieved (and potentially updated) using the
 [`db_info()`](https://patzaw.github.io/TKCat/reference/db_info.md)
 function.
 
@@ -933,8 +933,7 @@ names(file_clinvar)
 
 ``` r
 
-file_clinvar <- file_clinvar %>% 
-   set_names(sub("ClinVar_", "", names(.))) 
+names(file_clinvar) <- sub("ClinVar_", "", names(file_clinvar))
 names(file_clinvar)
 ```
 
@@ -973,7 +972,7 @@ collection_members(file_clinvar)
     ##  9 BE         ClinVar_BE_1.0       ClinVar      1 entr… orga… TRUE   Homo… Scie…
     ## 10 BE         ClinVar_BE_1.0       ClinVar      1 entr… sour… TRUE   Entr… NA
 
-The following functions are use to get the number of tables, the number
+The following functions are used to get the number of tables, the number
 of fields per table and the number of records.
 
 ``` r
@@ -1382,13 +1381,7 @@ with a connection to BED database in order to run the code below.
 
 ``` r
 
-try(BED::connectToBed(a))
-```
-
-    ## Error in eval(expr, envir) : object 'a' not found
-
-``` r
-
+try(BED::connectToBed())
 bedCheck <- try(BED::checkBedConn())
 if(!inherits(bedCheck, "try-error") && bedCheck){
    sel_coll <- get_shared_collections(file_clinvar, file_chembl) %>% 
@@ -1674,9 +1667,9 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
     ##  5 AP-Disease-Strategy diseases_parents                   NA                    
     ##  6 AP-Disease-Strategy diseases_synonyms                  NA                    
     ##  7 AP-Disease-Strategy general_disease_groups_identifiers General group of dise…
-    ##  8 ChEMBL              assay_classification               Classification scheme…
-    ##  9 Monarch             Diseases                           NA                    
-    ## 10 Monarch             Diseases_descendants               NA                    
+    ##  8 Monarch             Diseases                           NA                    
+    ##  9 Monarch             Diseases_descendants               NA                    
+    ## 10 Monarch             Diseases_mode_of_inheritance       NA                    
     ## # ℹ 44 more rows
 
 ``` r
@@ -1685,18 +1678,18 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
     ## # A tibble: 155 × 7
-    ##    resource              table               name  comment type  nullable unique
-    ##    <chr>                 <chr>               <chr> <chr>   <chr> <lgl>    <lgl> 
-    ##  1 DRE-Bulk-RNA-UMC-2024 conditions          cond… "Disea… char… TRUE     FALSE 
-    ##  2 DRE-Bulk-RNA-UMC-2024 samples             cond… "Disea… char… TRUE     FALSE 
-    ##  3 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
-    ##  4 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      char… FALSE    FALSE 
-    ##  5 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      nume… FALSE    FALSE 
-    ##  6 DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… ""      char… FALSE    FALSE 
-    ##  7 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
-    ##  8 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      char… FALSE    FALSE 
-    ##  9 AP-Disease-Strategy   strategic_indicati… cate… "pheno… char… FALSE    FALSE 
-    ## 10 AP-Disease-Strategy   strategic_indicati… class "sympt… char… FALSE    FALSE 
+    ##    resource            table                 name  comment type  nullable unique
+    ##    <chr>               <chr>                 <chr> <chr>   <chr> <lgl>    <lgl> 
+    ##  1 AP-Disease-Strategy strategic_indications cate… "pheno… char… FALSE    FALSE 
+    ##  2 AP-Disease-Strategy strategic_indications class "sympt… char… FALSE    FALSE 
+    ##  3 AP-Disease-Strategy general_disease_grou… dise… ""      char… FALSE    FALSE 
+    ##  4 AP-Disease-Strategy strategic_indications dise… "Can i… logi… FALSE    FALSE 
+    ##  5 AP-Disease-Strategy cci_drug_indications  dise… ""      char… TRUE     FALSE 
+    ##  6 AP-Disease-Strategy cci_drug_indications… dise… ""      char… TRUE     FALSE 
+    ##  7 AP-Disease-Strategy cci_target_indicatio… dise… ""      char… TRUE     FALSE 
+    ##  8 AP-Disease-Strategy cci_target_indicatio… dise… ""      char… TRUE     FALSE 
+    ##  9 AP-Disease-Strategy cddi_drug_indications dise… ""      char… TRUE     FALSE 
+    ## 10 AP-Disease-Strategy cddi_drug_indication… dise… ""      char… TRUE     FALSE 
     ## # ℹ 145 more rows
 
 ``` r
@@ -1889,7 +1882,7 @@ The data are stored in the `TKCAT_HOME` folder.
 
 ##### Cleaning and removing a TKCat instance
 
-When no longer needed, stooping and removing the docker container can be
+When no longer needed, stopping and removing the docker container can be
 achieved as exemplified below
 
 ``` sh
@@ -1916,9 +1909,9 @@ create_chTKCat_user(
 ```
 
 The function will require to setup a password for the new user. The
-admin parameter indicates if the new user have admin right on the whole
+admin parameter indicates if the new user has admin rights on the whole
 chTKCat instance (default: FALSE). The provider parameter indicates if
-the new user can create and populate new databases whithin the chTKCat
+the new user can create and populate new databases within the chTKCat
 instance (default: FALSE).
 
 ##### Update
@@ -2453,7 +2446,7 @@ appendix provides a short description of these format and type.
 
 #### Matrices of values
 
-ReDaMoR and TKCat support data frame and matrix objectq. Data frame is
+ReDaMoR and TKCat support data frame and matrix objects. Data frame is
 the most used data format from far. However, matrices of values can be
 useful in some use cases. The example below shows how such data format
 are modeled in ReDaMoR as a 3 columns table: one of type “row”

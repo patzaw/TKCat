@@ -11,12 +11,12 @@ Catalog) is to facilitate the management of data from knowledge
 resources that are frequently used alone or together in research
 environments. In TKCat, knowledge resources are manipulated as modeled
 database (MDB) objects. These objects provide access to the data tables
-along with a general description of the resource and a detail data model
-generated with [ReDaMoR](https://patzaw.github.io/ReDaMoR/) documenting
-the tables, their fields and their relationships. These MDB are then
-gathered in catalogs that can be easily explored an shared. TKCat
-provides tools to easily subset, filter and combine MDBs and create new
-catalogs suited for specific needs.
+along with a general description of the resource and a detailed data
+model generated with [ReDaMoR](https://patzaw.github.io/ReDaMoR/)
+documenting the tables, their fields and their relationships. These MDB
+are then gathered in catalogs that can be easily explored and shared.
+TKCat provides tools to easily subset, filter and combine MDBs and
+create new catalogs suited for specific needs.
 
 This package has been presented at the [useR!2022
 conference](https://user2022.r-project.org/) and here are [the
@@ -123,9 +123,9 @@ devtools::install_github("patzaw/TKCat")
     [datamodelr](https://github.com/bergant/datamodelr) package whereas
     **TKCat** relies on [ReDaMoR](https://patzaw.github.io/ReDaMoR/).
   - Both **dm** and **TKCat** provides mechanisms to check the
-    fulfillment of the data model constrains and tools to automatically
+    fulfillment of the data model constraints and tools to automatically
     take advantage of them.
-  - **dm** supports connection to many different DBMS. It also take
+  - **dm** supports connection to many different DBMS. It also takes
     advantage of constraints which are documented in the DBMS when
     available. **TKCat** only supports the
     [ClickHouse](https://clickhouse.com/) system through the

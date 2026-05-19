@@ -667,8 +667,7 @@ following examples).
 
 ```{r}
 names(file_clinvar)
-file_clinvar <- file_clinvar %>% 
-   set_names(sub("ClinVar_", "", names(.))) 
+names(file_clinvar) <- sub("ClinVar_", "", names(file_clinvar))
 names(file_clinvar)
 ```
 

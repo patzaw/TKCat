@@ -37,8 +37,8 @@ join_mdb_tables(
 
 - jtName:
 
-  the name of the joint. IF NA (default), the name is then the name is
-  the first provided table name.
+  the name of the joint table. If NA (default), it is the first provided
+  table name.
 
 ## Value
 

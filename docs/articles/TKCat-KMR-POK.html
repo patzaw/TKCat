@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Defining and using Requirements for Knowledge Management (KMR) in TKCat">
 <!-- Global site tag (gtag.js) - Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-7RG3ZVT8WZ"></script><script>
@@ -73,7 +73,7 @@
                         <h4 data-toc-skip class="author">Patrice
 Godard</h4>
             
-            <h4 data-toc-skip class="date">May 09, 2026</h4>
+            <h4 data-toc-skip class="date">May 19, 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/patzaw/TKCat/blob/HEAD/vignettes/TKCat-KMR-POK.Rmd" class="external-link"><code>vignettes/TKCat-KMR-POK.Rmd</code></a></small>
       <div class="d-none name"><code>TKCat-KMR-POK.Rmd</code></div>
@@ -85,7 +85,7 @@ Godard</h4>
 (MDB) objects. These objects provide access to the data tables along
 with a general description of the resource and a detail data model
 documenting the tables, their fields and their relationships. These MDB
-are then gathered in TKCat catalogs that can be explored an shared.</p>
+are then gathered in TKCat catalogs that can be explored and shared.</p>
 <p>Beside the relational model, no additional constraints are applied to
 an MDB. This allows for high flexibility in the data that can be
 managed. However, in some cases, it could be useful to add further
@@ -184,7 +184,7 @@ sample name and a sample description.</p>
 <div class="section level4">
 <h4 id="optional-features">Optional features<a class="anchor" aria-label="anchor" href="#optional-features"></a>
 </h4>
-<p>Non mandatory features can then added to the table definition. For
+<p>Non-mandatory features can then be added to the table definition. For
 samples, we can define the sex and tissue features and add them to the
 table definition:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -612,7 +612,7 @@ Knowledge) objects:</p>
 directly provided to the constructor.</li>
 </ul>
 <p>POK can be retrieved directly from a TKCat or chTKCat object as
-examplified below:</p>
+exemplified below:</p>
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">tkcat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/TKCat.html">TKCat</a></span><span class="op">(</span>Test<span class="op">=</span><span class="va">mdb</span>, EBKM<span class="op">=</span><span class="va">ebkm</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/get_POK.html">get_POK</a></span><span class="op">(</span><span class="va">tkcat</span>, <span class="st">"Test"</span>, <span class="st">"EBKM"</span><span class="op">)</span></span></code></pre></div>

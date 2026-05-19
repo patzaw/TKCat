@@ -4,7 +4,7 @@ In TKCat, knowledge resources are manipulated as modeled database (MDB)
 objects. These objects provide access to the data tables along with a
 general description of the resource and a detail data model documenting
 the tables, their fields and their relationships. These MDB are then
-gathered in TKCat catalogs that can be explored an shared.
+gathered in TKCat catalogs that can be explored and shared.
 
 Beside the relational model, no additional constraints are applied to an
 MDB. This allows for high flexibility in the data that can be managed.
@@ -119,7 +119,7 @@ ebkm <- add_table_def(
 
 #### Optional features
 
-Non mandatory features can then added to the table definition. For
+Non-mandatory features can then be added to the table definition. For
 samples, we can define the sex and tissue features and add them to the
 table definition:
 
@@ -606,7 +606,7 @@ A POK object is a list with the following slots:
   directly provided to the constructor.
 
 POK can be retrieved directly from a TKCat or chTKCat object as
-examplified below:
+exemplified below:
 
 ``` r
 

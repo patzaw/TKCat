@@ -24,8 +24,8 @@ join_mdb_tables(
 \item \code{"full"}: includes all rows in at least one provide table
 }}
 
-\item{jtName}{the name of the joint. IF NA (default), the name
-is then the name is the first provided table name.}
+\item{jtName}{the name of the joint table. If NA (default), it is
+the first provided table name.}
 }
 \value{
 A \link{metaMDB} corresponding to x with the

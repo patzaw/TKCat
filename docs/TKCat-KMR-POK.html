@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2026-05-09" />
+<meta name="date" content="2026-05-19" />
 
 <title>Defining and using Requirements for Knowledge Management (KMR) in TKCat</title>
 
@@ -353,7 +353,7 @@ display: none;
 <h1 class="title toc-ignore">Defining and using Requirements for
 Knowledge Management (KMR) in TKCat</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">May 09, 2026</h4>
+<h4 class="date">May 19, 2026</h4>
 
 </div>
 
@@ -396,7 +396,7 @@ properties</a></li>
 (MDB) objects. These objects provide access to the data tables along
 with a general description of the resource and a detail data model
 documenting the tables, their fields and their relationships. These MDB
-are then gathered in TKCat catalogs that can be explored an shared.</p>
+are then gathered in TKCat catalogs that can be explored and shared.</p>
 <p>Beside the relational model, no additional constraints are applied to
 an MDB. This allows for high flexibility in the data that can be
 managed. However, in some cases, it could be useful to add further
@@ -489,7 +489,7 @@ ebkm &lt;- add_feature_def(
 <div id="optional-features" class="section level3" number="1.2.2">
 <h3><span class="header-section-number">1.2.2</span> Optional
 features</h3>
-<p>Non mandatory features can then added to the table definition. For
+<p>Non-mandatory features can then be added to the table definition. For
 samples, we can define the sex and tissue features and add them to the
 table definition:</p>
 <pre class="r"><code>ebkm &lt;- add_feature_def(
@@ -873,7 +873,7 @@ pok</code></pre>
 directly provided to the constructor.</li>
 </ul>
 <p>POK can be retrieved directly from a TKCat or chTKCat object as
-examplified below:</p>
+exemplified below:</p>
 <pre class="r"><code>tkcat &lt;- TKCat(Test=mdb, EBKM=ebkm)
 get_POK(tkcat, &quot;Test&quot;, &quot;EBKM&quot;)</code></pre>
 <pre><code>## Test POK with EBKM requirements.

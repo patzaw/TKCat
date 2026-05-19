@@ -43,7 +43,7 @@ A list with:
 ## Examples
 
 ``` r
-get_local_collection("BE") %>% show_collection_def()
+get_local_collection("BE") |> show_collection_def()
 #> BE collection: Collection of biological entity (BE) concepts
 #> Arguments (non-mandatory arguments are between parentheses):
 #>    - be:
