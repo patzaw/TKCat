@@ -10,7 +10,7 @@
 #'
 read_collection_members <- function(txt) {
   if (file.exists(txt)) {
-    raw <- readLines(txt) %>% paste(collapse = "\n")
+    raw <- readLines(txt) |> paste(collapse = "\n")
   } else {
     raw <- txt
   }
@@ -19,8 +19,8 @@ read_collection_members <- function(txt) {
   if (!"collection" %in% names(mbl)) {
     stop("Not a valid collection members JSON file")
   }
-  schema <- tkcatEnv$COLLECTIONS %>%
-    dplyr::filter(.data$title == mbl$collection) %>%
+  schema <- tkcatEnv$COLLECTIONS |>
+    dplyr::filter(.data$title == mbl$collection) |>
     dplyr::pull("json")
   if (length(schema) == 0) {
     stop(sprintf('"%s" is not defined as a collection', mbl$collection))
@@ -54,8 +54,8 @@ read_collection_members <- function(txt) {
   toRet$collection <- mbl$collection
   toRet$cid <- mbl$"$id"
   toRet$resource <- mbl$resource
-  toRet <- toRet %>%
-    dplyr::mutate(type = as.character(.data$type)) %>%
+  toRet <- toRet |>
+    dplyr::mutate(type = as.character(.data$type)) |>
     dplyr::select(
       "collection",
       "cid",
@@ -102,13 +102,13 @@ write_collection_members <- function(colMembers, path = NA, collection = NULL) {
     tables = list()
   )
   for (mid in unique(colMembers$mid)) {
-    m <- colMembers %>% dplyr::filter(.data$mid == !!mid)
+    m <- colMembers |> dplyr::filter(.data$mid == !!mid)
     mToAdd <- list(
       name = jsonlite::unbox(unique(m$table)),
       fields = list()
     )
     for (field in unique(m$field)) {
-      f <- m %>% dplyr::filter(.data$field == !!field)
+      f <- m |> dplyr::filter(.data$field == !!field)
       fToAdd <- list(
         "static" = jsonlite::unbox(as.logical(f$static)),
         "value" = jsonlite::unbox(as.character(f$value))
@@ -164,13 +164,13 @@ write_collection_members <- function(colMembers, path = NA, collection = NULL) {
 #'    - **allowed** values if any
 #'
 #' @examples
-#' get_local_collection("BE") %>% show_collection_def()
+#' get_local_collection("BE") |> show_collection_def()
 #'
 #' @export
 #'
 show_collection_def <- function(collection, silent = FALSE) {
   collection <- jsonlite::fromJSON(collection)
-  p <- collection$properties$tables$items$properties$fields$properties %>%
+  p <- collection$properties$tables$items$properties$fields$properties |>
     lapply(function(x) {
       toRet <- lapply(
         x$properties,

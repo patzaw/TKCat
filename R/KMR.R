@@ -127,7 +127,7 @@ as_KMR <- function(x) {
 #' @export
 #'
 read_KMR <- function(...) {
-  read_fileMDB(...) %>%
+  read_fileMDB(...) |>
     as_KMR()
 }
 
@@ -196,7 +196,7 @@ add_unit_def <- function(kmr, measurement, unit, description) {
     dataModel = KMR_DM,
     dbInfo = db_info(kmr),
     check = FALSE
-  ) %>%
+  ) |>
     as_memoMDB()
   class(toRet) <- unique(c("KMR", class(toRet)))
   return(toRet)
@@ -351,7 +351,7 @@ add_feature_def <- function(
     dataModel = KMR_DM,
     dbInfo = db_info(kmr),
     check = FALSE
-  ) %>%
+  ) |>
     as_memoMDB()
   class(toRet) <- unique(c("KMR", class(toRet)))
   return(toRet)
@@ -467,7 +467,7 @@ add_property_values <- function(
     dataModel = KMR_DM,
     dbInfo = db_info(kmr),
     check = FALSE
-  ) %>%
+  ) |>
     as_memoMDB()
   class(toRet) <- unique(c("KMR", class(toRet)))
   return(toRet)
@@ -550,7 +550,7 @@ add_table_def <- function(
     dataModel = KMR_DM,
     dbInfo = db_info(kmr),
     check = FALSE
-  ) %>%
+  ) |>
     as_memoMDB()
   class(toRet) <- unique(c("KMR", class(toRet)))
   return(toRet)
@@ -623,7 +623,7 @@ add_table_features <- function(
     dataModel = KMR_DM,
     dbInfo = db_info(kmr),
     check = FALSE
-  ) %>%
+  ) |>
     as_memoMDB()
   class(toRet) <- unique(c("KMR", class(toRet)))
   return(toRet)
@@ -674,12 +674,12 @@ list_table_types <- function(kmr) {
 list_table_features <- function(kmr, tables = NULL) {
   stopifnot(is.KMR(kmr))
   getfp <- function(x) {
-    dplyr::group_by(x$Feature_properties, .data$feature) %>%
+    dplyr::group_by(x$Feature_properties, .data$feature) |>
       dplyr::arrange(
         .data$feature,
         desc(.data$mandatory),
         .data$property
-      ) %>%
+      ) |>
       dplyr::summarise(
         properties = paste(
           sprintf(
@@ -688,16 +688,16 @@ list_table_features <- function(kmr, tables = NULL) {
           ),
           collapse = ", "
         )
-      ) %>%
+      ) |>
       dplyr::ungroup()
   }
   if (length(tables) == 0) {
     fp <- getfp(kmr)
-    toRet <- dplyr::left_join(kmr$Features, fp, by = c("name" = "feature")) %>%
+    toRet <- dplyr::left_join(kmr$Features, fp, by = c("name" = "feature")) |>
       dplyr::rename(
         "feature" = "name",
         "feature.description" = "description"
-      ) %>%
+      ) |>
       dplyr::arrange(.data$feature)
   } else {
     stopifnot(all(tables %in% kmr$Tables$name))
@@ -715,19 +715,19 @@ list_table_features <- function(kmr, tables = NULL) {
       fkmr,
       setdiff(names(fkmr), "Feature_properties")
     )
-    toRet <- toRet %>%
-      dplyr::pull(setdiff(names(toRet), "Feature_properties")) %>%
+    toRet <- toRet |>
+      dplyr::pull(setdiff(names(toRet), "Feature_properties")) |>
       dplyr::left_join(
         fp,
         by = "feature"
-      ) %>%
+      ) |>
       dplyr::select(
         "table" = "name",
         "feature",
         "mandatory",
         "feature.description" = "Features.description",
         "properties"
-      ) %>%
+      ) |>
       dplyr::arrange(
         .data$table,
         dplyr::desc(.data$mandatory),
@@ -869,7 +869,7 @@ add_helpers.KMR <- function(x, code, name, language, ...) {
     warning("Existing helpers have been replaced")
   }
   helpers <- dplyr::bind_rows(
-    x$Helpers %>%
+    x$Helpers |>
       dplyr::filter(.data$name != !!name),
     dplyr::tibble(name = name, code = code, language = language)
   )
@@ -883,7 +883,7 @@ add_helpers.KMR <- function(x, code, name, language, ...) {
     dataModel = data_model(x),
     dbInfo = db_info(x),
     check = FALSE
-  ) %>%
+  ) |>
     as_KMR()
 
   return(toRet)
@@ -910,11 +910,11 @@ get_R_helpers.KMR <- function(x, hnames = NA, tkcat = NULL, mdb = NULL, ...) {
   )
 
   ## Get the code binary ----
-  scode <- x$Helpers %>%
+  scode <- x$Helpers |>
     dplyr::filter(.data$language == "R")
 
   if (!is.na(hnames)) {
-    scode <- scode %>%
+    scode <- scode |>
       dplyr::filter(.data$name %in% hnames)
   }
   code <- ""

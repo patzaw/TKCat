@@ -23,3 +23,16 @@
   )
   paste(toRetHR, sunits[uniti + 1])
 }
+
+.set_colnames <- function(x, nm) {
+  colnames(x) <- nm
+  x
+}
+.set_rownames <- function(x, nm) {
+  rownames(x) <- nm
+  x
+}
+.set_class <- function(x, cl) {
+  class(x) <- cl
+  x
+}

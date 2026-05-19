@@ -4,6 +4,8 @@
 ## Version 1.2.1
 
 - Remove dependency to {base64enc} library.
+- Remove dependency to {magrittr}: replace `%>%` with the native R pipe `|>`
+(requires R >= 4.1).
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->

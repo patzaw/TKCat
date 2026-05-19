@@ -194,7 +194,7 @@ db_reconnect.POK <- function(x, user, password, ntries = 3, ...) {
   nv$tkcat <- tkcat
   class(nv) <- unique(c("POK", class(nv)))
 
-  lenv <- lapply(nv$helpers, environment) %>% unique()
+  lenv <- lapply(nv$helpers, environment) |> unique()
   for (i in 1:length(lenv)) {
     lenv[[i]]$THISMDB <- mdb
     lenv[[i]]$THISKMR <- kmr

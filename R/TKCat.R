@@ -152,7 +152,7 @@ rename.TKCat <- function(.data, ...) {
   loc <- tidyselect::eval_rename(rlang::expr(c(...)), .data)
   names <- names(.data)
   names[loc] <- names(loc)
-  magrittr::set_names(.data, names)
+  rlang::set_names(.data, names)
 }
 
 ###############################################################################@
@@ -169,8 +169,8 @@ rename.TKCat <- function(.data, ...) {
   dmf <- attr(x, "fields")
   x <- unclass(x)[i]
   class(x) <- c("TKCat", class(x))
-  attr(x, "tables") <- dmt %>% dplyr::filter(.data$resource %in% names(x))
-  attr(x, "fields") <- dmf %>% dplyr::filter(.data$resource %in% names(x))
+  attr(x, "tables") <- dmt |> dplyr::filter(.data$resource %in% names(x))
+  attr(x, "fields") <- dmf |> dplyr::filter(.data$resource %in% names(x))
   return(x)
 }
 
@@ -274,7 +274,7 @@ search_MDB_tables.TKCat <- function(x, searchTerm) {
     grep(searchTerm, dmt$name, ignore.case = TRUE),
     grep(searchTerm, dmt$comment, ignore.case = TRUE)
   ))
-  toRet <- dmt %>% dplyr::slice(c(0, toTake))
+  toRet <- dmt |> dplyr::slice(c(0, toTake))
   return(toRet)
 }
 
@@ -292,7 +292,7 @@ search_MDB_fields.TKCat <- function(x, searchTerm) {
     grep(searchTerm, dmf$name, ignore.case = TRUE),
     grep(searchTerm, dmf$comment, ignore.case = TRUE)
   ))
-  toRet <- dmf %>% dplyr::slice(c(0, toTake))
+  toRet <- dmf |> dplyr::slice(c(0, toTake))
   return(toRet)
 }
 
@@ -329,8 +329,8 @@ collection_members.TKCat <- function(
         if (is.null(cm)) {
           return(NULL)
         }
-        cm %>%
-          dplyr::select("resource", "collection", "table") %>%
+        cm |>
+          dplyr::select("resource", "collection", "table") |>
           dplyr::distinct()
       }
     )
@@ -495,8 +495,8 @@ explore_MDBs.TKCat <- function(
     dm <- data_model(get_MDB(x, n))
     dmt <- dplyr::bind_rows(
       dmt,
-      ReDaMoR::toDBM(dm)$tables %>%
-        dplyr::mutate(resource = n) %>%
+      ReDaMoR::toDBM(dm)$tables |>
+        dplyr::mutate(resource = n) |>
         dplyr::select("resource", "name", "comment")
     )
   }
@@ -508,8 +508,8 @@ explore_MDBs.TKCat <- function(
     dm <- data_model(get_MDB(x, n))
     dmf <- dplyr::bind_rows(
       dmf,
-      ReDaMoR::toDBM(dm)$fields %>%
-        dplyr::mutate(resource = n) %>%
+      ReDaMoR::toDBM(dm)$fields |>
+        dplyr::mutate(resource = n) |>
         dplyr::select(
           "resource",
           "table",

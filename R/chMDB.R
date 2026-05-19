@@ -67,8 +67,8 @@ chMDB <- function(
           strsplit(dbTables, split = "`[.]`"),
           function(x) gsub("`", "", x)
         )
-      ) %>%
-        magrittr::set_colnames(c("database", "name")) %>%
+      ) |>
+        .set_colnames(c("database", "name")) |>
         dplyr::as_tibble()
       chTables <- list_tables(
         tkcon$chcon,
@@ -82,7 +82,7 @@ chMDB <- function(
       if (nrow(missTab) > 0) {
         stop(
           "The following tables are not in the clickhouse database: ",
-          sprintf("`%s`.`%s`", missTab$database, missTab$name) %>%
+          sprintf("`%s`.`%s`", missTab$database, missTab$name) |>
             paste(collapse = ", ")
         )
       }
@@ -237,7 +237,7 @@ get_query.chMDB <- function(
     )
     query <- paste(alias, query, sep = " ")
   }
-  DBI::dbGetQuery(con, query, ...) %>%
+  DBI::dbGetQuery(con, query, ...) |>
     dplyr::as_tibble()
 }
 
@@ -292,7 +292,7 @@ get_MDB.chTKCat <- function(
       }
       tst <- dplyr::tibble(
         table = setdiff(names(CHMDB_DATA_MODEL), MGT_TABLES)
-      ) %>%
+      ) |>
         dplyr::mutate(
           instance = .data$table
         )
@@ -309,7 +309,7 @@ get_MDB.chTKCat <- function(
     if (!timestamp %in% tst$timestamp) {
       stop("The selected timestamp does not exist")
     }
-    tst <- tst %>%
+    tst <- tst |>
       dplyr::filter(.data$timestamp == !!timestamp)
   }
 
@@ -381,11 +381,11 @@ get_MDB.chTKCat <- function(
     x,
     tsSelect("___CollectionMembers___"),
     format = "TabSeparatedWithNamesAndTypes"
-  ) %>%
+  ) |>
     dplyr::mutate(
       resource = dbName,
       static = as.logical(.data$static)
-    ) %>%
+    ) |>
     dplyr::select(
       "collection",
       "cid",
@@ -439,7 +439,7 @@ is.chMDB <- function(x) {
 is_current_chMDB <- function(x) {
   stopifnot(is.chMDB(x))
   ots <- db_info(x)$timestamp
-  dts <- list_chMDB_timestamps(unclass(x)$tkcon, db_info(x)$name) %>%
+  dts <- list_chMDB_timestamps(unclass(x)$tkcon, db_info(x)$name) |>
     attr("current")
   if (is.na(ots)) {
     if (is.null(dts) || is.na(dts)) {
@@ -627,10 +627,10 @@ as_chMDB <- function(
     if (get_hosts(tkcon) %in% get_hosts(x)) {
       chTables <- db_tables(x, host = get_hosts(tkcon))$dbTables
       if (is.null(tst) || nrow(tst) == 0) {
-        availableTables <- list_tables(tkcon$chcon, dbName) %>%
+        availableTables <- list_tables(tkcon$chcon, dbName) |>
           dplyr::select("table" = "name", "instance" = "name")
       } else {
-        availableTables <- tst %>% dplyr::select("table", "instance")
+        availableTables <- tst |> dplyr::select("table", "instance")
       }
       availableTables$path <- sprintf(
         "`%s`.`%s`",
@@ -641,7 +641,7 @@ as_chMDB <- function(
       toKeep <- availableTables$table[which(
         availableTables$table == availableTables$instance &
           availableTables$path == availableTables$inCh
-      )] %>%
+      )] |>
         as.character()
     } else {
       toKeep <- character()
@@ -878,10 +878,10 @@ drop_chMDB_projections <- function(x) {
   if (!is.null(colMb)) {
     ncolMb <- NULL
     for (i in 1:length(ovalues)) {
-      toAdd <- colMb %>% dplyr::filter(.data$table == !!ovalues[i])
+      toAdd <- colMb |> dplyr::filter(.data$table == !!ovalues[i])
       if (nrow(toAdd) > 0) {
         toAdd$table <- value[i]
-        ncolMb <- ncolMb %>% dplyr::bind_rows(toAdd)
+        ncolMb <- ncolMb |> dplyr::bind_rows(toAdd)
       }
     }
   }
@@ -906,7 +906,7 @@ rename.chMDB <- function(.data, ...) {
   loc <- tidyselect::eval_rename(rlang::expr(c(...)), .data)
   names <- names(.data)
   names[loc] <- names(loc)
-  magrittr::set_names(.data, names)
+  rlang::set_names(.data, names)
 }
 
 
@@ -1026,7 +1026,7 @@ collection_members.chMDB <- function(
   for (collection in unique(value$collection)) {
     cv <- dplyr::filter(value, .data$collection == !!collection)
     for (cid in unique(cv$cid)) {
-      jval <- dplyr::filter(cv, .data$cid == !!cid) %>%
+      jval <- dplyr::filter(cv, .data$cid == !!cid) |>
         write_collection_members()
     }
   }
@@ -1176,13 +1176,13 @@ dims.chMDB <- function(x, ...) {
   dbt <- db_tables(x)
   m <- data_model(x)
 
-  dbTables <- list_tables(unclass(x)$tkcon, db_info(x)$name) %>%
+  dbTables <- list_tables(unclass(x)$tkcon, db_info(x)$name) |>
     dplyr::mutate(
       "instance" = paste0("`", .data$database, "`.`", .data$name, "`")
     )
-  matrices <- lapply(m, ReDaMoR::is.MatrixModel) %>%
-    unlist() %>%
-    which() %>%
+  matrices <- lapply(m, ReDaMoR::is.MatrixModel) |>
+    unlist() |>
+    which() |>
     names()
 
   tables <- setdiff(names(m), matrices)
@@ -1192,9 +1192,9 @@ dims.chMDB <- function(x, ...) {
     tableValues <- dplyr::tibble(
       table = tables,
       instance = as.character(dbt$dbTables[tables])
-    ) %>%
+    ) |>
       dplyr::left_join(
-        dbTables %>%
+        dbTables |>
           dplyr::select(
             "instance",
             "total_rows",
@@ -1203,8 +1203,8 @@ dims.chMDB <- function(x, ...) {
             "transposed"
           ),
         by = "instance"
-      ) %>%
-      dplyr::mutate(format = "table") %>%
+      ) |>
+      dplyr::mutate(format = "table") |>
       dplyr::select(
         "name" = "table",
         "format",
@@ -1233,9 +1233,9 @@ dims.chMDB <- function(x, ...) {
     if (!"info" %in% colnames(matTables)) {
       matTables$info <- "values"
     }
-    matValues <- matTables %>%
-      dplyr::left_join(dbTables, by = c("table" = "name")) %>%
-      dplyr::group_by(.data$matrice) %>%
+    matValues <- matTables |>
+      dplyr::left_join(dbTables, by = c("table" = "name")) |>
+      dplyr::group_by(.data$matrice) |>
       dplyr::summarize(
         transposed = .data$transposed[1],
         format = if (all(.data$info == "values")) {
@@ -1262,8 +1262,8 @@ dims.chMDB <- function(x, ...) {
           .data$total_rows[which(.data$info == "columns")]
         },
         bytes = sum(.data$total_bytes)
-      ) %>%
-      dplyr::mutate(records = .data$nrow * .data$ncol) %>%
+      ) |>
+      dplyr::mutate(records = .data$nrow * .data$ncol) |>
       dplyr::select(
         "name" = "matrice",
         "format",
@@ -1275,7 +1275,7 @@ dims.chMDB <- function(x, ...) {
       )
   }
 
-  toRet <- rbind(tableValues, matValues) %>%
+  toRet <- rbind(tableValues, matValues) |>
     dplyr::slice(match(toTake, .data$name))
 
   # toRet <- do.call(dplyr::bind_rows, lapply(
@@ -1286,8 +1286,8 @@ dims.chMDB <- function(x, ...) {
   #          tablePath=toTake[tn], tableModel=m[[tn]]
   #       )
   #    }
-  # )) %>%
-  #    dplyr::mutate(name=names(toTake)) %>%
+  # )) |>
+  #    dplyr::mutate(name=names(toTake)) |>
   #    dplyr::relocate("name")
 
   return(toRet)
@@ -1337,7 +1337,7 @@ db_tables <- function(x, host) {
       }
       return(toRet)
     })
-    toRet <- toRet[which(lengths(toRet) > 0)] %>% magrittr::set_names(NULL)
+    toRet <- toRet[which(lengths(toRet) > 0)] |> rlang::set_names(NULL)
     if (length(toRet) > 0) {
       toRet <- list(
         tkcon = toRet[[1]]$tkcon,
@@ -1390,8 +1390,8 @@ db_tables <- function(x, host) {
   dbt <- dbt$dbTables[i]
   cm <- collection_members(x)
   if (!is.null(cm)) {
-    cm <- cm %>%
-      dplyr::filter(.data$table %in% !!i) %>%
+    cm <- cm |>
+      dplyr::filter(.data$table %in% !!i) |>
       dplyr::mutate(resource = !!dbi$name)
   }
   toRet <- chMDB(
@@ -1493,7 +1493,7 @@ as_fileMDB.chMDB <- function(
   hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
   ReDaMoR::write_json_data_model(dm, jModelPath)
   if (htmlModel) {
-    plot(dm) %>%
+    plot(dm) |>
       visNetwork::visSave(hModelPath)
   }
 
@@ -1505,7 +1505,7 @@ as_fileMDB.chMDB <- function(
     for (collection in unique(cm$collection)) {
       cv <- dplyr::filter(cm, .data$collection == !!collection)
       for (cid in unique(cv$cid)) {
-        dplyr::filter(cv, .data$cid == !!cid) %>%
+        dplyr::filter(cv, .data$cid == !!cid) |>
           write_collection_members(
             path = file.path(
               colPath,
@@ -1545,7 +1545,7 @@ as_fileMDB.chMDB <- function(
         rquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$i)
 
       cquery <- sprintf(
@@ -1557,18 +1557,18 @@ as_fileMDB.chMDB <- function(
         cquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j)
 
       chTables <- list_tables(
         unclass(x)$tkcon$chcon,
         dbNames = tdb
       )
-      nv <- chTables %>%
+      nv <- chTables |>
         dplyr::filter(
           .data$database == tdb &
             .data$name == qr$table[which(qr$info == "values")]
-        ) %>%
+        ) |>
         dplyr::pull("total_rows")
 
       readr::write_delim(
@@ -1600,7 +1600,7 @@ as_fileMDB.chMDB <- function(
         vquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j, .data$i)
       while (!is.null(toWrite) && nrow(toWrite) > 0) {
         readr::write_delim(
@@ -1622,7 +1622,7 @@ as_fileMDB.chMDB <- function(
           vquery,
           autoalias = FALSE,
           format = "Arrow"
-        ) %>%
+        ) |>
           dplyr::arrange(.data$j, .data$i)
       }
     } else {
@@ -1739,7 +1739,7 @@ slice.chMDB <- function(.data, ..., by = 10^5, .preserve = FALSE) {
   }
   i <- dots[[tn]]
 
-  ft <- data_tables(x, dplyr::all_of(tn), skip = 0, n_max = 1)[[1]] %>%
+  ft <- data_tables(x, dplyr::all_of(tn), skip = 0, n_max = 1)[[1]] |>
     dplyr::slice(2)
   s <- 0
   j <- i - s
@@ -1747,7 +1747,7 @@ slice.chMDB <- function(.data, ..., by = 10^5, .preserve = FALSE) {
   if (length(j) > 0) {
     ft <- dplyr::bind_rows(
       ft,
-      data_tables(x, dplyr::all_of(tn), skip = s, n_max = by)[[1]] %>%
+      data_tables(x, dplyr::all_of(tn), skip = s, n_max = by)[[1]] |>
         dplyr::slice(j)
     )
   }
@@ -1759,7 +1759,7 @@ slice.chMDB <- function(.data, ..., by = 10^5, .preserve = FALSE) {
     if (length(j) > 0) {
       ft <- dplyr::bind_rows(
         ft,
-        data_tables(x, dplyr::all_of(tn), skip = s, n_max = by)[[1]] %>%
+        data_tables(x, dplyr::all_of(tn), skip = s, n_max = by)[[1]] |>
           dplyr::slice(j)
       )
     }
@@ -1811,7 +1811,7 @@ filter_with_tables.chMDB <- function(
   ## Collection members ----
   cm <- collection_members(x)
   if (!is.null(cm)) {
-    cm <- cm %>% dplyr::filter(.data$table %in% names(tables))
+    cm <- cm |> dplyr::filter(.data$table %in% names(tables))
   }
 
   ## Results ----
@@ -1847,9 +1847,9 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
     !any(duplicated(names(iFilter))),
     all(names(iFilter) %in% tableModel$fields$name)
   )
-  vfield <- tableModel$fields %>%
-    dplyr::filter(!.data$type %in% c("row", "column")) %>%
-    dplyr::pull("name") %>%
+  vfield <- tableModel$fields |>
+    dplyr::filter(!.data$type %in% c("row", "column")) |>
+    dplyr::pull("name") |>
     intersect(names(iFilter))
   if (length(vfield) > 0) {
     stop("Cannot filter a matrix on values; only on row or column names")
@@ -1874,8 +1874,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
 
     fr <- fc <- NULL
     for (f in names(iFilter)) {
-      ft <- tableModel$fields %>%
-        dplyr::filter(.data$name == !!f) %>%
+      ft <- tableModel$fields |>
+        dplyr::filter(.data$name == !!f) |>
         dplyr::pull("type")
       if (ft == "row") {
         frn <- iFilter[[f]]
@@ -1895,7 +1895,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
             ),
             autoalias = FALSE,
             format = "Arrow"
-          ) %>%
+          ) |>
             dplyr::arrange(.data$i)
         }
       }
@@ -1917,7 +1917,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
             ),
             autoalias = FALSE,
             format = "Arrow"
-          ) %>%
+          ) |>
             dplyr::arrange(.data$j)
         }
       }
@@ -1933,7 +1933,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         ),
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$i)
       frn <- fri$name
     } else {
@@ -1949,7 +1949,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         ),
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j)
       fcn <- fcj$name
     } else {
@@ -2001,7 +2001,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         sprintf('j in (%s)', paste(fc$j, collapse = ", "))
       )
     )
-    toRet <- get_query(x, query, autoalias = FALSE, format = "Arrow") %>%
+    toRet <- get_query(x, query, autoalias = FALSE, format = "Arrow") |>
       dplyr::arrange(.data$j, .data$i)
     mi <- max(fri$i)
     mj <- max(fcj$j)
@@ -2017,7 +2017,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         i = setdiff(1:mi, fri$i),
         name = "x"
       )
-    ) %>%
+    ) |>
       arrange(.data$i)
     fcj2 <- rbind(
       fcj,
@@ -2025,7 +2025,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         j = setdiff(1:mj, fcj$j),
         name = "x"
       )
-    ) %>%
+    ) |>
       arrange(.data$j)
     toRet <- Matrix::sparseMatrix(
       i = toRet$i,
@@ -2049,8 +2049,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
 
     fr <- fc <- NULL
     for (f in names(iFilter)) {
-      ft <- tableModel$fields %>%
-        dplyr::filter(.data$name == !!f) %>%
+      ft <- tableModel$fields |>
+        dplyr::filter(.data$name == !!f) |>
         dplyr::pull("type")
       if (ft == "row") {
         frn <- iFilter[[f]]
@@ -2070,7 +2070,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
             ),
             autoalias = FALSE,
             format = "Arrow"
-          ) %>%
+          ) |>
             dplyr::arrange(.data$i)
         }
       }
@@ -2092,7 +2092,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
             ),
             autoalias = FALSE,
             format = "Arrow"
-          ) %>%
+          ) |>
             dplyr::arrange(.data$j)
         }
       }
@@ -2108,7 +2108,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         ),
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$i)
       frn <- fri$name
     } else {
@@ -2124,7 +2124,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         ),
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j)
       fcn <- fcj$name
     } else {
@@ -2176,7 +2176,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         sprintf('j in (%s)', paste(fc$j, collapse = ", "))
       )
     )
-    toRet <- get_query(x, query, autoalias = FALSE, format = "Arrow") %>%
+    toRet <- get_query(x, query, autoalias = FALSE, format = "Arrow") |>
       dplyr::arrange(.data$j, .data$i)
 
     toRet <- matrix(
@@ -2231,8 +2231,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
     ),
     autoalias = FALSE,
     format = "TabSeparatedWithNamesAndTypes"
-  ) %>%
-    dplyr::filter(.data$name != dimcol) %>%
+  ) |>
+    dplyr::filter(.data$name != dimcol) |>
     dplyr::arrange(.data$name)
 
   ## Create clause and selected fields ----
@@ -2240,8 +2240,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
   sel <- NA
   frc <- c()
   for (f in names(iFilter)) {
-    ft <- tableModel$fields %>%
-      dplyr::filter(.data$name == !!f) %>%
+    ft <- tableModel$fields |>
+      dplyr::filter(.data$name == !!f) |>
       dplyr::pull("type")
     if (ft == "row") {
       fr <- iFilter[[f]]
@@ -2288,11 +2288,11 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
       clause
     )
   } else {
-    totake <- chFields %>%
-      dplyr::filter(.data$table == !!mtables[[i]]) %>%
-      dplyr::pull("name") %>%
+    totake <- chFields |>
+      dplyr::filter(.data$table == !!mtables[[i]]) |>
+      dplyr::pull("name") |>
       intersect(sel)
-    totake <- c(dimcol, totake) %>%
+    totake <- c(dimcol, totake) |>
       paste(collapse = "`, `")
     totake <- paste0("`", totake, "`")
     tquery <- paste(
@@ -2318,11 +2318,11 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
           clause
         )
       } else {
-        totake <- chFields %>%
-          dplyr::filter(.data$table == !!mtables[[i]]) %>%
-          dplyr::pull("name") %>%
+        totake <- chFields |>
+          dplyr::filter(.data$table == !!mtables[[i]]) |>
+          dplyr::pull("name") |>
           intersect(sel)
-        totake <- c(dimcol, totake) %>%
+        totake <- c(dimcol, totake) |>
           paste(collapse = "`, `")
         totake <- paste0("`", totake, "`")
         tquery <- paste(
@@ -2360,11 +2360,11 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
     toRet <- toRet[[1]]
   }
   dimname <- toRet[[dimcol]]
-  toRet <- toRet[, -which(colnames(toRet) == dimcol), drop = FALSE] %>%
-    as.matrix() %>%
-    magrittr::set_rownames(dimname)
+  toRet <- toRet[, -which(colnames(toRet) == dimcol), drop = FALSE] |>
+    as.matrix() |>
+    .set_rownames(dimname)
   if (!vtype %in% c("Date", "POSIXct")) {
-    toRet <- toRet %>% magrittr::set_class(vtype)
+    toRet <- toRet |> .set_class(vtype)
   }
   if (dimcol == "___COLNAMES___") {
     toRet <- t(toRet)
@@ -2395,8 +2395,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
     message(tn)
     tm <- dm[[tn]]
     if (ReDaMoR::is.MatrixModel(tm)) {
-      nullable <- dm[[tn]]$fields %>%
-        dplyr::filter(!.data$type %in% c("column", "row")) %>%
+      nullable <- dm[[tn]]$fields |>
+        dplyr::filter(!.data$type %in% c("column", "row")) |>
         dplyr::pull("nullable")
       vtype <- setdiff(dm[[tn]]$fields$type, c("column", "row"))
 
@@ -2425,7 +2425,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
           rquery,
           autoalias = FALSE,
           format = "Arrow"
-        ) %>%
+        ) |>
           dplyr::arrange(.data$i)
 
         cquery <- sprintf(
@@ -2437,7 +2437,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
           cquery,
           autoalias = FALSE,
           format = "Arrow"
-        ) %>%
+        ) |>
           dplyr::arrange(.data$j)
 
         write_MergeTree(
@@ -2483,11 +2483,11 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
           unclass(x)$tkcon$chcon,
           dbNames = tndb
         )
-        nv <- chTables %>%
+        nv <- chTables |>
           dplyr::filter(
             .data$database == tndb &
               .data$name == valTable
-          ) %>%
+          ) |>
           dplyr::pull("total_rows")
 
         vtquery <- sprintf(
@@ -2504,7 +2504,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
           vquery,
           autoalias = FALSE,
           format = "Arrow"
-        ) %>%
+        ) |>
           dplyr::arrange(.data$j, .data$i)
         while (!is.null(toWrite) && nrow(toWrite) > 0) {
           ch_insert(
@@ -2524,7 +2524,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
             vquery,
             autoalias = FALSE,
             format = "Arrow"
-          ) %>%
+          ) |>
             dplyr::arrange(.data$j, .data$i)
         }
 
@@ -2554,8 +2554,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
             dbName = dbName,
             tableName = stn,
             value = toWrite,
-            rtypes = c("character", rep(vtype, ncol(toWrite) - 1)) %>%
-              magrittr::set_names(colnames(toWrite)),
+            rtypes = c("character", rep(vtype, ncol(toWrite) - 1)) |>
+              rlang::set_names(colnames(toWrite)),
             nullable = nulcol,
             sortKey = colnames(toWrite)[1]
           )
@@ -2668,7 +2668,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         vquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j, .data$i)
 
       rToTake <- max(values$i)
@@ -2682,7 +2682,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         rquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$i)
 
       cToTake <- max(values$j)
@@ -2696,7 +2696,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         cquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j)
 
       toRet <- Matrix::sparseMatrix(
@@ -2731,7 +2731,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         vquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j, .data$i)
 
       rToTake <- max(values$i)
@@ -2745,7 +2745,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         rquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$i)
 
       cToTake <- max(values$j)
@@ -2759,7 +2759,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         cquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j)
 
       toRet <- matrix(
@@ -2815,8 +2815,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
       ),
       autoalias = FALSE,
       format = "TabSeparatedWithNamesAndTypes"
-    ) %>%
-      dplyr::filter(.data$name != dimcol) %>%
+    ) |>
+      dplyr::filter(.data$name != dimcol) |>
       dplyr::arrange(.data$name)
     if (dimcol == "___ROWNAMES___") {
       for (st in unique(chFields$table)) {
@@ -2834,21 +2834,21 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
           stquery,
           autoalias = FALSE,
           format = "TabSeparatedWithNamesAndTypes"
-        ) %>%
+        ) |>
           dplyr::arrange(.data[[dimcol]])
         dimname <- stqr[[dimcol]]
         stopifnot(
           !any(duplicated(dimname)),
           ncol(stqr) > 1
         )
-        toAdd <- stqr[, -1, drop = FALSE] %>%
-          as.matrix() %>%
-          magrittr::set_rownames(dimname)
+        toAdd <- stqr[, -1, drop = FALSE] |>
+          as.matrix() |>
+          .set_rownames(dimname)
         toRet <- c(toRet, list(toAdd))
       }
       toRet <- do.call(cbind, toRet)
       if (!vtype %in% c("Date", "POSIXct")) {
-        toRet <- magrittr::set_class(toRet, vtype)
+        toRet <- .set_class(toRet, vtype)
       }
       toRet <- toRet[, sort(colnames(toRet))]
     } else {
@@ -2875,22 +2875,22 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
           stquery,
           autoalias = FALSE,
           format = "TabSeparatedWithNamesAndTypes"
-        ) %>%
+        ) |>
           dplyr::arrange(.data[[dimcol]])
         dimname <- stqr[[dimcol]]
         stopifnot(
           !any(duplicated(dimname)),
           ncol(stqr) > 1
         )
-        toAdd <- stqr[, -1, drop = FALSE] %>%
-          as.matrix() %>%
-          magrittr::set_rownames(dimname)
+        toAdd <- stqr[, -1, drop = FALSE] |>
+          as.matrix() |>
+          .set_rownames(dimname)
         toRet <- c(toRet, list(toAdd))
       }
-      toRet <- do.call(cbind, toRet) %>%
+      toRet <- do.call(cbind, toRet) |>
         t()
       if (!vtype %in% c("Date", "POSIXct")) {
-        toRet <- magrittr::set_class(toRet, vtype)
+        toRet <- .set_class(toRet, vtype)
       }
       toRet <- toRet[sort(rownames(toRet)), ]
     }
@@ -2924,11 +2924,11 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
   attr(toRet, "data.type") <- NULL
   cc <- unlist(lapply(toRet, function(x) class(x)[1]))
   fcc <- dplyr::mutate(tableModel$fields, cc = cc[.data$name])
-  wc <- dplyr::filter(fcc, .data$type != .data$cc) %>% dplyr::pull("name")
+  wc <- dplyr::filter(fcc, .data$type != .data$cc) |> dplyr::pull("name")
   for (cn in wc) {
     toRet[, cn] <- ReDaMoR::as_type(
       dplyr::pull(toRet, !!cn),
-      dplyr::filter(tableModel$fields, .data$name == !!cn) %>%
+      dplyr::filter(tableModel$fields, .data$name == !!cn) |>
         dplyr::pull("type")
     )
   }
@@ -2990,7 +2990,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         vquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j, .data$i)
       ## Sparse ==> all values may be missing
       if (nrow(values) == 0) {
@@ -3011,7 +3011,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         rquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$i)
 
       cquery <- sprintf(
@@ -3024,7 +3024,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         cquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j)
 
       mi <- max(rowNames$i)
@@ -3060,7 +3060,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         vquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j, .data$i)
 
       ## All values may be missing?
@@ -3082,7 +3082,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         rquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$i)
 
       cquery <- sprintf(
@@ -3095,7 +3095,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         cquery,
         autoalias = FALSE,
         format = "Arrow"
-      ) %>%
+      ) |>
         dplyr::arrange(.data$j)
 
       toRet <- matrix(
@@ -3128,8 +3128,8 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
       ),
       autoalias = FALSE,
       format = "TabSeparatedWithNamesAndTypes"
-    ) %>%
-      dplyr::filter(.data$name != dimcol) %>%
+    ) |>
+      dplyr::filter(.data$name != dimcol) |>
       dplyr::arrange(.data$name)
     if (!dd$transposed) {
       chFields <- chFields[1:nc, ]
@@ -3159,19 +3159,19 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
         stquery,
         autoalias = FALSE,
         format = "TabSeparatedWithNamesAndTypes"
-      ) %>%
+      ) |>
         dplyr::arrange(.data[[dimcol]])
       dimname <- stqr[[dimcol]]
       stopifnot(
         !any(duplicated(dimname)),
         ncol(stqr) > 1
       )
-      toAdd <- stqr[, -1, drop = FALSE] %>%
+      toAdd <- stqr[, -1, drop = FALSE] |>
         as.matrix()
       if (!vtype %in% c("Date", "POSIXct")) {
-        toAdd <- toAdd %>% magrittr::set_class(vtype)
+        toAdd <- toAdd |> .set_class(vtype)
       }
-      toAdd <- toAdd %>% magrittr::set_rownames(dimname)
+      toAdd <- toAdd |> .set_rownames(dimname)
       toRet <- cbind(toRet, toAdd)
     }
 
@@ -3196,22 +3196,22 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
   dm <- data_model(fdb)
   .contaminate <- function(tn) {
     ## Backward ----
-    fkf <- fk %>% dplyr::filter(.data$from == !!tn & .data$fmin > 0)
-    fkt <- fk %>% dplyr::filter(.data$to == !!tn & .data$tmin > 0)
-    nfk <<- nfk %>%
+    fkf <- fk |> dplyr::filter(.data$from == !!tn & .data$fmin > 0)
+    fkt <- fk |> dplyr::filter(.data$to == !!tn & .data$tmin > 0)
+    nfk <<- nfk |>
       dplyr::anti_join(
         dplyr::select(fkf, "from", "to"),
         by = c("from", "to")
-      ) %>%
+      ) |>
       dplyr::anti_join(
         dplyr::select(fkt, "from", "to"),
         by = c("from", "to")
       )
     fkl <- dplyr::bind_rows(
       fkf,
-      fkt %>%
+      fkt |>
         dplyr::rename("from" = "to", "ff" = "tf", "to" = "from", "tf" = "ff")
-    ) %>%
+    ) |>
       dplyr::distinct()
     if (nrow(fkl) > 0) {
       for (i in 1:nrow(fkl)) {
@@ -3220,7 +3220,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
           nv <- .mdjoin(
             d1 = d[[ntn]],
             d2 = d[[tn]],
-            by = magrittr::set_names(
+            by = rlang::set_names(
               fkl$ff[[i]],
               fkl$tf[[i]]
             ),
@@ -3293,7 +3293,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
               toAdd <- .mdjoin(
                 d1 = toAdd,
                 d2 = d[[tn]],
-                by = magrittr::set_names(
+                by = rlang::set_names(
                   fkl$ff[[i]],
                   fkl$tf[[i]]
                 ),
@@ -3316,19 +3316,19 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
     }
 
     ## Forward ----
-    fkf <- fk %>% dplyr::filter(.data$from == !!tn & .data$fmin == 0)
-    fkt <- fk %>% dplyr::filter(.data$to == !!tn & .data$tmin == 0)
-    nfk <<- nfk %>%
+    fkf <- fk |> dplyr::filter(.data$from == !!tn & .data$fmin == 0)
+    fkt <- fk |> dplyr::filter(.data$to == !!tn & .data$tmin == 0)
+    nfk <<- nfk |>
       dplyr::anti_join(
         dplyr::select(fkf, "from", "to"),
         by = c("from", "to")
-      ) %>%
+      ) |>
       dplyr::anti_join(dplyr::select(fkt, "from", "to"), by = c("from", "to"))
     fkl <- dplyr::bind_rows(
       fkf,
-      fkt %>%
+      fkt |>
         dplyr::rename("from" = "to", "ff" = "tf", "to" = "from", "tf" = "ff")
-    ) %>%
+    ) |>
       dplyr::distinct()
     if (nrow(fkl) > 0) {
       for (i in 1:nrow(fkl)) {
@@ -3391,7 +3391,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
             toAdd <- .mdjoin(
               d1 = toAdd,
               d2 = d[[tn]],
-              by = magrittr::set_names(
+              by = rlang::set_names(
                 fkl$ff[[i]],
                 fkl$tf[[i]]
               ),
@@ -3410,7 +3410,7 @@ filter_mdb_matrix.chMDB <- function(x, tableName, ...) {
           d[[ntn]] <<- rbind(
             d[[ntn]],
             vta
-          ) %>%
+          ) |>
             dplyr::distinct()
         }
       }

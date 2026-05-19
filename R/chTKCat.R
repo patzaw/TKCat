@@ -225,11 +225,11 @@ check_chTKCat <- function(x, verbose = FALSE) {
   lcols <- list_local_collections(withJson = TRUE)
   for (col in rcols$title) {
     if (col %in% lcols$title) {
-      lcol <- get_local_collection(title = col) %>%
+      lcol <- get_local_collection(title = col) |>
         jsonlite::fromJSON(simplifyVector = FALSE)
-      rcol <- rcols %>%
-        dplyr::filter(.data$title == !!col) %>%
-        dplyr::pull("json") %>%
+      rcol <- rcols |>
+        dplyr::filter(.data$title == !!col) |>
+        dplyr::pull("json") |>
         jsonlite::fromJSON(simplifyVector = FALSE)
       if (!identical(lcol, rcol)) {
         warning(
@@ -241,8 +241,8 @@ check_chTKCat <- function(x, verbose = FALSE) {
         )
       }
     } else {
-      rcol <- rcols %>%
-        dplyr::filter(.data$title == !!col) %>%
+      rcol <- rcols |>
+        dplyr::filter(.data$title == !!col) |>
         dplyr::pull("json")
       import_local_collection(rcol)
     }
@@ -486,7 +486,7 @@ get_hosts.chTKCat <- function(x, ...) {
 #' @export
 #'
 get_query.chTKCat <- function(x, query, ...) {
-  DBI::dbGetQuery(x$chcon, query, ...) %>%
+  DBI::dbGetQuery(x$chcon, query, ...) |>
     dplyr::as_tibble()
 }
 
@@ -697,7 +697,7 @@ list_chTKCat_users <- function(x) {
       "WHERE database='default' AND table='Users'"
     ),
     format = "TabSeparatedWithNamesAndTypes"
-  ) %>%
+  ) |>
     dplyr::pull("name")
   toRet <- DBI::dbGetQuery(
     con,
@@ -710,7 +710,7 @@ list_chTKCat_users <- function(x) {
       )
     ),
     format = "Arrow"
-  ) %>%
+  ) |>
     dplyr::as_tibble()
   if ("admin" %in% colnames(toRet)) {
     toRet$admin <- as.logical(toRet$admin)
@@ -1212,12 +1212,12 @@ list_MDBs.chTKCat <- function(x, withInfo = TRUE) {
     format = "TabSeparatedWithNamesAndTypes"
   )
   if (nrow(dbNames) > 0) {
-    dbNames <- dbNames %>%
-      dplyr::group_by(.data$database) %>%
-      dplyr::summarise(n = n()) %>%
-      dplyr::ungroup() %>%
-      dplyr::filter(.data$n == 2) %>%
-      dplyr::pull("database") %>%
+    dbNames <- dbNames |>
+      dplyr::group_by(.data$database) |>
+      dplyr::summarise(n = n()) |>
+      dplyr::ungroup() |>
+      dplyr::filter(.data$n == 2) |>
+      dplyr::pull("database") |>
       setdiff(CH_RESERVED_DB)
   } else {
     dbNames <- character(0)
@@ -1241,9 +1241,9 @@ list_MDBs.chTKCat <- function(x, withInfo = TRUE) {
         total_size = character()
       )
     } else {
-      dbSize <- list_tables(x) %>%
-        dplyr::filter(!is.na(.data$total_bytes)) %>%
-        dplyr::group_by(.data$database) %>%
+      dbSize <- list_tables(x) |>
+        dplyr::filter(!is.na(.data$total_bytes)) |>
+        dplyr::group_by(.data$database) |>
         dplyr::summarize(total_size = sum(.data$total_bytes))
       mdbDesc <- DBI::dbGetQuery(
         con,
@@ -1267,8 +1267,8 @@ list_MDBs.chTKCat <- function(x, withInfo = TRUE) {
           " WHERE name='___Timestamps___') AS q2 USING db"
         ),
         format = "Arrow"
-      ) %>%
-        dplyr::as_tibble() %>%
+      ) |>
+        dplyr::as_tibble() |>
         dplyr::mutate(
           public = as.logical(.data$public),
           populated = ifelse(
@@ -1281,9 +1281,9 @@ list_MDBs.chTKCat <- function(x, withInfo = TRUE) {
             FALSE,
             .data$total_rows > 0
           )
-        ) %>%
-        dplyr::select(-"name", -"total_rows") %>%
-        dplyr::rename("name" = "db") %>%
+        ) |>
+        dplyr::select(-"name", -"total_rows") |>
+        dplyr::rename("name" = "db") |>
         dplyr::arrange(.data$name)
 
       withTs <- mdbDesc$name[which(mdbDesc$timestamps)]
@@ -1309,7 +1309,7 @@ list_MDBs.chTKCat <- function(x, withInfo = TRUE) {
         mdbDesc$latest <- NA
       }
 
-      mdbUsers <- list_chMDB_users(x) %>%
+      mdbUsers <- list_chMDB_users(x) |>
         dplyr::filter(.data$login == con@user)
       notInit <- setdiff(dbNames, mdbDesc$name)
       if (length(notInit) > 0) {
@@ -1327,7 +1327,7 @@ list_MDBs.chTKCat <- function(x, withInfo = TRUE) {
           )
         )
       }
-      toRet <- mdbDesc %>%
+      toRet <- mdbDesc |>
         dplyr::mutate(
           access = dplyr::case_when(
             !!x$admin ~ "write and read",
@@ -1337,7 +1337,7 @@ list_MDBs.chTKCat <- function(x, withInfo = TRUE) {
             !is.na(.data$public) & .data$public ~ "read only",
             is.na(.data$public) ~ as.character(NA),
             TRUE ~ "none"
-          ) %>%
+          ) |>
             factor(levels = accessLevels)
         )
       toRet <- dplyr::left_join(toRet, dbSize, by = c("name" = "database"))
@@ -1398,8 +1398,8 @@ search_MDB_tables.chTKCat <- function(x, searchTerm) {
     "WHERE ms > 0"
   )
   query <- paste(selQueries, collapse = " UNION ALL ")
-  toRet <- get_query(x, query, format = "Arrow") %>%
-    dplyr::arrange(dplyr::desc(.data$ms)) %>%
+  toRet <- get_query(x, query, format = "Arrow") |>
+    dplyr::arrange(dplyr::desc(.data$ms)) |>
     dplyr::select("resource", "name", "comment")
   return(toRet)
 }
@@ -1459,8 +1459,8 @@ search_MDB_fields.chTKCat <- function(x, searchTerm) {
     "WHERE ms > 0"
   )
   query <- paste(selQueries, collapse = " UNION ALL ")
-  toRet <- get_query(x, query, format = "Arrow") %>%
-    dplyr::arrange(dplyr::desc(.data$ms)) %>%
+  toRet <- get_query(x, query, format = "Arrow") |>
+    dplyr::arrange(dplyr::desc(.data$ms)) |>
     dplyr::select(
       "resource",
       "table",
@@ -1469,7 +1469,7 @@ search_MDB_fields.chTKCat <- function(x, searchTerm) {
       "type",
       "nullable",
       "unique"
-    ) %>%
+    ) |>
     dplyr::mutate(
       nullable = as.logical(.data$nullable),
       unique = as.logical(.data$unique)
@@ -1518,7 +1518,7 @@ create_chMDB <- function(x, name, public = FALSE) {
     name,
     CHMDB_DATA_MODEL
   )
-  users <- list_chTKCat_users(x) %>% dplyr::pull("login")
+  users <- list_chTKCat_users(x) |> dplyr::pull("login")
   add_chMDB_user(x, name, x$chcon@user, admin = TRUE)
   set_chMDB_access(x, name, public = public)
   invisible()
@@ -1550,7 +1550,7 @@ drop_chMDB <- function(x, name) {
   }
   con <- x$chcon
   DBI::dbSendQuery(con, sprintf("DROP DATABASE `%s`", name))
-  ul <- list_chTKCat_users(x) %>%
+  ul <- list_chTKCat_users(x) |>
     dplyr::filter(!.data$admin)
   if ("provider" %in% colnames(ul)) {
     pl <- ul$login[which(ul$provider)]
@@ -1608,7 +1608,7 @@ update_chMDB_grants <- function(x, mdb) {
     length(mdb) == 1,
     !is.na(mdb)
   )
-  managedMdbs <- list_MDBs(x, withInfo = TRUE) %>%
+  managedMdbs <- list_MDBs(x, withInfo = TRUE) |>
     dplyr::filter(.data$access == "write and read" & .data$name == !!mdb)
   if (!mdb %in% managedMdbs$name) {
     stop(sprintf("No admin permission on '%s' database", mdb))
@@ -1619,9 +1619,9 @@ update_chMDB_grants <- function(x, mdb) {
   tkcUsers <- list_chTKCat_users(x)
   mdbUsers <- list_chMDB_users(x, mdb)
   adminUsers <- c(
-    tkcUsers %>% dplyr::filter(.data$admin) %>% dplyr::pull("login"),
-    mdbUsers %>% dplyr::filter(.data$admin) %>% dplyr::pull("login")
-  ) %>%
+    tkcUsers |> dplyr::filter(.data$admin) |> dplyr::pull("login"),
+    mdbUsers |> dplyr::filter(.data$admin) |> dplyr::pull("login")
+  ) |>
     unique()
   readUsers <- mdbUsers$login
   if (!is.na(managedMdbs$public) && managedMdbs$public) {
@@ -1731,10 +1731,10 @@ list_chMDB_timestamps <- function(x, name) {
     sprintf("SELECT * FROM `%s`.`___Timestamps___`", name),
     format = "TabSeparatedWithNamesAndTypes"
   )
-  current <- toRet %>%
+  current <- toRet |>
     dplyr::filter(
       .data$instance == "___MDB___" & .data$table == "___MDB___"
-    ) %>%
+    ) |>
     dplyr::pull("timestamp")
   if (length(current) == 0) {
     current <- NA
@@ -1793,7 +1793,7 @@ set_chMDB_timestamp <- function(x, name, timestamp) {
     length(name) == 1,
     !is.na(name)
   )
-  dbl <- list_MDBs(x) %>%
+  dbl <- list_MDBs(x) |>
     dplyr::filter(.data$populated)
   if (!is.data.frame(dbl) || !name %in% dbl$name) {
     stop(sprintf(
@@ -1826,7 +1826,7 @@ set_chMDB_timestamp <- function(x, name, timestamp) {
       name
     ),
     format = "TabSeparatedWithNamesAndTypes"
-  )$table %>%
+  )$table |>
     unique()
   if (length(sdtables) > 0) {
     stables <- get_query(
@@ -2010,10 +2010,10 @@ empty_chMDB <- function(
       if (!timestamp %in% tst$timestamp) {
         stop("The selected timestamp does not exist")
       }
-      toDrop <- tst %>%
+      toDrop <- tst |>
         dplyr::filter(
           .data$timestamp == !!timestamp
-        ) %>%
+        ) |>
         dplyr::pull("instance")
       .toKeep <- unique(c(
         .toKeep,
@@ -2130,7 +2130,7 @@ archive_chMDB <- function(
       format = "TabSeparatedWithNamesAndTypes"
     )$name
   )
-  toArchive <- tst %>%
+  toArchive <- tst |>
     dplyr::filter(
       .data$timestamp == attr(tst, "current"),
       .data$table %in% toArchive
@@ -2141,12 +2141,12 @@ archive_chMDB <- function(
     toArchive$instance,
     toArchive$newInstance
   )
-  toUpdate <- tst %>%
-    dplyr::filter(.data$instance %in% toArchive$instance) %>%
+  toUpdate <- tst |>
+    dplyr::filter(.data$instance %in% toArchive$instance) |>
     dplyr::left_join(
       toArchive[, c("instance", "newInstance")],
       by = "instance"
-    ) %>%
+    ) |>
     dplyr::select("timestamp", "table", "instance" = "newInstance")
   if (nrow(toArchive) > 0) {
     get_query(
@@ -2231,15 +2231,15 @@ unarchive_chMDB <- function(x, name) {
   }
 
   current <- max(tst$timestamp)
-  toUnarchive <- tst %>%
+  toUnarchive <- tst |>
     dplyr::filter(.data$timestamp == current)
   toUnarchive$newInstance <- toUnarchive$table
-  toUpdate <- tst %>%
-    dplyr::filter(.data$instance %in% toUnarchive$instance) %>%
+  toUpdate <- tst |>
+    dplyr::filter(.data$instance %in% toUnarchive$instance) |>
     dplyr::left_join(
       toUnarchive[, c("instance", "newInstance")],
       by = "instance"
-    ) %>%
+    ) |>
     dplyr::select("timestamp", "table", "instance" = "newInstance")
 
   if (nrow(toUnarchive) > 0) {
@@ -2313,8 +2313,8 @@ is_chMDB_public <- function(x, mdb) {
     con,
     sprintf("SELECT public from `%s`.___Public___", mdb),
     format = "TabSeparatedWithNamesAndTypes"
-  ) %>%
-    dplyr::pull("public") %>%
+  ) |>
+    dplyr::pull("public") |>
     as.logical()
   if (length(toRet) == 0) {
     toRet <- FALSE
@@ -2391,7 +2391,7 @@ list_chMDB_users <- function(x, mdbs = NULL) {
     con,
     "SELECT database FROM system.tables WHERE name='___MDBUsers___'",
     format = "TabSeparatedWithNamesAndTypes"
-  ) %>%
+  ) |>
     dplyr::pull("database")
   if (is.null(mdbs)) {
     mdbs <- mdbWithUsers
@@ -2434,9 +2434,9 @@ list_chMDB_users <- function(x, mdbs = NULL) {
         collapse = " UNION ALL "
       ),
       format = "TabSeparatedWithNamesAndTypes"
-    ) %>%
-      dplyr::as_tibble() %>%
-      dplyr::mutate(admin = as.logical(.data$admin)) %>%
+    ) |>
+      dplyr::as_tibble() |>
+      dplyr::mutate(admin = as.logical(.data$admin)) |>
       dplyr::arrange(.data$db, .data$admin, .data$login)
   }
   return(toRet)
@@ -2568,7 +2568,7 @@ get_chMDB_metadata <- function(x, dbName, timestamp = NA) {
       }
       tst <- dplyr::tibble(
         table = setdiff(names(CHMDB_DATA_MODEL), MGT_TABLES)
-      ) %>%
+      ) |>
         dplyr::mutate(
           instance = .data$table
         )
@@ -2585,7 +2585,7 @@ get_chMDB_metadata <- function(x, dbName, timestamp = NA) {
     if (!timestamp %in% tst$timestamp) {
       stop("The selected timestamp does not exist")
     }
-    tst <- tst %>%
+    tst <- tst |>
       dplyr::filter(.data$timestamp == !!timestamp)
   }
 
@@ -2642,11 +2642,11 @@ get_chMDB_metadata <- function(x, dbName, timestamp = NA) {
     x,
     tsSelect("___CollectionMembers___"),
     format = "TabSeparatedWithNamesAndTypes"
-  ) %>%
+  ) |>
     dplyr::mutate(
       resource = dbName,
       static = as.logical(.data$static)
-    ) %>%
+    ) |>
     dplyr::select(
       "collection",
       "cid",
@@ -2696,7 +2696,7 @@ list_chTKCat_collections <- function(x, withJson = FALSE) {
         ifelse(withJson, ", json", "")
       ),
       format = "Arrow"
-    ) %>%
+    ) |>
       dplyr::as_tibble()
   } else {
     toRet <- dplyr::tibble("title" = character(), "description" = character())
@@ -2761,7 +2761,7 @@ add_chTKCat_collection <- function(x, json, overwrite = FALSE) {
     stop("Only chTKCat admin can add collections")
   }
   if (file.exists(json)) {
-    raw <- readLines(json) %>% paste(collapse = "\n")
+    raw <- readLines(json) |> paste(collapse = "\n")
   } else if (json %in% list_local_collections()$title) {
     raw <- get_local_collection(json)
   } else {
@@ -2781,9 +2781,9 @@ add_chTKCat_collection <- function(x, json, overwrite = FALSE) {
   ctitle <- def$properties$collection$enum
   writeCol <- TRUE
   if (ctitle %in% list_chTKCat_collections(x)$title) {
-    lcol <- raw %>%
+    lcol <- raw |>
       jsonlite::fromJSON(simplifyVector = FALSE)
-    rcol <- get_chTKCat_collection(x, ctitle) %>%
+    rcol <- get_chTKCat_collection(x, ctitle) |>
       jsonlite::fromJSON(simplifyVector = FALSE)
     if (identical(lcol, rcol)) {
       writeCol <- FALSE
@@ -2876,8 +2876,8 @@ collection_members.chTKCat <- function(
     con,
     "SELECT name FROM system.databases",
     format = "TabSeparatedWithNamesAndTypes"
-  ) %>%
-    dplyr::pull("name") %>%
+  ) |>
+    dplyr::pull("name") |>
     setdiff(CH_RESERVED_DB)
 
   check_chTKCat(x, verbose = TRUE)
@@ -2901,10 +2901,10 @@ collection_members.chTKCat <- function(
             dbName
           ),
           format = "TabSeparatedWithNamesAndTypes"
-        ) %>%
-          dplyr::as_tibble() %>%
-          dplyr::mutate(resource = dbName) %>%
-          dplyr::select("resource", "collection", "table") %>%
+        ) |>
+          dplyr::as_tibble() |>
+          dplyr::mutate(resource = dbName) |>
+          dplyr::select("resource", "collection", "table") |>
           dplyr::distinct()
       )
     }
@@ -3237,8 +3237,8 @@ manage_chTKCat_users <- function(x, pwdFile = NULL) {
           )))
         }
         ut <- list_chTKCat_users(x)
-        cur_cont <- ut %>%
-          dplyr::filter(.data$login == ui$chcon@user) %>%
+        cur_cont <- ut |>
+          dplyr::filter(.data$login == ui$chcon@user) |>
           dplyr::pull("contact")
         toRet <- shiny::fluidRow(shiny::column(
           12,

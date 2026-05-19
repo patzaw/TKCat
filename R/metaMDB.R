@@ -234,7 +234,7 @@ relational_tables <- function(x, recursive = FALSE) {
       toRet,
       do.call(
         c,
-        magrittr::set_names(
+        rlang::set_names(
           lapply(
             MDBs(x),
             function(y) {
@@ -305,7 +305,7 @@ rename.metaMDB <- function(.data, ...) {
   loc <- tidyselect::eval_rename(rlang::expr(c(...)), .data)
   names <- names(.data)
   names[loc] <- names(loc)
-  magrittr::set_names(.data, names)
+  rlang::set_names(.data, names)
 }
 
 
@@ -355,19 +355,19 @@ data_model.metaMDB <- function(x, rtOnly = FALSE, recursive = FALSE, ...) {
   if (rtOnly) {
     rt <- names(relational_tables(x, recursive = recursive))
     fk <- ReDaMoR::get_foreign_keys(toRet)
-    toTake <- fk %>%
+    toTake <- fk |>
       dplyr::filter(
         .data$from %in% rt
-      ) %>%
-      dplyr::pull("to") %>%
+      ) |>
+      dplyr::pull("to") |>
       c(
-        fk %>%
+        fk |>
           dplyr::filter(
             .data$to %in% rt
-          ) %>%
+          ) |>
           dplyr::pull("from")
-      ) %>%
-      c(rt) %>%
+      ) |>
+      c(rt) |>
       unique()
     toRet <- toRet[toTake, rmForeignKeys = TRUE]
   }
@@ -696,7 +696,7 @@ as_fileMDB.metaMDB <- function(
   hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
   ReDaMoR::write_json_data_model(dm, jModelPath)
   if (htmlModel) {
-    plot(dm) %>%
+    plot(dm) |>
       visNetwork::visSave(hModelPath)
   }
 
@@ -709,7 +709,7 @@ as_fileMDB.metaMDB <- function(
     for (collection in unique(cm$collection)) {
       cv <- dplyr::filter(cm, .data$collection == !!collection)
       for (cid in unique(cv$cid)) {
-        dplyr::filter(cv, .data$cid == !!cid) %>%
+        dplyr::filter(cv, .data$cid == !!cid) |>
           write_collection_members(
             path = file.path(
               colPath,
@@ -734,8 +734,8 @@ as_fileMDB.metaMDB <- function(
       by = by
     )
     ofiles <- data_files(tmp)$dataFiles
-    dfiles <- file.path(dataPath, basename(ofiles)) %>%
-      magrittr::set_names(names(ofiles))
+    dfiles <- file.path(dataPath, basename(ofiles)) |>
+      rlang::set_names(names(ofiles))
     file.rename(ofiles, dfiles)
     unlink(file.path(dataPath, db_info(tmp)$name), recursive = TRUE)
     adfiles <- c(adfiles, dfiles)
@@ -749,8 +749,8 @@ as_fileMDB.metaMDB <- function(
     by = by
   )
   ofiles <- data_files(tmp)$dataFiles
-  dfiles <- file.path(dataPath, basename(ofiles)) %>%
-    magrittr::set_names(names(ofiles))
+  dfiles <- file.path(dataPath, basename(ofiles)) |>
+    rlang::set_names(names(ofiles))
   file.rename(ofiles, dfiles)
   unlink(file.path(dataPath, db_info(tmp)$name), recursive = TRUE)
   adfiles <- c(adfiles, dfiles)
@@ -794,7 +794,7 @@ filter.metaMDB <- function(.data, ..., .preserve = FALSE) {
       mdbt <- intersect(names(dots), names(y))
       if (length(mdbt) > 0) {
         sdots <- dots[mdbt]
-        toRet <- dplyr::filter(y, !!!sdots) %>% data_tables()
+        toRet <- dplyr::filter(y, !!!sdots) |> data_tables()
       } else {
         toRet <- NULL
       }
@@ -810,8 +810,8 @@ filter.metaMDB <- function(.data, ..., .preserve = FALSE) {
       dataModel = data_model(x)[rtNames, rmForeignKeys = TRUE],
       dbInfo = list(name = "reltables"),
       check = FALSE
-    ) %>%
-      dplyr::filter(dots[mdbt]) %>%
+    ) |>
+      dplyr::filter(dots[mdbt]) |>
       data_tables()
     fdt <- c(fdt, toAdd)
   }
@@ -891,8 +891,8 @@ filter_mdb_matrix.metaMDB <- function(x, tableName, ...) {
 
   ## Get relevant MDB ----
   mdbs <- MDBs(x)
-  tmdb <- lapply(mdbs, function(y) tableName %in% names(y)) %>%
-    unlist() %>%
+  tmdb <- lapply(mdbs, function(y) tableName %in% names(y)) |>
+    unlist() |>
     which()
   return(filter_mdb_matrix(x = mdbs[[tmdb]], tableName = tableName, ...))
 }

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2026-05-09" />
+<meta name="date" content="2026-05-19" />
 
 <title>Introduction to TKCat</title>
 
@@ -7275,7 +7275,7 @@ display: none;
 
 <h1 class="title toc-ignore">Introduction to TKCat</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">May 09, 2026</h4>
+<h4 class="date">May 19, 2026</h4>
 
 </div>
 
@@ -7431,18 +7431,18 @@ names and descriptions:</p>
 )
 HPO_hp</code></pre>
 <pre><code>## # A tibble: 500 × 4
-##    id      name                                              description                                                                                                 level
-##    &lt;chr&gt;   &lt;chr&gt;                                             &lt;chr&gt;                                                                                                       &lt;dbl&gt;
-##  1 0000002 Abnormality of body height                        Deviation from the norm of height with respect to that which is expected according to age and gender norms.     3
-##  2 0000009 Functional abnormality of the bladder             Dysfunction of the urinary bladder.                                                                             6
-##  3 0000014 Abnormality of the bladder                        An abnormality of the urinary bladder.                                                                          5
-##  4 0000017 Nocturia                                          Abnormally increased production of urine during the night leading to an unusually frequent need to urinate.     7
-##  5 0000019 Urinary hesitancy                                 Difficulty in beginning the process of urination.                                                               7
-##  6 0000021 Megacystis                                        Dilatation of the bladder postnatally.                                                                          8
-##  7 0000022 Abnormality of male internal genitalia            An abnormality of the male internal genitalia.                                                                  6
-##  8 0000024 Prostatitis                                       The presence of inflammation of the prostate.                                                                   8
-##  9 0000025 Functional abnormality of male internal genitalia &lt;NA&gt;                                                                                                            6
-## 10 0000030 Testicular gonadoblastoma                         The presence of a gonadoblastoma of the testis.                                                                 9
+##    id      name                                              description                                                                                            level
+##    &lt;chr&gt;   &lt;chr&gt;                                             &lt;chr&gt;                                                                                                  &lt;dbl&gt;
+##  1 0000002 Abnormality of body height                        Deviation from the norm of height with respect to that which is expected according to age and gender …     3
+##  2 0000009 Functional abnormality of the bladder             Dysfunction of the urinary bladder.                                                                        6
+##  3 0000014 Abnormality of the bladder                        An abnormality of the urinary bladder.                                                                     5
+##  4 0000017 Nocturia                                          Abnormally increased production of urine during the night leading to an unusually frequent need to ur…     7
+##  5 0000019 Urinary hesitancy                                 Difficulty in beginning the process of urination.                                                          7
+##  6 0000021 Megacystis                                        Dilatation of the bladder postnatally.                                                                     8
+##  7 0000022 Abnormality of male internal genitalia            An abnormality of the male internal genitalia.                                                             6
+##  8 0000024 Prostatitis                                       The presence of inflammation of the prostate.                                                              8
+##  9 0000025 Functional abnormality of male internal genitalia &lt;NA&gt;                                                                                                       6
+## 10 0000030 Testicular gonadoblastoma                         The presence of a gonadoblastoma of the testis.                                                            9
 ## # ℹ 490 more rows</code></pre>
 <p>The <code>HPO_diseases</code> table gathers disease identifiers and
 labels from different disease database.</p>
@@ -7693,7 +7693,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-09 05:57:09.133938
+## Timestamp: 2026-05-19 16:42:22.146541
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -7731,7 +7731,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-09 05:57:09.133938
+## Timestamp: 2026-05-19 16:42:22.146541
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -7776,18 +7776,18 @@ information for each row.</p>
 as a member of the <em>Condition</em> collection.</p>
 <pre class="r"><code>mhpo_db$HPO_hp</code></pre>
 <pre><code>## # A tibble: 500 × 4
-##    id      name                                              description                                                                                                 level
-##    &lt;chr&gt;   &lt;chr&gt;                                             &lt;chr&gt;                                                                                                       &lt;int&gt;
-##  1 0000002 Abnormality of body height                        Deviation from the norm of height with respect to that which is expected according to age and gender norms.     3
-##  2 0000009 Functional abnormality of the bladder             Dysfunction of the urinary bladder.                                                                             6
-##  3 0000014 Abnormality of the bladder                        An abnormality of the urinary bladder.                                                                          5
-##  4 0000017 Nocturia                                          Abnormally increased production of urine during the night leading to an unusually frequent need to urinate.     7
-##  5 0000019 Urinary hesitancy                                 Difficulty in beginning the process of urination.                                                               7
-##  6 0000021 Megacystis                                        Dilatation of the bladder postnatally.                                                                          8
-##  7 0000022 Abnormality of male internal genitalia            An abnormality of the male internal genitalia.                                                                  6
-##  8 0000024 Prostatitis                                       The presence of inflammation of the prostate.                                                                   8
-##  9 0000025 Functional abnormality of male internal genitalia &lt;NA&gt;                                                                                                            6
-## 10 0000030 Testicular gonadoblastoma                         The presence of a gonadoblastoma of the testis.                                                                 9
+##    id      name                                              description                                                                                            level
+##    &lt;chr&gt;   &lt;chr&gt;                                             &lt;chr&gt;                                                                                                  &lt;int&gt;
+##  1 0000002 Abnormality of body height                        Deviation from the norm of height with respect to that which is expected according to age and gender …     3
+##  2 0000009 Functional abnormality of the bladder             Dysfunction of the urinary bladder.                                                                        6
+##  3 0000014 Abnormality of the bladder                        An abnormality of the urinary bladder.                                                                     5
+##  4 0000017 Nocturia                                          Abnormally increased production of urine during the night leading to an unusually frequent need to ur…     7
+##  5 0000019 Urinary hesitancy                                 Difficulty in beginning the process of urination.                                                          7
+##  6 0000021 Megacystis                                        Dilatation of the bladder postnatally.                                                                     8
+##  7 0000022 Abnormality of male internal genitalia            An abnormality of the male internal genitalia.                                                             6
+##  8 0000024 Prostatitis                                       The presence of inflammation of the prostate.                                                              8
+##  9 0000025 Functional abnormality of male internal genitalia &lt;NA&gt;                                                                                                       6
+## 10 0000030 Testicular gonadoblastoma                         The presence of a gonadoblastoma of the testis.                                                            9
 ## # ℹ 490 more rows</code></pre>
 <pre class="r"><code>mhpo_db &lt;- add_collection_member(
    mhpo_db, collection=&quot;Condition&quot;, table=&quot;HPO_hp&quot;,
@@ -7824,7 +7824,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-09 05:57:09.133938
+## Timestamp: 2026-05-19 16:42:22.146541
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -7883,7 +7883,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-05-09 05:57:09
+## Timestamp: 2026-05-19 16:42:22
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -8107,10 +8107,11 @@ improve the readability of the following examples).</p>
 <pre class="r"><code>file_clinvar &lt;- file_clinvar %&gt;% 
    set_names(sub(&quot;ClinVar_&quot;, &quot;&quot;, names(.))) 
 names(file_clinvar)</code></pre>
-<pre><code>##  [1] &quot;ReferenceClinVarAssertion&quot; &quot;rcvaVariant&quot;               &quot;ClinVarAssertions&quot;         &quot;rcvaInhMode&quot;               &quot;rcvaObservedIn&quot;            &quot;rcvaTraits&quot;               
-##  [7] &quot;clinSigOrder&quot;              &quot;revStatOrder&quot;              &quot;variants&quot;                  &quot;cvaObservedIn&quot;             &quot;cvaSubmitters&quot;             &quot;traits&quot;                   
-## [13] &quot;varEntrez&quot;                 &quot;varAttributes&quot;             &quot;varCytoLoc&quot;                &quot;varNames&quot;                  &quot;varSeqLoc&quot;                 &quot;varXRef&quot;                  
-## [19] &quot;traitCref&quot;                 &quot;traitNames&quot;                &quot;entrezNames&quot;</code></pre>
+<pre><code>##  [1] &quot;ReferenceClinVarAssertion&quot; &quot;rcvaVariant&quot;               &quot;ClinVarAssertions&quot;         &quot;rcvaInhMode&quot;               &quot;rcvaObservedIn&quot;           
+##  [6] &quot;rcvaTraits&quot;                &quot;clinSigOrder&quot;              &quot;revStatOrder&quot;              &quot;variants&quot;                  &quot;cvaObservedIn&quot;            
+## [11] &quot;cvaSubmitters&quot;             &quot;traits&quot;                    &quot;varEntrez&quot;                 &quot;varAttributes&quot;             &quot;varCytoLoc&quot;               
+## [16] &quot;varNames&quot;                  &quot;varSeqLoc&quot;                 &quot;varXRef&quot;                   &quot;traitCref&quot;                 &quot;traitNames&quot;               
+## [21] &quot;entrezNames&quot;</code></pre>
 <p>The different collection members of an MDBs are listed with the
 <code>collection_members()</code> function.</p>
 <pre class="r"><code>collection_members(file_clinvar)</code></pre>
@@ -8270,11 +8271,11 @@ of interest in a single table as shown below.</p>
 gene_traits$entrezNames %&gt;%
    select(symbol, name, variants.type, variants.name, traitType, traits.name)</code></pre>
 <pre><code>## # A tibble: 4 × 6
-##   symbol name                                           variants.type             variants.name                               traitType traits.name                               
-##   &lt;chr&gt;  &lt;chr&gt;                                          &lt;chr&gt;                     &lt;chr&gt;                                       &lt;chr&gt;     &lt;chr&gt;                                     
-## 1 PIK3R2 phosphoinositide-3-kinase regulatory subunit 2 single nucleotide variant NM_005027.4(PIK3R2):c.1117G&gt;A (p.Gly373Arg) Disease   Megalencephaly-polymicrogyria-polydactyly…
-## 2 PIK3R2 phosphoinositide-3-kinase regulatory subunit 2 single nucleotide variant NM_005027.4(PIK3R2):c.1117G&gt;A (p.Gly373Arg) Disease   not provided                              
-## 3 PIK3R2 phosphoinositide-3-kinase regulatory subunit 2 single nucleotide variant NM_005027.4(PIK3R2):c.1694C&gt;G (p.Pro565Arg) Disease   not provided                              
+##   symbol name                                           variants.type             variants.name                               traitType traits.name                      
+##   &lt;chr&gt;  &lt;chr&gt;                                          &lt;chr&gt;                     &lt;chr&gt;                                       &lt;chr&gt;     &lt;chr&gt;                            
+## 1 PIK3R2 phosphoinositide-3-kinase regulatory subunit 2 single nucleotide variant NM_005027.4(PIK3R2):c.1117G&gt;A (p.Gly373Arg) Disease   Megalencephaly-polymicrogyria-po…
+## 2 PIK3R2 phosphoinositide-3-kinase regulatory subunit 2 single nucleotide variant NM_005027.4(PIK3R2):c.1117G&gt;A (p.Gly373Arg) Disease   not provided                     
+## 3 PIK3R2 phosphoinositide-3-kinase regulatory subunit 2 single nucleotide variant NM_005027.4(PIK3R2):c.1694C&gt;G (p.Pro565Arg) Disease   not provided                     
 ## 4 UGT1A8 UDP glucuronosyltransferase family 1 member A8 Microsatellite            UGT1A1*28                                   Disease   Gilbert&#39;s syndrome</code></pre>
 </div>
 <div id="merging-with-collections" class="section level2" number="3.6">
@@ -8527,10 +8528,10 @@ their preparation for potential integration. Several functions are
 available to achieve this goal.</p>
 <pre class="r"><code>list_MDBs(k)                     # list all the MDBs in a TKCat object</code></pre>
 <pre><code>## # A tibble: 2 × 7
-##   name    title                                    description                                                                        url   version maintainer timestamp
-##   &lt;chr&gt;   &lt;chr&gt;                                    &lt;chr&gt;                                                                              &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dttm&gt;   
-## 1 HPO     Data extracted from the HPO database     This is a very small subset of the HPO! Visit the reference URL for more informat… http… &lt;NA&gt;    &lt;NA&gt;       NA       
-## 2 ClinVar Data extracted from the ClinVar database ClinVar is a freely accessible, public archive of reports of the relationships am… http… 0.9     Patrice G… NA</code></pre>
+##   name    title                                    description                                                               url   version maintainer timestamp
+##   &lt;chr&gt;   &lt;chr&gt;                                    &lt;chr&gt;                                                                     &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dttm&gt;   
+## 1 HPO     Data extracted from the HPO database     This is a very small subset of the HPO! Visit the reference URL for more… http… &lt;NA&gt;    &lt;NA&gt;       NA       
+## 2 ClinVar Data extracted from the ClinVar database ClinVar is a freely accessible, public archive of reports of the relatio… http… 0.9     Patrice G… NA</code></pre>
 <pre class="r"><code>get_MDB(k, &quot;HPO&quot;)                # get a specific MDBs from the catalog</code></pre>
 <pre><code>## fileMDB HPO: Data extracted from the HPO database
 ##    - 9 tables with 25 fields
@@ -8616,48 +8617,48 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <em>TKCat</em> object.</p>
 <pre class="r"><code>list_MDBs(k)             # get a specific MDBs from the catalog</code></pre>
 <pre><code>## # A tibble: 30 × 12
-##    name                  title                                              description url   version maintainer public populated timestamps timestamp           access total_size
-##    &lt;chr&gt;                 &lt;chr&gt;                                              &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;lgl&gt;  &lt;lgl&gt;     &lt;lgl&gt;      &lt;dttm&gt;              &lt;fct&gt;       &lt;dbl&gt;
-##  1 AP-Disease-Strategy   Angelini Pharma disease strategy                   Ressources… &lt;NA&gt;  0.0.2   [Patrice … FALSE  TRUE      TRUE       2026-05-03 11:50:51 none      3.84e 8
-##  2 AP-RD-Scouting        Information from R&amp;D scouting activites at Angeli… Informatio… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2026-04-12 13:32:45 read …    2.16e 5
-##  3 Caravelle             New internal target candidate reviewed in the fra… Informatio… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2026-02-24 04:29:46 read …    2.48e 4
-##  4 ChEMBL                ChEMBL: a manually curated database of bioactive … ChEMBL is … http… 1.1.0   [Patrice … TRUE   TRUE      TRUE       2025-11-24 15:34:12 read …    6.73e 9
-##  5 Cortellis             Data extracted from Clarivate Cortellis databases  Clarivate … http… 0.0.3   [Patrice … FALSE  TRUE      TRUE       2026-05-03 03:53:55 none      1.81e 8
-##  6 Countries             General information about countries                General in… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2025-08-22 14:24:17 read …    2.06e 6
-##  7 DRE-Bulk-RNA-UMC-2024 Bulk RNA-Seq of Brain Samples from Patients with … Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE       2025-04-08 09:40:08 read …    7.06e 8
-##  8 FCD-TLE-Bulk-RNA-2019 Bulk RNA-Seq of Brain Samples from Patients with … Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE       2025-04-04 06:05:51 read …    9.34e 6
-##  9 GO                    The Gene Ontology                                  Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE       2026-05-01 04:59:18 read …    2.04e 8
-## 10 GTEx                  Genotype Tissue Expression                         The Adult … http… 0.01    [Patrice … TRUE   TRUE      TRUE       2026-05-06 05:25:03 read …    5.30e10
+##    name                  title                                     description url   version maintainer public populated timestamps timestamp           access total_size
+##    &lt;chr&gt;                 &lt;chr&gt;                                     &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;lgl&gt;  &lt;lgl&gt;     &lt;lgl&gt;      &lt;dttm&gt;              &lt;fct&gt;       &lt;dbl&gt;
+##  1 AP-Disease-Strategy   Angelini Pharma disease strategy          Ressources… &lt;NA&gt;  0.0.2   [Patrice … FALSE  TRUE      TRUE       2026-05-03 11:50:51 none      3.84e 8
+##  2 AP-RD-Scouting        Information from R&amp;D scouting activites … Informatio… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2026-04-12 13:32:45 read …    2.16e 5
+##  3 Caravelle             New internal target candidate reviewed i… Informatio… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2026-02-24 04:29:46 read …    2.48e 4
+##  4 ChEMBL                ChEMBL: a manually curated database of b… ChEMBL is … http… 1.1.0   [Patrice … TRUE   TRUE      TRUE       2025-11-24 15:34:12 read …    6.73e 9
+##  5 Cortellis             Data extracted from Clarivate Cortellis … Clarivate … http… 0.0.3   [Patrice … FALSE  TRUE      TRUE       2026-05-03 03:53:55 none      1.81e 8
+##  6 Countries             General information about countries       General in… &lt;NA&gt;  0.0.1   [Patrice … TRUE   TRUE      TRUE       2025-08-22 14:24:17 read …    2.06e 6
+##  7 DRE-Bulk-RNA-UMC-2024 Bulk RNA-Seq of Brain Samples from Patie… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE       2025-04-08 09:40:08 read …    7.06e 8
+##  8 FCD-TLE-Bulk-RNA-2019 Bulk RNA-Seq of Brain Samples from Patie… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE       2025-04-04 06:05:51 read …    9.34e 6
+##  9 GO                    The Gene Ontology                         Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE       2026-05-01 04:59:18 read …    2.04e 8
+## 10 GTEx                  Genotype Tissue Expression                The Adult … http… 0.01    [Patrice … TRUE   TRUE      TRUE       2026-05-06 05:25:03 read …    5.30e10
 ## # ℹ 20 more rows</code></pre>
 <pre class="r"><code>search_MDB_tables(k, &quot;disease&quot;)  # Search table about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 54 × 3
-##    resource            name                               comment                                                                                                                 
-##    &lt;chr&gt;               &lt;chr&gt;                              &lt;chr&gt;                                                                                                                   
-##  1 ChEMBL              assay_classification               Classification scheme for phenotypic assays e.g., by therapeutic area, phenotype/process and assay type. Can be used to…
-##  2 AP-Disease-Strategy diseases                           &lt;NA&gt;                                                                                                                    
-##  3 AP-Disease-Strategy diseases_descendants               &lt;NA&gt;                                                                                                                    
-##  4 AP-Disease-Strategy diseases_groups                    &lt;NA&gt;                                                                                                                    
-##  5 AP-Disease-Strategy diseases_groups_identifiers        &lt;NA&gt;                                                                                                                    
-##  6 AP-Disease-Strategy diseases_parents                   &lt;NA&gt;                                                                                                                    
-##  7 AP-Disease-Strategy diseases_synonyms                  &lt;NA&gt;                                                                                                                    
-##  8 AP-Disease-Strategy general_disease_groups_identifiers General group of diseases                                                                                               
-##  9 HPA                 Disease_involvement                &lt;NA&gt;                                                                                                                    
-## 10 HPO                 Disease_HP                         HP presented by diseases                                                                                                
+##    resource            name                               comment                                                                                                        
+##    &lt;chr&gt;               &lt;chr&gt;                              &lt;chr&gt;                                                                                                          
+##  1 ChEMBL              assay_classification               Classification scheme for phenotypic assays e.g., by therapeutic area, phenotype/process and assay type. Can b…
+##  2 AP-Disease-Strategy diseases                           &lt;NA&gt;                                                                                                           
+##  3 AP-Disease-Strategy diseases_descendants               &lt;NA&gt;                                                                                                           
+##  4 AP-Disease-Strategy diseases_groups                    &lt;NA&gt;                                                                                                           
+##  5 AP-Disease-Strategy diseases_groups_identifiers        &lt;NA&gt;                                                                                                           
+##  6 AP-Disease-Strategy diseases_parents                   &lt;NA&gt;                                                                                                           
+##  7 AP-Disease-Strategy diseases_synonyms                  &lt;NA&gt;                                                                                                           
+##  8 AP-Disease-Strategy general_disease_groups_identifiers General group of diseases                                                                                      
+##  9 HPA                 Disease_involvement                &lt;NA&gt;                                                                                                           
+## 10 HPO                 Disease_HP                         HP presented by diseases                                                                                       
 ## # ℹ 44 more rows</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 155 × 7
-##    resource            table                              name          comment                                  type      nullable unique
-##    &lt;chr&gt;               &lt;chr&gt;                              &lt;chr&gt;         &lt;chr&gt;                                    &lt;chr&gt;     &lt;lgl&gt;    &lt;lgl&gt; 
-##  1 AP-Disease-Strategy strategic_indications              category      &quot;phenotype or disease&quot;                   character FALSE    FALSE 
-##  2 AP-Disease-Strategy strategic_indications              class         &quot;symptom, disease, disorder or syndrome&quot; character FALSE    FALSE 
-##  3 AP-Disease-Strategy general_disease_groups_identifiers disease       &quot;&quot;                                       character FALSE    FALSE 
-##  4 AP-Disease-Strategy strategic_indications              disease       &quot;Can it be considered as a disease&quot;      logical   FALSE    FALSE 
-##  5 AP-Disease-Strategy cci_drug_indications               disease_group &quot;&quot;                                       character TRUE     FALSE 
-##  6 AP-Disease-Strategy cci_drug_indications_summary       disease_group &quot;&quot;                                       character TRUE     FALSE 
-##  7 AP-Disease-Strategy cci_target_indications             disease_group &quot;&quot;                                       character TRUE     FALSE 
-##  8 AP-Disease-Strategy cci_target_indications_summary     disease_group &quot;&quot;                                       character TRUE     FALSE 
-##  9 AP-Disease-Strategy cddi_drug_indications              disease_group &quot;&quot;                                       character TRUE     FALSE 
-## 10 AP-Disease-Strategy cddi_drug_indications_summary      disease_group &quot;&quot;                                       character TRUE     FALSE 
+##    resource            table                      name             comment                                  type      nullable unique
+##    &lt;chr&gt;               &lt;chr&gt;                      &lt;chr&gt;            &lt;chr&gt;                                    &lt;chr&gt;     &lt;lgl&gt;    &lt;lgl&gt; 
+##  1 Pilo-Bulk-RNA-2018  conditions                 condition        &quot;Disease&quot;                                character TRUE     TRUE  
+##  2 Pilo-Bulk-RNA-2018  samples                    condition        &quot;Disease&quot;                                character TRUE     FALSE 
+##  3 Pilo-Bulk-RNA-2018  epilepsies_genetics        disease          &quot;&quot;                                       character FALSE    FALSE 
+##  4 Pilo-Bulk-RNA-2018  epilepsies_targets         disease          &quot;&quot;                                       character FALSE    FALSE 
+##  5 Pilo-Bulk-RNA-2018  epilepsies_targets         disease_count    &quot;&quot;                                       numeric   FALSE    FALSE 
+##  6 Pilo-Bulk-RNA-2018  genes_epilepsies_abstracts disease_mentions &quot;&quot;                                       character FALSE    FALSE 
+##  7 Pilo-Bulk-RNA-2018  epilepsies_genetics        disease_name     &quot;&quot;                                       character FALSE    FALSE 
+##  8 Pilo-Bulk-RNA-2018  epilepsies_targets         disease_name     &quot;&quot;                                       character FALSE    FALSE 
+##  9 AP-Disease-Strategy strategic_indications      category         &quot;phenotype or disease&quot;                   character FALSE    FALSE 
+## 10 AP-Disease-Strategy strategic_indications      class            &quot;symptom, disease, disorder or syndrome&quot; character FALSE    FALSE 
 ## # ℹ 145 more rows</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 50 × 3

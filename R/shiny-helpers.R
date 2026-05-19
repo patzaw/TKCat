@@ -452,9 +452,9 @@ TKCAT_LOGO_DIV <- shiny::div(
         ),
         colnames(mdbs$list)
       )
-      toShow <- mdbs$list %>%
-        dplyr::select(dplyr::all_of(colToTake)) %>%
-        dplyr::rename("Resource" = "name") %>%
+      toShow <- mdbs$list |>
+        dplyr::select(dplyr::all_of(colToTake)) |>
+        dplyr::rename("Resource" = "name") |>
         dplyr::rename_all(function(x) {
           x <- gsub("_", " ", x)
           paste0(
@@ -463,24 +463,24 @@ TKCAT_LOGO_DIV <- shiny::div(
           )
         })
       if ("Total size" %in% colnames(toShow)) {
-        toShow <- toShow %>%
+        toShow <- toShow |>
           dplyr::mutate(
             "Total size" = signif(
               .data$`Total size` / 2^(30),
               3
             )
-          ) %>%
+          ) |>
           dplyr::rename("Total size (GB)" = "Total size")
       }
       if (nrow(mdbs$collections) > 0) {
-        cm <- mdbs$collections %>%
-          dplyr::select("collection", "resource") %>%
-          dplyr::distinct() %>%
-          dplyr::group_by(.data$resource) %>%
+        cm <- mdbs$collections |>
+          dplyr::select("collection", "resource") |>
+          dplyr::distinct() |>
+          dplyr::group_by(.data$resource) |>
           dplyr::summarize(
             collection = paste(.data$collection, collapse = ", ")
-          ) %>%
-          dplyr::ungroup() %>%
+          ) |>
+          dplyr::ungroup() |>
           dplyr::rename("Collections" = "collection")
         toShow <- dplyr::left_join(toShow, cm, by = c("Resource" = "resource"))
       } else {
@@ -519,7 +519,7 @@ TKCAT_LOGO_DIV <- shiny::div(
         )
       )
       if ("Access" %in% colnames(toShow)) {
-        toRet <- toRet %>%
+        toRet <- toRet |>
           DT::formatStyle(
             1:ncol(toShow),
             valueColumns = "Access",
@@ -554,7 +554,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::req(n)
       mdbl <- shiny::isolate(mdbs$list)
       if ("access" %in% colnames(mdbl)) {
-        access <- dplyr::filter(mdbl, .data$name == !!n) %>%
+        access <- dplyr::filter(mdbl, .data$name == !!n) |>
           dplyr::pull("access")
       } else {
         access <- NULL
@@ -629,8 +629,8 @@ TKCAT_LOGO_DIV <- shiny::div(
           dbi$"Number of fields" <- lapply(
             dm,
             function(x) nrow(x$fields)
-          ) %>%
-            unlist() %>%
+          ) |>
+            unlist() |>
             sum()
           if (is.fileMDB(mdb)) {
             dbs <- sum(data_file_size(mdb)$size)
@@ -655,8 +655,8 @@ TKCAT_LOGO_DIV <- shiny::div(
           dbi$"Number of fields" <- lapply(
             dm,
             function(x) nrow(x$fields)
-          ) %>%
-            unlist() %>%
+          ) |>
+            unlist() |>
             sum()
           ts <- get_chMDB_timestamps(tkcon, dbi$name)
           if (!is.null(ts)) {
@@ -677,7 +677,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                       shiny::HTML(dbi[[n]]),
                       href = dbi[[n]],
                       target = "_blank"
-                    ) %>%
+                    ) |>
                       as.character()
                   } else if (n %in% c("maintainer", "description")) {
                     vt <- markdown::renderMarkdown(text = dbi[[n]])
@@ -797,7 +797,7 @@ TKCAT_LOGO_DIV <- shiny::div(
               return(fname)
             },
             seed = TRUE
-          ) %>%
+          ) |>
             dbdone()
         }
       })
@@ -860,12 +860,12 @@ TKCAT_LOGO_DIV <- shiny::div(
       }
       dbdm$validInput <- TRUE
       nodesIdSelection <- list(enabled = TRUE, useLabels = FALSE)
-      sel <- shiny::isolate(selStatus$tables) %>%
+      sel <- shiny::isolate(selStatus$tables) |>
         intersect(names(dm))
       if (length(sel) > 0) {
         nodesIdSelection$selected <- sel
       }
-      plot(dm) %>%
+      plot(dm) |>
         visNetwork::visOptions(
           nodesIdSelection = nodesIdSelection,
           height = "100%"
@@ -892,7 +892,7 @@ TKCAT_LOGO_DIV <- shiny::div(
 
     shiny::observe({
       selTables <- selStatus$tables
-      visNetwork::visNetworkProxy("dataModel") %>%
+      visNetwork::visNetworkProxy("dataModel") |>
         visNetwork::visSelectNodes(selTables)
     })
 
@@ -909,7 +909,7 @@ TKCAT_LOGO_DIV <- shiny::div(
     output$colMembers <- DT::renderDT({
       cm <- dbdm$collections
       shiny::req(cm)
-      cm %>%
+      cm |>
         dplyr::select(
           "collection",
           "id" = "mid",
@@ -918,7 +918,7 @@ TKCAT_LOGO_DIV <- shiny::div(
           "static",
           "value",
           "type"
-        ) %>%
+        ) |>
         DT::datatable(
           rownames = FALSE,
           selection = 'single',
@@ -938,10 +938,10 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::req(cs)
       cm <- shiny::isolate(dbdm$collections)
       shiny::req(cm)
-      cmt <- cm %>%
-        dplyr::slice(cs) %>%
+      cmt <- cm |>
+        dplyr::slice(cs) |>
         dplyr::pull(table)
-      visNetwork::visNetworkProxy("dataModel") %>%
+      visNetwork::visNetworkProxy("dataModel") |>
         visNetwork::visSelectNodes(id = cmt)
     })
 
@@ -959,7 +959,7 @@ TKCAT_LOGO_DIV <- shiny::div(
           )
         ))
       }
-      sel <- selStatus$tables %>%
+      sel <- selStatus$tables |>
         intersect(names(mdb))
       shiny::req(sel)
       shiny::req(length(sel) == 1)
@@ -972,9 +972,9 @@ TKCAT_LOGO_DIV <- shiny::div(
             shiny::tags$li(
               shiny::tags$strong("File size"),
               ":",
-              data_file_size(mdb) %>%
-                dplyr::filter(table == !!sel) %>%
-                dplyr::pull("size") %>%
+              data_file_size(mdb) |>
+                dplyr::filter(table == !!sel) |>
+                dplyr::pull("size") |>
                 .format_bytes(),
               sprintf("(showing %s records)", nr)
             )
@@ -985,13 +985,13 @@ TKCAT_LOGO_DIV <- shiny::div(
                 shiny::tags$li(
                   shiny::tags$strong("Number of columns"),
                   ":",
-                  tdim$ncol %>%
+                  tdim$ncol |>
                     format(big.mark = ",")
                 ),
                 shiny::tags$li(
                   shiny::tags$strong("Number of rows"),
                   ":",
-                  tdim$nrow %>%
+                  tdim$nrow |>
                     format(big.mark = ",")
                 ),
                 shiny::tags$li(
@@ -1002,7 +1002,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                 shiny::tags$li(
                   shiny::tags$strong("Number of values"),
                   ":",
-                  (tdim$nrow * tdim$ncol) %>%
+                  (tdim$nrow * tdim$ncol) |>
                     format(big.mark = ","),
                   sprintf("(showing %s records)", nr)
                 )
@@ -1021,7 +1021,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       tabSubSet(NULL)
       mdb <- selStatus$mdb
       shiny::req(mdb)
-      sel <- selStatus$tables %>%
+      sel <- selStatus$tables |>
         intersect(names(mdb))
       shiny::req(sel)
       shiny::req(length(sel) == 1)
@@ -1061,7 +1061,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       if (!attr(toShow, "mat")) {
         mdb <- shiny::isolate(selStatus$mdb)
         shiny::req(mdb)
-        sel <- shiny::isolate(selStatus$tables) %>%
+        sel <- shiny::isolate(selStatus$tables) |>
           intersect(names(mdb))
         shiny::req(sel)
         shiny::req(length(sel) == 1)
@@ -1124,7 +1124,7 @@ TKCAT_LOGO_DIV <- shiny::div(
           )
         )
         if (length(b64_fields) > 0) {
-          toRet <- toRet %>%
+          toRet <- toRet |>
             DT::formatStyle(
               columns = b64_fields,
               "font-style" = "italic"
@@ -1157,12 +1157,12 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::req(!attr(tabss, "mat"))
       mdb <- shiny::isolate(selStatus$mdb)
       shiny::req(mdb)
-      sel <- shiny::isolate(selStatus$tables) %>%
+      sel <- shiny::isolate(selStatus$tables) |>
         intersect(names(mdb))
       shiny::req(sel)
       tabMod <- data_model(mdb)[[sel]]
-      b64_fields <- tabMod$fields %>%
-        dplyr::filter(.data$type == "base64") %>%
+      b64_fields <- tabMod$fields |>
+        dplyr::filter(.data$type == "base64") |>
         dplyr::pull("name")
       cn <- intersect(colnames(tabss)[cs[2] + 1], b64_fields)
       if (length(cn) == 1) {
@@ -1181,11 +1181,11 @@ TKCAT_LOGO_DIV <- shiny::div(
         tabss <- tabSubSet()
         cs <- input$dataSample_cells_selected
         mdb <- selStatus$mdb
-        sel <- selStatus$tables %>%
+        sel <- selStatus$tables |>
           intersect(names(mdb))
         f <- colnames(tabss)[cs[2] + 1]
-        fd <- data_model(mdb)[[sel]]$fields %>%
-          dplyr::filter(.data$name == !!f) %>%
+        fd <- data_model(mdb)[[sel]]$fields |>
+          dplyr::filter(.data$name == !!f) |>
           dplyr::pull("comment")
         extm <- regexpr("^ *[{][.]?[[:alnum:]]+[}]", fd)
         if (extm == -1) {
@@ -1214,7 +1214,7 @@ TKCAT_LOGO_DIV <- shiny::div(
         input$refreshTabledown
         mdb <- selStatus$mdb
         shiny::req(mdb)
-        sel <- selStatus$tables %>%
+        sel <- selStatus$tables |>
           intersect(names(mdb))
         shiny::req(sel)
         shiny::req(length(sel) == 1)
@@ -1266,7 +1266,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::observeEvent(input$prepTabledown, {
         mdb <- shiny::isolate(selStatus$mdb)
         shiny::req(mdb)
-        sel <- shiny::isolate(selStatus$tables) %>%
+        sel <- shiny::isolate(selStatus$tables) |>
           intersect(names(mdb))
         shiny::req(sel)
         shiny::req(length(sel) == 1)
@@ -1294,7 +1294,7 @@ TKCAT_LOGO_DIV <- shiny::div(
               return(fname)
             },
             seed = TRUE
-          ) %>%
+          ) |>
             tabledone()
         }
       })
@@ -1360,7 +1360,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::req(mdbs)
       st <- input$searchInput
       shiny::req(st)
-      mdbs <- mdbs %>%
+      mdbs <- mdbs |>
         dplyr::select("name", "title", "description", "maintainer")
       toTake <- unlist(apply(
         mdbs,
@@ -1370,7 +1370,7 @@ TKCAT_LOGO_DIV <- shiny::div(
         }
       ))
       toTake <- unique(c(0, toTake))
-      toRet <- mdbs %>% dplyr::slice(toTake)
+      toRet <- mdbs |> dplyr::slice(toTake)
       if (nrow(toRet) > 0) {
         searchRes$resources <- toRet
       } else {
@@ -1391,13 +1391,13 @@ TKCAT_LOGO_DIV <- shiny::div(
       toRet <- searchRes$resources
       shiny::req(toRet)
       if (nrow(toRet) > 0) {
-        toRet %>%
+        toRet |>
           dplyr::mutate(
             name = .highlightText(.data$name, st),
             title = .highlightText(.data$title, st),
             description = .highlightText(.data$description, st),
             maintainer = .highlightText(.data$maintainer, st)
-          ) %>%
+          ) |>
           DT::datatable(
             rownames = FALSE,
             escape = FALSE,
@@ -1416,7 +1416,7 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::req(sel)
       rt <- shiny::isolate(searchRes$resources)
       shiny::req(rt)
-      mdbListProxy %>%
+      mdbListProxy |>
         DT::selectRows(
           which(
             shiny::isolate(mdbs$list$name) %in%
@@ -1451,12 +1451,12 @@ TKCAT_LOGO_DIV <- shiny::div(
       toRet <- searchRes$tables
       shiny::req(toRet)
       if (nrow(toRet) > 0) {
-        toRet %>%
+        toRet |>
           dplyr::mutate(
             # resource=.highlightText(.data$resource, st),
             name = .highlightText(.data$name, st),
             comment = .highlightText(.data$comment, st)
-          ) %>%
+          ) |>
           DT::datatable(
             rownames = FALSE,
             escape = FALSE,
@@ -1476,14 +1476,14 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::req(sel)
       rt <- shiny::isolate(searchRes$tables)
       shiny::req(rt)
-      mdbListProxy %>%
+      mdbListProxy |>
         DT::selectRows(
           which(
             shiny::isolate(mdbs$list$name) %in%
               dplyr::pull(dplyr::slice(rt, sel), "resource")
           )
         )
-      selStatus$tables <- rt %>% dplyr::slice(sel) %>% dplyr::pull("name")
+      selStatus$tables <- rt |> dplyr::slice(sel) |> dplyr::pull("name")
     })
     ## _+ fields ----
     shiny::observe({
@@ -1512,11 +1512,11 @@ TKCAT_LOGO_DIV <- shiny::div(
       toRet <- searchRes$fields
       shiny::req(toRet)
       if (nrow(toRet) > 0) {
-        toRet %>%
+        toRet |>
           dplyr::mutate(
             name = .highlightText(.data$name, st),
             comment = .highlightText(.data$comment, st)
-          ) %>%
+          ) |>
           DT::datatable(
             rownames = FALSE,
             escape = FALSE,
@@ -1536,14 +1536,14 @@ TKCAT_LOGO_DIV <- shiny::div(
       shiny::req(sel)
       rt <- shiny::isolate(searchRes$fields)
       shiny::req(rt)
-      mdbListProxy %>%
+      mdbListProxy |>
         DT::selectRows(
           which(
             shiny::isolate(mdbs$list$name) %in%
               dplyr::pull(dplyr::slice(rt, sel), "resource")
           )
         )
-      selStatus$tables <- rt %>% dplyr::slice(sel) %>% dplyr::pull("table")
+      selStatus$tables <- rt |> dplyr::slice(sel) |> dplyr::pull("table")
     })
 
     ###############################################@

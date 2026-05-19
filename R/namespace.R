@@ -1,4 +1,3 @@
-#' @import magrittr
 #' @import dplyr
 #' @import ReDaMoR
 #' @import DBI
@@ -11,7 +10,7 @@
 #' @importFrom future future plan multisession
 #'
 #' @importFrom ClickHouseHTTP ClickHouseHTTP
-#' @importFrom rlang .data enquo
+#' @importFrom rlang .data enquo set_names
 #' @importFrom tidyselect eval_select vars_pull eval_rename
 #'
 #' @importFrom jsonlite fromJSON read_json unbox toJSON

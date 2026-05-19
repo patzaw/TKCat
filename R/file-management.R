@@ -109,7 +109,7 @@ parse_R_helpers <- function(code, ...) {
         function(x) if (length(x) == 1) unlist(x) else x
       )
       toRet[names(toChange)] <- toChange
-      toRet <- magrittr::set_names(list(toRet), d$object$alias)
+      toRet <- rlang::set_names(list(toRet), d$object$alias)
     })
   )
 

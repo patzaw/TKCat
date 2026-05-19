@@ -187,7 +187,7 @@ add_km_table <- function(x, kmr, name, type, features = list()) {
   tc <- dplyr::filter(
     kmr$Tables,
     .data$name == !!type
-  ) %>%
+  ) |>
     dplyr::pull("collection")
   if (!is.na(tc)) {
     dbc <- collection_members(toRet)
@@ -198,7 +198,7 @@ add_km_table <- function(x, kmr, name, type, features = list()) {
         tc
       ))
     }
-    dbc <- dbc %>%
+    dbc <- dbc |>
       dplyr::filter(.data$collection == !!tc & .data$table == !!name)
     if (nrow(dbc) == 0) {
       stop(sprintf(
@@ -255,7 +255,7 @@ add_km_table <- function(x, kmr, name, type, features = list()) {
   f <- dplyr::filter(
     kms$Features,
     .data$table == !!name
-  ) %>%
+  ) |>
     dplyr::pull("feature")
   pf <- dplyr::filter(kmr$Table_features, .data$table == !!type)
   mf <- pf$feature[which(pf$mandatory)]
@@ -539,7 +539,7 @@ add_km_feature <- function(
     m <- dplyr::filter(
       fp,
       .data$property == !!p
-    ) %>%
+    ) |>
       pull("measurement")
     if (is.na(m) && (!"unit" %in% names(f) || is.na(f$unit))) {
       toRet$unit <- as.character(NA)
@@ -563,7 +563,7 @@ add_km_feature <- function(
       toRet$unit <- unit
     }
     if (!is.na(m) && "unit" %in% names(f)) {
-      u <- dplyr::filter(kmr$Units, .data$measurement == !!m) %>%
+      u <- dplyr::filter(kmr$Units, .data$measurement == !!m) |>
         pull("unit")
       if (!is.character(f$unit) || length(f$unit) != 1) {
         stop(
@@ -586,7 +586,7 @@ add_km_feature <- function(
     pt <- dplyr::filter(
       fp,
       .data$property == !!p
-    ) %>%
+    ) |>
       pull("type")
     if (
       pt %in%
@@ -600,7 +600,7 @@ add_km_feature <- function(
           "base64"
         )
     ) {
-      ft <- dplyr::filter(dtm$fields, .data$name == !!f$field) %>%
+      ft <- dplyr::filter(dtm$fields, .data$name == !!f$field) |>
         dplyr::pull("type")
       if (ft != pt) {
         stop(sprintf(
@@ -780,7 +780,7 @@ add_helpers.MDB <- function(x, code, name, language, kmr, ...) {
     warning("Existing helpers have been replaced")
   }
   helpers <- dplyr::bind_rows(
-    kms$Helpers %>%
+    kms$Helpers |>
       dplyr::filter(.data$name != !!name),
     dplyr::tibble(name = name, code = code, language = language)
   )
@@ -850,11 +850,11 @@ get_R_helpers.MDB <- function(x, hnames = NA, kmr, tkcat = NULL, ...) {
       )
     )
   } else {
-    scode <- kms$Helpers %>%
+    scode <- kms$Helpers |>
       dplyr::filter(.data$language == "R")
   }
   if (!is.na(hnames)) {
-    scode <- scode %>%
+    scode <- scode |>
       dplyr::filter(.data$name %in% hnames)
   }
   code <- ""

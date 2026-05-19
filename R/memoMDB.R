@@ -142,10 +142,10 @@ as_memoMDB <- function(x, ...) {
   if (!is.null(colMb)) {
     ncolMb <- NULL
     for (i in 1:length(ovalues)) {
-      toAdd <- colMb %>% dplyr::filter(.data$table == !!ovalues[i])
+      toAdd <- colMb |> dplyr::filter(.data$table == !!ovalues[i])
       if (nrow(toAdd) > 0) {
         toAdd$table <- value[i]
-        ncolMb <- ncolMb %>% dplyr::bind_rows(toAdd)
+        ncolMb <- ncolMb |> dplyr::bind_rows(toAdd)
       }
     }
   }
@@ -170,7 +170,7 @@ rename.memoMDB <- function(.data, ...) {
   loc <- tidyselect::eval_rename(rlang::expr(c(...)), .data)
   names <- names(.data)
   names[loc] <- names(loc)
-  magrittr::set_names(.data, names)
+  rlang::set_names(.data, names)
 }
 
 
@@ -291,7 +291,7 @@ collection_members.memoMDB <- function(
   for (collection in unique(value$collection)) {
     cv <- dplyr::filter(value, .data$collection == !!collection)
     for (cid in unique(cv$cid)) {
-      jval <- dplyr::filter(cv, .data$cid == !!cid) %>%
+      jval <- dplyr::filter(cv, .data$cid == !!cid) |>
         write_collection_members()
     }
   }
@@ -504,8 +504,8 @@ dims.memoMDB <- function(x, ...) {
   dt <- data_tables(x)[i]
   cm <- collection_members(x)
   if (!is.null(cm)) {
-    cm <- cm %>%
-      dplyr::filter(.data$table %in% !!i) %>%
+    cm <- cm |>
+      dplyr::filter(.data$table %in% !!i) |>
       dplyr::mutate(resource = !!dbi$name)
   }
   toRet <- memoMDB(
@@ -585,7 +585,7 @@ as_fileMDB.memoMDB <- function(
   hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
   ReDaMoR::write_json_data_model(dm, jModelPath)
   if (htmlModel) {
-    plot(dm) %>%
+    plot(dm) |>
       visNetwork::visSave(hModelPath)
   }
 
@@ -597,7 +597,7 @@ as_fileMDB.memoMDB <- function(
     for (collection in unique(cm$collection)) {
       cv <- dplyr::filter(cm, .data$collection == !!collection)
       for (cid in unique(cv$cid)) {
-        dplyr::filter(cv, .data$cid == !!cid) %>%
+        dplyr::filter(cv, .data$cid == !!cid) |>
           write_collection_members(
             path = file.path(
               colPath,
@@ -773,7 +773,7 @@ filter_with_tables.memoMDB <- function(x, tables, checkTables = TRUE, ...) {
   ## Collection members ----
   cm <- collection_members(x)
   if (!is.null(cm)) {
-    cm <- cm %>% dplyr::filter(.data$table %in% names(tables))
+    cm <- cm |> dplyr::filter(.data$table %in% names(tables))
   }
 
   ## Results ----
@@ -809,9 +809,9 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
     !any(duplicated(names(iFilter))),
     all(names(iFilter) %in% tableModel$fields$name)
   )
-  vfield <- tableModel$fields %>%
-    dplyr::filter(!.data$type %in% c("row", "column")) %>%
-    dplyr::pull("name") %>%
+  vfield <- tableModel$fields |>
+    dplyr::filter(!.data$type %in% c("row", "column")) |>
+    dplyr::pull("name") |>
     intersect(names(iFilter))
   if (length(vfield) > 0) {
     stop("Cannot filter a matrix on values; only on row or column names")
@@ -820,8 +820,8 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
   ## Select fields ----
   frc <- c()
   for (f in names(iFilter)) {
-    ft <- tableModel$fields %>%
-      dplyr::filter(.data$name == !!f) %>%
+    ft <- tableModel$fields |>
+      dplyr::filter(.data$name == !!f) |>
       dplyr::pull("type")
     if (ft == "row") {
       fr <- intersect(iFilter[[f]], rownames(x[[tableName]]))
@@ -895,8 +895,8 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
         )
 
         ## Values
-        nullable <- dm[[tn]]$fields %>%
-          dplyr::filter(!.data$type %in% c("column", "row")) %>%
+        nullable <- dm[[tn]]$fields |>
+          dplyr::filter(!.data$type %in% c("column", "row")) |>
           dplyr::pull("nullable")
         if (nullable) {
           nullable <- "x"
@@ -962,8 +962,8 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
           )
 
           ## Values
-          nullable <- dm[[tn]]$fields %>%
-            dplyr::filter(!.data$type %in% c("column", "row")) %>%
+          nullable <- dm[[tn]]$fields |>
+            dplyr::filter(!.data$type %in% c("column", "row")) |>
             dplyr::pull("nullable")
           if (nullable) {
             nullable <- "x"
@@ -1036,19 +1036,19 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
           )
 
           names(colList) <- uuid::UUIDgenerate(n = length(colList))
-          nullable <- dm[[tn]]$fields %>%
-            dplyr::filter(!.data$type %in% c("column", "row")) %>%
+          nullable <- dm[[tn]]$fields |>
+            dplyr::filter(!.data$type %in% c("column", "row")) |>
             dplyr::pull("nullable")
-          vtype <- dm[[tn]]$fields %>%
-            dplyr::filter(!.data$type %in% c("column", "row")) %>%
+          vtype <- dm[[tn]]$fields |>
+            dplyr::filter(!.data$type %in% c("column", "row")) |>
             dplyr::pull("type")
           for (stn in names(colList)) {
             if (transposed) {
-              stw <- tw[colList[[stn]], , drop = FALSE] %>%
-                t() %>%
+              stw <- tw[colList[[stn]], , drop = FALSE] |>
+                t() |>
                 dplyr::as_tibble(rownames = "___COLNAMES___")
             } else {
-              stw <- tw[, colList[[stn]], drop = FALSE] %>%
+              stw <- tw[, colList[[stn]], drop = FALSE] |>
                 dplyr::as_tibble(rownames = "___ROWNAMES___")
             }
             nulcol <- NULL
@@ -1060,8 +1060,8 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
               dbName = dbName,
               tableName = stn,
               value = stw,
-              rtypes = c("character", rep(vtype, ncol(stw) - 1)) %>%
-                magrittr::set_names(colnames(stw)),
+              rtypes = c("character", rep(vtype, ncol(stw) - 1)) |>
+                rlang::set_names(colnames(stw)),
               nullable = nulcol,
               sortKey = colnames(stw)[1],
               by = by
@@ -1081,8 +1081,8 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
       ## Table ----
 
       toWrite <- x[[tn]]
-      b64_fields <- dm[[tn]]$fields %>%
-        dplyr::filter(.data$type == "base64") %>%
+      b64_fields <- dm[[tn]]$fields |>
+        dplyr::filter(.data$type == "base64") |>
         dplyr::pull("name")
       for (b64f in b64_fields) {
         toWrite[[b64f]] <- lapply(
@@ -1114,22 +1114,22 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
   nfk <- fk
   .contaminate <- function(tn) {
     ## Backward ----
-    fkf <- fk %>% dplyr::filter(.data$from == !!tn & .data$fmin > 0)
-    fkt <- fk %>% dplyr::filter(.data$to == !!tn & .data$tmin > 0)
-    nfk <<- nfk %>%
+    fkf <- fk |> dplyr::filter(.data$from == !!tn & .data$fmin > 0)
+    fkt <- fk |> dplyr::filter(.data$to == !!tn & .data$tmin > 0)
+    nfk <<- nfk |>
       dplyr::anti_join(
         dplyr::select(fkf, "from", "to"),
         by = c("from", "to")
-      ) %>%
+      ) |>
       dplyr::anti_join(
         dplyr::select(fkt, "from", "to"),
         by = c("from", "to")
       )
     fkl <- dplyr::bind_rows(
       fkf,
-      fkt %>%
+      fkt |>
         dplyr::rename("from" = "to", "ff" = "tf", "to" = "from", "tf" = "ff")
-    ) %>%
+    ) |>
       dplyr::distinct()
     if (nrow(fkl) > 0) {
       for (i in 1:nrow(fkl)) {
@@ -1142,7 +1142,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
         d[[ntn]] <<- .mdjoin(
           d1 = nv,
           d2 = d[[tn]],
-          by = magrittr::set_names(
+          by = rlang::set_names(
             fkl$ff[[i]],
             fkl$tf[[i]]
           ),
@@ -1153,22 +1153,22 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
     }
 
     ## Forward ----
-    fkf <- fk %>% dplyr::filter(.data$from == !!tn & .data$fmin == 0)
-    fkt <- fk %>% dplyr::filter(.data$to == !!tn & .data$tmin == 0)
-    nfk <<- nfk %>%
+    fkf <- fk |> dplyr::filter(.data$from == !!tn & .data$fmin == 0)
+    fkt <- fk |> dplyr::filter(.data$to == !!tn & .data$tmin == 0)
+    nfk <<- nfk |>
       dplyr::anti_join(
         dplyr::select(fkf, "from", "to"),
         by = c("from", "to")
-      ) %>%
+      ) |>
       dplyr::anti_join(
         dplyr::select(fkt, "from", "to"),
         by = c("from", "to")
       )
     fkl <- dplyr::bind_rows(
       fkf,
-      fkt %>%
+      fkt |>
         dplyr::rename("from" = "to", "ff" = "tf", "to" = "from", "tf" = "ff")
-    ) %>%
+    ) |>
       dplyr::distinct()
     if (nrow(fkl) > 0) {
       for (i in 1:nrow(fkl)) {
@@ -1177,7 +1177,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
         toAdd <- .mdjoin(
           d1 = all[[ntn]],
           d2 = d[[tn]],
-          by = magrittr::set_names(
+          by = rlang::set_names(
             fkl$ff[[i]],
             fkl$tf[[i]]
           ),
@@ -1195,7 +1195,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
           d[[ntn]] <<- dplyr::bind_rows(
             d[[ntn]],
             toAdd
-          ) %>%
+          ) |>
             dplyr::distinct()
         }
       }
@@ -1219,16 +1219,16 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
   if (is.null(fk)) {
     return(toRet)
   }
-  fk <- fk %>%
+  fk <- fk |>
     dplyr::filter(
       .data$from %in% names(dataTables) | .data$to %in% names(dataTables)
     )
   .norm_table <- function(tn) {
-    fkf <- fk %>% dplyr::filter(.data$from == !!tn & .data$fmin > 0)
-    fkt <- fk %>% dplyr::filter(.data$to == !!tn & .data$tmin > 0)
+    fkf <- fk |> dplyr::filter(.data$from == !!tn & .data$fmin > 0)
+    fkt <- fk |> dplyr::filter(.data$to == !!tn & .data$tmin > 0)
     fkl <- dplyr::bind_rows(
       fkf,
-      fkt %>%
+      fkt |>
         dplyr::rename("from" = "to", "ff" = "tf", "to" = "from", "tf" = "ff")
     )
     if (nrow(fkl) > 0) {
@@ -1237,7 +1237,7 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
         nv <- .mdjoin(
           d1 = toRet[[ntn]],
           d2 = toRet[[tn]],
-          by = magrittr::set_names(
+          by = rlang::set_names(
             fkl$ff[[i]],
             fkl$tf[[i]]
           ),
@@ -1300,8 +1300,8 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
       }
       attr(toRet, "f") <- "value"
       return(toRet)
-    }) %>%
-      magrittr::set_names(fields)
+    }) |>
+      rlang::set_names(fields)
   }
 
   ## A matrix to filter ----
@@ -1312,8 +1312,8 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
     } else {
       d2val <- lapply(as.character(by), function(f) {
         d2[[f]]
-      }) %>%
-        magrittr::set_names(as.character(by))
+      }) |>
+        rlang::set_names(as.character(by))
     }
     toTake <- lapply(1:length(d1val), function(fi) {
       toTake <- which(d1val[[fi]] %in% d2val[[fi]])

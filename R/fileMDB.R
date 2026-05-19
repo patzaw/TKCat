@@ -236,11 +236,11 @@ read_fileMDB <- function(
       }
       return(f)
     }
-  ) %>%
+  ) |>
     unlist()
-  dataFiles <- file.path(dp, dataFiles) %>%
-    normalizePath() %>%
-    magrittr::set_names(names(dataModel))
+  dataFiles <- file.path(dp, dataFiles) |>
+    normalizePath() |>
+    rlang::set_names(names(dataModel))
 
   ## Collection members ----
   if (is.null(collectionMembers)) {
@@ -308,10 +308,10 @@ is.fileMDB <- function(x) {
   if (!is.null(colMb)) {
     ncolMb <- NULL
     for (i in 1:length(ovalues)) {
-      toAdd <- colMb %>% dplyr::filter(.data$table == !!ovalues[i])
+      toAdd <- colMb |> dplyr::filter(.data$table == !!ovalues[i])
       if (nrow(toAdd) > 0) {
         toAdd$table <- value[i]
-        ncolMb <- ncolMb %>% dplyr::bind_rows(toAdd)
+        ncolMb <- ncolMb |> dplyr::bind_rows(toAdd)
       }
     }
   }
@@ -336,7 +336,7 @@ rename.fileMDB <- function(.data, ...) {
   loc <- tidyselect::eval_rename(rlang::expr(c(...)), .data)
   names <- names(.data)
   names[loc] <- names(loc)
-  magrittr::set_names(.data, names)
+  rlang::set_names(.data, names)
 }
 
 
@@ -456,7 +456,7 @@ collection_members.fileMDB <- function(
   for (collection in unique(value$collection)) {
     cv <- dplyr::filter(value, .data$collection == !!collection)
     for (cid in unique(cv$cid)) {
-      jval <- dplyr::filter(cv, .data$cid == !!cid) %>%
+      jval <- dplyr::filter(cv, .data$cid == !!cid) |>
         write_collection_members()
     }
   }
@@ -564,7 +564,7 @@ heads.fileMDB <- function(x, ..., n = 6L) {
         if (is.infinite(n)) {
           return(data_tables(x, dplyr::all_of(name))[[1]])
         }
-        ncol <- data_tables(x, dplyr::all_of(name), n_max = 1)[[1]] %>% ncol()
+        ncol <- data_tables(x, dplyr::all_of(name), n_max = 1)[[1]] |> ncol()
         mn <- min(floor(sqrt(n)), ncol)
         for (nc in mn:floor(mn / 2)) {
           if (n %% nc == 0) {
@@ -712,7 +712,7 @@ dims.fileMDB <- function(
           ),
           ncol = n[2],
           nrow = n[1]
-        ) %>%
+        ) |>
           dplyr::mutate(
             records = ifelse(
               .data$format != "table",
@@ -772,7 +772,7 @@ data_file_size <- function(x, hr = FALSE) {
       close(fcon)
       return(toRet)
     }
-  ) %>%
+  ) |>
     unlist()
   toRet <- dplyr::tibble(
     table = names(df),
@@ -824,8 +824,8 @@ data_file_size <- function(x, hr = FALSE) {
   df <- df$dataFiles[i]
   cm <- collection_members(x)
   if (!is.null(cm)) {
-    cm <- cm %>%
-      dplyr::filter(.data$table %in% !!i) %>%
+    cm <- cm |>
+      dplyr::filter(.data$table %in% !!i) |>
       dplyr::mutate(resource = !!dbi$name)
   }
   toRet <- fileMDB(
@@ -941,7 +941,7 @@ as_fileMDB.fileMDB <- function(
   hModelPath <- file.path(modelPath, paste0(dbName, ".html"))
   ReDaMoR::write_json_data_model(dm, jModelPath)
   if (htmlModel) {
-    plot(dm) %>%
+    plot(dm) |>
       visNetwork::visSave(hModelPath)
   }
 
@@ -953,7 +953,7 @@ as_fileMDB.fileMDB <- function(
     for (collection in unique(cm$collection)) {
       cv <- dplyr::filter(cm, .data$collection == !!collection)
       for (cid in unique(cv$cid)) {
-        dplyr::filter(cv, .data$cid == !!cid) %>%
+        dplyr::filter(cv, .data$cid == !!cid) |>
           write_collection_members(
             path = file.path(
               colPath,
@@ -968,8 +968,8 @@ as_fileMDB.fileMDB <- function(
   dataPath <- file.path(fullPath, "data")
   dir.create(dataPath)
   ofiles <- data_files(x)$dataFiles
-  dfiles <- file.path(dataPath, basename(ofiles)) %>%
-    magrittr::set_names(names(ofiles))
+  dfiles <- file.path(dataPath, basename(ofiles)) |>
+    rlang::set_names(names(ofiles))
   if (rewrite) {
     for (tn in names(x)) {
       if (ReDaMoR::is_MM(ofiles[tn])) {
@@ -1169,7 +1169,7 @@ filter_with_tables.fileMDB <- function(
   ## Collection members ----
   cm <- collection_members(x)
   if (!is.null(cm)) {
-    cm <- cm %>% dplyr::filter(.data$table %in% names(tables))
+    cm <- cm |> dplyr::filter(.data$table %in% names(tables))
   }
 
   ## Results ----
@@ -1208,9 +1208,9 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by = 10^5, ...) {
     !any(duplicated(names(iFilter))),
     all(names(iFilter) %in% tableModel$fields$name)
   )
-  vfield <- tableModel$fields %>%
-    dplyr::filter(!.data$type %in% c("row", "column")) %>%
-    dplyr::pull("name") %>%
+  vfield <- tableModel$fields |>
+    dplyr::filter(!.data$type %in% c("row", "column")) |>
+    dplyr::pull("name") |>
     intersect(names(iFilter))
   if (length(vfield) > 0) {
     stop("Cannot filter a matrix on values; only on row or column names")
@@ -1219,8 +1219,8 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by = 10^5, ...) {
   ## Select fields ----
   frc <- c()
   for (f in names(iFilter)) {
-    ft <- tableModel$fields %>%
-      dplyr::filter(.data$name == !!f) %>%
+    ft <- tableModel$fields |>
+      dplyr::filter(.data$name == !!f) |>
       dplyr::pull("type")
     if (ft == "row") {
       fr <- iFilter[[f]]
@@ -1339,29 +1339,29 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by = 10^5, ...) {
         list(
           callback = readr::DataFrameCallback$new(function(y, pos) {
             if (frc == "r") {
-              toRet <- y %>%
-                dplyr::filter(.data$`___ROWNAMES___` %in% fr) %>%
+              toRet <- y |>
+                dplyr::filter(.data$`___ROWNAMES___` %in% fr) |>
                 as.data.frame()
             }
             if (frc == "c") {
-              toRet <- y %>%
+              toRet <- y |>
                 dplyr::select(
                   dplyr::all_of(intersect(
                     c("___ROWNAMES___", fc),
                     colnames(y)
                   ))
-                ) %>%
+                ) |>
                 as.data.frame()
             }
             if (frc == "cr") {
-              toRet <- y %>%
+              toRet <- y |>
                 dplyr::select(
                   dplyr::all_of(intersect(
                     c("___ROWNAMES___", fc),
                     colnames(y)
                   ))
-                ) %>%
-                dplyr::filter(.data$`___ROWNAMES___` %in% fr) %>%
+                ) |>
+                dplyr::filter(.data$`___ROWNAMES___` %in% fr) |>
                 as.data.frame()
             }
             rownames(toRet) <- toRet$"___ROWNAMES___"
@@ -1487,8 +1487,8 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
         )
 
         ## Values
-        nullable <- dm[[tn]]$fields %>%
-          dplyr::filter(!.data$type %in% c("column", "row")) %>%
+        nullable <- dm[[tn]]$fields |>
+          dplyr::filter(!.data$type %in% c("column", "row")) |>
           dplyr::pull("nullable")
         if (nullable) {
           nullable <- "x"
@@ -1536,11 +1536,11 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
           value = modTable
         )
       } else {
-        nullable <- dm[[tn]]$fields %>%
-          dplyr::filter(!.data$type %in% c("column", "row")) %>%
+        nullable <- dm[[tn]]$fields |>
+          dplyr::filter(!.data$type %in% c("column", "row")) |>
           dplyr::pull("nullable")
         vtype <- setdiff(dm[[tn]]$fields$type, c("column", "row"))
-        cnames <- data_tables(x, dplyr::all_of(tn), n_max = 1)[[1]] %>%
+        cnames <- data_tables(x, dplyr::all_of(tn), n_max = 1)[[1]] |>
           colnames()
         n_col <- length(cnames)
 
@@ -1581,8 +1581,8 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
           )
 
           ## Values (prepare empty table)
-          nullable <- dm[[tn]]$fields %>%
-            dplyr::filter(!.data$type %in% c("column", "row")) %>%
+          nullable <- dm[[tn]]$fields |>
+            dplyr::filter(!.data$type %in% c("column", "row")) |>
             dplyr::pull("nullable")
           if (nullable) {
             nullable <- "x"
@@ -1662,7 +1662,7 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
         } else {
           ## Matrix ----
           transposed <- FALSE
-          cnames <- cnames %>%
+          cnames <- cnames |>
             sort()
           colList <- seq(1, n_col, by = CH_MAX_COL)
           colList <- lapply(
@@ -1681,8 +1681,8 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
             for (field in fields) {
               toAdd <- integer()
               class(toAdd) <- vtype
-              toAdd <- dplyr::tibble(toAdd) %>%
-                magrittr::set_colnames(field)
+              toAdd <- dplyr::tibble(toAdd) |>
+                .set_colnames(field)
               tval <- dplyr::bind_cols(tval, toAdd)
             }
             nulcol <- NULL
@@ -1694,8 +1694,8 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
               dbName = dbName,
               tableName = tname,
               value = tval,
-              rtypes = c("character", rep(vtype, length(fields))) %>%
-                magrittr::set_names(colnames(tval)),
+              rtypes = c("character", rep(vtype, length(fields))) |>
+                rlang::set_names(colnames(tval)),
               nullable = nulcol,
               sortKey = colnames(tval)[1]
             )
@@ -1743,8 +1743,8 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
             list(
               callback = readr::DataFrameCallback$new(function(y, pos) {
                 toWrite <- y
-                b64_fields <- dm[[tn]]$fields %>%
-                  dplyr::filter(.data$type == "base64") %>%
+                b64_fields <- dm[[tn]]$fields |>
+                  dplyr::filter(.data$type == "base64") |>
                   dplyr::pull("name")
                 for (b64f in b64_fields) {
                   toWrite[[b64f]] <- lapply(
@@ -1786,19 +1786,19 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
   dm <- data_model(fdb)
   .contaminate <- function(tn) {
     ## Backward ----
-    fkf <- fk %>% dplyr::filter(.data$from == !!tn & .data$fmin > 0)
-    fkt <- fk %>% dplyr::filter(.data$to == !!tn & .data$tmin > 0)
-    nfk <<- nfk %>%
+    fkf <- fk |> dplyr::filter(.data$from == !!tn & .data$fmin > 0)
+    fkt <- fk |> dplyr::filter(.data$to == !!tn & .data$tmin > 0)
+    nfk <<- nfk |>
       dplyr::anti_join(
         dplyr::select(fkf, "from", "to"),
         by = c("from", "to")
-      ) %>%
+      ) |>
       dplyr::anti_join(dplyr::select(fkt, "from", "to"), by = c("from", "to"))
     fkl <- dplyr::bind_rows(
       fkf,
-      fkt %>%
+      fkt |>
         dplyr::rename("from" = "to", "ff" = "tf", "to" = "from", "tf" = "ff")
-    ) %>%
+    ) |>
       dplyr::distinct()
     if (nrow(fkl) > 0) {
       for (i in 1:nrow(fkl)) {
@@ -1807,7 +1807,7 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
           nv <- .mdjoin(
             d1 = d[[ntn]],
             d2 = d[[tn]],
-            by = magrittr::set_names(
+            by = rlang::set_names(
               fkl$ff[[i]],
               fkl$tf[[i]]
             ),
@@ -1875,7 +1875,7 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
                       .mdjoin(
                         d1 = y,
                         d2 = d[[tn]],
-                        by = magrittr::set_names(
+                        by = rlang::set_names(
                           fkl$ff[[i]],
                           fkl$tf[[i]]
                         ),
@@ -1895,19 +1895,19 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
     }
 
     ## Forward ----
-    fkf <- fk %>% dplyr::filter(.data$from == !!tn & .data$fmin == 0)
-    fkt <- fk %>% dplyr::filter(.data$to == !!tn & .data$tmin == 0)
-    nfk <<- nfk %>%
+    fkf <- fk |> dplyr::filter(.data$from == !!tn & .data$fmin == 0)
+    fkt <- fk |> dplyr::filter(.data$to == !!tn & .data$tmin == 0)
+    nfk <<- nfk |>
       dplyr::anti_join(
         dplyr::select(fkf, "from", "to"),
         by = c("from", "to")
-      ) %>%
+      ) |>
       dplyr::anti_join(dplyr::select(fkt, "from", "to"), by = c("from", "to"))
     fkl <- dplyr::bind_rows(
       fkf,
-      fkt %>%
+      fkt |>
         dplyr::rename("from" = "to", "ff" = "tf", "to" = "from", "tf" = "ff")
-    ) %>%
+    ) |>
       dplyr::distinct()
     if (nrow(fkl) > 0) {
       for (i in 1:nrow(fkl)) {
@@ -1973,7 +1973,7 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
                   .mdjoin(
                     d1 = y,
                     d2 = d[[tn]],
-                    by = magrittr::set_names(
+                    by = rlang::set_names(
                       fkl$ff[[i]],
                       fkl$tf[[i]]
                     ),
@@ -1988,7 +1988,7 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
           d[[ntn]] <<- dplyr::bind_rows(
             d[[ntn]],
             toAdd
-          ) %>%
+          ) |>
             dplyr::distinct()
         }
       }
@@ -2032,14 +2032,14 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
       )
     } else {
       r1 <- attr(ismm, "r1")
-      cn <- r1 %>%
-        strsplit(split = delim) %>%
+      cn <- r1 |>
+        strsplit(split = delim) |>
         unlist()
       cn <- gsub("['`]", "", cn)
       cn <- gsub('["]', "", cn)
 
-      vt <- tm$fields %>%
-        dplyr::filter(!.data$type %in% c("row", "column")) %>%
+      vt <- tm$fields |>
+        dplyr::filter(!.data$type %in% c("row", "column")) |>
         dplyr::pull("type")
 
       cclasses <- c("character", rep(vt, length(cn) - 1))
@@ -2081,14 +2081,14 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
   ... # additional parameters for read_delim_chunked()
 ) {
   if (ReDaMoR::is.MatrixModel(tm)) {
-    cn <- readLines(f, n = 1) %>%
-      strsplit(split = delim) %>%
+    cn <- readLines(f, n = 1) |>
+      strsplit(split = delim) |>
       unlist()
     cn <- gsub("['`]", "", cn)
     cn <- gsub('["]', "", cn)
 
-    vt <- tm$fields %>%
-      dplyr::filter(!.data$type %in% c("row", "column")) %>%
+    vt <- tm$fields |>
+      dplyr::filter(!.data$type %in% c("row", "column")) |>
       dplyr::pull("type")
     ctypes <- do.call(
       readr::cols,

@@ -71,7 +71,7 @@ length.MDB <- function(x) {
 #'
 count_records.MDB <- function(x, ...) {
   d <- dims(x, ...)
-  d$records %>% magrittr::set_names(d$name)
+  d$records |> rlang::set_names(d$name)
 }
 
 
@@ -405,7 +405,7 @@ compare_MDB <- function(former, new) {
     "Information" = dbif,
     "Former" = unlist(fdbi)[dbif],
     "New" = unlist(ndbi)[dbif]
-  ) %>%
+  ) |>
     dplyr::mutate(
       "Identical" = .data$Former == .data$New
     )
@@ -448,7 +448,7 @@ compare_MDB <- function(former, new) {
         "Information" = c(sprintf("Table %s", names(fnr)), "Total"),
         "Former" = format(c(fnr, sum(fnr)), big.mark = ",", trim = FALSE),
         "New" = format(c(nnr, sum(nnr)), big.mark = ",", trim = FALSE)
-      ) %>%
+      ) |>
         dplyr::mutate(
           "Identical" = c(fnr, sum(fnr)) == c(nnr, sum(nnr))
         )
@@ -458,27 +458,27 @@ compare_MDB <- function(former, new) {
   ## Collection members ----
   ccm <- collection_members(former)
   if (!is.null(ccm)) {
-    ccm <- ccm %>% dplyr::select(-"resource") %>% dplyr::arrange_all()
-    ccoll <- ccm %>%
+    ccm <- ccm |> dplyr::select(-"resource") |> dplyr::arrange_all()
+    ccoll <- ccm |>
       dplyr::distinct(
         .data$collection,
         .data$table,
         .data$mid
-      ) %>%
-      nrow
+      ) |>
+      nrow()
   } else {
     ccoll <- 0
   }
   ncm <- collection_members(new)
   if (!is.null(ncm)) {
-    ncm <- ncm %>% dplyr::select(-"resource") %>% dplyr::arrange_all()
-    ncoll <- ncm %>%
+    ncm <- ncm |> dplyr::select(-"resource") |> dplyr::arrange_all()
+    ncoll <- ncm |>
       dplyr::distinct(
         .data$collection,
         .data$table,
         .data$mid
-      ) %>%
-      nrow
+      ) |>
+      nrow()
   } else {
     ncoll <- 0
   }
@@ -535,8 +535,8 @@ c.MDB <- function(...) {
     "MDBs to combine cannot have the same names"
   }
   names(MDBs) <- dbNames
-  dbModels <- lapply(MDBs, data_model) %>%
-    magrittr::set_names(NULL)
+  dbModels <- lapply(MDBs, data_model) |>
+    rlang::set_names(NULL)
   dataModel <- do.call(c, dbModels)
   return(metaMDB(
     MDBs = MDBs,
@@ -620,7 +620,7 @@ merge.MDB <- function(
   dbInfo <- .check_dbInfo(dbInfo)
 
   ## Building the relational tables ----
-  by <- by %>%
+  by <- by |>
     dplyr::mutate(
       rt = ifelse(
         !is.na(.data$collection),
@@ -674,7 +674,7 @@ merge.MDB <- function(
       relationalTables[[byi$rt]] <- dplyr::bind_rows(
         x[[byi$table.x]][, tmxy$name],
         y[[byi$table.y]][, tmxy$name],
-      ) %>%
+      ) |>
         dplyr::distinct()
 
       tm <- ReDaMoR::RelTableModel(
@@ -708,37 +708,37 @@ merge.MDB <- function(
         )
       )
     } else {
-      xcmi <- xcm %>%
+      xcmi <- xcm |>
         dplyr::filter(
           .data$collection == byi$collection,
           .data$mid == byi$mid.x,
           .data$table == byi$table.x
-        ) %>%
+        ) |>
         dplyr::select("field", "static", "value", "type")
-      ycmi <- ycm %>%
+      ycmi <- ycm |>
         dplyr::filter(
           .data$collection == byi$collection,
           .data$mid == byi$mid.y,
           .data$table == byi$table.y
-        ) %>%
+        ) |>
         dplyr::select("field", "static", "value", "type")
 
-      dxcmi <- xcmi %>%
-        dplyr::filter(!.data$static) %>%
-        dplyr::select("name" = "value") %>%
-        dplyr::left_join(dm[[byi$table.x]]$fields, by = "name") %>%
-        dplyr::rename("to" = "name") %>%
+      dxcmi <- xcmi |>
+        dplyr::filter(!.data$static) |>
+        dplyr::select("name" = "value") |>
+        dplyr::left_join(dm[[byi$table.x]]$fields, by = "name") |>
+        dplyr::rename("to" = "name") |>
         dplyr::mutate(
           name = paste(.data$to, byi$table.x, sep = "_"),
           nullable = TRUE,
           unique = FALSE,
           refTable = byi$table.x
         )
-      dycmi <- ycmi %>%
-        dplyr::filter(!.data$static) %>%
-        dplyr::select("name" = "value") %>%
-        dplyr::left_join(dm[[byi$table.y]]$fields, by = "name") %>%
-        dplyr::rename("to" = "name") %>%
+      dycmi <- ycmi |>
+        dplyr::filter(!.data$static) |>
+        dplyr::select("name" = "value") |>
+        dplyr::left_join(dm[[byi$table.y]]$fields, by = "name") |>
+        dplyr::rename("to" = "name") |>
         dplyr::mutate(
           name = paste(.data$to, byi$table.y, sep = "_"),
           nullable = TRUE,
@@ -814,7 +814,7 @@ merge.MDB <- function(
 
       cc <- unlist(lapply(nrt, function(x) class(x)[1]))
       fcc <- dplyr::mutate(tm$fields, cc = cc[.data$name])
-      wc <- dplyr::filter(fcc, .data$type != .data$cc) %>% dplyr::pull("name")
+      wc <- dplyr::filter(fcc, .data$type != .data$cc) |> dplyr::pull("name")
 
       for (cn in wc) {
         nrt[, cn] <- ReDaMoR::as_type(
@@ -835,8 +835,8 @@ merge.MDB <- function(
   }
 
   return(metaMDB(
-    MDBs = list(x, y) %>%
-      magrittr::set_names(c(db_info(x)$name, db_info(y)$name)),
+    MDBs = list(x, y) |>
+      rlang::set_names(c(db_info(x)$name, db_info(y)$name)),
     relationalTables = relationalTables,
     dataModel = dm,
     dbInfo = dbInfo
@@ -933,7 +933,7 @@ join_mdb_tables <- function(
     dplyr::filter(
       fk,
       .data$from == !!toJoin[2] & .data$to == !!toJoin[1]
-    ) %>%
+    ) |>
       dplyr::rename(
         "to" = "from",
         "tf" = "ff",
@@ -976,26 +976,26 @@ join_mdb_tables <- function(
   jdm <- data_model(rx)
   toAdd <- dm[toJoin[1], rmForeignKeys = TRUE][[1]]
   toAdd$tableName <- techname
-  toAdd$fields <- toAdd$fields %>%
+  toAdd$fields <- toAdd$fields |>
     dplyr::mutate(
       nullable = TRUE,
       unique = FALSE
     )
   toAdd$primaryKey <- character()
   toAdd$indexes <- list()
-  toAdd <- list(toAdd) %>% magrittr::set_names(techname)
+  toAdd <- list(toAdd) |> rlang::set_names(techname)
   toAdd <- ReDaMoR::RelDataModel(toAdd)
   jdm <- c(jdm, toAdd)
   fkToAdd <- dplyr::bind_rows(
     dplyr::filter(
       fk,
       .data$from == !!toJoin[1] & .data$to %in% names(rx)
-    ) %>%
+    ) |>
       dplyr::mutate(from = techname, fmin = 0L, fmax = -1L),
     dplyr::filter(
       fk,
       .data$from %in% names(rx) & .data$to == !!toJoin[1]
-    ) %>%
+    ) |>
       dplyr::mutate(to = techname, tmin = 0L, tmax = -1L)
   )
   if (nrow(fkToAdd) > 0) {
@@ -1030,17 +1030,17 @@ join_mdb_tables <- function(
     }
     cn <- c(cn, fkt$tf[[i]])
     nn <- c(nn, fkt$ff[[i]])
-    rnv <- cn %>% magrittr::set_names(nn)
+    rnv <- cn |> rlang::set_names(nn)
     t2i <- dplyr::rename(t2i, dplyr::all_of(rnv))
     jt <- jfun(jt, t2i, by = fkt$ff[[i]])
 
-    rnv <- nn %>% magrittr::set_names(cn)
-    toAdd <- dm[[toJoin[2]]]$fields %>%
+    rnv <- nn |> rlang::set_names(cn)
+    toAdd <- dm[[toJoin[2]]]$fields |>
       dplyr::mutate(
         name = as.character(rnv[.data$name]),
         nullable = TRUE,
         unique = FALSE
-      ) %>%
+      ) |>
       dplyr::filter(!.data$name %in% !!jdm[[techname]]$fields$name)
     for (j in 1:nrow(toAdd)) {
       toAddj <- dplyr::slice(toAdd, j)
@@ -1059,7 +1059,7 @@ join_mdb_tables <- function(
       dplyr::filter(
         fk,
         .data$from == !!toJoin[2] & .data$to %in% names(rx)
-      ) %>%
+      ) |>
         dplyr::mutate(
           from = techname,
           fmin = 0L,
@@ -1071,7 +1071,7 @@ join_mdb_tables <- function(
       dplyr::filter(
         fk,
         .data$from %in% names(rx) & .data$to == !!toJoin[2]
-      ) %>%
+      ) |>
         dplyr::mutate(
           to = techname,
           tmin = 0L,
@@ -1100,8 +1100,8 @@ join_mdb_tables <- function(
   }
 
   ## metaMDB object ----
-  MDBs <- list(rx) %>% magrittr::set_names(db_info(rx)$name)
-  rt <- list(jt) %>% magrittr::set_names(techname)
+  MDBs <- list(rx) |> rlang::set_names(db_info(rx)$name)
+  rt <- list(jt) |> rlang::set_names(techname)
   toRet <- metaMDB(
     MDBs = MDBs,
     relationalTables = rt,
@@ -1116,8 +1116,8 @@ join_mdb_tables <- function(
     ttj,
     type = type,
     jtName = techname
-  ) %>%
-    dplyr::rename(dplyr::all_of(magrittr::set_names(techname, jtName)))
+  ) |>
+    dplyr::rename(dplyr::all_of(rlang::set_names(techname, jtName)))
   return(toRet)
 }
 

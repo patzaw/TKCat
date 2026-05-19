@@ -65,8 +65,8 @@ list_tables.DBIConnection <- function(
     x,
     query,
     format = "TabSeparatedWithNamesAndTypes"
-  )) %>%
-    dplyr::rename("name" = "table") %>%
+  )) |>
+    dplyr::rename("name" = "table") |>
     dplyr::mutate(
       total_rows = as.numeric(.data$total_rows),
       total_bytes = as.numeric(.data$total_bytes),
@@ -284,7 +284,7 @@ ch_insert <- function(
       con,
       sprintf("SELECT * FROM %s LIMIT 0", qname),
       format = "TabSeparatedWithNamesAndTypes"
-    ) %>%
+    ) |>
       colnames()
     if (!all(colnames(value) %in% fo)) {
       stop(
@@ -389,14 +389,14 @@ mergeTree_from_RelTableModel <- function(
   } else {
     rtypes <- tm$fields$type
     names(rtypes) <- tm$fields$name
-    nullable <- tm$fields %>%
-      dplyr::filter(.data$nullable) %>%
+    nullable <- tm$fields |>
+      dplyr::filter(.data$nullable) |>
       dplyr::pull("name")
-    lowCardinality <- tm$fields %>%
+    lowCardinality <- tm$fields |>
       dplyr::filter(
         .data$type %in% c("character"),
         grepl('{ch_LowCardinality}', .data$comment, fixed = TRUE)
-      ) %>%
+      ) |>
       dplyr::pull("name")
     value <- dplyr::tibble()
     for (i in 1:nrow(tm$fields)) {
@@ -439,7 +439,7 @@ mergeTree_from_RelTableModel <- function(
 
   #       # If no primary key, sort by the first unique index
   #       if(nrow(uit)>0){
-  #          toRet <- dplyr::filter(uit, .data$index==min(uit$index)) %>%
+  #          toRet <- dplyr::filter(uit, .data$index==min(uit$index)) |>
   #             dplyr::pull("field")
   #       }else{
 
@@ -453,37 +453,37 @@ mergeTree_from_RelTableModel <- function(
   #    }
   # }
 
-  nullable <- tm$fields %>%
-    dplyr::filter(.data$nullable) %>%
+  nullable <- tm$fields |>
+    dplyr::filter(.data$nullable) |>
     dplyr::pull("name")
 
   toRet <- c()
 
   indexes <- ReDaMoR::index_table(tm)
   if (length(toRet) == 0 && 1 %in% indexes$index) {
-    toRet <- indexes %>%
-      dplyr::filter(.data$index == 1) %>%
-      dplyr::pull("field") %>%
+    toRet <- indexes |>
+      dplyr::filter(.data$index == 1) |>
+      dplyr::pull("field") |>
       setdiff(c(NA, nullable))
   }
   if (length(toRet) == 0 && !is.null(indexes) && nrow(indexes) > 0) {
     # && 0 %in% indexes$index) {
-    toRet <- indexes %>%
-      # dplyr::filter(.data$index == 0) %>%
-      dplyr::pull("field") %>%
+    toRet <- indexes |>
+      # dplyr::filter(.data$index == 0) |>
+      dplyr::pull("field") |>
       setdiff(c(NA, nullable))
   }
 
   foreign_keys <- ReDaMoR::get_foreign_keys(tm)
   if (length(toRet) == 0 && !is.null(foreign_keys) && nrow(foreign_keys) > 0) {
-    toRet <- unique(unlist(foreign_keys$ff)) %>%
+    toRet <- unique(unlist(foreign_keys$ff)) |>
       setdiff(c(NA, nullable))
   }
 
   if (length(toRet) == 0) {
-    toRet <- tm$fields %>%
-      dplyr::filter(!.data$nullable) %>%
-      dplyr::pull("name") %>%
+    toRet <- tm$fields |>
+      dplyr::filter(!.data$nullable) |>
+      dplyr::pull("name") |>
       head(1)
   }
 
@@ -509,15 +509,15 @@ mergeTree_from_RelTableModel <- function(
     return(NULL)
   }
 
-  not_nullable <- tm$fields %>%
-    dplyr::filter(!.data$nullable) %>%
+  not_nullable <- tm$fields |>
+    dplyr::filter(!.data$nullable) |>
     dplyr::pull("name")
 
   projections <- gsub(
     "\\}",
     "",
     x = gsub("\\{ch_Projection:", "", projections)
-  ) %>%
+  ) |>
     strsplit(split = ",")
 
   projections <- projections[which(lengths(projections) > 0)]
@@ -561,11 +561,11 @@ mergeTree_from_RelTableModel <- function(
   }
 
   toRet <- c()
-  ifields <- indexes %>%
-    dplyr::filter(.data$index > 1) %>%
-    dplyr::arrange(.data$index) %>%
-    dplyr::distinct(.data$index, .keep_all = TRUE) %>%
-    dplyr::pull("field") %>%
+  ifields <- indexes |>
+    dplyr::filter(.data$index > 1) |>
+    dplyr::arrange(.data$index) |>
+    dplyr::distinct(.data$index, .keep_all = TRUE) |>
+    dplyr::pull("field") |>
     unique()
   for (f in ifields) {
     if (tm$fields$type[which(tm$fields$name == f)] == "character") {

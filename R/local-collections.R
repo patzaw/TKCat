@@ -12,7 +12,7 @@
 #'
 import_local_collection <- function(txt, overwrite = FALSE) {
   if (file.exists(txt)) {
-    raw <- readLines(txt) %>% paste(collapse = "\n")
+    raw <- readLines(txt) |> paste(collapse = "\n")
   } else {
     raw <- txt
   }
@@ -43,8 +43,8 @@ import_local_collection <- function(txt, overwrite = FALSE) {
   }
   assign(
     x = "COLLECTIONS",
-    value = tkcatEnv$COLLECTIONS %>%
-      dplyr::filter(.data$title != def$properties$collection$enum) %>%
+    value = tkcatEnv$COLLECTIONS |>
+      dplyr::filter(.data$title != def$properties$collection$enum) |>
       dplyr::bind_rows(dplyr::tibble(
         title = def$properties$collection$enum,
         description = def$description,
@@ -89,8 +89,8 @@ get_local_collection <- function(title) {
   if (!title %in% list_local_collections()$title) {
     stop("This collection is not available")
   }
-  tkcatEnv$COLLECTIONS %>%
-    dplyr::filter(.data$title == !!title) %>%
+  tkcatEnv$COLLECTIONS |>
+    dplyr::filter(.data$title == !!title) |>
     dplyr::pull("json")
 }
 
@@ -198,8 +198,8 @@ map_collection_members <- function(
   xp <- dplyr::select(
     x,
     dplyr::all_of(xm$value[which(!xm$static)])
-  ) %>%
-    magrittr::set_colnames(xm$field[which(!xm$static)])
+  ) |>
+    .set_colnames(xm$field[which(!xm$static)])
   for (i in 1:nrow(xm)) {
     f <- xm$field[i]
     if (xm$static[i]) {
@@ -213,8 +213,8 @@ map_collection_members <- function(
   yp <- dplyr::select(
     y,
     dplyr::all_of(ym$value[which(!ym$static)])
-  ) %>%
-    magrittr::set_colnames(ym$field[which(!ym$static)])
+  ) |>
+    .set_colnames(ym$field[which(!ym$static)])
   for (i in 1:nrow(ym)) {
     f <- ym$field[i]
     if (ym$static[i]) {
@@ -236,8 +236,8 @@ map_collection_members <- function(
   toKeep <- c(
     paste0(xm$value, suffix[1])[which(!xm$static)],
     paste0(ym$value, suffix[2])[which(!ym$static)]
-  ) %>%
-    magrittr::set_names(c(
+  ) |>
+    rlang::set_names(c(
       paste0(xm$field, "_x")[which(!xm$static)],
       paste0(ym$field, "_y")[which(!ym$static)]
     ))

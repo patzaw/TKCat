@@ -39,8 +39,6 @@ The following R packages available on CRAN are required:
 
 - [ReDaMoR](https://CRAN.R-project.org/package=ReDaMoR): Relational Data
   Modeler
-- [magrittr](https://CRAN.R-project.org/package=magrittr): A
-  Forward-Pipe Operator for R
 - [DBI](https://CRAN.R-project.org/package=DBI): R Database Interface
 - [visNetwork](https://CRAN.R-project.org/package=visNetwork): Network
   Visualization using ‘vis.js’ Library
