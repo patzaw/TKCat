@@ -303,8 +303,8 @@ ch_insert <- function(
         DBI::dbAppendTable(
           conn = con,
           name = tableName, #qname,
-          database = dbName,
           value = dplyr::slice(value, s[!!i]:e[!!i]),
+          database = dbName,
           row.names = FALSE
           # append=TRUE
         ),
