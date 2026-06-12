@@ -88,6 +88,16 @@
 - [`ch_insert()`](https://patzaw.github.io/TKCat/reference/ch_insert.md)
   : Insert records by batches in a Clickhouse table
 
+- [`ch_join_query()`](https://patzaw.github.io/TKCat/reference/ch_join_query.md)
+  :
+
+  Build a ClickHouse `JOIN` query from two sub-queries
+
+- [`ch_union_query()`](https://patzaw.github.io/TKCat/reference/ch_union_query.md)
+  :
+
+  Build a ClickHouse `UNION` query from several sub-queries
+
 - [`change_chTKCat_password()`](https://patzaw.github.io/TKCat/reference/change_chTKCat_password.md)
   : Change chTKCat password
 

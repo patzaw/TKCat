@@ -1,6 +1,17 @@
 # Changelog
 
+## Version 1.2.2
+
+- Export
+  [`ch_join_query()`](https://patzaw.github.io/TKCat/reference/ch_join_query.md)
+  and
+  [`ch_union_query()`](https://patzaw.github.io/TKCat/reference/ch_union_query.md)
+  helpers for building ClickHouse `JOIN` and `UNION` queries from
+  sub-queries (with roxygen2 documentation).
+
 ## Version 1.2.1
+
+CRAN release: 2026-05-19
 
 - Remove dependency to {base64enc} library.
 - Remove dependency to {magrittr}: replace `%>%` with the native R pipe

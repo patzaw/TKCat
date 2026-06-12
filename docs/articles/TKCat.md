@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-19 17:23:46.306466
+    ## Timestamp: 2026-06-12 07:03:48.470506
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-19 17:23:46.306466
+    ## Timestamp: 2026-06-12 07:03:48.470506
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-19 17:23:46.306466
+    ## Timestamp: 2026-06-12 07:03:48.470506
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-05-19 17:23:46
+    ## Timestamp: 2026-06-12 07:03:48
     ## 
 
 Also writing these data and related information in text files make them
@@ -1657,7 +1657,7 @@ list_MDBs(k)             # get a specific MDBs from the catalog
 search_MDB_tables(k, "disease")  # Search table about "disease"
 ```
 
-    ## # A tibble: 54 × 3
+    ## # A tibble: 56 × 3
     ##    resource            name                               comment               
     ##    <chr>               <chr>                              <chr>                 
     ##  1 AP-Disease-Strategy diseases                           NA                    
@@ -1667,17 +1667,17 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
     ##  5 AP-Disease-Strategy diseases_parents                   NA                    
     ##  6 AP-Disease-Strategy diseases_synonyms                  NA                    
     ##  7 AP-Disease-Strategy general_disease_groups_identifiers General group of dise…
-    ##  8 Monarch             Diseases                           NA                    
-    ##  9 Monarch             Diseases_descendants               NA                    
-    ## 10 Monarch             Diseases_mode_of_inheritance       NA                    
-    ## # ℹ 44 more rows
+    ##  8 HPO                 Disease_HP                         HP presented by disea…
+    ##  9 HPO                 Disease_synonyms                   Disease synonyms      
+    ## 10 HPO                 Diseases                           Diseases              
+    ## # ℹ 46 more rows
 
 ``` r
 
 search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
-    ## # A tibble: 155 × 7
+    ## # A tibble: 165 × 7
     ##    resource            table                 name  comment type  nullable unique
     ##    <chr>               <chr>                 <chr> <chr>   <chr> <lgl>    <lgl> 
     ##  1 AP-Disease-Strategy strategic_indications cate… "pheno… char… FALSE    FALSE 
@@ -1690,7 +1690,7 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
     ##  8 AP-Disease-Strategy cci_target_indicatio… dise… ""      char… TRUE     FALSE 
     ##  9 AP-Disease-Strategy cddi_drug_indications dise… ""      char… TRUE     FALSE 
     ## 10 AP-Disease-Strategy cddi_drug_indication… dise… ""      char… TRUE     FALSE 
-    ## # ℹ 145 more rows
+    ## # ℹ 155 more rows
 
 ``` r
 

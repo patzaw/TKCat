@@ -419,6 +419,103 @@ mergeTree_from_RelTableModel <- function(
   invisible()
 }
 
+###############################################################################@
+#' Build a ClickHouse `JOIN` query from two sub-queries
+#'
+#' Wraps two SQL sub-queries in a single `SELECT ... JOIN ... USING ...`
+#' statement. Both sub-queries are used as derived tables, so they can be any
+#' valid `SELECT` statements.
+#'
+#' @param q1 a character string with the left-hand side `SELECT` sub-query
+#' @param q2 a character string with the right-hand side `SELECT` sub-query
+#' @param using a character string with the column(s) to join on, as expected
+#' after the `USING` keyword (e.g. `"id"` or `"(id, version)"`)
+#' @param type the join type, passed verbatim before the `JOIN` keyword
+#' (e.g. `"LEFT"`, `"INNER"`, `"FULL"`, `"ANY LEFT"`). Default: `"LEFT"`.
+#' @param select a character string with the columns to select. Default:
+#' `"*"`. Columns can be qualified with the sub-query aliases (see `a1`/`a2`)
+#' to disambiguate non-key columns present on both sides.
+#' @param a1 alias given to the left-hand side sub-query. Default: `"l"`.
+#' @param a2 alias given to the right-hand side sub-query. Default: `"r"`.
+#'
+#' @return A character string with the assembled `JOIN` query.
+#'
+#' @seealso [ch_union_query()]
+#'
+#' @export
+#'
+ch_join_query <- function(
+  q1,
+  q2,
+  using,
+  type = "LEFT",
+  select = "*",
+  a1 = "l",
+  a2 = "r"
+) {
+  stopifnot(
+    is.character(q1),
+    length(q1) == 1,
+    !is.na(q1),
+    is.character(q2),
+    length(q2) == 1,
+    !is.na(q2),
+    is.character(using),
+    length(using) == 1,
+    !is.na(using),
+    is.character(type),
+    length(type) == 1,
+    !is.na(type),
+    is.character(select),
+    length(select) == 1,
+    !is.na(select),
+    is.character(a1),
+    length(a1) == 1,
+    !is.na(a1),
+    is.character(a2),
+    length(a2) == 1,
+    !is.na(a2)
+  )
+  sprintf(
+    "SELECT %s FROM (%s) AS %s %s JOIN (%s) AS %s USING %s",
+    select,
+    q1,
+    a1,
+    type,
+    q2,
+    a2,
+    using
+  )
+}
+
+###############################################################################@
+#' Build a ClickHouse `UNION` query from several sub-queries
+#'
+#' Wraps each input sub-query as a derived table and combines them with
+#' `UNION DISTINCT` or `UNION ALL`. A single sub-query is returned wrapped but
+#' without any `UNION` clause.
+#'
+#' @param queries a character vector of `SELECT` sub-queries to combine
+#' @param mode the union mode: `"DISTINCT"` (default) to deduplicate rows
+#' across sub-queries, or `"ALL"` to keep every row
+#'
+#' @return A character string with the assembled `UNION` query.
+#'
+#' @seealso [ch_join_query()]
+#'
+#' @export
+#'
+ch_union_query <- function(queries, mode = c("DISTINCT", "ALL")) {
+  mode <- match.arg(mode)
+  stopifnot(
+    is.character(queries),
+    length(queries) >= 1,
+    !any(is.na(queries))
+  )
+  sprintf("SELECT * FROM (%s)", queries) |>
+    paste(collapse = sprintf(" UNION %s ", mode))
+}
+
 
 ###############################################################################@
 ## Helpers ----
