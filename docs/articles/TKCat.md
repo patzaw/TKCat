@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-06-12 07:03:48.470506
+    ## Timestamp: 2026-08-09 07:36:54.898073
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-06-12 07:03:48.470506
+    ## Timestamp: 2026-08-09 07:36:54.898073
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-06-12 07:03:48.470506
+    ## Timestamp: 2026-08-09 07:36:54.898073
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-06-12 07:03:48
+    ## Timestamp: 2026-08-09 07:36:54
     ## 
 
 Also writing these data and related information in text files make them
@@ -1667,9 +1667,9 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
     ##  5 AP-Disease-Strategy diseases_parents                   NA                    
     ##  6 AP-Disease-Strategy diseases_synonyms                  NA                    
     ##  7 AP-Disease-Strategy general_disease_groups_identifiers General group of dise…
-    ##  8 HPO                 Disease_HP                         HP presented by disea…
-    ##  9 HPO                 Disease_synonyms                   Disease synonyms      
-    ## 10 HPO                 Diseases                           Diseases              
+    ##  8 HPA                 Disease_involvement                NA                    
+    ##  9 Monarch             Diseases                           Disease concepts (bio…
+    ## 10 Monarch             Diseases_descendants               Transitive closure of…
     ## # ℹ 46 more rows
 
 ``` r
@@ -1678,18 +1678,18 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
     ## # A tibble: 165 × 7
-    ##    resource            table                 name  comment type  nullable unique
-    ##    <chr>               <chr>                 <chr> <chr>   <chr> <lgl>    <lgl> 
-    ##  1 AP-Disease-Strategy strategic_indications cate… "pheno… char… FALSE    FALSE 
-    ##  2 AP-Disease-Strategy strategic_indications class "sympt… char… FALSE    FALSE 
-    ##  3 AP-Disease-Strategy general_disease_grou… dise… ""      char… FALSE    FALSE 
-    ##  4 AP-Disease-Strategy strategic_indications dise… "Can i… logi… FALSE    FALSE 
-    ##  5 AP-Disease-Strategy cci_drug_indications  dise… ""      char… TRUE     FALSE 
-    ##  6 AP-Disease-Strategy cci_drug_indications… dise… ""      char… TRUE     FALSE 
-    ##  7 AP-Disease-Strategy cci_target_indicatio… dise… ""      char… TRUE     FALSE 
-    ##  8 AP-Disease-Strategy cci_target_indicatio… dise… ""      char… TRUE     FALSE 
-    ##  9 AP-Disease-Strategy cddi_drug_indications dise… ""      char… TRUE     FALSE 
-    ## 10 AP-Disease-Strategy cddi_drug_indication… dise… ""      char… TRUE     FALSE 
+    ##    resource              table               name  comment type  nullable unique
+    ##    <chr>                 <chr>               <chr> <chr>   <chr> <lgl>    <lgl> 
+    ##  1 DRE-Bulk-RNA-UMC-2024 conditions          cond… "Disea… char… TRUE     FALSE 
+    ##  2 DRE-Bulk-RNA-UMC-2024 samples             cond… "Disea… char… TRUE     FALSE 
+    ##  3 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
+    ##  4 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      char… FALSE    FALSE 
+    ##  5 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      nume… FALSE    FALSE 
+    ##  6 DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… ""      char… FALSE    FALSE 
+    ##  7 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
+    ##  8 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      char… FALSE    FALSE 
+    ##  9 Kainate-Bulk-RNA-2023 conditions          cond… "Disea… char… TRUE     FALSE 
+    ## 10 Kainate-Bulk-RNA-2023 samples             cond… "Disea… char… TRUE     FALSE 
     ## # ℹ 155 more rows
 
 ``` r
@@ -1757,7 +1757,7 @@ get_query(
 )
 ```
 
-    ## # A tibble: 296 × 3
+    ## # A tibble: 299 × 3
     ##    db    id     label                                                           
     ##    <chr> <chr>  <chr>                                                           
     ##  1 OMIM  117100 Centralopathic epilepsy                                         
@@ -1770,7 +1770,7 @@ get_query(
     ##  8 OMIM  213000 Cerebellar hypoplasia/atrophy, epilepsy, and global development…
     ##  9 OMIM  226810 Celiac disease, epilepsy and cerebral calcification syndrome    
     ## 10 OMIM  226850 EPILEPSY-TELANGIECTASIA                                         
-    ## # ℹ 286 more rows
+    ## # ℹ 289 more rows
 
 ### Data organization in ClickHouse
 

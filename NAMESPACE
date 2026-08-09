@@ -269,42 +269,58 @@ import(shiny)
 import(shinydashboard)
 import(visNetwork)
 importFrom(ClickHouseHTTP,ClickHouseHTTP)
-importFrom(Matrix,drop0)
-importFrom(Matrix,sparseMatrix)
-importFrom(Matrix,summary)
+importFrom(Matrix,
+  drop0,
+  sparseMatrix,
+  summary
+)
 importFrom(askpass,askpass)
-importFrom(future,future)
-importFrom(future,multisession)
-importFrom(future,plan)
+importFrom(future,
+  future,
+  multisession,
+  plan
+)
 importFrom(graphics,plot)
-importFrom(jsonlite,fromJSON)
-importFrom(jsonlite,read_json)
-importFrom(jsonlite,toJSON)
-importFrom(jsonlite,unbox)
+importFrom(jsonlite,
+  fromJSON,
+  read_json,
+  toJSON,
+  unbox
+)
 importFrom(jsonvalidate,json_validate)
 importFrom(markdown,renderMarkdown)
-importFrom(readr,DataFrameCallback)
-importFrom(readr,read_delim)
-importFrom(readr,read_delim_chunked)
-importFrom(readr,write_tsv)
-importFrom(rlang,.data)
-importFrom(rlang,enquo)
-importFrom(rlang,set_names)
+importFrom(readr,
+  DataFrameCallback,
+  read_delim,
+  read_delim_chunked,
+  write_tsv
+)
+importFrom(rlang,
+  .data,
+  enquo,
+  set_names
+)
 importFrom(roxygen2,parse_text)
 importFrom(stats,setNames)
-importFrom(tidyselect,eval_rename)
-importFrom(tidyselect,eval_select)
-importFrom(tidyselect,vars_pull)
-importFrom(utils,head)
-importFrom(utils,object.size)
-importFrom(utils,packageName)
-importFrom(utils,read.delim)
-importFrom(utils,str)
-importFrom(utils,write.table)
-importFrom(utils,zip)
+importFrom(tidyselect,
+  eval_rename,
+  eval_select,
+  vars_pull
+)
+importFrom(utils,
+  head,
+  object.size,
+  packageName,
+  read.delim,
+  str,
+  write.table,
+  zip
+)
 importFrom(uuid,UUIDgenerate)
-importFrom(xml2,read_xml)
-importFrom(xml2,write_xml)
-importFrom(xml2,xml_children)
-importFrom(xml2,xml_name)
-importFrom(xml2,xml_replace)
+importFrom(xml2,
+  read_xml,
+  write_xml,
+  xml_children,
+  xml_name,
+  xml_replace
+)

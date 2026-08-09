@@ -1,6 +1,13 @@
 # Changelog
 
+## Version 1.2.3
+
+- Bug correction: order of index from datamodel in clickhouse now
+  preserved
+
 ## Version 1.2.2
+
+CRAN release: 2026-06-29
 
 - Export
   [`ch_join_query()`](https://patzaw.github.io/TKCat/reference/ch_join_query.md)

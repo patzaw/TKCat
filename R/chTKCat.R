@@ -72,7 +72,7 @@ chTKCat <- function(
       sprintf("%s password (press escape or cancel if no password)", user)
     )
     if (is.null(password)) {
-      password = ""
+      password <- ""
     }
   }
 
@@ -801,7 +801,7 @@ create_chTKCat_user <- function(
 
   ## Register the user ----
   if (admin) {
-    provider = TRUE
+    provider <- TRUE
   }
   ch_insert(
     con,
@@ -2627,6 +2627,12 @@ get_chMDB_metadata <- function(x, dbName, timestamp = NA) {
   dbm$fields$nullable <- as.logical(dbm$fields$nullable)
   dbm$fields$unique <- as.logical(dbm$fields$unique)
   dbm$indexes$unique <- as.logical(dbm$indexes$unique)
+  for (mtn in c("indexes", "primaryKeys", "foreignKeys")) {
+    if ("row_order" %in% colnames(dbm[[mtn]])) {
+      dbm[[mtn]] <- dbm[[mtn]] |>
+        dplyr::arrange(.data$row_order)
+    }
+  }
   dataModel <- ReDaMoR::fromDBM(dbm)
 
   ## DB information ----

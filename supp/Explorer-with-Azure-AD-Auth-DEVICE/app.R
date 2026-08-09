@@ -588,7 +588,7 @@ server <- function(input, output, session) {
         if (is.chMDB(mdb)) {
           ts <- get_chMDB_timestamps(unclass(mdb)$tkcon, dbi$name)
           if (!is.null(ts)) {
-            dbi$"other instances" = nrow(ts) - 1
+            dbi$"other instances" <- nrow(ts) - 1
           }
         }
       } else {
@@ -600,7 +600,7 @@ server <- function(input, output, session) {
           sum()
         ts <- get_chMDB_timestamps(tkcon, dbi$name)
         if (!is.null(ts)) {
-          dbi$"other instances" = nrow(ts) - 1
+          dbi$"other instances" <- nrow(ts) - 1
         }
       }
       dbi$access <- access

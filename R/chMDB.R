@@ -351,6 +351,12 @@ get_MDB.chTKCat <- function(
   dbm$fields$nullable <- as.logical(dbm$fields$nullable)
   dbm$fields$unique <- as.logical(dbm$fields$unique)
   dbm$indexes$unique <- as.logical(dbm$indexes$unique)
+  for (mtn in c("indexes", "primaryKeys", "foreignKeys")) {
+    if ("row_order" %in% colnames(dbm[[mtn]])) {
+      dbm[[mtn]] <- dbm[[mtn]] |>
+        dplyr::arrange(.data$row_order)
+    }
+  }
   dataModel <- ReDaMoR::fromDBM(dbm)
 
   ## DB information ----
@@ -687,6 +693,12 @@ as_chMDB <- function(
   er <- try(
     {
       dbm <- ReDaMoR::toDBM(dataModel)
+      for (mtn in c("indexes", "primaryKeys", "foreignKeys")) {
+        dbm[[mtn]] <- dbm[[mtn]] |>
+          dplyr::mutate(
+            row_order = seq_len(dplyr::n())
+          )
+      }
       ch_insert(
         con = con,
         dbName = dbName,

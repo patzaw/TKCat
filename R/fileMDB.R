@@ -928,9 +928,9 @@ as_fileMDB.fileMDB <- function(
         function(rpn) readParameters[[rpn]] != rp[[rpn]]
       )))
   ) {
-    rewrite = TRUE
+    rewrite <- TRUE
   } else {
-    rewrite = FALSE
+    rewrite <- FALSE
   }
 
   ## Data model ----
@@ -1243,16 +1243,16 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by = 10^5, ...) {
     fheader <- ReDaMoR::read_named_MM_header(dfile)
     fv <- list()
     if (frc == "cr") {
-      fv$rows = which(fheader$rownames %in% fr)
-      fv$columns = which(fheader$colnames %in% fc)
+      fv$rows <- which(fheader$rownames %in% fr)
+      fv$columns <- which(fheader$colnames %in% fc)
     }
     if (frc == "r") {
-      fv$rows = which(fheader$rownames %in% fr)
-      fv$columns = 1:length(fheader$colnames)
+      fv$rows <- which(fheader$rownames %in% fr)
+      fv$columns <- 1:length(fheader$colnames)
     }
     if (frc == "c") {
-      fv$rows = 1:length(fheader$rownames)
-      fv$columns = which(fheader$colnames %in% fc)
+      fv$rows <- 1:length(fheader$rownames)
+      fv$columns <- which(fheader$colnames %in% fc)
     }
     if (length(fv$rows) == 0 || length(fv$columns) == 0) {
       toRet <- matrix(

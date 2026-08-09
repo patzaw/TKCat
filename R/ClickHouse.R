@@ -372,7 +372,7 @@ mergeTree_from_RelTableModel <- function(
     !is.na(dbName),
     ReDaMoR::is.RelTableModel(tm)
   )
-  projections = .get_tm_projections(tm)
+  projections <- .get_tm_projections(tm)
   if (ReDaMoR::is.MatrixModel(tm)) {
     write_MergeTree(
       con = con,

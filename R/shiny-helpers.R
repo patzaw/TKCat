@@ -645,7 +645,7 @@ TKCAT_LOGO_DIV <- shiny::div(
           if (is.chMDB(mdb)) {
             ts <- get_chMDB_timestamps(unclass(mdb)$tkcon, dbi$name)
             if (!is.null(ts)) {
-              dbi$"other instances" = nrow(ts) - 1
+              dbi$"other instances" <- nrow(ts) - 1
             }
           }
         } else {
@@ -660,7 +660,7 @@ TKCAT_LOGO_DIV <- shiny::div(
             sum()
           ts <- get_chMDB_timestamps(tkcon, dbi$name)
           if (!is.null(ts)) {
-            dbi$"other instances" = nrow(ts) - 1
+            dbi$"other instances" <- nrow(ts) - 1
           }
         }
         dbi$access <- access
