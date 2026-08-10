@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-08-09 07:36:54.898073
+    ## Timestamp: 2026-08-10 09:47:54.009535
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-08-09 07:36:54.898073
+    ## Timestamp: 2026-08-10 09:47:54.009535
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-08-09 07:36:54.898073
+    ## Timestamp: 2026-08-10 09:47:54.009535
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-08-09 07:36:54
+    ## Timestamp: 2026-08-10 09:47:54
     ## 
 
 Also writing these data and related information in text files make them
@@ -1667,9 +1667,9 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
     ##  5 AP-Disease-Strategy diseases_parents                   NA                    
     ##  6 AP-Disease-Strategy diseases_synonyms                  NA                    
     ##  7 AP-Disease-Strategy general_disease_groups_identifiers General group of dise…
-    ##  8 HPA                 Disease_involvement                NA                    
-    ##  9 Monarch             Diseases                           Disease concepts (bio…
-    ## 10 Monarch             Diseases_descendants               Transitive closure of…
+    ##  8 OpenTargets         Associations                       {ch_Projection:diseas…
+    ##  9 OpenTargets         Clinical_reports_diseases          NA                    
+    ## 10 OpenTargets         Diseases_ancestors                 Diseases/Phenotypes a…
     ## # ℹ 46 more rows
 
 ``` r
@@ -1678,18 +1678,18 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
     ## # A tibble: 165 × 7
-    ##    resource              table               name  comment type  nullable unique
-    ##    <chr>                 <chr>               <chr> <chr>   <chr> <lgl>    <lgl> 
-    ##  1 DRE-Bulk-RNA-UMC-2024 conditions          cond… "Disea… char… TRUE     FALSE 
-    ##  2 DRE-Bulk-RNA-UMC-2024 samples             cond… "Disea… char… TRUE     FALSE 
-    ##  3 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
-    ##  4 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      char… FALSE    FALSE 
-    ##  5 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      nume… FALSE    FALSE 
-    ##  6 DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… ""      char… FALSE    FALSE 
-    ##  7 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
-    ##  8 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      char… FALSE    FALSE 
-    ##  9 Kainate-Bulk-RNA-2023 conditions          cond… "Disea… char… TRUE     FALSE 
-    ## 10 Kainate-Bulk-RNA-2023 samples             cond… "Disea… char… TRUE     FALSE 
+    ##    resource              table            name     comment type  nullable unique
+    ##    <chr>                 <chr>            <chr>    <chr>   <chr> <lgl>    <lgl> 
+    ##  1 HPO                   Disease_HP       db       Diseas… char… FALSE    FALSE 
+    ##  2 HPO                   Disease_synonyms db       Diseas… char… FALSE    FALSE 
+    ##  3 HPO                   Diseases         db       Diseas… char… FALSE    FALSE 
+    ##  4 HPO                   Disease_HP       id       Diseas… char… FALSE    FALSE 
+    ##  5 HPO                   Disease_synonyms id       Diseas… char… FALSE    FALSE 
+    ##  6 HPO                   Diseases         id       Diseas… char… FALSE    FALSE 
+    ##  7 HPO                   Diseases         label    Diseas… char… FALSE    FALSE 
+    ##  8 HPO                   Disease_synonyms synonym  Diseas… char… FALSE    FALSE 
+    ##  9 Kainate-Bulk-RNA-2023 conditions       conditi… Disease char… TRUE     FALSE 
+    ## 10 Kainate-Bulk-RNA-2023 samples          conditi… Disease char… TRUE     FALSE 
     ## # ℹ 155 more rows
 
 ``` r

@@ -2105,7 +2105,7 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
             "POSIXct" = readr::col_datetime()
           )
         ),
-        .Names = c("___ROWNAMES___", ".default")
+        names = c("___ROWNAMES___", ".default")
       )
     )
     td <- readr::read_delim_chunked(

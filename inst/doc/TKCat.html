@@ -11,7 +11,7 @@
 
 <meta name="author" content="Patrice Godard" />
 
-<meta name="date" content="2026-08-09" />
+<meta name="date" content="2026-08-10" />
 
 <title>Introduction to TKCat</title>
 
@@ -7275,7 +7275,7 @@ display: none;
 
 <h1 class="title toc-ignore">Introduction to TKCat</h1>
 <h4 class="author">Patrice Godard</h4>
-<h4 class="date">August 09, 2026</h4>
+<h4 class="date">August 10, 2026</h4>
 
 </div>
 
@@ -7693,7 +7693,7 @@ db_info(mhpo_db)$timestamp &lt;- Sys.time()</code></pre>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-08-09 07:27:57.333357
+## Timestamp: 2026-08-10 09:46:45.403283
 ## </code></pre>
 </div>
 <div id="min-coll-memb" class="section level2" number="2.5">
@@ -7731,7 +7731,7 @@ statement displayed when printing the object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-08-09 07:27:57.333357
+## Timestamp: 2026-08-10 09:46:45.403283
 ## </code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -7824,7 +7824,7 @@ MDB object:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-08-09 07:27:57.333357
+## Timestamp: 2026-08-10 09:46:45.403283
 ## </code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -7883,7 +7883,7 @@ the corresponding documentation from it back in R:</p>
 ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
 ## (https://hpo.jax.org/)
 ## 
-## Timestamp: 2026-08-09 07:27:57
+## Timestamp: 2026-08-10 09:46:45
 ## </code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -8633,33 +8633,33 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 ## # ℹ 20 more rows</code></pre>
 <pre class="r"><code>search_MDB_tables(k, &quot;disease&quot;)  # Search table about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 56 × 3
-##    resource            name                               comment                                                                                      
-##    &lt;chr&gt;               &lt;chr&gt;                              &lt;chr&gt;                                                                                        
-##  1 ChEMBL              assay_classification               Classification scheme for phenotypic assays e.g., by therapeutic area, phenotype/process and…
-##  2 AP-Disease-Strategy diseases                           &lt;NA&gt;                                                                                         
-##  3 AP-Disease-Strategy diseases_descendants               &lt;NA&gt;                                                                                         
-##  4 AP-Disease-Strategy diseases_groups                    &lt;NA&gt;                                                                                         
-##  5 AP-Disease-Strategy diseases_groups_identifiers        &lt;NA&gt;                                                                                         
-##  6 AP-Disease-Strategy diseases_parents                   &lt;NA&gt;                                                                                         
-##  7 AP-Disease-Strategy diseases_synonyms                  &lt;NA&gt;                                                                                         
-##  8 AP-Disease-Strategy general_disease_groups_identifiers General group of diseases                                                                    
-##  9 HPO                 Disease_HP                         HP presented by diseases                                                                     
-## 10 HPO                 Disease_synonyms                   Disease synonyms                                                                             
+##    resource name                         comment                                                                                                       
+##    &lt;chr&gt;    &lt;chr&gt;                        &lt;chr&gt;                                                                                                         
+##  1 Monarch  Diseases                     Disease concepts (biolink:Disease nodes), primarily MONDO terms. One row per disease.                         
+##  2 Monarch  Diseases_descendants         Transitive closure of subclass_of: maps each disease term to all of its descendants (including itself). One r…
+##  3 Monarch  Diseases_mode_of_inheritance Disease mode-of-inheritance associations (biolink:has_mode_of_inheritance). One row per association.          
+##  4 Monarch  Diseases_parents             Direct subclass_of relationships in the disease ontology. One row per (child, parent) edge.                   
+##  5 Monarch  Diseases_phenotypes          Disease-phenotype associations (biolink:has_phenotype). One row per association, with frequency, onset and se…
+##  6 Monarch  Diseases_related             related_to associations between two disease terms. One row per relationship.                                  
+##  7 Monarch  Diseases_synonyms            Alternative labels for Disease concepts. One row per (disease, synonym).                                      
+##  8 Monarch  Diseases_xref                Cross-references from Disease nodes to external resources. One row per (disease, xref); each xref CURIE is sp…
+##  9 Monarch  Genes_diseases               Gene-disease associations. One row per association.                                                           
+## 10 Monarch  Models_of_diseases           Genotype-disease model relationships (biolink:model_of); genotypes that model a disease. One row per associat…
 ## # ℹ 46 more rows</code></pre>
 <pre class="r"><code>search_MDB_fields(k, &quot;disease&quot;)  # Search a field about &quot;disease&quot;</code></pre>
 <pre><code>## # A tibble: 165 × 7
-##    resource            table                              name             comment                                                type  nullable unique
-##    &lt;chr&gt;               &lt;chr&gt;                              &lt;chr&gt;            &lt;chr&gt;                                                  &lt;chr&gt; &lt;lgl&gt;    &lt;lgl&gt; 
-##  1 ChEMBL              drug_human_targets                 disease_efficacy &quot;&quot;                                                     inte… FALSE    FALSE 
-##  2 ChEMBL              drug_mechanism                     disease_efficacy &quot;Flag to show whether the target assigned is believed… nume… TRUE     FALSE 
-##  3 ChEMBL              drug_indication                    efo_id           &quot;Experimental Factor Ontology (EFO) disease identifie… char… TRUE     FALSE 
-##  4 ChEMBL              drug_indication                    mesh_heading     &quot;Medical Subject Heading term for the MeSH disease ID&quot; char… FALSE    FALSE 
-##  5 ChEMBL              drug_indication                    mesh_id          &quot;Medical Subject Headings (MeSH) disease identifier c… char… FALSE    FALSE 
-##  6 MetaBase            ImagemapsEdges                     disease          &quot;&quot;                                                     logi… FALSE    FALSE 
-##  7 AP-Disease-Strategy strategic_indications              category         &quot;phenotype or disease&quot;                                 char… FALSE    FALSE 
-##  8 AP-Disease-Strategy strategic_indications              class            &quot;symptom, disease, disorder or syndrome&quot;               char… FALSE    FALSE 
-##  9 AP-Disease-Strategy general_disease_groups_identifiers disease          &quot;&quot;                                                     char… FALSE    FALSE 
-## 10 AP-Disease-Strategy strategic_indications              disease          &quot;Can it be considered as a disease&quot;                    logi… FALSE    FALSE 
+##    resource            table                              name          comment                                  type      nullable unique
+##    &lt;chr&gt;               &lt;chr&gt;                              &lt;chr&gt;         &lt;chr&gt;                                    &lt;chr&gt;     &lt;lgl&gt;    &lt;lgl&gt; 
+##  1 AP-Disease-Strategy strategic_indications              category      &quot;phenotype or disease&quot;                   character FALSE    FALSE 
+##  2 AP-Disease-Strategy strategic_indications              class         &quot;symptom, disease, disorder or syndrome&quot; character FALSE    FALSE 
+##  3 AP-Disease-Strategy general_disease_groups_identifiers disease       &quot;&quot;                                       character FALSE    FALSE 
+##  4 AP-Disease-Strategy strategic_indications              disease       &quot;Can it be considered as a disease&quot;      logical   FALSE    FALSE 
+##  5 AP-Disease-Strategy cci_drug_indications               disease_group &quot;&quot;                                       character TRUE     FALSE 
+##  6 AP-Disease-Strategy cci_drug_indications_summary       disease_group &quot;&quot;                                       character TRUE     FALSE 
+##  7 AP-Disease-Strategy cci_target_indications             disease_group &quot;&quot;                                       character TRUE     FALSE 
+##  8 AP-Disease-Strategy cci_target_indications_summary     disease_group &quot;&quot;                                       character TRUE     FALSE 
+##  9 AP-Disease-Strategy cddi_drug_indications              disease_group &quot;&quot;                                       character TRUE     FALSE 
+## 10 AP-Disease-Strategy cddi_drug_indications_summary      disease_group &quot;&quot;                                       character TRUE     FALSE 
 ## # ℹ 155 more rows</code></pre>
 <pre class="r"><code>collection_members(k)  </code></pre>
 <pre><code>## # A tibble: 50 × 3
