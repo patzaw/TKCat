@@ -1,6 +1,23 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 
+## Version 1.3.0
+
+- New `chTKCat_mcp_server()` function: a read-only
+[MCP](https://modelcontextprotocol.io) server giving AI assistants
+(e.g. Claude Code, Claude Desktop) access to the MDBs of a chTKCat instance,
+their descriptions and their data models
+(see `vignette("TKCat-MCP")`).
+- New `chTKCat_mcp_http_server()` function: the same MCP server available
+to remote clients through HTTP (Streamable HTTP transport), with users
+authenticated by their chTKCat credentials. The vignette documents its
+deployment behind nginx.
+- Bug correction: single quotes and backslashes in search terms are now
+escaped in `search_MDB_tables()` and `search_MDB_fields()` for chTKCat.
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+
 ## Version 1.2.3
 
 - Bug correction: order of index from datamodel in clickhouse now preserved

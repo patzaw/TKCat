@@ -111,6 +111,10 @@ devtools::install_github("patzaw/TKCat")
   Management](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html)
   (`vignette("TKCat-KMR-POK")`)
 
+- [Querying a chTKCat instance with an AI assistant (MCP
+  server)](https://patzaw.github.io/TKCat/articles/TKCat-MCP.html)
+  (`vignette("TKCat-MCP")`)
+
 ## Alternatives
 
 - The [dm](https://github.com/krlmlr/dm) package provides similar
