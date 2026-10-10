@@ -52,14 +52,14 @@ chTKCat(
 - drv:
 
   a DBI driver for connecting to ClickHouse (default:
-  [`ClickHouseHTTP::ClickHouseHTTP()`](https://rdrr.io/pkg/ClickHouseHTTP/man/ClickHouseHTTP.html);
+  [`ClickHouseHTTP::ClickHouseHTTP()`](https://patzaw.github.io/neo2R/reference/ClickHouseHTTP.html);
   other supported driver:
   [`RClickhouse::clickhouse()`](https://rdrr.io/pkg/RClickhouse/man/ClickhouseDriver-class.html))
 
 - ...:
 
   additional parameters for connection (see
-  [ClickHouseHTTP::dbConnect,ClickHouseHTTPDriver-method](https://rdrr.io/pkg/ClickHouseHTTP/man/ClickHouseHTTPDriver-class.html)
+  [ClickHouseHTTP::dbConnect,ClickHouseHTTPDriver-method](https://patzaw.github.io/neo2R/reference/ClickHouseHTTPDriver-class.html)
   for the default driver)
 
 ## Value

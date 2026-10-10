@@ -78,7 +78,7 @@
                         <h4 data-toc-skip class="author">Patrice
 Godard</h4>
             
-            <h4 data-toc-skip class="date">August 10, 2026</h4>
+            <h4 data-toc-skip class="date">October 10, 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/patzaw/TKCat/blob/HEAD/vignettes/TKCat.Rmd" class="external-link"><code>vignettes/TKCat.Rmd</code></a></small>
       <div class="d-none name"><code>TKCat.Rmd</code></div>
@@ -449,7 +449,7 @@ to document the data themselves.</li>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2026-08-10 09:47:54.009535</span></span>
+<span><span class="co">## Timestamp: 2026-10-10 08:02:25.608399</span></span>
 <span><span class="co">## </span></span></code></pre>
 </div>
 <div class="section level3">
@@ -489,7 +489,7 @@ statement displayed when printing the object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2026-08-10 09:47:54.009535</span></span>
+<span><span class="co">## Timestamp: 2026-10-10 08:02:25.608399</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>However, as just discussed, the <em>HPO_hp</em> table refers to human
 phenotypes and the <em>HPO_diseases</em> table to human diseases. These
@@ -590,7 +590,7 @@ MDB object:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2026-08-10 09:47:54.009535</span></span>
+<span><span class="co">## Timestamp: 2026-10-10 08:02:25.608399</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>And the documented collection members of an MDB can be displayed as
 following:</p>
@@ -652,7 +652,7 @@ the corresponding documentation from it back in R:</p>
 <span><span class="co">## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted</span></span>
 <span><span class="co">## (https://hpo.jax.org/)</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">## Timestamp: 2026-08-10 09:47:54</span></span>
+<span><span class="co">## Timestamp: 2026-10-10 08:02:25</span></span>
 <span><span class="co">## </span></span></code></pre>
 <p>Also writing these data and related information in text files make
 them convenient to share with people using them in other analytical
@@ -1433,7 +1433,7 @@ are described below in the <a href="#ch-op">appendix</a>.</p>
 <code class="sourceCode R"><span><span class="va">k</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/chTKCat.html">chTKCat</a></span><span class="op">(</span></span>
 <span>   host<span class="op">=</span><span class="st">"localhost"</span>,                     <span class="co"># default parameter</span></span>
 <span>   port<span class="op">=</span><span class="fl">9111L</span>,                           <span class="co"># default parameter</span></span>
-<span>   drv<span class="op">=</span><span class="fu">ClickHouseHTTP</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/ClickHouseHTTP/man/ClickHouseHTTP.html" class="external-link">ClickHouseHTTP</a></span><span class="op">(</span><span class="op">)</span>, <span class="co"># default parameter</span></span>
+<span>   drv<span class="op">=</span><span class="fu">ClickHouseHTTP</span><span class="fu">::</span><span class="fu"><a href="https://patzaw.github.io/neo2R/reference/ClickHouseHTTP.html" class="external-link">ClickHouseHTTP</a></span><span class="op">(</span><span class="op">)</span>, <span class="co"># default parameter</span></span>
 <span>   user<span class="op">=</span><span class="st">"default"</span>,                       <span class="co"># default parameter</span></span>
 <span>   password<span class="op">=</span><span class="st">""</span>                           <span class="co"># if not provided the</span></span>
 <span>                                         <span class="co"># password is requested interactively </span></span>
@@ -1451,53 +1451,53 @@ But TLS wrapping is not supported yet by the RClickhouse package.</p>
 <em>TKCat</em> object.</p>
 <div class="sourceCode" id="cb120"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/list_MDBs.html">list_MDBs</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>             <span class="co"># get a specific MDBs from the catalog</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 30 × 12</span></span></span>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 31 × 12</span></span></span>
 <span><span class="co">##    name   title description url   version maintainer public populated timestamps</span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>     </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> AP-Di… Ange… Ressources… <span style="color: #BB0000;">NA</span>    0.0.2   [Patrice … FALSE  TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> AP-RD… Info… Informatio… <span style="color: #BB0000;">NA</span>    0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> Carav… New … Informatio… <span style="color: #BB0000;">NA</span>    0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> ChEMBL ChEM… ChEMBL is … http… 1.1.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> Corte… Data… Clarivate … http… 0.0.3   [Patrice … FALSE  TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Count… Gene… General in… <span style="color: #BB0000;">NA</span>    0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> DRE-B… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> FCD-T… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> GO     The … Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> GTEx   Geno… The Adult … http… 0.01    [Patrice … TRUE   TRUE      TRUE      </span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 20 more rows</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> AACT   Aggr… AACT is a … http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> AP-Di… Ange… Ressources… <span style="color: #BB0000;">NA</span>    0.0.2   [Patrice … FALSE  TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> AP-RD… Info… Informatio… <span style="color: #BB0000;">NA</span>    0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> Carav… New … Informatio… <span style="color: #BB0000;">NA</span>    0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> ChEMBL ChEM… ChEMBL is … http… 1.1.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> Corte… Data… Clarivate … http… 0.0.3   [Patrice … FALSE  TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> Count… Gene… General in… <span style="color: #BB0000;">NA</span>    0.0.1   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> DRE-B… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> FCD-T… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> GO     The … Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      </span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 21 more rows</span></span></span>
 <span><span class="co">## <span style="color: #949494;"># ℹ 3 more variables: timestamp &lt;dttm&gt;, access &lt;fct&gt;, total_size &lt;dbl&gt;</span></span></span></code></pre>
 <div class="sourceCode" id="cb122"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_tables.html">search_MDB_tables</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search table about "disease"</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 56 × 3</span></span></span>
-<span><span class="co">##    resource            name                               comment               </span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                              <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> AP-Disease-Strategy diseases                           <span style="color: #BB0000;">NA</span>                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> AP-Disease-Strategy diseases_descendants               <span style="color: #BB0000;">NA</span>                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> AP-Disease-Strategy diseases_groups                    <span style="color: #BB0000;">NA</span>                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> AP-Disease-Strategy diseases_groups_identifiers        <span style="color: #BB0000;">NA</span>                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> AP-Disease-Strategy diseases_parents                   <span style="color: #BB0000;">NA</span>                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> AP-Disease-Strategy diseases_synonyms                  <span style="color: #BB0000;">NA</span>                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> AP-Disease-Strategy general_disease_groups_identifiers General group of dise…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> OpenTargets         Associations                       {ch_Projection:diseas…</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> OpenTargets         Clinical_reports_diseases          <span style="color: #BB0000;">NA</span>                    </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> OpenTargets         Diseases_ancestors                 Diseases/Phenotypes a…</span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 46 more rows</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 82 × 3</span></span></span>
+<span><span class="co">##    resource            name                            comment                  </span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                           <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> AP-Disease-Strategy cci_drug_indications            Indications reported in …</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> AP-Disease-Strategy cci_drug_indications_summary    Summary of the CCI indic…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> AP-Disease-Strategy cci_target_indications          CCI targets of the drugs…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> AP-Disease-Strategy cci_target_indications_summary  Summary of the indicatio…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> AP-Disease-Strategy cddi_drug_indications           Development reported in …</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> AP-Disease-Strategy cddi_drug_indications_summary   Summary of the CDDI indi…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> AP-Disease-Strategy cddi_target_indications         CDDI targets of the drug…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> AP-Disease-Strategy cddi_target_indications_summary Summary of the indicatio…</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> AP-Disease-Strategy diseases                        Diseases and phenotypes …</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> AP-Disease-Strategy diseases_descendants            Transitive closure of th…</span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 72 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb124"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/search_MDB_fields.html">search_MDB_fields</a></span><span class="op">(</span><span class="va">k</span>, <span class="st">"disease"</span><span class="op">)</span>  <span class="co"># Search a field about "disease"</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 165 × 7</span></span></span>
-<span><span class="co">##    resource              table            name     comment type  nullable unique</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> HPO                   Disease_HP       db       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> HPO                   Disease_synonyms db       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> HPO                   Diseases         db       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> HPO                   Disease_HP       id       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> HPO                   Disease_synonyms id       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> HPO                   Diseases         id       Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> HPO                   Diseases         label    Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> HPO                   Disease_synonyms synonym  Diseas… char… FALSE    FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> Kainate-Bulk-RNA-2023 conditions       conditi… Disease char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span> Kainate-Bulk-RNA-2023 samples          conditi… Disease char… TRUE     FALSE </span></span>
-<span><span class="co">## <span style="color: #949494;"># ℹ 155 more rows</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 227 × 7</span></span></span>
+<span><span class="co">##    resource              table               name  comment type  nullable unique</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span> Kainate-Bulk-RNA-2023 conditions          cond… <span style="color: #949494;">"</span>Disea… char… TRUE     FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span> Kainate-Bulk-RNA-2023 samples             cond… <span style="color: #949494;">"</span>Disea… char… TRUE     FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span> MetaBase              ImagemapsEdges      dise… <span style="color: #949494;">""</span>      logi… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span> DRE-Bulk-RNA-UMC-2024 conditions          cond… <span style="color: #949494;">"</span>Disea… char… TRUE     FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span> DRE-Bulk-RNA-UMC-2024 samples             cond… <span style="color: #949494;">"</span>Disea… char… TRUE     FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span> DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span> DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span> DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… <span style="color: #949494;">""</span>      nume… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span> DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span> DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… <span style="color: #949494;">""</span>      char… FALSE    FALSE </span></span>
+<span><span class="co">## <span style="color: #949494;"># ℹ 217 more rows</span></span></span></code></pre>
 <div class="sourceCode" id="cb126"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/collection_members.html">collection_members</a></span><span class="op">(</span><span class="va">k</span><span class="op">)</span>  </span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 50 × 3</span></span></span>

@@ -1,5 +1,3 @@
-# README
-
 # Tailored Knowledge Catalog ![](https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png)
 
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
@@ -24,16 +22,16 @@ slides](https://patzaw.github.io/TKCat/useR2022/TKCat-useR2022-Patrice-Godard.ht
 The TKCat R package is licensed under
 [GPL-3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
-# Installation
+## Installation
 
-## From CRAN
+### From CRAN
 
 ``` r
 
 install.packages("TKCat")
 ```
 
-## Dependencies
+### Dependencies
 
 The following R packages available on CRAN are required:
 
@@ -97,14 +95,14 @@ And those are suggested:
 - [BED](https://CRAN.R-project.org/package=BED): Biological Entity
   Dictionary (BED)
 
-## From github
+### From github
 
 ``` r
 
 devtools::install_github("patzaw/TKCat")
 ```
 
-# Documentation
+## Documentation
 
 - [Introduction to
   TKCat](https://patzaw.github.io/TKCat/articles/TKCat.html)
@@ -114,7 +112,7 @@ devtools::install_github("patzaw/TKCat")
   Management](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html)
   ([`vignette("TKCat-KMR-POK")`](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.md))
 
-# Alternatives
+## Alternatives
 
 - The [dm](https://github.com/krlmlr/dm) package provides similar
   features but with different implementation choices. Here are the main

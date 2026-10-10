@@ -1,5 +1,4 @@
 ---
-title: "README"
 output:
   rmarkdown::github_document:
     number_sections: false
@@ -43,15 +42,15 @@ here are [the slides](https://patzaw.github.io/TKCat/useR2022/TKCat-useR2022-Pat
 The TKCat R package is licensed under
 [GPL-3](https://www.gnu.org/licenses/gpl-3.0.en.html).
 
-# Installation
+## Installation
 
-## From CRAN
+### From CRAN
 
 ```{r, eval=FALSE}
 install.packages("TKCat")
 ```
 
-## Dependencies
+### Dependencies
 
 The following R packages available on CRAN are required:
 
@@ -72,13 +71,13 @@ for(p in wdeps$package){
 }
 ```
 
-## From github
+### From github
 
 ```{r, eval=FALSE}
 devtools::install_github("patzaw/TKCat")
 ```
 
-# Documentation
+## Documentation
 
 - [Introduction to TKCat](https://patzaw.github.io/TKCat/articles/TKCat.html)
 (`vignette("TKCat")`)
@@ -86,7 +85,7 @@ devtools::install_github("patzaw/TKCat")
 - [Defining and using Requirements for Knowledge Management](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html)
  (`vignette("TKCat-KMR-POK")`)
 
-# Alternatives
+## Alternatives
 
 -   The [dm](https://github.com/krlmlr/dm) package provides similar features but
     with different implementation choices. Here are the main differences:

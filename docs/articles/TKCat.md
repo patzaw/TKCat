@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-08-10 09:47:54.009535
+    ## Timestamp: 2026-10-10 08:02:25.608399
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-08-10 09:47:54.009535
+    ## Timestamp: 2026-10-10 08:02:25.608399
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-08-10 09:47:54.009535
+    ## Timestamp: 2026-10-10 08:02:25.608399
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-08-10 09:47:54
+    ## Timestamp: 2026-10-10 08:02:25
     ## 
 
 Also writing these data and related information in text files make them
@@ -1636,20 +1636,20 @@ Once connected, this *chTKCat* object can be used as a *TKCat* object.
 list_MDBs(k)             # get a specific MDBs from the catalog
 ```
 
-    ## # A tibble: 30 × 12
+    ## # A tibble: 31 × 12
     ##    name   title description url   version maintainer public populated timestamps
     ##    <chr>  <chr> <chr>       <chr> <chr>   <chr>      <lgl>  <lgl>     <lgl>     
-    ##  1 AP-Di… Ange… Ressources… NA    0.0.2   [Patrice … FALSE  TRUE      TRUE      
-    ##  2 AP-RD… Info… Informatio… NA    0.0.1   [Patrice … TRUE   TRUE      TRUE      
-    ##  3 Carav… New … Informatio… NA    0.0.1   [Patrice … TRUE   TRUE      TRUE      
-    ##  4 ChEMBL ChEM… ChEMBL is … http… 1.1.0   [Patrice … TRUE   TRUE      TRUE      
-    ##  5 Corte… Data… Clarivate … http… 0.0.3   [Patrice … FALSE  TRUE      TRUE      
-    ##  6 Count… Gene… General in… NA    0.0.1   [Patrice … TRUE   TRUE      TRUE      
-    ##  7 DRE-B… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
-    ##  8 FCD-T… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
-    ##  9 GO     The … Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      
-    ## 10 GTEx   Geno… The Adult … http… 0.01    [Patrice … TRUE   TRUE      TRUE      
-    ## # ℹ 20 more rows
+    ##  1 AACT   Aggr… AACT is a … http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      
+    ##  2 AP-Di… Ange… Ressources… NA    0.0.2   [Patrice … FALSE  TRUE      TRUE      
+    ##  3 AP-RD… Info… Informatio… NA    0.0.1   [Patrice … TRUE   TRUE      TRUE      
+    ##  4 Carav… New … Informatio… NA    0.0.1   [Patrice … TRUE   TRUE      TRUE      
+    ##  5 ChEMBL ChEM… ChEMBL is … http… 1.1.0   [Patrice … TRUE   TRUE      TRUE      
+    ##  6 Corte… Data… Clarivate … http… 0.0.3   [Patrice … FALSE  TRUE      TRUE      
+    ##  7 Count… Gene… General in… NA    0.0.1   [Patrice … TRUE   TRUE      TRUE      
+    ##  8 DRE-B… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
+    ##  9 FCD-T… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
+    ## 10 GO     The … Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      
+    ## # ℹ 21 more rows
     ## # ℹ 3 more variables: timestamp <dttm>, access <fct>, total_size <dbl>
 
 ``` r
@@ -1657,40 +1657,40 @@ list_MDBs(k)             # get a specific MDBs from the catalog
 search_MDB_tables(k, "disease")  # Search table about "disease"
 ```
 
-    ## # A tibble: 56 × 3
-    ##    resource            name                               comment               
-    ##    <chr>               <chr>                              <chr>                 
-    ##  1 AP-Disease-Strategy diseases                           NA                    
-    ##  2 AP-Disease-Strategy diseases_descendants               NA                    
-    ##  3 AP-Disease-Strategy diseases_groups                    NA                    
-    ##  4 AP-Disease-Strategy diseases_groups_identifiers        NA                    
-    ##  5 AP-Disease-Strategy diseases_parents                   NA                    
-    ##  6 AP-Disease-Strategy diseases_synonyms                  NA                    
-    ##  7 AP-Disease-Strategy general_disease_groups_identifiers General group of dise…
-    ##  8 OpenTargets         Associations                       {ch_Projection:diseas…
-    ##  9 OpenTargets         Clinical_reports_diseases          NA                    
-    ## 10 OpenTargets         Diseases_ancestors                 Diseases/Phenotypes a…
-    ## # ℹ 46 more rows
+    ## # A tibble: 82 × 3
+    ##    resource            name                            comment                  
+    ##    <chr>               <chr>                           <chr>                    
+    ##  1 AP-Disease-Strategy cci_drug_indications            Indications reported in …
+    ##  2 AP-Disease-Strategy cci_drug_indications_summary    Summary of the CCI indic…
+    ##  3 AP-Disease-Strategy cci_target_indications          CCI targets of the drugs…
+    ##  4 AP-Disease-Strategy cci_target_indications_summary  Summary of the indicatio…
+    ##  5 AP-Disease-Strategy cddi_drug_indications           Development reported in …
+    ##  6 AP-Disease-Strategy cddi_drug_indications_summary   Summary of the CDDI indi…
+    ##  7 AP-Disease-Strategy cddi_target_indications         CDDI targets of the drug…
+    ##  8 AP-Disease-Strategy cddi_target_indications_summary Summary of the indicatio…
+    ##  9 AP-Disease-Strategy diseases                        Diseases and phenotypes …
+    ## 10 AP-Disease-Strategy diseases_descendants            Transitive closure of th…
+    ## # ℹ 72 more rows
 
 ``` r
 
 search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
-    ## # A tibble: 165 × 7
-    ##    resource              table            name     comment type  nullable unique
-    ##    <chr>                 <chr>            <chr>    <chr>   <chr> <lgl>    <lgl> 
-    ##  1 HPO                   Disease_HP       db       Diseas… char… FALSE    FALSE 
-    ##  2 HPO                   Disease_synonyms db       Diseas… char… FALSE    FALSE 
-    ##  3 HPO                   Diseases         db       Diseas… char… FALSE    FALSE 
-    ##  4 HPO                   Disease_HP       id       Diseas… char… FALSE    FALSE 
-    ##  5 HPO                   Disease_synonyms id       Diseas… char… FALSE    FALSE 
-    ##  6 HPO                   Diseases         id       Diseas… char… FALSE    FALSE 
-    ##  7 HPO                   Diseases         label    Diseas… char… FALSE    FALSE 
-    ##  8 HPO                   Disease_synonyms synonym  Diseas… char… FALSE    FALSE 
-    ##  9 Kainate-Bulk-RNA-2023 conditions       conditi… Disease char… TRUE     FALSE 
-    ## 10 Kainate-Bulk-RNA-2023 samples          conditi… Disease char… TRUE     FALSE 
-    ## # ℹ 155 more rows
+    ## # A tibble: 227 × 7
+    ##    resource              table               name  comment type  nullable unique
+    ##    <chr>                 <chr>               <chr> <chr>   <chr> <lgl>    <lgl> 
+    ##  1 Kainate-Bulk-RNA-2023 conditions          cond… "Disea… char… TRUE     FALSE 
+    ##  2 Kainate-Bulk-RNA-2023 samples             cond… "Disea… char… TRUE     FALSE 
+    ##  3 MetaBase              ImagemapsEdges      dise… ""      logi… FALSE    FALSE 
+    ##  4 DRE-Bulk-RNA-UMC-2024 conditions          cond… "Disea… char… TRUE     FALSE 
+    ##  5 DRE-Bulk-RNA-UMC-2024 samples             cond… "Disea… char… TRUE     FALSE 
+    ##  6 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
+    ##  7 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      char… FALSE    FALSE 
+    ##  8 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      nume… FALSE    FALSE 
+    ##  9 DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… ""      char… FALSE    FALSE 
+    ## 10 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
+    ## # ℹ 217 more rows
 
 ``` r
 

@@ -66,29 +66,24 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="readme">README<a class="anchor" aria-label="anchor" href="#readme"></a>
+<div class="page-header"><h1 id="tailored-knowledge-catalog-">Tailored Knowledge Catalog <img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" align="right" alt="" width="120"><a class="anchor" aria-label="anchor" href="#tailored-knowledge-catalog-"></a>
 </h1></div>
-</div>
-<div class="section level1">
-<h1 id="tailored-knowledge-catalog-">Tailored Knowledge Catalog <img src="https://github.com/patzaw/TKCat/raw/master/supp/logo/TKCat.png" align="right" alt="" width="120"><a class="anchor" aria-label="anchor" href="#tailored-knowledge-catalog-"></a>
-</h1>
 <p><a href="https://cran.r-project.org/package=TKCat" class="external-link"><img src="https://www.r-pkg.org/badges/version/TKCat" alt="CRAN_Status_Badge"></a> <a href="https://cran.r-project.org/package=TKCat" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/TKCat"></a></p>
 <p>The aim of <a href="https://patzaw.github.io/TKCat/">TKCat</a> (Tailored Knowledge Catalog) is to facilitate the management of data from knowledge resources that are frequently used alone or together in research environments. In TKCat, knowledge resources are manipulated as modeled database (MDB) objects. These objects provide access to the data tables along with a general description of the resource and a detailed data model generated with <a href="https://patzaw.github.io/ReDaMoR/" class="external-link">ReDaMoR</a> documenting the tables, their fields and their relationships. These MDB are then gathered in catalogs that can be easily explored and shared. TKCat provides tools to easily subset, filter and combine MDBs and create new catalogs suited for specific needs.</p>
 <p>This package has been presented at the <a href="https://user2022.r-project.org/" class="external-link">useR!2022 conference</a> and here are <a href="https://patzaw.github.io/TKCat/useR2022/TKCat-useR2022-Patrice-Godard.html">the slides</a>.</p>
 <p>The TKCat R package is licensed under <a href="https://www.gnu.org/licenses/gpl-3.0.en.html" class="external-link">GPL-3</a>.</p>
-</div>
-<div class="section level1">
-<h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h1>
 <div class="section level2">
-<h2 id="from-cran">From CRAN<a class="anchor" aria-label="anchor" href="#from-cran"></a>
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
+<div class="section level3">
+<h3 id="from-cran">From CRAN<a class="anchor" aria-label="anchor" href="#from-cran"></a>
+</h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"TKCat"</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
-</h2>
+<div class="section level3">
+<h3 id="dependencies">Dependencies<a class="anchor" aria-label="anchor" href="#dependencies"></a>
+</h3>
 <p>The following R packages available on CRAN are required:</p>
 <ul>
 <li>
@@ -154,24 +149,24 @@
 <a href="https://CRAN.R-project.org/package=BED" class="external-link">BED</a>: Biological Entity Dictionary (BED)</li>
 </ul>
 </div>
-<div class="section level2">
-<h2 id="from-github">From github<a class="anchor" aria-label="anchor" href="#from-github"></a>
-</h2>
+<div class="section level3">
+<h3 id="from-github">From github<a class="anchor" aria-label="anchor" href="#from-github"></a>
+</h3>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/install-deprecated.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"patzaw/TKCat"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
-<div class="section level1">
-<h1 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
-</h1>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
 <ul>
 <li><p><a href="https://patzaw.github.io/TKCat/articles/TKCat.html">Introduction to TKCat</a> (<code><a href="articles/TKCat.html">vignette("TKCat")</a></code>)</p></li>
 <li><p><a href="https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html">Defining and using Requirements for Knowledge Management</a> (<code><a href="articles/TKCat-KMR-POK.html">vignette("TKCat-KMR-POK")</a></code>)</p></li>
 </ul>
 </div>
-<div class="section level1">
-<h1 id="alternatives">Alternatives<a class="anchor" aria-label="anchor" href="#alternatives"></a>
-</h1>
+<div class="section level2">
+<h2 id="alternatives">Alternatives<a class="anchor" aria-label="anchor" href="#alternatives"></a>
+</h2>
 <ul>
 <li>
 <p>The <a href="https://github.com/krlmlr/dm" class="external-link">dm</a> package provides similar features but with different implementation choices. Here are the main differences:</p>
@@ -188,7 +183,7 @@
 </li>
 </ul>
 </div>
-
+</div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">

@@ -2,6 +2,8 @@
 
 ## Version 1.2.3
 
+CRAN release: 2026-08-20
+
 - Bug correction: order of index from datamodel in clickhouse now
   preserved
 
