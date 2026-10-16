@@ -756,6 +756,8 @@ MCP_PROTOCOL_VERSIONS <- c(
     "4. Answer the question with query_mdb (ClickHouse SQL dialect,",
     "read-only, results limited in size: aggregate and filter in SQL)",
     "or with get_matrix_values for tables with a matrix format.",
+    "Filtering on the leading fields of the sorting key or of a projection",
+    "(reported by describe_tables) is efficient on large tables.",
     "",
     "Collections (list_collections) identify fields referring to the same",
     "kind of concepts (e.g. genes, diseases, tissues) in different MDBs:",
@@ -908,8 +910,9 @@ MCP_PROTOCOL_VERSIONS <- c(
       description = paste(
         "Get the detailed data model of one or several tables of an MDB:",
         "fields with their type (R and ClickHouse), nullability, uniqueness",
-        "and comment, primary key, indexes, foreign keys and",
-        "collection members. Call it before writing SQL queries."
+        "and comment, primary key, indexes, ClickHouse sorting key and",
+        "projections, foreign keys and collection members.",
+        "Call it before writing SQL queries."
       ),
       inputSchema = list(
         type = "object",
@@ -1153,14 +1156,16 @@ MCP_PROTOCOL_VERSIONS <- c(
   if ("tables" %in% scope) {
     found <- search_MDB_tables(state$tkcon, term) |>
       dplyr::filter(.data$resource %in% mdbs$name) |>
-      .mcp_add_access(mdbs)
+      .mcp_add_access(mdbs) |>
+      dplyr::mutate(comment = .mcp_clean_comment(.data$comment))
     toRet <- c(toRet, .mcp_section("Matching tables", found, maxResults))
   }
 
   if ("fields" %in% scope) {
     found <- search_MDB_fields(state$tkcon, term) |>
       dplyr::filter(.data$resource %in% mdbs$name) |>
-      .mcp_add_access(mdbs)
+      .mcp_add_access(mdbs) |>
+      dplyr::mutate(comment = .mcp_clean_comment(.data$comment))
     toRet <- c(toRet, .mcp_section("Matching fields", found, maxResults))
   }
 
@@ -1180,7 +1185,7 @@ MCP_PROTOCOL_VERSIONS <- c(
     table = names(m),
     comment = vapply(
       m,
-      function(tm) .mcp_na(tm$display$comment, ""),
+      function(tm) .mcp_na(.mcp_clean_comment(tm$display$comment), ""),
       character(1)
     )
   ) |>
@@ -1264,13 +1269,15 @@ MCP_PROTOCOL_VERSIONS <- c(
   cm <- collection_members(x)
   fks <- ReDaMoR::get_foreign_keys(m)
   chTypes <- .mcp_ch_types(x, tables)
+  chKeys <- .mcp_ch_keys(x, tables)
 
   toRet <- vapply(
     tables,
     function(tn) {
       tm <- m[[tn]]
       td <- dplyr::filter(d, .data$name == !!tn)
-      fields <- tm$fields
+      fields <- tm$fields |>
+        dplyr::mutate(comment = .mcp_clean_comment(.data$comment))
       isMatrix <- ReDaMoR::is.MatrixModel(tm)
       if (isMatrix) {
         rf <- fields$name[which(fields$type == "row")]
@@ -1343,6 +1350,7 @@ MCP_PROTOCOL_VERSIONS <- c(
             }
           ),
           sprintf("Indexes: %s", idx),
+          .mcp_format_ch_keys(chKeys, tn),
           "",
           "Fields:\n",
           .mcp_csv(fields),
@@ -1385,7 +1393,7 @@ MCP_PROTOCOL_VERSIONS <- c(
       paste(
         sprintf("# %s.%s", mdb, tn),
         "",
-        .mcp_na(tm$display$comment, "No comment"),
+        .mcp_na(.mcp_clean_comment(tm$display$comment), "No comment"),
         "",
         content,
         sprintf("Foreign keys:\n%s", rel),
@@ -1812,6 +1820,123 @@ MCP_PROTOCOL_VERSIONS <- c(
   toRet |>
     dplyr::inner_join(inst, by = c("database", "instance")) |>
     dplyr::select("table", "name", "ch_type")
+}
+
+## ClickHouse sorting key and projections of non-matrix tables
+## (projections are parsed from the DDL because system.projections
+## requires specific privileges)
+.mcp_ch_keys <- function(x, tables) {
+  m <- data_model(x)
+  tables <- tables[
+    !vapply(tables, function(tn) ReDaMoR::is.MatrixModel(m[[tn]]), logical(1))
+  ]
+  if (length(tables) == 0) {
+    return(NULL)
+  }
+  dbt <- db_tables(x)$dbTables[tables]
+  inst <- dplyr::tibble(
+    table = names(dbt),
+    database = sub("^`(.*)`[.]`.*`$", "\\1", dbt),
+    instance = sub("^`.*`[.]`(.*)`$", "\\1", dbt)
+  )
+  toRet <- try(
+    get_query(
+      unclass(x)$tkcon,
+      sprintf(
+        paste(
+          "SELECT database, name AS instance, sorting_key, create_table_query",
+          "FROM system.tables WHERE database='%s' AND name IN ('%s')"
+        ),
+        .ch_escape_string(inst$database[1]),
+        paste(.ch_escape_string(inst$instance), collapse = "', '")
+      ),
+      format = "TabSeparatedWithNamesAndTypes"
+    ),
+    silent = TRUE
+  )
+  if (inherits(toRet, "try-error")) {
+    return(NULL)
+  }
+  toRet |>
+    dplyr::inner_join(inst, by = c("database", "instance")) |>
+    dplyr::mutate(
+      projections = lapply(.data$create_table_query, .mcp_ch_projections)
+    ) |>
+    dplyr::select("table", "sorting_key", "projections")
+}
+
+## Sorting keys of the projections defined in a CREATE TABLE query
+.mcp_ch_projections <- function(ddl) {
+  chars <- strsplit(ddl, "")[[1]]
+  starts <- gregexpr(
+    "PROJECTION\\s+(`[^`]*`|[^\\s(]+)\\s*\\(",
+    ddl,
+    perl = TRUE
+  )[[1]]
+  if (starts[1] == -1) {
+    return(character(0))
+  }
+  ends <- starts + attr(starts, "match.length") - 1
+  vapply(
+    ends,
+    function(open) {
+      ## Find the matching closing parenthesis (outside quotes)
+      depth <- 1
+      quote <- ""
+      i <- open
+      while (depth > 0 && i < length(chars)) {
+        i <- i + 1
+        ch <- chars[i]
+        if (nzchar(quote)) {
+          if (ch == quote) {
+            quote <- ""
+          }
+        } else if (ch %in% c("`", "'", '"')) {
+          quote <- ch
+        } else if (ch == "(") {
+          depth <- depth + 1
+        } else if (ch == ")") {
+          depth <- depth - 1
+        }
+      }
+      body <- trimws(paste(chars[(open + 1):(i - 1)], collapse = ""))
+      if (!grepl("ORDER BY", body, fixed = TRUE)) {
+        return(body)
+      }
+      key <- trimws(sub("^.*ORDER BY\\s+", "", body))
+      sub("^\\((.*)\\)$", "\\1", key)
+    },
+    character(1)
+  )
+}
+
+.mcp_format_ch_keys <- function(chKeys, tn) {
+  if (is.null(chKeys)) {
+    return(NULL)
+  }
+  tk <- dplyr::filter(chKeys, .data$table == !!tn)
+  if (nrow(tk) == 0) {
+    return(NULL)
+  }
+  proj <- tk$projections[[1]]
+  paste(
+    sprintf("ClickHouse sorting key: %s", .mcp_na(tk$sorting_key[1], "none")),
+    sprintf(
+      "ClickHouse projections (alternative sorting keys): %s",
+      if (length(proj) == 0) {
+        "none"
+      } else {
+        paste(sprintf("(%s)", proj), collapse = "; ")
+      }
+    ),
+    sep = "\n"
+  )
+}
+
+## Remove ClickHouse specific instructions (e.g. {ch_LowCardinality},
+## {ch_Projection:...}) from comments
+.mcp_clean_comment <- function(x) {
+  trimws(gsub("\\s*\\{ch_[^{}]*\\}", "", x))
 }
 
 .mcp_format_fk <- function(from, ff, to, tf, cardinality) {
