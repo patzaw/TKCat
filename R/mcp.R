@@ -168,7 +168,8 @@ chTKCat_mcp_server <- function(
 #' its own user. No credential is stored by the server, except in memory
 #' to keep the connections open (during `cacheTime` seconds).
 #' If `anonymousUser` is set (e.g., "default"), requests without
-#' `Authorization` header are processed with this user without password.
+#' `Authorization` header are processed with this user and
+#' `anonymousPassword`.
 #' **Credentials are sent in clear text if HTTPS is not used.**
 #'
 #' **Read-only access.** As for [chTKCat_mcp_server()], ClickHouse sessions
@@ -197,7 +198,11 @@ chTKCat_mcp_server <- function(
 #' to connect to the database
 #' (default: `TKCAT_HTTPS` environment variable or FALSE)
 #' @param anonymousUser the ClickHouse user to use for requests without
-#' `Authorization` header (default: NA ==> authentication is required)
+#' `Authorization` header
+#' (default: `TKCAT_MCP_ANONYMOUS_USER` environment variable or NA
+#' ==> authentication is required). An empty string is equivalent to NA.
+#' @param anonymousPassword the password of `anonymousUser`
+#' (default: `TKCAT_MCP_ANONYMOUS_PASSWORD` environment variable or "")
 #' @param allowedOrigins requests with an `Origin` header are only accepted
 #' if this header is in this vector of origins
 #' (e.g., "https://tkcat.example.com"). Default: NULL ==> requests with an
@@ -236,7 +241,8 @@ chTKCat_mcp_http_server <- function(
   host = Sys.getenv("TKCAT_HOST", "localhost"),
   port = as.integer(Sys.getenv("TKCAT_PORT", "9111")),
   https = as.logical(Sys.getenv("TKCAT_HTTPS", "FALSE")),
-  anonymousUser = NA,
+  anonymousUser = Sys.getenv("TKCAT_MCP_ANONYMOUS_USER", NA),
+  anonymousPassword = Sys.getenv("TKCAT_MCP_ANONYMOUS_PASSWORD", ""),
   allowedOrigins = NULL,
   maxRows = 1000L,
   maxChars = 60000L,
@@ -245,6 +251,11 @@ chTKCat_mcp_http_server <- function(
   cacheTime = 3600,
   ...
 ) {
+  if (
+    length(anonymousUser) == 1 && !is.na(anonymousUser) && anonymousUser == ""
+  ) {
+    anonymousUser <- NA
+  }
   stopifnot(
     is.character(mcpHost),
     length(mcpHost) == 1,
@@ -256,6 +267,8 @@ chTKCat_mcp_http_server <- function(
     grepl("^/", mcpPath),
     length(anonymousUser) == 1,
     is.na(anonymousUser) || is.character(anonymousUser),
+    is.character(anonymousPassword),
+    length(anonymousPassword) == 1,
     is.null(allowedOrigins) || is.character(allowedOrigins),
     is.numeric(maxRows),
     length(maxRows) == 1,
@@ -271,6 +284,13 @@ chTKCat_mcp_http_server <- function(
     length(https) == 1,
     !is.na(https)
   )
+  cpar <- list(...)
+  if (any(c("user", "password") %in% names(cpar))) {
+    stop(
+      "'user' and 'password' cannot be provided: ",
+      "use 'anonymousUser' and 'anonymousPassword'"
+    )
+  }
   options(warn = 1)
   config <- list(
     path = mcpPath,
@@ -278,13 +298,14 @@ chTKCat_mcp_http_server <- function(
     port = port,
     https = https,
     anonymousUser = anonymousUser,
+    anonymousPassword = anonymousPassword,
     allowedOrigins = allowedOrigins,
     maxRows = maxRows,
     maxChars = maxChars,
     maxExecutionTime = maxExecutionTime,
     maxBodySize = maxBodySize,
     cacheTime = cacheTime,
-    cpar = list(...)
+    cpar = cpar
   )
   ## User connections
   connections <- new.env(parent = emptyenv())
@@ -425,7 +446,11 @@ chTKCat_mcp_http_server <- function(
     }
   }
 
-  credentials <- .mcp_http_credentials(authorization, config$anonymousUser)
+  credentials <- .mcp_http_credentials(
+    authorization,
+    config$anonymousUser,
+    config$anonymousPassword
+  )
   key <- paste0("auth:", .mcp_na(authorization, ""))
   if (exists(key, envir = connections, inherits = FALSE)) {
     return(connections[[key]]$state)
@@ -468,12 +493,16 @@ chTKCat_mcp_http_server <- function(
 }
 
 ## Get user and password from an HTTP Basic Authorization header
-.mcp_http_credentials <- function(authorization, anonymousUser) {
+.mcp_http_credentials <- function(
+  authorization,
+  anonymousUser,
+  anonymousPassword = ""
+) {
   if (is.null(authorization) || !nzchar(authorization)) {
     if (is.na(anonymousUser)) {
       .mcp_auth_error("Authentication required")
     }
-    return(list(user = anonymousUser, password = ""))
+    return(list(user = anonymousUser, password = anonymousPassword))
   }
   if (!grepl("^Basic[[:space:]]+", authorization, ignore.case = TRUE)) {
     .mcp_auth_error("Only Basic authentication is supported")

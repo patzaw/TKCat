@@ -11,7 +11,8 @@ chTKCat_mcp_http_server(
   host = Sys.getenv("TKCAT_HOST", "localhost"),
   port = as.integer(Sys.getenv("TKCAT_PORT", "9111")),
   https = as.logical(Sys.getenv("TKCAT_HTTPS", "FALSE")),
-  anonymousUser = NA,
+  anonymousUser = Sys.getenv("TKCAT_MCP_ANONYMOUS_USER", NA),
+  anonymousPassword = Sys.getenv("TKCAT_MCP_ANONYMOUS_PASSWORD", ""),
   allowedOrigins = NULL,
   maxRows = 1000L,
   maxChars = 60000L,
@@ -42,7 +43,12 @@ to connect to the database
 (default: \code{TKCAT_HTTPS} environment variable or FALSE)}
 
 \item{anonymousUser}{the ClickHouse user to use for requests without
-\code{Authorization} header (default: NA ==> authentication is required)}
+\code{Authorization} header
+(default: \code{TKCAT_MCP_ANONYMOUS_USER} environment variable or NA
+==> authentication is required). An empty string is equivalent to NA.}
+
+\item{anonymousPassword}{the password of \code{anonymousUser}
+(default: \code{TKCAT_MCP_ANONYMOUS_PASSWORD} environment variable or "")}
 
 \item{allowedOrigins}{requests with an \code{Origin} header are only accepted
 if this header is in this vector of origins
@@ -91,7 +97,8 @@ checked by ClickHouse and each client gets access to the MDBs readable by
 its own user. No credential is stored by the server, except in memory
 to keep the connections open (during \code{cacheTime} seconds).
 If \code{anonymousUser} is set (e.g., "default"), requests without
-\code{Authorization} header are processed with this user without password.
+\code{Authorization} header are processed with this user and
+\code{anonymousPassword}.
 \strong{Credentials are sent in clear text if HTTPS is not used.}
 
 \strong{Read-only access.} As for \code{\link[=chTKCat_mcp_server]{chTKCat_mcp_server()}}, ClickHouse sessions

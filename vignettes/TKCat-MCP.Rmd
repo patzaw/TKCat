@@ -105,7 +105,9 @@ devtools::install_github("patzaw/TKCat")
 
 - The `Rscript` command must be available in the `PATH`
 (otherwise use its full path in the configurations below,
-e.g. `C:\\Program Files\\R\\R-4.5.1\\bin\\Rscript.exe` on Windows).
+e.g.
+`C:\\Users\\user_name\\AppData\\Local\\Programs\\R\\R-4.6.1\\bin\\Rscript.exe`
+on Windows).
 
 - A chTKCat instance reachable from this computer.
 
@@ -151,7 +153,7 @@ can be used to try the tools interactively (requires Node.js):
 ```{bash}
 npx @modelcontextprotocol/inspector \
    -e TKCAT_HOST=localhost -e TKCAT_PORT=9111 \
-   Rscript -e "TKCat::chTKCat_mcp_server()"
+   -- Rscript -e "TKCat::chTKCat_mcp_server()"
 ```
 
 ## Configuring an MCP client
@@ -281,7 +283,8 @@ The main parameters of `chTKCat_mcp_http_server()` are the following
 | `mcpPort` | Listening port | `TKCAT_MCP_PORT` or `8800` |
 | `mcpPath` | Path of the MCP endpoint | `/mcp` |
 | `host`, `port`, `https` | chTKCat connection | `TKCAT_HOST`, `TKCAT_PORT`, `TKCAT_HTTPS` |
-| `anonymousUser` | ClickHouse user used for requests without credentials (e.g. `"default"` to give access to public MDBs without authentication) | `NA` (authentication required) |
+| `anonymousUser` | ClickHouse user used for requests without credentials (e.g. `"default"` to give access to public MDBs without authentication) | `TKCAT_MCP_ANONYMOUS_USER` or `NA` (authentication required) |
+| `anonymousPassword` | Password of `anonymousUser` | `TKCAT_MCP_ANONYMOUS_PASSWORD` or `""` |
 | `allowedOrigins` | Accepted values of the `Origin` header (only sent by web browsers) | `NULL` (requests with an `Origin` header are rejected) |
 | `maxRows`, `maxChars`, `maxExecutionTime` | Same as for the local server | `1000`, `60000`, `300` |
 | `cacheTime` | Seconds during which user connections and data models are kept in memory | `3600` |
@@ -317,22 +320,38 @@ Environment=TKCAT_HOST=localhost
 Environment=TKCAT_PORT=9111
 Environment=TKCAT_MCP_HOST=127.0.0.1
 Environment=TKCAT_MCP_PORT=%i
-ExecStart=/usr/bin/Rscript -e "TKCat::chTKCat_mcp_http_server()"
+EnvironmentFile=-/etc/tkcat-mcp.env
+ExecStart=/usr/local/bin/Rscript -e "TKCat::chTKCat_mcp_http_server()"
 Restart=on-failure
 RestartSec=5
 NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
-ProtectHome=true
+ProtectHome=read-only
 
 [Install]
 WantedBy=multi-user.target
 ```
 
-Create the system user and start, for example, 4 instances:
+Anonymous access is configured in the optional `/etc/tkcat-mcp.env` file
+(the leading `-` in `EnvironmentFile=-` makes it optional: without this
+file, authentication is required for all the requests).
+This file is read by systemd before dropping privileges: it can thus be
+readable by root only, which keeps the password out of the command line and
+out of the files readable by the `tkcat-mcp` user.
+
+```ini
+TKCAT_MCP_ANONYMOUS_USER=techuser
+TKCAT_MCP_ANONYMOUS_PASSWORD=techuser_password
+```
+
+Create the system user, protect the environment file and start, for example,
+4 instances:
 
 ```{bash}
 sudo useradd --system --no-create-home --shell /usr/sbin/nologin tkcat-mcp
+sudo chown root:root /etc/tkcat-mcp.env
+sudo chmod 600 /etc/tkcat-mcp.env
 sudo systemctl daemon-reload
 sudo systemctl enable --now tkcat-mcp@8801 tkcat-mcp@8802 tkcat-mcp@8803 tkcat-mcp@8804
 ## Logs
@@ -348,11 +367,10 @@ among the server instances and limits the request rate by client
 Replace `tkcat.example.com` and the certificate paths with your own values.
 
 ```nginx
-## Request rate limit by client address
 limit_req_zone $binary_remote_addr zone=tkcat_mcp:10m rate=5r/s;
 
 ## R MCP server instances (see the systemd service above)
-upstream tkcat_mcp {
+upstream tkcat_mcp_inst {
     least_conn;
     server 127.0.0.1:8801;
     server 127.0.0.1:8802;
@@ -361,29 +379,20 @@ upstream tkcat_mcp {
     keepalive 8;
 }
 
-server {
-    listen 80;
-    server_name tkcat.example.com;
-    return 301 https://$host$request_uri;
-}
+## Other config commands
+## ...
 
 server {
-    listen 443 ssl;
-    server_name tkcat.example.com;
 
-    ssl_certificate     /etc/ssl/certs/tkcat.example.com.crt;
-    ssl_certificate_key /etc/ssl/private/tkcat.example.com.key;
-    ssl_protocols       TLSv1.2 TLSv1.3;
-
-    ## Optional: restrict access to the internal network
-    # allow 10.0.0.0/8;
-    # deny all;
-
-    location = /mcp {
+    ## Other config commands
+    ## ...
+    
+    ## TKCat MCP server
+    location = /tkcat_mcp {
         limit_req zone=tkcat_mcp burst=20 nodelay;
         client_max_body_size 1m;
 
-        proxy_pass http://tkcat_mcp;
+        proxy_pass http://tkcat_mcp_inst/mcp;
         proxy_http_version 1.1;
         proxy_set_header Connection "";
         proxy_set_header Host $host;
@@ -397,9 +406,7 @@ server {
         proxy_buffering off;
     }
 
-    location / {
-        return 404;
-    }
+    ## ...
 }
 ```
 
@@ -419,7 +426,7 @@ The server can be checked with `curl` (`-u` provides the credentials
 in a Basic `Authorization` header):
 
 ```{bash}
-curl -u jdoe:xxxxxx https://tkcat.example.com/mcp \
+curl -u jdoe:xxxxxx https://tkcat.example.com/tkcat_mcp \
    -H "Content-Type: application/json" \
    -H "Accept: application/json, text/event-stream" \
    -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"list_mdbs","arguments":{}}}'
@@ -451,7 +458,7 @@ jsonlite::base64_enc("jdoe:xxxxxx")
 
 ```{bash}
 claude mcp add tkcat --scope user --transport http \
-   https://tkcat.example.com/mcp \
+   https://tkcat.example.com/tkcat_mcp \
    --header "Authorization: Basic amRvZTp4eHh4eHg="
 ```
 
@@ -464,7 +471,7 @@ environment variable with the Base64 value):
   "mcpServers": {
     "tkcat": {
       "type": "http",
-      "url": "https://tkcat.example.com/mcp",
+      "url": "https://tkcat.example.com/tkcat_mcp",
       "headers": {
         "Authorization": "Basic ${TKCAT_MCP_AUTH}"
       }
@@ -476,7 +483,7 @@ environment variable with the Base64 value):
 ### Other MCP clients
 
 Any MCP client supporting the Streamable HTTP transport and custom headers can
-connect to `https://tkcat.example.com/mcp` with the `Authorization` header
+connect to `https://tkcat.example.com/tkcat_mcp` with the `Authorization` header
 described above.
 
 Clients supporting only the stdio transport (e.g. Claude Desktop with a local
@@ -490,16 +497,31 @@ check that third-party tools are allowed by your organization):
     "tkcat": {
       "command": "npx",
       "args": [
-        "mcp-remote", "https://tkcat.example.com/mcp",
+        "-y",
+        "mcp-remote", "https://tkcat.example.com/tkcat_mcp",
         "--header", "Authorization:${TKCAT_MCP_AUTH}"
       ],
       "env": {
-        "TKCAT_MCP_AUTH": "Basic amRvZTp4eHh4eHg="
+        "NODE_OPTIONS": "--use-system-ca"
       }
     }
   }
 }
 ```
+
+The `NODE_OPTIONS` environment variable set to `--use-system-ca` tells
+Node.js to trust the certificate authorities (CA) installed in the
+operating system certificate store. By default, Node.js only relies on its
+own bundled list of public CAs. Thus, if the certificate of the nginx server
+is signed by an internal CA of your organization (or if the HTTPS traffic is
+inspected by a corporate proxy), the connection fails with errors such as
+`unable to get local issuer certificate` or
+`self-signed certificate in certificate chain`.
+This option requires a recent version of Node.js (>= 22.15).
+With older versions, the `NODE_EXTRA_CA_CERTS` environment variable can be
+set instead, with the path to a PEM file containing the internal CA
+certificate(s). The `env` entry can be removed if the server certificate is
+signed by a public CA.
 
 Connectors added in the web interface of claude.ai are connected from
 Anthropic's cloud: they would require the server to be reachable from the
