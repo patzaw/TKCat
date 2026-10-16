@@ -58,6 +58,8 @@ The following R packages available on CRAN are required:
   JavaScript Library ‘DataTables’
 - [htmltools](https://CRAN.R-project.org/package=htmltools): Tools for
   HTML
+- [httpuv](https://CRAN.R-project.org/package=httpuv): HTTP and
+  WebSocket Server Library
 - [readr](https://CRAN.R-project.org/package=readr): Read Rectangular
   Text Data
 - [jsonlite](https://CRAN.R-project.org/package=jsonlite): A Simple and

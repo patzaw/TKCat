@@ -85,6 +85,13 @@
 - [`chTKCat()`](https://patzaw.github.io/TKCat/reference/chTKCat.md) :
   Connect to a ClickHouse TKCat instance
 
+- [`chTKCat_mcp_http_server()`](https://patzaw.github.io/TKCat/reference/chTKCat_mcp_http_server.md)
+  : Run a read-only MCP server giving remote access to a chTKCat
+  instance
+
+- [`chTKCat_mcp_server()`](https://patzaw.github.io/TKCat/reference/chTKCat_mcp_server.md)
+  : Run a read-only MCP server giving access to a chTKCat instance
+
 - [`ch_insert()`](https://patzaw.github.io/TKCat/reference/ch_insert.md)
   : Insert records by batches in a Clickhouse table
 

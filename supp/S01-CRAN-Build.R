@@ -9,6 +9,29 @@ devtools::document(
 install.packages(here::here(), repos = NULL)
 
 ##############################@
+## Build mermaid diagrams ----
+## Requires node.js (npx). The chromium sandbox is disabled because
+## it is not usable on recent Ubuntu versions.
+puppeteer_config <- tempfile(fileext = ".json")
+writeLines('{"args": ["--no-sandbox"]}', puppeteer_config)
+for (f in list.files(here("vignettes"), pattern = "\\.mmd$")) {
+  system2(
+    "npx",
+    c(
+      "-y",
+      "@mermaid-js/mermaid-cli",
+      "-p",
+      puppeteer_config,
+      "-i",
+      file.path(here("vignettes"), f),
+      "-o",
+      file.path(here("vignettes"), sub("\\.mmd$", ".svg", f))
+    )
+  )
+}
+file.remove(puppeteer_config)
+
+##############################@
 ## Build and copy vignettes ----
 rmarkdown::render(here("README.Rmd"))
 tools::buildVignettes(dir = here(), clean = FALSE, quiet = TRUE)

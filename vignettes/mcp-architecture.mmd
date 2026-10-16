@@ -1,0 +1,14 @@
+flowchart LR
+    client["MCP client"]
+    nginx["nginx<br/>(:443)"]
+    subgraph rsrv["R MCP server(s)"]
+        direction TB
+        r1["127.0.0.1:8801"]
+        r2["127.0.0.1:8802"]
+        rn["..."]
+        r1 ~~~ r2 ~~~ rn
+    end
+    ch[("chTKCat<br/>(ClickHouse :9111)")]
+    client -- HTTPS --> nginx
+    nginx -- HTTP --> rsrv
+    rsrv -- HTTP --> ch

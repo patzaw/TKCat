@@ -13,3 +13,4 @@
 ^README.html$
 ^_pkgdown\.yml$
 ^pkgdown$
+^vignettes/mcp-architecture\.mmd$

@@ -1,5 +1,26 @@
 # Changelog
 
+## Version 1.3.0
+
+- New
+  [`chTKCat_mcp_server()`](https://patzaw.github.io/TKCat/reference/chTKCat_mcp_server.md)
+  function: a read-only [MCP](https://modelcontextprotocol.io) server
+  giving AI assistants (e.g. Claude Code, Claude Desktop) access to the
+  MDBs of a chTKCat instance, their descriptions and their data models
+  (see
+  [`vignette("TKCat-MCP")`](https://patzaw.github.io/TKCat/articles/TKCat-MCP.md)).
+- New
+  [`chTKCat_mcp_http_server()`](https://patzaw.github.io/TKCat/reference/chTKCat_mcp_http_server.md)
+  function: the same MCP server available to remote clients through HTTP
+  (Streamable HTTP transport), with users authenticated by their chTKCat
+  credentials. The vignette documents its deployment behind nginx.
+- Bug correction: single quotes and backslashes in search terms are now
+  escaped in
+  [`search_MDB_tables()`](https://patzaw.github.io/TKCat/reference/search_MDB_tables.md)
+  and
+  [`search_MDB_fields()`](https://patzaw.github.io/TKCat/reference/search_MDB_fields.md)
+  for chTKCat.
+
 ## Version 1.2.3
 
 CRAN release: 2026-08-20

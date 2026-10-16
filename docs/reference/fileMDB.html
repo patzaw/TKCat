@@ -15,7 +15,7 @@ Rename tables of a fileMDB object"><!-- Global site tag (gtag.js) - Google Analy
 
     <a class="navbar-brand me-2" href="../index.html">TKCat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -28,6 +28,7 @@ Rename tables of a fileMDB object"><!-- Global site tag (gtag.js) - Google Analy
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/TKCat-KMR-POK.html">Defining and using Requirements for Knowledge Management (KMR) in TKCat</a></li>
+    <li><a class="dropdown-item" href="../articles/TKCat-MCP.html">Querying a chTKCat instance with an AI assistant (MCP server)</a></li>
   </ul></li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
@@ -170,17 +171,17 @@ data from the tables in x.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">hpof</span> <span class="op">&lt;-</span> <span class="fu"><a href="read_fileMDB.html">read_fileMDB</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>   path<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/HPO-subset"</span>, package<span class="op">=</span><span class="st">"ReDaMoR"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   dataModel<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/HPO-model.json"</span>, package<span class="op">=</span><span class="st">"ReDaMoR"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>   dbInfo<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      <span class="st">"name"</span><span class="op">=</span><span class="st">"HPO"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"title"</span><span class="op">=</span><span class="st">"Data extracted from the HPO database"</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"description"</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>         <span class="st">"This is a very small subset of the HPO!"</span>,</span></span>
-<span class="r-in"><span>         <span class="st">"Visit the reference URL for more information"</span></span></span>
-<span class="r-in"><span>      <span class="op">)</span>,</span></span>
-<span class="r-in"><span>      <span class="st">"url"</span><span class="op">=</span><span class="st">"http://human-phenotype-ontology.github.io/"</span></span></span>
-<span class="r-in"><span>   <span class="op">)</span></span></span>
+<span class="r-in"><span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/HPO-subset"</span>, package <span class="op">=</span> <span class="st">"ReDaMoR"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  dataModel <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"examples/HPO-model.json"</span>, package <span class="op">=</span> <span class="st">"ReDaMoR"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  dbInfo <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="st">"name"</span> <span class="op">=</span> <span class="st">"HPO"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"title"</span> <span class="op">=</span> <span class="st">"Data extracted from the HPO database"</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"description"</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>      <span class="st">"This is a very small subset of the HPO!"</span>,</span></span>
+<span class="r-in"><span>      <span class="st">"Visit the reference URL for more information"</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span>,</span></span>
+<span class="r-in"><span>    <span class="st">"url"</span> <span class="op">=</span> <span class="st">"http://human-phenotype-ontology.github.io/"</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold; text-decoration: underline;">HPO</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BBBBBB; background-color: #00BB00;">SUCCESS</span></span>
@@ -197,32 +198,31 @@ data from the tables in x.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                 730 </span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## The following commands take time on fileMDB object</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu">select</span><span class="op">(</span><span class="va">hpof</span>, <span class="va">HPO_hp</span><span class="op">:</span><span class="va">HPO_diseases</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">toTake</span> <span class="op">&lt;-</span> <span class="st">"HPO_altId"</span></span></span>
+<span class="r-in"><span>  <span class="fu">select</span><span class="op">(</span><span class="va">hpof</span>, <span class="fu">all_of</span><span class="op">(</span><span class="va">toTake</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">select</span><span class="op">(</span><span class="va">hpof</span>, <span class="va">HPO_hp</span><span class="op">:</span><span class="va">HPO_diseases</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">toTake</span> <span class="op">&lt;-</span> <span class="st">"HPO_altId"</span></span></span>
-<span class="r-in"><span><span class="fu">select</span><span class="op">(</span><span class="va">hpof</span>, <span class="fu">all_of</span><span class="op">(</span><span class="va">toTake</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">hpoSlice</span> <span class="op">&lt;-</span> <span class="fu">slice</span><span class="op">(</span><span class="va">hpof</span>, HPO_diseases <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="count_records.html">count_records</a></span><span class="op">(</span><span class="va">hpoSlice</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">hpoSlice</span> <span class="op">&lt;-</span> <span class="fu">slice</span><span class="op">(</span><span class="va">hpof</span>, HPO_diseases<span class="op">=</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="count_records.html">count_records</a></span><span class="op">(</span><span class="va">hpoSlice</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span><span class="op">(</span><span class="st">"stringr"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html" class="external-link">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>,<span class="st">"Package"</span><span class="op">]</span><span class="op">)</span><span class="op">{</span></span></span>
-<span class="r-in"><span>   <span class="va">epilHP</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="st">"stringr"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/utils/installed.packages.html" class="external-link">installed.packages</a></span><span class="op">(</span><span class="op">)</span><span class="op">[</span>, <span class="st">"Package"</span><span class="op">]</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">epilHP</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>      <span class="va">hpof</span>,</span></span>
-<span class="r-in"><span>      HPO_diseases<span class="op">=</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>         <span class="va">label</span>, <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/modifiers.html" class="external-link">regex</a></span><span class="op">(</span><span class="st">"epilepsy"</span>, ignore_case<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      HPO_diseases <span class="op">=</span> <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="va">label</span>,</span></span>
+<span class="r-in"><span>        <span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/modifiers.html" class="external-link">regex</a></span><span class="op">(</span><span class="st">"epilepsy"</span>, ignore_case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>      <span class="op">)</span></span></span>
-<span class="r-in"><span>   <span class="op">)</span></span></span>
-<span class="r-in"><span>   <span class="fu"><a href="count_records.html">count_records</a></span><span class="op">(</span><span class="va">epilHP</span><span class="op">)</span></span></span>
-<span class="r-in"><span>   <span class="va">label</span> <span class="op">&lt;-</span> <span class="st">"Rolandic epilepsy"</span></span></span>
-<span class="r-in"><span>   <span class="va">cn</span> <span class="op">&lt;-</span> <span class="fu">sym</span><span class="op">(</span><span class="st">"label"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>   <span class="va">reHP</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="count_records.html">count_records</a></span><span class="op">(</span><span class="va">epilHP</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">label</span> <span class="op">&lt;-</span> <span class="st">"Rolandic epilepsy"</span></span></span>
+<span class="r-in"><span>    <span class="va">cn</span> <span class="op">&lt;-</span> <span class="fu">sym</span><span class="op">(</span><span class="st">"label"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">reHP</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>      <span class="va">hpof</span>,</span></span>
-<span class="r-in"><span>      HPO_diseases<span class="op">=</span><span class="op">!</span><span class="op">!</span><span class="va">cn</span><span class="op">==</span><span class="op">!</span><span class="op">!</span><span class="va">label</span></span></span>
-<span class="r-in"><span>   <span class="op">)</span></span></span>
+<span class="r-in"><span>      HPO_diseases <span class="op">=</span> <span class="op">!</span><span class="op">!</span><span class="va">cn</span> <span class="op">==</span> <span class="op">!</span><span class="op">!</span><span class="va">label</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

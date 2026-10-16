@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-10 08:02:25.608399
+    ## Timestamp: 2026-10-16 09:06:44.301513
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-10 08:02:25.608399
+    ## Timestamp: 2026-10-16 09:06:44.301513
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-10 08:02:25.608399
+    ## Timestamp: 2026-10-16 09:06:44.301513
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-10 08:02:25
+    ## Timestamp: 2026-10-16 09:06:44
     ## 
 
 Also writing these data and related information in text files make them
@@ -1658,18 +1658,18 @@ search_MDB_tables(k, "disease")  # Search table about "disease"
 ```
 
     ## # A tibble: 82 × 3
-    ##    resource            name                            comment                  
-    ##    <chr>               <chr>                           <chr>                    
-    ##  1 AP-Disease-Strategy cci_drug_indications            Indications reported in …
-    ##  2 AP-Disease-Strategy cci_drug_indications_summary    Summary of the CCI indic…
-    ##  3 AP-Disease-Strategy cci_target_indications          CCI targets of the drugs…
-    ##  4 AP-Disease-Strategy cci_target_indications_summary  Summary of the indicatio…
-    ##  5 AP-Disease-Strategy cddi_drug_indications           Development reported in …
-    ##  6 AP-Disease-Strategy cddi_drug_indications_summary   Summary of the CDDI indi…
-    ##  7 AP-Disease-Strategy cddi_target_indications         CDDI targets of the drug…
-    ##  8 AP-Disease-Strategy cddi_target_indications_summary Summary of the indicatio…
-    ##  9 AP-Disease-Strategy diseases                        Diseases and phenotypes …
-    ## 10 AP-Disease-Strategy diseases_descendants            Transitive closure of th…
+    ##    resource            name                           comment                   
+    ##    <chr>               <chr>                          <chr>                     
+    ##  1 AACT                conditions                     Name(s) of the disease(s)…
+    ##  2 AACT                design_outcomes                Description of planned ou…
+    ##  3 AACT                outcomes                       Descriptions of outcomes,…
+    ##  4 AACT                reported_events                Summary information about…
+    ##  5 brainSCOPE          CT_group_conditions            Experimental condition (e…
+    ##  6 brainSCOPE          Cell_type_conditions           Experimental condition (e…
+    ##  7 AP-Disease-Strategy cci_drug_indications           Indications reported in C…
+    ##  8 AP-Disease-Strategy cci_drug_indications_summary   Summary of the CCI indica…
+    ##  9 AP-Disease-Strategy cci_target_indications         CCI targets of the drugs …
+    ## 10 AP-Disease-Strategy cci_target_indications_summary Summary of the indication…
     ## # ℹ 72 more rows
 
 ``` r
@@ -1678,18 +1678,18 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
     ## # A tibble: 227 × 7
-    ##    resource              table               name  comment type  nullable unique
-    ##    <chr>                 <chr>               <chr> <chr>   <chr> <lgl>    <lgl> 
-    ##  1 Kainate-Bulk-RNA-2023 conditions          cond… "Disea… char… TRUE     FALSE 
-    ##  2 Kainate-Bulk-RNA-2023 samples             cond… "Disea… char… TRUE     FALSE 
-    ##  3 MetaBase              ImagemapsEdges      dise… ""      logi… FALSE    FALSE 
-    ##  4 DRE-Bulk-RNA-UMC-2024 conditions          cond… "Disea… char… TRUE     FALSE 
-    ##  5 DRE-Bulk-RNA-UMC-2024 samples             cond… "Disea… char… TRUE     FALSE 
-    ##  6 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
-    ##  7 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      char… FALSE    FALSE 
-    ##  8 DRE-Bulk-RNA-UMC-2024 epilepsies_targets  dise… ""      nume… FALSE    FALSE 
-    ##  9 DRE-Bulk-RNA-UMC-2024 genes_epilepsies_a… dise… ""      char… FALSE    FALSE 
-    ## 10 DRE-Bulk-RNA-UMC-2024 epilepsies_genetics dise… ""      char… FALSE    FALSE 
+    ##    resource              table            name     comment type  nullable unique
+    ##    <chr>                 <chr>            <chr>    <chr>   <chr> <lgl>    <lgl> 
+    ##  1 FCD-TLE-Bulk-RNA-2019 conditions       conditi… "Disea… char… TRUE     TRUE  
+    ##  2 FCD-TLE-Bulk-RNA-2019 samples          conditi… "Disea… char… TRUE     FALSE 
+    ##  3 MetaBase              ImagemapsEdges   disease  ""      logi… FALSE    FALSE 
+    ##  4 HPO                   Disease_HP       db       "Disea… char… FALSE    FALSE 
+    ##  5 HPO                   Disease_synonyms db       "Disea… char… FALSE    FALSE 
+    ##  6 HPO                   Diseases         db       "Disea… char… FALSE    FALSE 
+    ##  7 HPO                   Disease_HP       id       "Disea… char… FALSE    FALSE 
+    ##  8 HPO                   Disease_synonyms id       "Disea… char… FALSE    FALSE 
+    ##  9 HPO                   Diseases         id       "Disea… char… FALSE    FALSE 
+    ## 10 HPO                   Diseases         label    "Disea… char… FALSE    FALSE 
     ## # ℹ 217 more rows
 
 ``` r

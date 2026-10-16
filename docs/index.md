@@ -58,6 +58,8 @@ The following R packages available on CRAN are required:
   JavaScript Library ‘DataTables’
 - [htmltools](https://CRAN.R-project.org/package=htmltools): Tools for
   HTML
+- [httpuv](https://CRAN.R-project.org/package=httpuv): HTTP and
+  WebSocket Server Library
 - [readr](https://CRAN.R-project.org/package=readr): Read Rectangular
   Text Data
 - [jsonlite](https://CRAN.R-project.org/package=jsonlite): A Simple and
@@ -111,6 +113,10 @@ devtools::install_github("patzaw/TKCat")
 - [Defining and using Requirements for Knowledge
   Management](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html)
   ([`vignette("TKCat-KMR-POK")`](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.md))
+
+- [Querying a chTKCat instance with an AI assistant (MCP
+  server)](https://patzaw.github.io/TKCat/articles/TKCat-MCP.html)
+  ([`vignette("TKCat-MCP")`](https://patzaw.github.io/TKCat/articles/TKCat-MCP.md))
 
 ## Alternatives
 

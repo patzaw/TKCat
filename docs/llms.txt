@@ -58,6 +58,8 @@ The following R packages available on CRAN are required:
   JavaScript Library ‘DataTables’
 - [htmltools](https://CRAN.R-project.org/package=htmltools): Tools for
   HTML
+- [httpuv](https://CRAN.R-project.org/package=httpuv): HTTP and
+  WebSocket Server Library
 - [readr](https://CRAN.R-project.org/package=readr): Read Rectangular
   Text Data
 - [jsonlite](https://CRAN.R-project.org/package=jsonlite): A Simple and
@@ -111,6 +113,10 @@ devtools::install_github("patzaw/TKCat")
 - [Defining and using Requirements for Knowledge
   Management](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html)
   ([`vignette("TKCat-KMR-POK")`](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.md))
+
+- [Querying a chTKCat instance with an AI assistant (MCP
+  server)](https://patzaw.github.io/TKCat/articles/TKCat-MCP.html)
+  ([`vignette("TKCat-MCP")`](https://patzaw.github.io/TKCat/articles/TKCat-MCP.md))
 
 ## Alternatives
 
@@ -225,6 +231,13 @@ devtools::install_github("patzaw/TKCat")
 
 - [`chTKCat()`](https://patzaw.github.io/TKCat/reference/chTKCat.md) :
   Connect to a ClickHouse TKCat instance
+
+- [`chTKCat_mcp_http_server()`](https://patzaw.github.io/TKCat/reference/chTKCat_mcp_http_server.md)
+  : Run a read-only MCP server giving remote access to a chTKCat
+  instance
+
+- [`chTKCat_mcp_server()`](https://patzaw.github.io/TKCat/reference/chTKCat_mcp_server.md)
+  : Run a read-only MCP server giving access to a chTKCat instance
 
 - [`ch_insert()`](https://patzaw.github.io/TKCat/reference/ch_insert.md)
   : Insert records by batches in a Clickhouse table
@@ -609,5 +622,7 @@ devtools::install_github("patzaw/TKCat")
 
 - [Defining and using Requirements for Knowledge Management (KMR) in
   TKCat](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.md):
+- [Querying a chTKCat instance with an AI assistant (MCP
+  server)](https://patzaw.github.io/TKCat/articles/TKCat-MCP.md):
 - [Introduction to
   TKCat](https://patzaw.github.io/TKCat/articles/TKCat.md):

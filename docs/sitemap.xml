@@ -2,8 +2,10 @@
 <url><loc>https://patzaw.github.io/TKCat/404.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/LICENSE-text.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/TKCat-KMR-POK.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/TKCat-MCP.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/TKCat.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/articles/TKCat-MCP.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/articles/TKCat.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/articles/index.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/authors.html</loc></url>
@@ -31,6 +33,8 @@
 <url><loc>https://patzaw.github.io/TKCat/reference/as_memoMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/chMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/chTKCat.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/chTKCat_mcp_http_server.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/chTKCat_mcp_server.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/ch_insert.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/ch_join_query.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/ch_union_query.html</loc></url>
