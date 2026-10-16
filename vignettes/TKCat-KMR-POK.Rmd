@@ -5,14 +5,13 @@ date:  "`r format(Sys.time(), '%B %d, %Y')`"
 package: "TKCat (version `r packageVersion('TKCat')`)"
 link-citations: yes
 output:
-   rmarkdown::html_document:
+   rmarkdown::html_vignette:
       number_sections: yes
-      self_contained: true
       toc: yes
       fig_width: 7
       fig_height: 5
 vignette: >
-   %\VignetteIndexEntry{TKCat-KMR-POK}
+   %\VignetteIndexEntry{Defining and using Requirements for Knowledge Management (KMR) in TKCat}
    %\VignetteEncoding{UTF-8}
    %\VignetteEngine{knitr::rmarkdown}
 editor_options: 

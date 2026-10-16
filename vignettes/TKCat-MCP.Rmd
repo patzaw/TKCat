@@ -6,14 +6,13 @@ package: "TKCat (version `r packageVersion('TKCat')`)"
 bibliography: TKCat.bib
 link-citations: true
 output:
-   rmarkdown::html_document:
+   rmarkdown::html_vignette:
       number_sections: yes
-      self_contained: true
       toc: yes
       fig_width: 7
       fig_height: 5
 vignette: >
-   %\VignetteIndexEntry{TKCat-MCP}
+   %\VignetteIndexEntry{Querying a chTKCat instance with an AI assistant (MCP server)}
    %\VignetteEncoding{UTF-8}
    %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
