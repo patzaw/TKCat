@@ -1,0 +1,985 @@
+---
+title: "TKCat End-to-End: From ClickHouse Setup to MCP Server Configuration"
+author: "Patrice Godard"
+date:  "`r format(Sys.time(), '%B %d, %Y')`"
+package: "TKCat (version `r packageVersion('TKCat')`)"
+bibliography: TKCat.bib
+link-citations: true
+output:
+   rmarkdown::html_vignette:
+      number_sections: yes
+      toc: yes
+      fig_width: 7
+      fig_height: 5
+vignette: >
+   %\VignetteIndexEntry{TKCat End-to-End: From ClickHouse Setup to MCP Server Configuration}
+   %\VignetteEncoding{UTF-8}
+   %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, message=FALSE, echo=FALSE, include=FALSE, cache=FALSE, eval=FALSE}
+library(knitr)
+opts_chunk$set(
+   include = TRUE,
+   echo = TRUE,
+   eval = FALSE,
+   message = TRUE,
+   warning = TRUE,
+   cache = FALSE
+)
+```
+
+[redamor]: https://patzaw.github.io/ReDaMoR/
+[tkcat]: https://patzaw.github.io/TKCat/
+[clickhouse]: https://clickhouse.com/
+[rclickhouse]: https://github.com/IMSMWU/RClickhouse
+[chhttp]: https://github.com/patzaw/ClickHouseHTTP
+
+[hpo]: https://hpo.jax.org/
+[clinvar]: https://www.ncbi.nlm.nih.gov/clinvar/
+[chembl]: https://www.ebi.ac.uk/chembl/
+
+# Introduction
+
+This vignette provides a comprehensive end-to-end guide for setting up a ClickHouse
+_database for TKCat, preparing and loading MDBs (Modeled Databases), querying them,
+exploring available resources, and finally configuring an MCP (Model Context Protocol)
+server to enable AI assistant integration.
+
+The workflow covered includes:
+
+1. **Setting up ClickHouse** for TKCat usage
+2. **Preparing MDBs** from different sources (HPO from ReDaMoR, ClinVar and ChEMBL from TKCat)
+3. **Pushing MDBs** to the ClickHouse database
+4. **Querying MDBs** and exploring available resources
+5. **Setting up MCP server** (both local and remote configurations)
+6. **Configuring MCP clients** (Claude Code, Claude Desktop, Mistral Vibe)
+
+This document references and builds upon the information provided in the main
+[Introduction to TKCat](TKCat.html) vignette and the
+[Querying a chTKCat instance with an AI assistant (MCP server)](TKCat-MCP.html) vignette.
+
+# Setting up ClickHouse
+
+As described in the [ClickHouse folder](https://github.com/patzaw/TKCat/tree/master/ClickHouse),
+TKCat provides scripts to easily set up a ClickHouse instance ready for TKCat usage.
+
+## Copy-paste setup script
+
+The following bash chunks can be copy-pasted and run directly in your terminal.
+They will clone the TKCat repository to `/home/$(whoami)/tmp`, modify the configuration files,
+and initialize a ClickHouse instance with the specified parameters.
+
+### Parameters used in this guide
+
+- **ClickHouse version**: `26.9.19`
+- **TKCAT_VERSION**: `"2026-10-17"`
+- **TKCAT_INSTANCE**: `"tkcat_2026_10_17"`
+- **TKCAT_ADMIN**: `"admin"`
+- **TKCAT_NAT_PORT**: `9103`
+- **TKCAT_HTTP_PORT**: `9113`
+- **TKCAT_HOSTDIR**: `/home/$(whoami)/tmp`
+
+### Step 1: Clone the repository and navigate to docker-init
+
+```bash
+mkdir -p /home/$(whoami)/tmp
+cd /home/$(whoami)/tmp
+git clone https://github.com/patzaw/TKCat.git
+cd TKCat/ClickHouse/docker-init
+```
+
+### Step 2: Update Dockerfile
+
+```bash
+cat > Dockerfile << 'EOF'
+FROM clickhouse/clickhouse-server:26.9.19
+COPY users.xml /users.xml
+COPY default-user.xml /default-user.xml
+COPY remove_default_user.yaml /remove_default_user.yaml
+COPY init-db.sh /docker-entrypoint-initdb.d/init-db.sh
+EOF
+```
+
+### Step 3: Create modified launch script
+
+```bash
+cat > launch-tkcat-instance.sh << 'EOF'
+#!/bin/bash
+
+##################################################################
+## Customize parameters
+IMAGE_BASE_NAME="tkcat"
+TKCAT_INSTANCE="tkcat_2026_10_17"
+TKCAT_VERSION="2026-10-17"
+TKCAT_ADMIN="admin"
+
+## Don't forget to create a password for the TKCAT_ADMIN user
+## In R: ?TKCat::change_chTKCat_password()
+
+TKCAT_NAT_PORT=9103
+TKCAT_HTTP_PORT=9113
+
+TKCAT_HOSTDIR=/home/$(whoami)/tmp
+
+######################
+## Automatic parameters
+IMAGE=${IMAGE_BASE_NAME}:${TKCAT_VERSION}
+
+CONTAINER=${TKCAT_INSTANCE}_${TKCAT_VERSION}
+TKCAT_HOME=${TKCAT_HOSTDIR}/${CONTAINER}
+TKCAT_DATA=${TKCAT_HOME}/data
+TKCAT_CONFIG=${TKCAT_HOME}/config
+TKCAT_LOG=${TKCAT_HOME}/log
+
+if [ -e "$TKCAT_HOME" ]; then
+    echo "File $TKCAT_HOME already exists. Exiting without doing anything."
+    exit 1
+fi
+
+######################
+docker build -t ${IMAGE} .
+
+######################
+mkdir -p ${TKCAT_HOME}
+chmod a+rwx ${TKCAT_HOME}
+mkdir -p ${TKCAT_DATA}
+chmod a+rwx ${TKCAT_DATA}
+mkdir -p ${TKCAT_LOG}
+chmod a+rwx ${TKCAT_LOG}
+
+######################
+docker run -d \
+	--name ${CONTAINER} \
+	--ulimit nofile=262144:262144 \
+	--publish=${TKCAT_NAT_PORT}:9000 \
+	--publish=${TKCAT_HTTP_PORT}:8123 \
+	--volume ${TKCAT_DATA}:/var/lib/clickhouse \
+	--volume ${TKCAT_CONFIG}:/etc/clickhouse-server \
+	--volume ${TKCAT_LOG}:/var/log/clickhouse-server \
+	-e TKCAT_INSTANCE="${TKCAT_INSTANCE}" \
+	-e TKCAT_VERSION="${TKCAT_VERSION}" \
+	-e TKCAT_ADMIN="${TKCAT_ADMIN}" \
+	--restart=always \
+	${IMAGE}
+EOF
+chmod +x launch-tkcat-instance.sh
+```
+
+### Step 4: Run the initialization
+
+```bash
+/bin/bash launch-tkcat-instance.sh
+```
+
+**Note**: This step requires Docker to be installed on your system. The script will:
+- Build a Docker image with ClickHouse version 26.9.19
+- Create the necessary directories in `/home/$(whoami)/tmp/tkcat_2026_10_17`
+- Launch a Docker container with the proper configuration
+
+**Important**: When connecting to this ClickHouse instance from R or MCP clients, use:
+- Host: `localhost`
+- Native TCP port: `9103` (not the default 9101)
+- HTTP port: `9113` (not the default 9111)
+- Admin user: `admin`
+
+The following R code shows how to connect to this instance, change the admin password,
+and add additional users:
+
+```{r, eval=FALSE}
+library(TKCat)
+# Connect to your ClickHouse instance with the custom ports
+k <- chTKCat(
+   host = "localhost",
+   port = 9113L,  # Using the custom HTTP port
+   user = "admin",  # The admin user created by the docker-init script
+   drv = ClickHouseHTTP::ClickHouseHTTP()
+)
+
+# Change the admin password (you will be prompted for the new password)
+change_chTKCat_password(k, "admin")
+
+# Add additional users with appropriate permissions
+# Create a regular user with read-only access
+create_chTKCat_user(k, login = "read_only_user", contact = NA, admin = FALSE)
+
+# Create a user with admin privileges
+create_chTKCat_user(k, login = "mcp_admin", contact = NA, admin = TRUE)
+
+# Grant access to specific MDBs (after creating them)
+# add_chMDB_user(k, mdb = "HPO", login = "read_only_user", admin = FALSE)
+```
+
+After initialization, you can create a password for the admin user using the
+`change_chTKCat_password()` function as shown above.
+
+> **Upgrading ClickHouse**: To upgrade an existing ClickHouse instance, use the scripts in the
+> `ClickHouse/docker-upgrade` directory. Set the `CH_VERSION` parameter to `26.9.19` and
+> update the TKCAT parameters (TKCAT_VERSION, TKCAT_INSTANCE, TKCAT_NAT_PORT, TKCAT_HTTP_PORT, TKCAT_HOSTDIR) as needed,
+> then run the upgrade script.
+
+For more details on ClickHouse setup, refer to the 
+[ClickHouse/README.md](https://github.com/patzaw/TKCat/blob/master/ClickHouse/README.md) file.
+
+# Preparing MDBs
+
+In this section, we prepare three example MDBs:
+1. HPO (Human Phenotype Ontology) from ReDaMoR
+2. ClinVar from TKCat package data
+3. ChEMBL from TKCat package data
+
+**Important**: These are old subsets of the respective databases, provided for
+illustration purposes. For production use, you should download and prepare
+current versions of these resources.
+
+## HPO from ReDaMoR
+
+The [Human Phenotype Ontology (HPO)][hpo] aims to provide a standardized vocabulary
+of phenotypic abnormalities encountered in human diseases [@kohler_expansion_2019].
+
+As described in the [main vignette](TKCat.html#hpo), a subset of HPO is provided
+within the [ReDaMoR][redamor] package:
+
+```{r, eval=FALSE}
+# Load HPO data from ReDaMoR
+file_hpo <- read_fileMDB(
+   path = system.file("examples/HPO-subset", package = "ReDaMoR"),
+   dataModel = system.file("examples/HPO-model.json", package = "ReDaMoR"),
+   dbInfo = list(
+      "name" = "HPO",
+      "title" = "Data extracted from the HPO database",
+      "description" = paste(
+         "This is a very small subset of the HPO!",
+         "Visit the reference URL for more information."
+      ),
+      "url" = "http://human-phenotype-ontology.github.io/"
+   )
+)
+```
+
+We can also document the collection members for HPO tables to enable integration
+with other resources:
+
+```{r, eval=FALSE}
+file_hpo <- file_hpo |>
+   add_collection_member(
+      collection = "Condition",
+      table = "HPO_hp",
+      condition = list(value = "Phenotype", static = TRUE),
+      source = list(value = "HP", static = TRUE),
+      identifier = list(value = "id", static = FALSE)
+   ) |>
+   add_collection_member(
+      collection = "Condition",
+      table = "HPO_diseases",
+      condition = list(value = "Disease", static = TRUE),
+      source = list(value = "db", static = FALSE),
+      identifier = list(value = "id", static = FALSE)
+   )
+```
+
+## ClinVar from TKCat
+
+[ClinVar][clinvar] is a freely accessible, public archive of reports of the
+relationships among human variations and phenotypes, with supporting evidence
+[@landrum_clinvar_2018].
+
+A subset of ClinVar is provided within the TKCat package:
+
+```{r, eval=FALSE}
+# Load ClinVar data from TKCat
+file_clinvar <- read_fileMDB(
+   path = system.file("examples/ClinVar", package = "TKCat")
+)
+
+# Rename tables for better readability
+names(file_clinvar) <- sub("ClinVar_", "", names(file_clinvar))
+```
+
+**Reference**: This is a small subset of ClinVar data. For the complete database,
+visit [https://www.ncbi.nlm.nih.gov/clinvar/](https://www.ncbi.nlm.nih.gov/clinvar/).
+
+## ChEMBL from TKCat
+
+[CHEMBL][chembl] is a manually curated chemical database of bioactive molecules
+with drug-like properties [@mendez_chembl_2019].
+
+A subset of ChEMBL is also provided within the TKCat package:
+
+```{r, eval=FALSE}
+# Load ChEMBL data from TKCat
+file_chembl <- read_fileMDB(
+   path = system.file("examples/CHEMBL", package = "TKCat")
+)
+```
+
+**Reference**: This is a small subset of ChEMBL data. For the complete database,
+visit [https://www.ebi.ac.uk/chembl/](https://www.ebi.ac.uk/chembl/).
+
+## Summary
+
+We now have three MDBs ready to be pushed to ClickHouse:
+- `file_hpo`: HPO database with phenotype and disease information
+- `file_clinvar`: ClinVar database with variant and clinical significance information
+- `file_chembl`: ChEMBL database with compound and drug information
+
+All three are subsets provided for demonstration purposes. The full databases
+should be downloaded and prepared for production use.
+
+# Pushing MDBs to ClickHouse
+
+Once ClickHouse is set up and running, we can push our MDBs to create a
+centralized catalog.
+
+## Connecting to chTKCat
+
+First, establish a connection to your chTKCat instance:
+
+```{r, eval=FALSE}
+# Connect to chTKCat (adjust parameters as needed)
+k <- chTKCat(
+   host = "localhost",
+   port = 9113L,  # Using the custom HTTP port
+   user = "admin",  # The admin user created by the docker-init script
+   drv = ClickHouseHTTP::ClickHouseHTTP()
+)
+```
+
+**Note**: For the examples below to work, the user must have write permissions
+on the ClickHouse database.
+
+## Preparing the database in ClickHouse
+
+Each MDB needs to have its own database in ClickHouse. Use the `create_chMDB()`
+function to prepare the database structure:
+
+```{r, eval=FALSE}
+# Create database for HPO
+create_chMDB(k, "HPO", public = TRUE)
+
+# Create database for ClinVar
+create_chMDB(k, "ClinVar", public = TRUE)
+
+# Create database for ChEMBL
+create_chMDB(k, "CHEMBL", public = TRUE)
+```
+
+The `public=TRUE` parameter makes the MDB accessible to all users with read access
+to the ClickHouse instance. Set it to `FALSE` for private MDBs.
+
+## Pushing MDBs to ClickHouse
+
+Now we can push each MDB to ClickHouse using the `as_chMDB()` function:
+
+```{r, eval=FALSE}
+# Push HPO MDB
+ch_hpo <- as_chMDB(file_hpo, k)
+
+# Push ClinVar MDB
+ch_clinvar <- as_chMDB(file_clinvar, k)
+
+# Push ChEMBL MDB
+ch_chembl <- as_chMDB(file_chembl, k)
+```
+
+The `as_chMDB()` function:
+- Creates the necessary tables in the ClickHouse database
+- Loads the data from the fileMDB into ClickHouse
+- Returns a chMDB object that can be used to query the data
+
+**Note**: The `overwrite` parameter (default: `FALSE`) controls whether existing
+tables should be replaced. Set it to `TRUE` to overwrite existing data.
+
+## Verifying the push
+
+You can verify that the MDBs have been successfully pushed by listing all
+MDBs in the catalog:
+
+```{r, eval=FALSE}
+list_MDBs(k)
+```
+
+This will display a table with information about each MDB including:
+- Name
+- Title
+- Description
+- Version
+- Size
+- Access level (public/private)
+
+# Querying MDBs
+
+Once the MDBs are in ClickHouse, we can query them efficiently.
+
+## Connecting as a regular user
+
+For querying, we can connect with a user that has read-only access:
+
+```{r, eval=FALSE}
+k_readonly <- chTKCat(
+   host = "localhost",
+   port = 9113L,  # Using the custom HTTP port
+   user = "default" # Default user has read access to public MDBs
+)
+```
+
+## Exploring available MDBs from R
+
+ TKCat provides several functions to explore the available MDBs:
+
+```{r, eval=FALSE}
+# List all MDBs
+list_MDBs(k_readonly)
+
+# Search for tables related to "disease"
+search_MDB_tables(k_readonly, "disease")
+
+# Search for fields related to "gene"
+search_MDB_fields(k_readonly, "gene")
+
+# Get collection members across all MDBs
+collection_members(k_readonly)
+```
+
+## Example queries
+
+### Querying HPO
+
+Get phenotype information:
+
+```{r, eval=FALSE}
+hpo <- get_MDB(k_readonly, "HPO")
+
+# Get first 10 phenotypes
+get_query(
+   hpo,
+   query = "SELECT * FROM HPO_hp LIMIT 10"
+)
+
+# Search for phenotypes related to epilepsy
+get_query(
+   hpo,
+   query = sprintf("SELECT * FROM HPO_hp WHERE lower(label) LIKE '%%epilep%%'")
+)
+```
+
+### Querying ClinVar
+
+Find variants in specific genes:
+
+```{r, eval=FALSE}
+clinvar <- get_MDB(k_readonly, "ClinVar")
+
+# Get information about variants in the PIK3R2 gene
+get_query(
+   clinvar,
+   query = "SELECT * FROM entrezNames WHERE symbol = 'PIK3R2'"
+)
+
+# Get pathogenic variants
+get_query(
+   clinvar,
+   query = paste(
+      "SELECT * FROM ReferenceClinVarAssertion ",
+      "WHERE lower(clinicalSignificance) LIKE '%%pathogen%%' ",
+      "LIMIT 10"
+   )
+)
+```
+
+### Querying ChEMBL
+
+Search for drug targets:
+
+```{r, eval=FALSE}
+chembl <- get_MDB(k_readonly, "CHEMBL")
+
+# Get first 10 drug targets
+get_query(
+   chembl,
+   query = "SELECT * FROM CHEMBL_component_sequence LIMIT 10"
+)
+
+# Search for compounds targeting a specific protein
+get_query(
+   chembl,
+   query = "SELECT * FROM CHEMBL_compound WHERE compound_name LIKE '%%aspirin%%'"
+)
+```
+
+### Cross-MDB queries
+
+You can also query across multiple MDBs in a single query by using the
+`` `MDB`.`table` `` syntax:
+
+```{r, eval=FALSE}
+# Get diseases from HPO and associated traits from ClinVar
+# (assuming they share condition identifiers)
+get_query(
+   hpo,
+   query = paste(
+      "SELECT h.* FROM HPO_diseases h ",
+      "WHERE h.id IN (SELECT DISTINCT id FROM `ClinVar`.traitNames) ",
+      "LIMIT 10"
+   )
+)
+```
+
+**Note**: Cross-MDB queries require that the MDBs share collection members or
+have compatible identifier systems.
+
+## Exploring data models
+
+You can explore the data model of each MDB:
+
+```{r, eval=FALSE}
+# Get and plot the data model of HPO
+hpo_model <- data_model(hpo)
+plot(hpo_model)
+
+# Get the data model of ClinVar
+clinvar_model <- data_model(clinvar)
+plot(clinvar_model)
+```
+
+# Setting up MCP Server
+
+The MCP (Model Context Protocol) server enables AI assistants to interact with
+your chTKCat instance. This section describes how to set it up in different configurations.
+
+## Local Server (stdio transport)
+
+The local server runs on the user's machine and connects to a chTKCat instance
+(local or remote).
+
+### Requirements
+
+- R (>= 4.1) installed
+- TKCat package (version >= 1.3.0) installed
+- `Rscript` command available in PATH
+- A chTKCat instance reachable from the machine
+
+### Environment variables
+
+The server uses environment variables for configuration:
+
+| Variable | Description | Default | For this guide |
+|----------|-------------|---------|----------------|
+| `TKCAT_HOST` | chTKCat host | `localhost` | `localhost` |
+| `TKCAT_PORT` | chTKCat HTTP port | `9111` | `9113` |
+| `TKCAT_USER` | ClickHouse user | `default` | `admin` or `mcp_user` |
+| `TKCAT_PASSWORD` | User password | `""` | Your password |
+| `TKCAT_HTTPS` | Use HTTPS | `FALSE` | `FALSE` |
+
+### Starting the server
+
+```{bash}
+# Basic start (using the custom port 9113 for our ClickHouse instance)
+TKCAT_HOST=localhost TKCAT_PORT=9113 TKCAT_USER=admin \
+   Rscript -e "TKCat::chTKCat_mcp_server()"
+
+# With custom parameters
+Rscript -e "TKCat::chTKCat_mcp_server(maxRows = 500, maxExecutionTime = 60)"
+```
+
+The server parameters include:
+- `maxRows`: Maximum number of rows returned (default: 1000)
+- `maxChars`: Maximum characters returned (default: 60000)
+- `maxExecutionTime`: Maximum query execution time in seconds (default: 300)
+
+### Creating a dedicated user for MCP
+
+For security, create a dedicated user with read-only access:
+
+```{r, eval=FALSE}
+# Connect as admin
+k_admin <- chTKCat(host = "localhost", port = 9113, user = "admin")
+
+# Create a dedicated MCP user
+create_chTKCat_user(k_admin, login = "mcp_user", contact = NA, admin = FALSE)
+
+# Give access to public MDBs (or specific private MDBs)
+add_chMDB_user(k_admin, mdb = "HPO", login = "mcp_user", admin = FALSE)
+add_chMDB_user(k_admin, mdb = "ClinVar", login = "mcp_user", admin = FALSE)
+add_chMDB_user(k_admin, mdb = "CHEMBL", login = "mcp_user", admin = FALSE)
+```
+
+## Remote Server (HTTP transport)
+
+The remote server runs as a service, typically on the same machine as the
+chTKCat instance, with nginx providing HTTPS.
+
+### Architecture
+
+The recommended architecture uses:
+- Multiple R server instances running on local ports
+- nginx as a reverse proxy providing HTTPS and load balancing
+- Basic authentication via ClickHouse credentials
+
+### Running the server
+
+Start one or more instances:
+
+```{bash}
+# Instance 1 (using the custom port 9113 for our ClickHouse instance)
+TKCAT_HOST=localhost TKCAT_PORT=9113 TKCAT_MCP_PORT=8801 \
+   Rscript -e "TKCat::chTKCat_mcp_http_server()"
+
+# Instance 2
+TKCAT_HOST=localhost TKCAT_PORT=9113 TKCAT_MCP_PORT=8802 \
+   Rscript -e "TKCat::chTKCat_mcp_http_server()"
+```
+
+Server parameters:
+- `mcpHost`: Listening address (default: `127.0.0.1`)
+- `mcpPort`: Listening port (default: `8800`)
+- `mcpPath`: MCP endpoint path (default: `/mcp`)
+- `host`, `port`, `https`: chTKCat connection parameters
+- `anonymousUser`: User for unauthenticated access (default: `NA`)
+- `anonymousPassword`: Password for anonymous user
+- `allowedOrigins`: Allowed Origin headers
+- `cacheTime`: Connection cache time in seconds (default: `3600`)
+
+### systemd service
+
+Create a systemd service for automatic management:
+
+```ini
+[Unit]
+Description=chTKCat MCP server (port %i)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=tkcat-mcp
+Group=tkcat-mcp
+Environment=TKCAT_HOST=localhost
+Environment=TKCAT_PORT=9113
+Environment=TKCAT_MCP_HOST=127.0.0.1
+Environment=TKCAT_MCP_PORT=%i
+EnvironmentFile=-/etc/tkcat-mcp.env
+ExecStart=/usr/local/bin/Rscript -e "TKCat::chTKCat_mcp_http_server()"
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Create the system user and enable multiple instances:
+
+```{bash}
+sudo useradd --system --no-create-home --shell /usr/sbin/nologin tkcat-mcp
+sudo systemctl daemon-reload
+sudo systemctl enable --now tkcat-mcp@8801 tkcat-mcp@8802 tkcat-mcp@8803 tkcat-mcp@8804
+```
+
+### nginx configuration
+
+Configure nginx to proxy requests to the R server instances:
+
+```nginx
+limit_req_zone $binary_remote_addr zone=tkcat_mcp:10m rate=5r/s;
+
+upstream tkcat_mcp_inst {
+    least_conn;
+    server 127.0.0.1:8801;
+    server 127.0.0.1:8802;
+    server 127.0.0.1:8803;
+    server 127.0.0.1:8804;
+    keepalive 8;
+}
+
+server {
+    # ... other configuration ...
+    
+    location = /tkcat_mcp {
+        limit_req zone=tkcat_mcp burst=20 nodelay;
+        client_max_body_size 1m;
+
+        proxy_pass http://tkcat_mcp_inst/mcp;
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_read_timeout 330s;
+        proxy_send_timeout 330s;
+        proxy_buffering off;
+    }
+}
+```
+
+Reload nginx:
+
+```{bash}
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+## Configuring MCP Clients
+
+This section shows how to configure different MCP clients to connect to your
+chTKCat instance.
+
+## Claude Code
+
+### Local server configuration
+
+```{bash}
+claude mcp add tkcat --scope user \
+   -e TKCAT_HOST=localhost -e TKCAT_PORT=9113 \
+   -e TKCAT_USER=mcp_user -e TKCAT_PASSWORD=xxxxxx \
+   -- Rscript -e "TKCat::chTKCat_mcp_server()"
+```
+
+Check the connection:
+
+```{bash}
+claude mcp list
+```
+
+Or use the `/mcp` command within Claude Code.
+
+### Project configuration
+
+Create a `.mcp.json` file at your project root:
+
+```json
+{
+  "mcpServers": {
+    "tkcat": {
+      "command": "Rscript",
+      "args": ["-e", "TKCat::chTKCat_mcp_server()"],
+      "env": {
+        "TKCAT_HOST": "tkcat.example.com",
+        "TKCAT_PORT": "9113",
+        "TKCAT_USER": "${TKCAT_USER}",
+        "TKCAT_PASSWORD": "${TKCAT_PASSWORD}"
+      }
+    }
+  }
+}
+```
+
+### Remote server configuration (HTTP transport)
+
+```{bash}
+claude mcp add tkcat --scope user --transport http \
+   https://tkcat.example.com/tkcat_mcp \
+   --header "Authorization: Basic amRvZTp4eHh4eHg="
+```
+
+Where `amRvZTp4eHh4eHg=` is the Base64 encoding of `user:password`.
+
+Compute the Base64 encoding:
+
+```{bash}
+printf '%s' 'mcp_user:password' | base64
+```
+
+Or in R:
+
+```{r, eval=FALSE}
+jsonlite::base64_enc("mcp_user:password")
+```
+
+## Claude Desktop
+
+### Local server configuration
+
+Add to `claude_desktop_config.json` (Settings > Developer > Edit Config):
+
+```json
+{
+  "mcpServers": {
+    "tkcat": {
+      "command": "Rscript",
+      "args": ["-e", "TKCat::chTKCat_mcp_server()"],
+      "env": {
+        "TKCAT_HOST": "localhost",
+        "TKCAT_PORT": "9113",
+        "TKCAT_USER": "mcp_user",
+        "TKCAT_PASSWORD": "xxxxxx"
+      }
+    }
+  }
+}
+```
+
+Restart Claude Desktop after making changes.
+
+### Remote server configuration
+
+```json
+{
+  "mcpServers": {
+    "tkcat": {
+      "type": "http",
+      "url": "https://tkcat.example.com/tkcat_mcp",
+      "headers": {
+        "Authorization": "Basic amRvZTp4eHh4eHg="
+      }
+    }
+  }
+}
+```
+
+## Mistral Vibe
+
+Mistral Vibe supports MCP through its configuration. The configuration method
+depends on how you're using Mistral Vibe:
+
+### Using mcp-remote bridge
+
+For clients that don't support HTTP transport directly, use the
+[mcp-remote](https://www.npmjs.com/package/mcp-remote) bridge:
+
+```json
+{
+  "mcpServers": {
+    "tkcat": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote", "https://tkcat.example.com/tkcat_mcp",
+        "--header", "Authorization:Basic ${TKCAT_MCP_AUTH}"
+      ],
+      "env": {
+        "NODE_OPTIONS": "--use-system-ca",
+        "TKCAT_MCP_AUTH": "amRvZTp4eHh4eHg="
+      }
+    }
+  }
+}
+```
+
+The `NODE_OPTIONS` environment variable with `--use-system-ca` tells Node.js
+to trust the system certificate authorities, which is useful for internal
+certificates or corporate proxies.
+
+### Direct HTTP transport
+
+If Mistral Vibe supports HTTP transport directly, use:
+
+```json
+{
+  "mcpServers": {
+    "tkcat": {
+      "url": "https://tkcat.example.com/tkcat_mcp",
+      "headers": {
+        "Authorization": "Basic ${TKCAT_MCP_AUTH}"
+      }
+    }
+  }
+}
+```
+
+## Testing the connection
+
+### Using MCP Inspector
+
+Test your server with the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector):
+
+```{bash}
+# For local server (using our custom port 9113)
+npx @modelcontextprotocol/inspector \
+   -e TKCAT_HOST=localhost -e TKCAT_PORT=9113 \
+   -- Rscript -e "TKCat::chTKCat_mcp_server()"
+
+# For remote server
+npx @modelcontextprotocol/inspector \
+   https://tkcat.example.com/tkcat_mcp \
+   --header "Authorization: Basic amRvZTp4eHh4eHg="
+```
+
+### Using curl
+
+Test the remote server with curl:
+
+```{bash}
+curl -u mcp_user:password https://tkcat.example.com/tkcat_mcp \
+   -H "Content-Type: application/json" \
+   -H "Accept: application/json, text/event-stream" \
+   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"list_mdbs","arguments":{}}}'
+```
+
+# Usage Examples with AI Assistants
+
+Once configured, AI assistants can query your chTKCat instance using natural language.
+
+## Available tools
+
+The MCP server provides the following tools:
+
+| Tool | Description |
+|------|-------------|
+| `list_mdbs` | List all MDBs with metadata |
+| `search_tkcat` | Search MDBs, tables, and fields by keyword |
+| `describe_mdb` | Get MDB information, tables, relationships |
+| `describe_tables` | Get detailed data model of tables |
+| `preview_table` | Get first records of a table |
+| `query_mdb` | Run a read-only SQL query on an MDB |
+| `get_matrix_values` | Get values from matrix tables |
+| `list_collections` | List collections and their members |
+
+## Example questions
+
+- "Which resources provide information about genes?"
+- "What is the data model of the HPO MDB?"
+- "Show me the first 10 phenotypes in HPO"
+- "Find all diseases associated with the gene PIK3R2"
+- "Which MDBs can be integrated through gene identifiers?"
+- "List all tables in ClinVar that contain variant information"
+
+## Security considerations
+
+When configuring the MCP server:
+
+1. **Use dedicated users**: Create dedicated users with read-only access to
+   specific MDBs only.
+
+2. **Secure credentials**: Never hardcode credentials in configuration files.
+   Use environment variables or secure credential stores.
+
+3. **Use HTTPS**: Always use HTTPS for remote connections to prevent
+   credential interception.
+
+4. **Limit access**: Restrict access to trusted networks when possible.
+
+5. **Data sensitivity**: Only expose MDBs whose content can be shared with the
+   AI service according to your organization's policies.
+
+6. **Monitor usage**: Check server logs for suspicious activity.
+
+# Summary
+
+This vignette has demonstrated a complete end-to-end workflow:
+
+1. **Setting up ClickHouse** with specific parameters (version 26.9.19, TKCAT_VERSION 2026-10-17)
+2. **Preparing three example MDBs**:
+   - HPO from ReDaMoR (subset) [@kohler_expansion_2019]
+   - ClinVar from TKCat package (subset) [@landrum_clinvar_2018]
+   - ChEMBL from TKCat package (subset) [@mendez_chembl_2019]
+3. **Pushing MDBs** to ClickHouse and verifying the push
+4. **Querying MDBs** with various examples and exploration functions
+5. **Setting up MCP server** in both local and remote configurations
+6. **Configuring MCP clients**:
+   - Claude Code (stdio and HTTP transport)
+   - Claude Desktop
+   - Mistral Vibe
+
+For more details on any of these topics, refer to:
+- [Introduction to TKCat](TKCat.html) - Main vignette
+- [Querying a chTKCat instance with an AI assistant (MCP server)](TKCat-MCP.html) - MCP server details
+- [ClickHouse README](https://github.com/patzaw/TKCat/blob/master/ClickHouse/README.md) - ClickHouse setup
+
+**Important reminder**: The MDBs used in this guide are subsets provided for
+demonstration. For production use, ensure you download and prepare current
+versions of the databases, and properly document all data sources and versions.
