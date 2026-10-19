@@ -920,56 +920,6 @@ Restart Claude Desktop after making changes.
 }
 ```
 
-### Mistral Vibe
-
-Mistral Vibe supports MCP through its configuration. The configuration method
-depends on how you're using Mistral Vibe:
-
-#### Using mcp-remote bridge
-
-For clients that don't support HTTP transport directly, use the
-[mcp-remote](https://www.npmjs.com/package/mcp-remote) bridge:
-
-```json
-{
-  "mcpServers": {
-    "tkcat": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-remote", "https://tkcat.example.com/tkcat_mcp",
-        "--header", "Authorization:Basic ${TKCAT_MCP_AUTH}"
-      ],
-      "env": {
-        "NODE_OPTIONS": "--use-system-ca",
-        "TKCAT_MCP_AUTH": "amRvZTp4eHh4eHg="
-      }
-    }
-  }
-}
-```
-
-The `NODE_OPTIONS` environment variable with `--use-system-ca` tells Node.js
-to trust the system certificate authorities, which is useful for internal
-certificates or corporate proxies.
-
-#### Direct HTTP transport
-
-If Mistral Vibe supports HTTP transport directly, use:
-
-```json
-{
-  "mcpServers": {
-    "tkcat": {
-      "url": "https://tkcat.example.com/tkcat_mcp",
-      "headers": {
-        "Authorization": "Basic ${TKCAT_MCP_AUTH}"
-      }
-    }
-  }
-}
-```
-
 ### Posit Assistant
 
 Add the following entry to the mcpServers section of the `~/.posit/assistant/settings.json` file:
@@ -1011,7 +961,7 @@ The MCP server provides the following tools:
 - "Which resources provide information about genes?"
 - "What is the data model of the HPO MDB?"
 - "Show me the first 10 phenotypes in HPO"
-- "Find all diseases associated with the gene PIK3R2"
+- "Which MDBs can be integrated through BE identifiers?"
 - "Which MDBs can be integrated through gene identifiers?"
 - "List all tables in ClinVar that contain variant information"
 
