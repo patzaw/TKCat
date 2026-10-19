@@ -107,15 +107,31 @@ devtools::install_github("patzaw/TKCat")
 
 - [Introduction to
   TKCat](https://patzaw.github.io/TKCat/articles/TKCat.html)
-  (`vignette("TKCat")`)
+  (`vignette("TKCat")`): the main guide. It shows how to create MDBs
+  (data tables, description and data model), how to explore, filter,
+  join and combine them, and how to manage them in local catalogs or in
+  a centralized ClickHouse catalog (chTKCat).
 
-- [Defining and using Requirements for Knowledge
-  Management](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html)
-  (`vignette("TKCat-KMR-POK")`)
+- [TKCat
+  end-to-end](https://patzaw.github.io/TKCat/articles/TKCat-EndToEnd.html)
+  (`vignette("TKCat-EndToEnd")`): a step-by-step walkthrough of a
+  complete deployment: setting up ClickHouse, preparing a few MDBs and
+  pushing them to the database, querying them, and configuring an MCP
+  server and its clients.
 
 - [Querying a chTKCat instance with an AI assistant (MCP
   server)](https://patzaw.github.io/TKCat/articles/TKCat-MCP.html)
-  (`vignette("TKCat-MCP")`)
+  (`vignette("TKCat-MCP")`): how to run the TKCat MCP server, locally
+  (stdio) or as a remote service (HTTP), so that AI assistants such as
+  Claude can explore and query the MDBs of a chTKCat instance. It also
+  covers the available tools and security considerations.
+
+- [Defining and using Requirements for Knowledge
+  Management](https://patzaw.github.io/TKCat/articles/TKCat-KMR-POK.html)
+  (`vignette("TKCat-KMR-POK")`): how to define shared requirements (KMR)
+  that MDBs can comply with, how to refer to them in MDBs, and how to
+  use KMR and MDBs together to retrieve pieces of knowledge (POK) in a
+  consistent way.
 
 ## Alternatives
 

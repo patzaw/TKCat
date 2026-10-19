@@ -492,7 +492,7 @@ collection_members(k_readonly)
 A Shiny app is also available to explore available resources:
 
 ```{r, eval=FALSE}
-explore_MDBs(k)
+explore_MDBs(k_readonly)
 ```
 
 ## Example queries

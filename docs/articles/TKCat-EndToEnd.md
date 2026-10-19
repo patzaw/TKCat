@@ -495,7 +495,7 @@ A Shiny app is also available to explore available resources:
 
 ``` r
 
-explore_MDBs(k)
+explore_MDBs(k_readonly)
 ```
 
 ### Example queries
