@@ -42,6 +42,8 @@ library(TKCat)
 [clinvar]: https://www.ncbi.nlm.nih.gov/clinvar/
 [chembl]: https://www.ebi.ac.uk/chembl/
 
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 # Introduction
 
 This vignette provides a comprehensive end-to-end guide for setting up a ClickHouse
@@ -62,6 +64,8 @@ This document references and builds upon the information provided in the main
 [Introduction to TKCat](TKCat.html) vignette and the
 [Querying a chTKCat instance with an AI assistant (MCP server)](TKCat-MCP.html) vignette.
 
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 # Setting up ClickHouse
 
 Scripts are provided in the [ClickHouse folder](https://github.com/patzaw/TKCat/tree/master/ClickHouse),
@@ -206,9 +210,6 @@ db_reconnect(k)
 # Create a regular user with read-only access
 create_chTKCat_user(k, login = "read_only_user", contact = NA, admin = FALSE)
 
-# Create a user with admin privileges
-create_chTKCat_user(k, login = "mcp_admin", contact = NA, admin = TRUE)
-
 # Grant access to specific MDBs (after creating them)
 # add_chMDB_user(k, mdb = "HPO", login = "read_only_user", admin = FALSE)
 ```
@@ -221,6 +222,8 @@ After initialization, you can create a password for the admin user using the
 > update the TKCAT parameters (TKCAT_VERSION, TKCAT_INSTANCE, TKCAT_NAT_PORT, TKCAT_HTTP_PORT, TKCAT_HOSTDIR) as needed,
 > then run the upgrade script.
 
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 # Preparing MDBs
 
 In this section, we prepare three example MDBs:
@@ -259,7 +262,7 @@ to the [TKCat main vignette](TKCat.html#hpo) to learn how to create such
 data model.
 
 ```{r, eval=TRUE}
-hpo_model <- read_json_data_model(system.file(
+hpo_model <- ReDaMoR::read_json_data_model(system.file(
   "examples/HPO-model.json",
   package = "ReDaMoR"
 ))
@@ -365,6 +368,8 @@ We now have three MDBs ready to be pushed to ClickHouse:
 All three are subsets provided for demonstration purposes. The full databases
 should be downloaded and prepared for production use.
 
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 # Pushing MDBs to ClickHouse
 
 Once ClickHouse is set up and running, we can push our MDBs to create a
@@ -447,6 +452,8 @@ This will display a table with information about each MDB including:
 - Size
 - Access level (public/private)
 
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 # Querying MDBs
 
 Once the MDBs are in ClickHouse, we can query them efficiently.
@@ -578,6 +585,8 @@ get_query(
 ```
 
 
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 # Setting up MCP Server
 
 The MCP (Model Context Protocol) server enables AI assistants to interact with
@@ -603,15 +612,32 @@ The server uses environment variables for configuration:
 |----------|-------------|---------|----------------|
 | `TKCAT_HOST` | chTKCat host | `localhost` | `localhost` |
 | `TKCAT_PORT` | chTKCat HTTP port | `9111` | `9113` |
-| `TKCAT_USER` | ClickHouse user | `default` | `admin` or `mcp_user` |
+| `TKCAT_USER` | ClickHouse user | `default` | `mcp_user` |
 | `TKCAT_PASSWORD` | User password | `""` | Your password |
 | `TKCAT_HTTPS` | Use HTTPS | `FALSE` | `FALSE` |
 
+### Creating a dedicated user for MCP
+
+For security, create a dedicated user with read-only access:
+
+```{r, eval=FALSE}
+# Connect as admin
+k_admin <- chTKCat(host = "localhost", port = 9113, user = "admin")
+
+# Create a dedicated MCP user
+create_chTKCat_user(k_admin, login = "mcp_user", password = "XXXX", contact = NA, admin = FALSE)
+
+# All users have read access to public MDBs
+# Give access to public MDBs (or specific private MDBs)
+# Access to private MDBs can be given as follows
+add_chMDB_user(k_admin, mdb = "HPO", login = "mcp_user", admin = FALSE)
+```
+
 ### Starting the server
 
-```{bash}
+```bash
 # Basic start (using the custom port 9113 for our ClickHouse instance)
-TKCAT_HOST=localhost TKCAT_PORT=9113 TKCAT_USER=admin \
+TKCAT_HOST=localhost TKCAT_PORT=9113 TKCAT_USER=mcp_user TKCAT_PASSWORD=XXXX \
    Rscript -e "TKCat::chTKCat_mcp_server()"
 
 # With custom parameters
@@ -623,27 +649,10 @@ The server parameters include:
 - `maxChars`: Maximum characters returned (default: 60000)
 - `maxExecutionTime`: Maximum query execution time in seconds (default: 300)
 
-### Creating a dedicated user for MCP
-
-For security, create a dedicated user with read-only access:
-
-```{r, eval=FALSE}
-# Connect as admin
-k_admin <- chTKCat(host = "localhost", port = 9113, user = "admin")
-
-# Create a dedicated MCP user
-create_chTKCat_user(k_admin, login = "mcp_user", contact = NA, admin = FALSE)
-
-# Give access to public MDBs (or specific private MDBs)
-add_chMDB_user(k_admin, mdb = "HPO", login = "mcp_user", admin = FALSE)
-add_chMDB_user(k_admin, mdb = "ClinVar", login = "mcp_user", admin = FALSE)
-add_chMDB_user(k_admin, mdb = "CHEMBL", login = "mcp_user", admin = FALSE)
-```
-
 ## Remote Server (HTTP transport)
 
 The remote server runs as a service, typically on the same machine as the
-chTKCat instance, with nginx providing HTTPS.
+chTKCat instance.
 
 ### Architecture
 
@@ -656,7 +665,7 @@ The recommended architecture uses:
 
 Start one or more instances:
 
-```{bash}
+```bash
 # Instance 1 (using the custom port 9113 for our ClickHouse instance)
 TKCAT_HOST=localhost TKCAT_PORT=9113 TKCAT_MCP_PORT=8801 \
    Rscript -e "TKCat::chTKCat_mcp_http_server()"
@@ -675,6 +684,18 @@ Server parameters:
 - `anonymousPassword`: Password for anonymous user
 - `allowedOrigins`: Allowed Origin headers
 - `cacheTime`: Connection cache time in seconds (default: `3600`)
+
+
+### Testing the Server using curl
+
+Test the remote server with curl:
+
+```bash
+curl -u mcp_user:XXXX http://localhost:8801/mcp \
+   -H "Content-Type: application/json" \
+   -H "Accept: application/json, text/event-stream" \
+   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"list_mdbs","arguments":{}}}'
+```
 
 ### systemd service
 
@@ -706,9 +727,12 @@ ProtectHome=read-only
 WantedBy=multi-user.target
 ```
 
+Additional environment variables can be put in the `/etc/tkcat-mcp.env` file,
+such as `TKCAT_MCP_ANONYMOUS_USER` and `TKCAT_MCP_ANONYMOUS_PASSWORD`.
+
 Create the system user and enable multiple instances:
 
-```{bash}
+```bash
 sudo useradd --system --no-create-home --shell /usr/sbin/nologin tkcat-mcp
 sudo systemctl daemon-reload
 sudo systemctl enable --now tkcat-mcp@8801 tkcat-mcp@8802 tkcat-mcp@8803 tkcat-mcp@8804
@@ -753,35 +777,60 @@ server {
 
 Reload nginx:
 
-```{bash}
+```bash
 sudo nginx -t && sudo systemctl reload nginx
 ```
+
+## Security considerations
+
+When configuring the MCP server:
+
+1. **Use dedicated users**: Create dedicated users with read-only access to
+   specific MDBs only.
+
+2. **Secure credentials**: Never hardcode credentials in configuration files.
+   Use environment variables or secure credential stores.
+
+3. **Use HTTPS**: Always use HTTPS for remote connections to prevent
+   credential interception.
+
+4. **Limit access**: Restrict access to trusted networks when possible.
+
+5. **Data sensitivity**: Only expose MDBs whose content can be shared with the
+   AI service according to your organization's policies.
+
+6. **Monitor usage**: Check server logs for suspicious activity.
+
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+# Usage Examples with AI Assistants
 
 ## Configuring MCP Clients
 
 This section shows how to configure different MCP clients to connect to your
 chTKCat instance.
 
-## Claude Code
+### Claude Code
 
-### Local server configuration
+#### Local server configuration
 
-```{bash}
+```bash
 claude mcp add tkcat --scope user \
    -e TKCAT_HOST=localhost -e TKCAT_PORT=9113 \
-   -e TKCAT_USER=mcp_user -e TKCAT_PASSWORD=xxxxxx \
+   -e TKCAT_USER=mcp_user -e TKCAT_PASSWORD=XXXX \
    -- Rscript -e "TKCat::chTKCat_mcp_server()"
 ```
 
 Check the connection:
 
-```{bash}
+```bash
 claude mcp list
 ```
 
 Or use the `/mcp` command within Claude Code.
 
-### Project configuration
+#### Project configuration
 
 Create a `.mcp.json` file at your project root:
 
@@ -802,9 +851,9 @@ Create a `.mcp.json` file at your project root:
 }
 ```
 
-### Remote server configuration (HTTP transport)
+#### Remote server configuration (HTTP transport)
 
-```{bash}
+```bash
 claude mcp add tkcat --scope user --transport http \
    https://tkcat.example.com/tkcat_mcp \
    --header "Authorization: Basic amRvZTp4eHh4eHg="
@@ -814,7 +863,7 @@ Where `amRvZTp4eHh4eHg=` is the Base64 encoding of `user:password`.
 
 Compute the Base64 encoding:
 
-```{bash}
+```bash
 printf '%s' 'mcp_user:password' | base64
 ```
 
@@ -824,9 +873,9 @@ Or in R:
 jsonlite::base64_enc("mcp_user:password")
 ```
 
-## Claude Desktop
+### Claude Desktop
 
-### Local server configuration
+#### Local server configuration
 
 Add to `claude_desktop_config.json` (Settings > Developer > Edit Config):
 
@@ -840,7 +889,7 @@ Add to `claude_desktop_config.json` (Settings > Developer > Edit Config):
         "TKCAT_HOST": "localhost",
         "TKCAT_PORT": "9113",
         "TKCAT_USER": "mcp_user",
-        "TKCAT_PASSWORD": "xxxxxx"
+        "TKCAT_PASSWORD": "XXXX"
       }
     }
   }
@@ -849,7 +898,7 @@ Add to `claude_desktop_config.json` (Settings > Developer > Edit Config):
 
 Restart Claude Desktop after making changes.
 
-### Remote server configuration
+#### Remote server configuration
 
 ```json
 {
@@ -865,12 +914,12 @@ Restart Claude Desktop after making changes.
 }
 ```
 
-## Mistral Vibe
+### Mistral Vibe
 
 Mistral Vibe supports MCP through its configuration. The configuration method
 depends on how you're using Mistral Vibe:
 
-### Using mcp-remote bridge
+#### Using mcp-remote bridge
 
 For clients that don't support HTTP transport directly, use the
 [mcp-remote](https://www.npmjs.com/package/mcp-remote) bridge:
@@ -898,7 +947,7 @@ The `NODE_OPTIONS` environment variable with `--use-system-ca` tells Node.js
 to trust the system certificate authorities, which is useful for internal
 certificates or corporate proxies.
 
-### Direct HTTP transport
+#### Direct HTTP transport
 
 If Mistral Vibe supports HTTP transport directly, use:
 
@@ -915,40 +964,11 @@ If Mistral Vibe supports HTTP transport directly, use:
 }
 ```
 
-## Testing the connection
-
-### Using MCP Inspector
-
-Test your server with the [MCP Inspector](https://modelcontextprotocol.io/docs/tools/inspector):
-
-```{bash}
-# For local server (using our custom port 9113)
-npx @modelcontextprotocol/inspector \
-   -e TKCAT_HOST=localhost -e TKCAT_PORT=9113 \
-   -- Rscript -e "TKCat::chTKCat_mcp_server()"
-
-# For remote server
-npx @modelcontextprotocol/inspector \
-   https://tkcat.example.com/tkcat_mcp \
-   --header "Authorization: Basic amRvZTp4eHh4eHg="
-```
-
-### Using curl
-
-Test the remote server with curl:
-
-```{bash}
-curl -u mcp_user:password https://tkcat.example.com/tkcat_mcp \
-   -H "Content-Type: application/json" \
-   -H "Accept: application/json, text/event-stream" \
-   -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"list_mdbs","arguments":{}}}'
-```
-
-# Usage Examples with AI Assistants
+## Query examples
 
 Once configured, AI assistants can query your chTKCat instance using natural language.
 
-## Available tools
+### Available tools
 
 The MCP server provides the following tools:
 
@@ -963,7 +983,7 @@ The MCP server provides the following tools:
 | `get_matrix_values` | Get values from matrix tables |
 | `list_collections` | List collections and their members |
 
-## Example questions
+### Example questions
 
 - "Which resources provide information about genes?"
 - "What is the data model of the HPO MDB?"
@@ -972,26 +992,8 @@ The MCP server provides the following tools:
 - "Which MDBs can be integrated through gene identifiers?"
 - "List all tables in ClinVar that contain variant information"
 
-## Security considerations
-
-When configuring the MCP server:
-
-1. **Use dedicated users**: Create dedicated users with read-only access to
-   specific MDBs only.
-
-2. **Secure credentials**: Never hardcode credentials in configuration files.
-   Use environment variables or secure credential stores.
-
-3. **Use HTTPS**: Always use HTTPS for remote connections to prevent
-   credential interception.
-
-4. **Limit access**: Restrict access to trusted networks when possible.
-
-5. **Data sensitivity**: Only expose MDBs whose content can be shared with the
-   AI service according to your organization's policies.
-
-6. **Monitor usage**: Check server logs for suspicious activity.
-
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
 # Summary
 
 This vignette has demonstrated a complete end-to-end workflow:
