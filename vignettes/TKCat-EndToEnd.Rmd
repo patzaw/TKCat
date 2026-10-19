@@ -625,7 +625,13 @@ For security, create a dedicated user with read-only access:
 k_admin <- chTKCat(host = "localhost", port = 9113, user = "admin")
 
 # Create a dedicated MCP user
-create_chTKCat_user(k_admin, login = "mcp_user", password = "XXXX", contact = NA, admin = FALSE)
+create_chTKCat_user(
+  k_admin,
+  login = "mcp_user",
+  password = "XXXX",
+  contact = NA,
+  admin = FALSE
+)
 
 # All users have read access to public MDBs
 # Give access to public MDBs (or specific private MDBs)
@@ -961,6 +967,23 @@ If Mistral Vibe supports HTTP transport directly, use:
       }
     }
   }
+}
+```
+
+### Posit Assistant
+
+Add the following entry to the mcpServers section of the `~/.posit/assistant/settings.json` file:
+
+```json
+"mcpServers": {
+   "tkcat": {
+      "type": "remote",
+      "url": "https://tkcat.example.com/tkcat_mcp",
+      "headers": {
+         "Authorization": "Basic amRvZTp4eHh4eHg="
+      },
+      "transport": "http"
+   }
 }
 ```
 
