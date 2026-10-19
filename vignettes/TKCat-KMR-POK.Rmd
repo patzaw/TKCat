@@ -3,7 +3,7 @@ title: "Defining and using Requirements for Knowledge Management (KMR) in TKCat"
 author: "Patrice Godard"
 date:  "`r format(Sys.time(), '%B %d, %Y')`"
 package: "TKCat (version `r packageVersion('TKCat')`)"
-link-citations: yes
+link-citations: true
 output:
    rmarkdown::html_vignette:
       number_sections: yes

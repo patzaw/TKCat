@@ -29,6 +29,7 @@ opts_chunk$set(
    warning = TRUE,
    cache = FALSE
 )
+library(TKCat)
 ```
 
 [redamor]: https://patzaw.github.io/ReDaMoR/
@@ -44,14 +45,14 @@ opts_chunk$set(
 # Introduction
 
 This vignette provides a comprehensive end-to-end guide for setting up a ClickHouse
-_database for TKCat, preparing and loading MDBs (Modeled Databases), querying them,
+_database for TKCat, preparing and loading data as MDBs (Modeled Databases), querying them,
 exploring available resources, and finally configuring an MCP (Model Context Protocol)
 server to enable AI assistant integration.
 
 The workflow covered includes:
 
 1. **Setting up ClickHouse** for TKCat usage
-2. **Preparing MDBs** from different sources (HPO from ReDaMoR, ClinVar and ChEMBL from TKCat)
+2. **Preparing data as MDBs** using a few examples
 3. **Pushing MDBs** to the ClickHouse database
 4. **Querying MDBs** and exploring available resources
 5. **Setting up MCP server** (both local and remote configurations)
@@ -63,8 +64,8 @@ This document references and builds upon the information provided in the main
 
 # Setting up ClickHouse
 
-As described in the [ClickHouse folder](https://github.com/patzaw/TKCat/tree/master/ClickHouse),
-TKCat provides scripts to easily set up a ClickHouse instance ready for TKCat usage.
+Scripts are provided in the [ClickHouse folder](https://github.com/patzaw/TKCat/tree/master/ClickHouse),
+to easily set up a ClickHouse instance ready for TKCat usage.
 
 ## Copy-paste setup script
 
@@ -112,7 +113,7 @@ cat > launch-tkcat-instance.sh << 'EOF'
 ##################################################################
 ## Customize parameters
 IMAGE_BASE_NAME="tkcat"
-TKCAT_INSTANCE="tkcat_2026_10_17"
+TKCAT_INSTANCE="tkcat_test"
 TKCAT_VERSION="2026-10-17"
 TKCAT_ADMIN="admin"
 
@@ -131,7 +132,6 @@ IMAGE=${IMAGE_BASE_NAME}:${TKCAT_VERSION}
 CONTAINER=${TKCAT_INSTANCE}_${TKCAT_VERSION}
 TKCAT_HOME=${TKCAT_HOSTDIR}/${CONTAINER}
 TKCAT_DATA=${TKCAT_HOME}/data
-TKCAT_CONFIG=${TKCAT_HOME}/config
 TKCAT_LOG=${TKCAT_HOME}/log
 
 if [ -e "$TKCAT_HOME" ]; then
@@ -157,7 +157,6 @@ docker run -d \
 	--publish=${TKCAT_NAT_PORT}:9000 \
 	--publish=${TKCAT_HTTP_PORT}:8123 \
 	--volume ${TKCAT_DATA}:/var/lib/clickhouse \
-	--volume ${TKCAT_CONFIG}:/etc/clickhouse-server \
 	--volume ${TKCAT_LOG}:/var/log/clickhouse-server \
 	-e TKCAT_INSTANCE="${TKCAT_INSTANCE}" \
 	-e TKCAT_VERSION="${TKCAT_VERSION}" \
@@ -176,7 +175,7 @@ chmod +x launch-tkcat-instance.sh
 
 **Note**: This step requires Docker to be installed on your system. The script will:
 - Build a Docker image with ClickHouse version 26.9.19
-- Create the necessary directories in `/home/$(whoami)/tmp/tkcat_2026_10_17`
+- Create the necessary directories in `/home/$(whoami)/tmp/tkcat_test_2026-10-17`
 - Launch a Docker container with the proper configuration
 
 **Important**: When connecting to this ClickHouse instance from R or MCP clients, use:
@@ -193,13 +192,15 @@ library(TKCat)
 # Connect to your ClickHouse instance with the custom ports
 k <- chTKCat(
    host = "localhost",
-   port = 9113L,  # Using the custom HTTP port
-   user = "admin",  # The admin user created by the docker-init script
+   port = 9113L, # Using the custom HTTP port
+   user = "admin", # The admin user created by the docker-init script
+   password = "", # No password after initialization !!
    drv = ClickHouseHTTP::ClickHouseHTTP()
 )
 
 # Change the admin password (you will be prompted for the new password)
 change_chTKCat_password(k, "admin")
+db_reconnect(k)
 
 # Add additional users with appropriate permissions
 # Create a regular user with read-only access
@@ -220,9 +221,6 @@ After initialization, you can create a password for the admin user using the
 > update the TKCAT parameters (TKCAT_VERSION, TKCAT_INSTANCE, TKCAT_NAT_PORT, TKCAT_HTTP_PORT, TKCAT_HOSTDIR) as needed,
 > then run the upgrade script.
 
-For more details on ClickHouse setup, refer to the 
-[ClickHouse/README.md](https://github.com/patzaw/TKCat/blob/master/ClickHouse/README.md) file.
-
 # Preparing MDBs
 
 In this section, we prepare three example MDBs:
@@ -240,13 +238,54 @@ The [Human Phenotype Ontology (HPO)][hpo] aims to provide a standardized vocabul
 of phenotypic abnormalities encountered in human diseases [@kohler_expansion_2019].
 
 As described in the [main vignette](TKCat.html#hpo), a subset of HPO is provided
-within the [ReDaMoR][redamor] package:
+within the [ReDaMoR][redamor] package as the following tables:
 
-```{r, eval=FALSE}
-# Load HPO data from ReDaMoR
-file_hpo <- read_fileMDB(
-   path = system.file("examples/HPO-subset", package = "ReDaMoR"),
-   dataModel = system.file("examples/HPO-model.json", package = "ReDaMoR"),
+```{r, eval=TRUE}
+# List available tables in the HPO subset
+hpo_files <- list.files(system.file("examples/HPO-subset", package = "ReDaMoR"))
+hpo_files
+```
+
+An MDB (Modeled Database) in TKCat is a self-describing container that packages:
+
+- Data tables: The actual content in tabular format
+- Data model: JSON schema defining tables, fields, field types, and relationships between tables
+- Metadata: name, title, description, version, reference URL
+- Collection mappings: How tables integrate across MDBs via shared identifiers (e.g., Gene, Disease)
+
+A data model for the HPO data is provided within the [ReDaMoR][redamor] package.
+Refer to package documentation and also
+to the [TKCat main vignette](TKCat.html#hpo) to learn how to create such
+data model.
+
+```{r, eval=TRUE}
+hpo_model <- read_json_data_model(system.file(
+  "examples/HPO-model.json",
+  package = "ReDaMoR"
+))
+plot(hpo_model)
+```
+
+Data can be loaded before being encapsulated in a `memoMDB` object as shown
+below. 
+
+```{r, eval=TRUE}
+## Reading the data
+hpo_data <- lapply(hpo_files, function(x) {
+   readr::read_tsv(
+      file.path(
+         system.file("examples/HPO-subset", package = "ReDaMoR"),
+         x
+      ),
+      ## Column types taken from the data model
+      col_types = ReDaMoR::col_types(hpo_model[[sub("[.]txt", "", x)]])
+   )
+}) |>
+   setNames(sub("[.]txt", "", hpo_files))
+## Creating the MDB
+memo_hpo <- memoMDB(
+   dataTables = hpo_data,
+   dataModel = hpo_model,
    dbInfo = list(
       "name" = "HPO",
       "title" = "Data extracted from the HPO database",
@@ -262,8 +301,8 @@ file_hpo <- read_fileMDB(
 We can also document the collection members for HPO tables to enable integration
 with other resources:
 
-```{r, eval=FALSE}
-file_hpo <- file_hpo |>
+```{r, eval=TRUE}
+memo_hpo <- memo_hpo |>
    add_collection_member(
       collection = "Condition",
       table = "HPO_hp",
@@ -286,16 +325,14 @@ file_hpo <- file_hpo |>
 relationships among human variations and phenotypes, with supporting evidence
 [@landrum_clinvar_2018].
 
-A subset of ClinVar is provided within the TKCat package:
+An MDB with a subset of ClinVar is provided within the TKCat package.
+It can be read directly as a `fileMDB`: the data are not loaded in memory.
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 # Load ClinVar data from TKCat
 file_clinvar <- read_fileMDB(
    path = system.file("examples/ClinVar", package = "TKCat")
 )
-
-# Rename tables for better readability
-names(file_clinvar) <- sub("ClinVar_", "", names(file_clinvar))
 ```
 
 **Reference**: This is a small subset of ClinVar data. For the complete database,
@@ -308,7 +345,7 @@ with drug-like properties [@mendez_chembl_2019].
 
 A subset of ChEMBL is also provided within the TKCat package:
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 # Load ChEMBL data from TKCat
 file_chembl <- read_fileMDB(
    path = system.file("examples/CHEMBL", package = "TKCat")
@@ -321,7 +358,7 @@ visit [https://www.ebi.ac.uk/chembl/](https://www.ebi.ac.uk/chembl/).
 ## Summary
 
 We now have three MDBs ready to be pushed to ClickHouse:
-- `file_hpo`: HPO database with phenotype and disease information
+- `memo_hpo`: HPO database with phenotype and disease information
 - `file_clinvar`: ClinVar database with variant and clinical significance information
 - `file_chembl`: ChEMBL database with compound and drug information
 
@@ -341,14 +378,15 @@ First, establish a connection to your chTKCat instance:
 # Connect to chTKCat (adjust parameters as needed)
 k <- chTKCat(
    host = "localhost",
-   port = 9113L,  # Using the custom HTTP port
-   user = "admin",  # The admin user created by the docker-init script
+   port = 9113L, # Using the custom HTTP port
+   user = "admin", # The admin user created by the docker-init script
    drv = ClickHouseHTTP::ClickHouseHTTP()
 )
 ```
 
 **Note**: For the examples below to work, the user must have write permissions
 on the ClickHouse database.
+For more details about chTKCat operations, see the [chTKCat operations section in the main TKCat vignette](TKCat.html#ch-op).
 
 ## Preparing the database in ClickHouse
 
@@ -375,7 +413,7 @@ Now we can push each MDB to ClickHouse using the `as_chMDB()` function:
 
 ```{r, eval=FALSE}
 # Push HPO MDB
-ch_hpo <- as_chMDB(file_hpo, k)
+ch_hpo <- as_chMDB(memo_hpo, k)
 
 # Push ClinVar MDB
 ch_clinvar <- as_chMDB(file_clinvar, k)
@@ -420,8 +458,9 @@ For querying, we can connect with a user that has read-only access:
 ```{r, eval=FALSE}
 k_readonly <- chTKCat(
    host = "localhost",
-   port = 9113L,  # Using the custom HTTP port
-   user = "default" # Default user has read access to public MDBs
+   port = 9113L, # Using the custom HTTP port
+   user = "default", # Default user has read access to public MDBs,
+   password = ""
 )
 ```
 
@@ -443,25 +482,36 @@ search_MDB_fields(k_readonly, "gene")
 collection_members(k_readonly)
 ```
 
+A Shiny app is also available to explore available resources:
+
+```{r, eval=FALSE}
+explore_MDBs(k)
+```
+
 ## Example queries
 
 ### Querying HPO
 
-Get phenotype information:
+Data model can be explored as following:
 
 ```{r, eval=FALSE}
 hpo <- get_MDB(k_readonly, "HPO")
+plot(data_model(hpo))
+```
 
+Get phenotype information:
+
+```{r, eval=FALSE}
 # Get first 10 phenotypes
 get_query(
    hpo,
    query = "SELECT * FROM HPO_hp LIMIT 10"
 )
 
-# Search for phenotypes related to epilepsy
+# Search for abnormalities
 get_query(
    hpo,
-   query = sprintf("SELECT * FROM HPO_hp WHERE lower(label) LIKE '%%epilep%%'")
+   query = "SELECT * FROM HPO_hp WHERE lower(name) LIKE '%abnorm%'"
 )
 ```
 
@@ -472,18 +522,18 @@ Find variants in specific genes:
 ```{r, eval=FALSE}
 clinvar <- get_MDB(k_readonly, "ClinVar")
 
-# Get information about variants in the PIK3R2 gene
+# Get the PIK3R2 gene
 get_query(
    clinvar,
-   query = "SELECT * FROM entrezNames WHERE symbol = 'PIK3R2'"
+   query = "SELECT * FROM ClinVar_entrezNames WHERE symbol = 'PIK3R2'"
 )
 
 # Get pathogenic variants
 get_query(
    clinvar,
    query = paste(
-      "SELECT * FROM ReferenceClinVarAssertion ",
-      "WHERE lower(clinicalSignificance) LIKE '%%pathogen%%' ",
+      "SELECT * FROM ClinVar_ReferenceClinVarAssertion ",
+      "WHERE lower(clinicalSignificance) LIKE '%pathogen%' ",
       "LIMIT 10"
    )
 )
@@ -502,10 +552,10 @@ get_query(
    query = "SELECT * FROM CHEMBL_component_sequence LIMIT 10"
 )
 
-# Search for compounds targeting a specific protein
+# Search for a molecule
 get_query(
    chembl,
-   query = "SELECT * FROM CHEMBL_compound WHERE compound_name LIKE '%%aspirin%%'"
+   query = "SELECT * FROM CHEMBL_molecule_dictionary WHERE pref_name = 'DOCETAXEL'"
 )
 ```
 
@@ -521,28 +571,12 @@ get_query(
    hpo,
    query = paste(
       "SELECT h.* FROM HPO_diseases h ",
-      "WHERE h.id IN (SELECT DISTINCT id FROM `ClinVar`.traitNames) ",
+      "WHERE h.id IN (SELECT DISTINCT id FROM `ClinVar`.ClinVar_traitCref) ",
       "LIMIT 10"
    )
 )
 ```
 
-**Note**: Cross-MDB queries require that the MDBs share collection members or
-have compatible identifier systems.
-
-## Exploring data models
-
-You can explore the data model of each MDB:
-
-```{r, eval=FALSE}
-# Get and plot the data model of HPO
-hpo_model <- data_model(hpo)
-plot(hpo_model)
-
-# Get the data model of ClinVar
-clinvar_model <- data_model(clinvar)
-plot(clinvar_model)
-```
 
 # Setting up MCP Server
 
@@ -964,9 +998,9 @@ This vignette has demonstrated a complete end-to-end workflow:
 
 1. **Setting up ClickHouse** with specific parameters (version 26.9.19, TKCAT_VERSION 2026-10-17)
 2. **Preparing three example MDBs**:
-   - HPO from ReDaMoR (subset) [@kohler_expansion_2019]
-   - ClinVar from TKCat package (subset) [@landrum_clinvar_2018]
-   - ChEMBL from TKCat package (subset) [@mendez_chembl_2019]
+   - HPO from ReDaMoR (deprecated subset) [@kohler_expansion_2019]
+   - ClinVar from TKCat package (deprecated subset) [@landrum_clinvar_2018]
+   - ChEMBL from TKCat package (deprecated subset) [@mendez_chembl_2019]
 3. **Pushing MDBs** to ClickHouse and verifying the push
 4. **Querying MDBs** with various examples and exploration functions
 5. **Setting up MCP server** in both local and remote configurations
@@ -978,7 +1012,6 @@ This vignette has demonstrated a complete end-to-end workflow:
 For more details on any of these topics, refer to:
 - [Introduction to TKCat](TKCat.html) - Main vignette
 - [Querying a chTKCat instance with an AI assistant (MCP server)](TKCat-MCP.html) - MCP server details
-- [ClickHouse README](https://github.com/patzaw/TKCat/blob/master/ClickHouse/README.md) - ClickHouse setup
 
 **Important reminder**: The MDBs used in this guide are subsets provided for
 demonstration. For production use, ensure you download and prepare current
