@@ -2,10 +2,11 @@ pandoc: '3.10'
 pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
+  TKCat-EndToEnd: TKCat-EndToEnd.html
   TKCat-KMR-POK: TKCat-KMR-POK.html
   TKCat-MCP: TKCat-MCP.html
   TKCat: TKCat.html
-last_built: 2026-10-16T07:19Z
+last_built: 2026-10-19T06:25Z
 urls:
   reference: https://patzaw.github.io/TKCat/reference
   article: https://patzaw.github.io/TKCat/articles

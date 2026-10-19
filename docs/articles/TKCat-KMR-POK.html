@@ -46,7 +46,8 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/TKCat-KMR-POK.html">Defining and using Requirements for Knowledge Management (KMR) in TKCat</a></li>
+<li><a class="dropdown-item" href="../articles/TKCat-EndToEnd.html">TKCat End-to-End: From ClickHouse Setup to MCP Server Configuration</a></li>
+    <li><a class="dropdown-item" href="../articles/TKCat-KMR-POK.html">Defining and using Requirements for Knowledge Management (KMR) in TKCat</a></li>
     <li><a class="dropdown-item" href="../articles/TKCat-MCP.html">Querying a chTKCat instance with an AI assistant (MCP server)</a></li>
   </ul>
 </li>
@@ -74,7 +75,7 @@
                         <h4 data-toc-skip class="author">Patrice
 Godard</h4>
             
-            <h4 data-toc-skip class="date">October 16, 2026</h4>
+            <h4 data-toc-skip class="date">October 19, 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/patzaw/TKCat/blob/HEAD/vignettes/TKCat-KMR-POK.Rmd" class="external-link"><code>vignettes/TKCat-KMR-POK.Rmd</code></a></small>
       <div class="d-none name"><code>TKCat-KMR-POK.Rmd</code></div>
@@ -136,7 +137,7 @@ properties</p></li>
 <p>It’s also possible to store helpers in a KMR object. These helpers
 are typically functions used to query MDBs fitting KMR requirements.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/data_model.html">data_model</a></span><span class="op">(</span><span class="va">ebkm</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/data_model.html">data_model</a></span><span class="op">(</span><span class="va">ebkm</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>   <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="KMR-data-model.png"></p>
 </div>
@@ -423,7 +424,7 @@ functions.</p>
 <p>Let’s create a simple MDB with only one table with biological samples
 information.</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>   name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"S1"</span>, <span class="st">"S2"</span>, <span class="st">"S3"</span>, <span class="st">"S4"</span><span class="op">)</span>,</span>
 <span>   description <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>      <span class="st">"Sample from left hippocampus from patient 1"</span>,</span>

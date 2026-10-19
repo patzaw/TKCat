@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-16 09:20:39.246806
+    ## Timestamp: 2026-10-19 08:26:17.464869
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-16 09:20:39.246806
+    ## Timestamp: 2026-10-19 08:26:17.464869
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-16 09:20:39.246806
+    ## Timestamp: 2026-10-19 08:26:17.464869
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-16 09:20:39
+    ## Timestamp: 2026-10-19 08:26:17
     ## 
 
 Also writing these data and related information in text files make them
@@ -1636,20 +1636,12 @@ Once connected, this *chTKCat* object can be used as a *TKCat* object.
 list_MDBs(k)             # get a specific MDBs from the catalog
 ```
 
-    ## # A tibble: 31 × 12
-    ##    name   title description url   version maintainer public populated timestamps
-    ##    <chr>  <chr> <chr>       <chr> <chr>   <chr>      <lgl>  <lgl>     <lgl>     
-    ##  1 AACT   Aggr… AACT is a … http… 0.0.1   [Patrice … TRUE   TRUE      TRUE      
-    ##  2 AP-Di… Ange… Ressources… NA    0.0.2   [Patrice … FALSE  TRUE      TRUE      
-    ##  3 AP-RD… Info… Informatio… NA    0.0.1   [Patrice … TRUE   TRUE      TRUE      
-    ##  4 Carav… New … Informatio… NA    0.0.1   [Patrice … TRUE   TRUE      TRUE      
-    ##  5 ChEMBL ChEM… ChEMBL is … http… 1.1.0   [Patrice … TRUE   TRUE      TRUE      
-    ##  6 Corte… Data… Clarivate … http… 0.0.3   [Patrice … FALSE  TRUE      TRUE      
-    ##  7 Count… Gene… General in… NA    0.0.1   [Patrice … TRUE   TRUE      TRUE      
-    ##  8 DRE-B… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
-    ##  9 FCD-T… Bulk… Re-interpr… http… 0.01    [Patrice … TRUE   TRUE      TRUE      
-    ## 10 GO     The … Because of… http… 1.0.0   [Patrice … TRUE   TRUE      TRUE      
-    ## # ℹ 21 more rows
+    ## # A tibble: 3 × 12
+    ##   name    title description url   version maintainer public populated timestamps
+    ##   <chr>   <chr> <chr>       <chr> <chr>   <chr>      <lgl>  <lgl>     <lgl>     
+    ## 1 CHEMBL  Data… CHEMBL is … http… 0.2     Liesbeth … TRUE   TRUE      TRUE      
+    ## 2 ClinVar Data… ClinVar is… http… 0.9     Patrice G… TRUE   TRUE      TRUE      
+    ## 3 HPO     Data… This is a … http… NA      NA         TRUE   TRUE      TRUE      
     ## # ℹ 3 more variables: timestamp <dttm>, access <fct>, total_size <dbl>
 
 ``` r
@@ -1657,60 +1649,49 @@ list_MDBs(k)             # get a specific MDBs from the catalog
 search_MDB_tables(k, "disease")  # Search table about "disease"
 ```
 
-    ## # A tibble: 82 × 3
-    ##    resource   name                         comment                              
-    ##    <chr>      <chr>                        <chr>                                
-    ##  1 HPA        Disease_involvement          NA                                   
-    ##  2 AACT       conditions                   Name(s) of the disease(s) or conditi…
-    ##  3 AACT       design_outcomes              Description of planned outcome measu…
-    ##  4 AACT       outcomes                     Descriptions of outcomes, or observa…
-    ##  5 AACT       reported_events              Summary information about reported a…
-    ##  6 brainSCOPE CT_group_conditions          Experimental condition (e.g.: to be …
-    ##  7 brainSCOPE Cell_type_conditions         Experimental condition (e.g.: to be …
-    ##  8 Monarch    Diseases                     Disease concepts (biolink:Disease no…
-    ##  9 Monarch    Diseases_descendants         Transitive closure of subclass_of: m…
-    ## 10 Monarch    Diseases_mode_of_inheritance Disease mode-of-inheritance associat…
-    ## # ℹ 72 more rows
+    ## # A tibble: 3 × 3
+    ##   resource name                comment                 
+    ##   <chr>    <chr>               <chr>                   
+    ## 1 HPO      HPO_diseaseHP       HP presented by diseases
+    ## 2 HPO      HPO_diseaseSynonyms Disease synonyms        
+    ## 3 HPO      HPO_diseases        Diseases
 
 ``` r
 
 search_MDB_fields(k, "disease")  # Search a field about "disease"
 ```
 
-    ## # A tibble: 227 × 7
-    ##    resource              table               name  comment type  nullable unique
-    ##    <chr>                 <chr>               <chr> <chr>   <chr> <lgl>    <lgl> 
-    ##  1 Kainate-Bulk-RNA-2023 conditions          cond… Disease char… TRUE     FALSE 
-    ##  2 Kainate-Bulk-RNA-2023 samples             cond… Disease char… TRUE     FALSE 
-    ##  3 AP-Disease-Strategy   gd_drug_indications area  Therap… char… TRUE     FALSE 
-    ##  4 AP-Disease-Strategy   strategic_indicati… cate… phenot… char… FALSE    FALSE 
-    ##  5 AP-Disease-Strategy   diseases_groups     class Kind o… char… FALSE    FALSE 
-    ##  6 AP-Disease-Strategy   strategic_indicati… class sympto… char… FALSE    FALSE 
-    ##  7 AP-Disease-Strategy   diseases_descendan… desc… The an… char… FALSE    FALSE 
-    ##  8 AP-Disease-Strategy   general_disease_gr… dise… Genera… char… FALSE    FALSE 
-    ##  9 AP-Disease-Strategy   strategic_indicati… dise… Can it… logi… FALSE    FALSE 
-    ## 10 AP-Disease-Strategy   cci_drug_indicatio… dise… Group … char… TRUE     FALSE 
-    ## # ℹ 217 more rows
+    ## # A tibble: 12 × 7
+    ##    resource table                  name            comment type  nullable unique
+    ##    <chr>    <chr>                  <chr>           <chr>   <chr> <lgl>    <lgl> 
+    ##  1 CHEMBL   CHEMBL_drug_indication DB              "Datab… char… FALSE    FALSE 
+    ##  2 CHEMBL   CHEMBL_drug_mechanism  disease_effica… ""      char… TRUE     FALSE 
+    ##  3 CHEMBL   CHEMBL_drug_indication id              "Disea… char… FALSE    FALSE 
+    ##  4 CHEMBL   CHEMBL_drug_indication name            "Term … char… FALSE    FALSE 
+    ##  5 HPO      HPO_diseaseHP          db              "Disea… char… FALSE    FALSE 
+    ##  6 HPO      HPO_diseaseSynonyms    db              "Disea… char… FALSE    FALSE 
+    ##  7 HPO      HPO_diseases           db              "Disea… char… FALSE    FALSE 
+    ##  8 HPO      HPO_diseaseHP          id              "Disea… char… FALSE    FALSE 
+    ##  9 HPO      HPO_diseaseSynonyms    id              "Disea… char… FALSE    FALSE 
+    ## 10 HPO      HPO_diseases           id              "Disea… char… FALSE    FALSE 
+    ## 11 HPO      HPO_diseases           label           "Disea… char… FALSE    FALSE 
+    ## 12 HPO      HPO_diseaseSynonyms    synonym         "Disea… char… FALSE    FALSE
 
 ``` r
 
 collection_members(k)  
 ```
 
-    ## # A tibble: 50 × 3
-    ##    resource              collection table                   
-    ##    <chr>                 <chr>      <chr>                   
-    ##  1 AP-Disease-Strategy   BE         gene_indications_summary
-    ##  2 AP-RD-Scouting        BE         Targets_genes           
-    ##  3 AP-RD-Scouting        BE         Human_complexes_hgnc    
-    ##  4 AP-RD-Scouting        BE         Human_complexes         
-    ##  5 AP-RD-Scouting        BE         Targets_HGNC_family     
-    ##  6 Caravelle             BE         Targets_genes           
-    ##  7 ChEMBL                BE         component_sequences     
-    ##  8 ChEMBL                Condition  drug_indication         
-    ##  9 Cortellis             BE         target_genes            
-    ## 10 DRE-Bulk-RNA-UMC-2024 BE         genes                   
-    ## # ℹ 40 more rows
+    ## # A tibble: 7 × 3
+    ##   resource collection table                    
+    ##   <chr>    <chr>      <chr>                    
+    ## 1 CHEMBL   BE         CHEMBL_component_sequence
+    ## 2 CHEMBL   Condition  CHEMBL_drug_indication   
+    ## 3 ClinVar  BE         ClinVar_entrezNames      
+    ## 4 ClinVar  Condition  ClinVar_traitCref        
+    ## 5 ClinVar  Condition  ClinVar_traits           
+    ## 6 HPO      Condition  HPO_hp                   
+    ## 7 HPO      Condition  HPO_diseases
 
 ``` r
 
@@ -1757,20 +1738,25 @@ get_query(
 )
 ```
 
-    ## # A tibble: 299 × 3
-    ##    db    id     label                                                           
-    ##    <chr> <chr>  <chr>                                                           
-    ##  1 OMIM  117100 Centralopathic epilepsy                                         
-    ##  2 OMIM  121201 Epilepsy, benign neonatal, 2                                    
-    ##  3 OMIM  132090 Epilepsy, benign occipital                                      
-    ##  4 OMIM  132300 Epilepsy, reading                                               
-    ##  5 OMIM  159600 Myoclonic epilepsy, Hartung type                                
-    ##  6 OMIM  159950 Spinal muscular atrophy with progressive myoclonic epilepsy     
-    ##  7 OMIM  208700 Ataxia with myoclonic epilepsy and presenile dementia           
-    ##  8 OMIM  213000 Cerebellar hypoplasia/atrophy, epilepsy, and global development…
-    ##  9 OMIM  226810 Celiac disease, epilepsy and cerebral calcification syndrome    
-    ## 10 OMIM  226850 EPILEPSY-TELANGIECTASIA                                         
-    ## # ℹ 289 more rows
+    ## # A tibble: 16 × 3
+    ##    db    id     label                                                          
+    ##    <chr> <chr>  <chr>                                                          
+    ##  1 OMIM  266100 EPILEPSY, PYRIDOXINE-DEPENDENT                                 
+    ##  2 OMIM  601068 EPILEPSY, FAMILIAL ADULT MYOCLONIC, 1; FAME1                   
+    ##  3 OMIM  607876 EPILEPSY, FAMILIAL ADULT MYOCLONIC, 2; FAME2                   
+    ##  4 OMIM  610003 CEROID LIPOFUSCINOSIS, NEURONAL, 8, NORTHERN EPILEPSY VARIANT  
+    ##  5 OMIM  612164 EPILEPTIC ENCEPHALOPATHY, EARLY INFANTILE, 4                   
+    ##  6 OMIM  613608 EPILEPSY, FAMILIAL ADULT MYOCLONIC, 3; FAME3                   
+    ##  7 OMIM  615127 EPILEPSY, FAMILIAL ADULT MYOCLONIC, 4; FAME4                   
+    ##  8 OMIM  616457 EPILEPTIC ENCEPHALOPATHY, EARLY INFANTILE, 50; EIEE50          
+    ##  9 ORPHA 1192   Atherosclerosis-deafness-diabetes-epilepsy-nephropathy syndrome
+    ## 10 ORPHA 1934   Early infantile epileptic encephalopathy                       
+    ## 11 ORPHA 1945   Rolandic epilepsy                                              
+    ## 12 ORPHA 263516 Progressive myoclonic epilepsy type 3                          
+    ## 13 ORPHA 352582 Familial infantile myoclonic epilepsy                          
+    ## 14 ORPHA 352596 Progressive myoclonic epilepsy with dystonia                   
+    ## 15 ORPHA 439218 KCNQ2-related epileptic encephalopathy                         
+    ## 16 ORPHA 86909  Myoclonic epilepsy of infancy
 
 ### Data organization in ClickHouse
 

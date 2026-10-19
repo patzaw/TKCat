@@ -19,7 +19,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r setup, message=FALSE, echo=FALSE, include=FALSE, cache=FALSE, eval=FALSE}
+```{r setup, message=FALSE, echo=FALSE, include=FALSE, cache=FALSE, eval=TRUE}
 library(knitr)
 opts_chunk$set(
    include = TRUE,
