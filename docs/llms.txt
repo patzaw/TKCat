@@ -101,7 +101,7 @@ And those are suggested:
 
 ``` r
 
-devtools::install_github("patzaw/TKCat")
+pak::pkg_install("github::patzaw/TKCat")
 ```
 
 ## Documentation
