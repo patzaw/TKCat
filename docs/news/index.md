@@ -2,6 +2,8 @@
 
 ## Version 1.3.0
 
+CRAN release: 2026-10-20
+
 - New
   [`chTKCat_mcp_server()`](https://patzaw.github.io/TKCat/reference/chTKCat_mcp_server.md)
   function: a read-only [MCP](https://modelcontextprotocol.io) server

@@ -1002,6 +1002,8 @@ for demonstration. For production use, ensure you download and prepare
 current versions of the databases, and properly document all data
 sources and versions.
 
+## References
+
 Köhler, Sebastian, Leigh Carmody, Nicole Vasilevsky, et al. 2019.
 “Expansion of the Human Phenotype Ontology (HPO) Knowledge Base and
 Resources.” *Nucleic Acids Research* 47 (D1): D1018–27.

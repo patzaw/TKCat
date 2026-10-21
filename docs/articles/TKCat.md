@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-20 08:38:27.95196
+    ## Timestamp: 2026-10-21 05:15:45.888568
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-20 08:38:27.95196
+    ## Timestamp: 2026-10-21 05:15:45.888568
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-20 08:38:27.95196
+    ## Timestamp: 2026-10-21 05:15:45.888568
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-20 08:38:27
+    ## Timestamp: 2026-10-21 05:15:45
     ## 
 
 Also writing these data and related information in text files make them
