@@ -991,3 +991,5 @@ For more details on any of these topics, refer to:
 **Important reminder**: The MDBs used in this guide are subsets provided for
 demonstration. For production use, ensure you download and prepare current
 versions of the databases, and properly document all data sources and versions.
+
+# References {-}
