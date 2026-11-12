@@ -66,8 +66,8 @@ The following R packages available on CRAN are required:
   Robust JSON Parser and Generator for R
 - [jsonvalidate](https://CRAN.R-project.org/package=jsonvalidate):
   Validate ‘JSON’ Schema
-- [markdown](https://CRAN.R-project.org/package=markdown): Render
-  Markdown with ‘commonmark’
+- [markdown](https://CRAN.R-project.org/package=markdown): A Thin
+  Wrapper of ‘litedown’ to Render Markdown Documents
 - [promises](https://CRAN.R-project.org/package=promises): Abstractions
   for Promise-Based Asynchronous Programming
 - [future](https://CRAN.R-project.org/package=future): Unified Parallel

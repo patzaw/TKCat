@@ -1,6 +1,16 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 
+## Version 1.3.1
+
+- `list_chMDB_timestamps()` now warns when several current timestamps
+are recorded for an MDB and keeps the most recent one as the "current"
+attribute.
+- Vignettes: add a "References" section to `vignette("TKCat-EndToEnd")`.
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+
 ## Version 1.3.0
 
 - New `chTKCat_mcp_server()` function: a read-only

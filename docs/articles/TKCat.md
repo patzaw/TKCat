@@ -386,7 +386,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-21 05:15:45.888568
+    ## Timestamp: 2026-11-12 11:04:05.382014
     ## 
 
 ### Documenting collection members
@@ -435,7 +435,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-21 05:15:45.888568
+    ## Timestamp: 2026-11-12 11:04:05.382014
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +559,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-21 05:15:45.888568
+    ## Timestamp: 2026-11-12 11:04:05.382014
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -636,7 +636,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-10-21 05:15:45
+    ## Timestamp: 2026-11-12 11:04:05
     ## 
 
 Also writing these data and related information in text files make them
@@ -1725,6 +1725,9 @@ are located in the ClickHouse database and pulled on request.
 
 ch_hpo <- get_MDB(k, "HPO")
 ```
+
+    ## Warning in list_chMDB_timestamps(x, dbName): Several current timestamps. Check
+    ## ClickHouse operations
 
 To avoid pulling a whole table from ClickHouse (which can take time if
 the table is big), SQL queries can be made on the *chMDB* object as

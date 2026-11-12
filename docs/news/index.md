@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 1.3.1
+
+- [`list_chMDB_timestamps()`](https://patzaw.github.io/TKCat/reference/list_chMDB_timestamps.md)
+  now warns when several current timestamps are recorded for an MDB and
+  keeps the most recent one as the “current” attribute.
+- Vignettes: add a “References” section to
+  [`vignette("TKCat-EndToEnd")`](https://patzaw.github.io/TKCat/articles/TKCat-EndToEnd.md).
+
 ## Version 1.3.0
 
 CRAN release: 2026-10-20
