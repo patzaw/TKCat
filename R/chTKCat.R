@@ -1741,7 +1741,7 @@ list_chMDB_timestamps <- function(x, name) {
   if (length(current) == 0) {
     current <- NA
   }
-  if (length(current) > 0) {
+  if (length(current) > 1) {
     warning("Several current timestamps. Check ClickHouse operations")
     current <- max(current, na.rm = TRUE)
   }
