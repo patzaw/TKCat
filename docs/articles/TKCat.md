@@ -387,7 +387,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-11-24 09:43:50.99731
+    ## Timestamp: 2026-11-24 11:27:07.104432
     ## 
 
 ### Documenting collection members
@@ -436,7 +436,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-11-24 09:43:50.99731
+    ## Timestamp: 2026-11-24 11:27:07.104432
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -560,7 +560,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-11-24 09:43:50.99731
+    ## Timestamp: 2026-11-24 11:27:07.104432
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -698,7 +698,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-11-24 09:43:50
+    ## Timestamp: 2026-11-24 11:27:07
     ## 
 
 Also writing these data and related information in text files make them
@@ -1753,18 +1753,18 @@ search_MDB_fields(k, "disease")  # Search a field about "disease"
     ## # A tibble: 12 × 7
     ##    resource table                  name            comment type  nullable unique
     ##    <chr>    <chr>                  <chr>           <chr>   <chr> <lgl>    <lgl> 
-    ##  1 CHEMBL   CHEMBL_drug_indication DB              "Datab… char… FALSE    FALSE 
-    ##  2 CHEMBL   CHEMBL_drug_mechanism  disease_effica… ""      char… TRUE     FALSE 
-    ##  3 CHEMBL   CHEMBL_drug_indication id              "Disea… char… FALSE    FALSE 
-    ##  4 CHEMBL   CHEMBL_drug_indication name            "Term … char… FALSE    FALSE 
-    ##  5 HPO      HPO_diseaseHP          db              "Disea… char… FALSE    FALSE 
-    ##  6 HPO      HPO_diseaseSynonyms    db              "Disea… char… FALSE    FALSE 
-    ##  7 HPO      HPO_diseases           db              "Disea… char… FALSE    FALSE 
-    ##  8 HPO      HPO_diseaseHP          id              "Disea… char… FALSE    FALSE 
-    ##  9 HPO      HPO_diseaseSynonyms    id              "Disea… char… FALSE    FALSE 
-    ## 10 HPO      HPO_diseases           id              "Disea… char… FALSE    FALSE 
-    ## 11 HPO      HPO_diseases           label           "Disea… char… FALSE    FALSE 
-    ## 12 HPO      HPO_diseaseSynonyms    synonym         "Disea… char… FALSE    FALSE
+    ##  1 HPO      HPO_diseaseHP          db              "Disea… char… FALSE    FALSE 
+    ##  2 HPO      HPO_diseaseSynonyms    db              "Disea… char… FALSE    FALSE 
+    ##  3 HPO      HPO_diseases           db              "Disea… char… FALSE    FALSE 
+    ##  4 HPO      HPO_diseaseHP          id              "Disea… char… FALSE    FALSE 
+    ##  5 HPO      HPO_diseaseSynonyms    id              "Disea… char… FALSE    FALSE 
+    ##  6 HPO      HPO_diseases           id              "Disea… char… FALSE    FALSE 
+    ##  7 HPO      HPO_diseases           label           "Disea… char… FALSE    FALSE 
+    ##  8 HPO      HPO_diseaseSynonyms    synonym         "Disea… char… FALSE    FALSE 
+    ##  9 CHEMBL   CHEMBL_drug_indication DB              "Datab… char… FALSE    FALSE 
+    ## 10 CHEMBL   CHEMBL_drug_mechanism  disease_effica… ""      char… TRUE     FALSE 
+    ## 11 CHEMBL   CHEMBL_drug_indication id              "Disea… char… FALSE    FALSE 
+    ## 12 CHEMBL   CHEMBL_drug_indication name            "Term … char… FALSE    FALSE
 
 ``` r
 

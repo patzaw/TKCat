@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 1.4.1
+
+- Parquet files are not memory mapped anymore when read: on Windows,
+  mapped files could not be overwritten, moved or removed, making
+  [`as_parquetMDB()`](https://patzaw.github.io/TKCat/reference/as_parquetMDB.md)
+  fail on metaMDB.
+- The *promises* and *markdown* packages are not imported anymore:
+  *promises* was not used directly and markdown texts are now rendered
+  with
+  [`shiny::markdown()`](https://rdrr.io/pkg/shiny/man/markdown.html).
+
 ## Version 1.4.0
 
 - New MDB implementation relying on

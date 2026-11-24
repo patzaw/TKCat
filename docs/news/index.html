@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">TKCat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,11 @@
       <small>Source: <a href="https://github.com/patzaw/TKCat/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.4.1" id="version-141">Version 1.4.1<a class="anchor" aria-label="anchor" href="#version-141"></a></h2>
+<ul><li>Parquet files are not memory mapped anymore when read: on Windows, mapped files could not be overwritten, moved or removed, making <code><a href="../reference/as_parquetMDB.html">as_parquetMDB()</a></code> fail on metaMDB.</li>
+<li>The <em>promises</em> and <em>markdown</em> packages are not imported anymore: <em>promises</em> was not used directly and markdown texts are now rendered with <code><a href="https://rdrr.io/pkg/shiny/man/markdown.html" class="external-link">shiny::markdown()</a></code>.</li>
+</ul><!-----------------------------------------------------------------------------></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.4.0" id="version-140">Version 1.4.0<a class="anchor" aria-label="anchor" href="#version-140"></a></h2>
 <ul><li>New MDB implementation relying on <a href="https://parquet.apache.org/" class="external-link">parquet</a> files: <code><a href="../reference/parquetMDB.html">parquetMDB()</a></code> and <code><a href="../reference/read_parquetMDB.html">read_parquetMDB()</a></code>. A parquetMDB is similar to a fileMDB but columns are typed according to the data model, the exact dimensions of the tables are read from the metadata of the files (<code><a href="../reference/dims.html">dims()</a></code>) and filters are applied when reading the files (<code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code>, <code><a href="../reference/filter_with_tables.html">filter_with_tables()</a></code>, <code><a href="../reference/filter_mdb_matrix.html">filter_mdb_matrix()</a></code>).</li>
