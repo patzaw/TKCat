@@ -82,6 +82,7 @@
   [`rename(`*`<chMDB>`*`)`](https://patzaw.github.io/TKCat/reference/chMDB.md)
   [`` `[`( ``*`<chMDB>`*`)`](https://patzaw.github.io/TKCat/reference/chMDB.md)
   [`` `[[`( ``*`<chMDB>`*`)`](https://patzaw.github.io/TKCat/reference/chMDB.md)
+  [`` `$`( ``*`<chMDB>`*`)`](https://patzaw.github.io/TKCat/reference/chMDB.md)
   [`as.list(`*`<chMDB>`*`)`](https://patzaw.github.io/TKCat/reference/chMDB.md)
   : An MDB (Modeled DataBase) relying on ClickHouse: chMDB
 
@@ -137,10 +138,10 @@
   : Create a chTKCat user
 
 - [`data_file_size()`](https://patzaw.github.io/TKCat/reference/data_file_size.md)
-  : Get the size of data files from a fileMDB or a parquetMDB object
+  : Get the size of data files from an MDB stored in files
 
 - [`data_files()`](https://patzaw.github.io/TKCat/reference/data_files.md)
-  : Get the data files from a fileMDB or a parquetMDB object
+  : Get the data files from an MDB stored in files
 
 - [`data_model()`](https://patzaw.github.io/TKCat/reference/data_model.md)
   : Get object data model
@@ -188,8 +189,7 @@
 - [`explore_MDBs()`](https://patzaw.github.io/TKCat/reference/explore_MDBs.md)
   : Explore available MDB in a shiny web interface
 
-- [`` `$`( ``*`<chMDB>`*`)`](https://patzaw.github.io/TKCat/reference/fileMDB.md)
-  [`fileMDB()`](https://patzaw.github.io/TKCat/reference/fileMDB.md)
+- [`fileMDB()`](https://patzaw.github.io/TKCat/reference/fileMDB.md)
   [`` `names<-`( ``*`<fileMDB>`*`)`](https://patzaw.github.io/TKCat/reference/fileMDB.md)
   [`rename(`*`<fileMDB>`*`)`](https://patzaw.github.io/TKCat/reference/fileMDB.md)
   [`` `[`( ``*`<fileMDB>`*`)`](https://patzaw.github.io/TKCat/reference/fileMDB.md)

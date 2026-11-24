@@ -39,6 +39,36 @@
 - Tests relying on the testthat package have been added.
 - Vignettes: parquetMDB are described in
   [`vignette("TKCat")`](https://patzaw.github.io/TKCat/articles/TKCat.md).
+- Bug fixes:
+  - Matrices without any value, row or column are now correctly read
+    from text files (fileMDB):
+    [`data_tables()`](https://patzaw.github.io/TKCat/reference/data_tables.md),
+    [`heads()`](https://patzaw.github.io/TKCat/reference/heads.md),
+    [`filter_mdb_matrix()`](https://patzaw.github.io/TKCat/reference/filter_mdb_matrix.md),
+    [`filter_with_tables()`](https://patzaw.github.io/TKCat/reference/filter_with_tables.md)
+    and
+    [`as_fileMDB()`](https://patzaw.github.io/TKCat/reference/as_fileMDB.md).
+  - Sparse matrices read from text files keep the last rows and columns
+    when they do not have any value.
+  - [`as_fileMDB()`](https://patzaw.github.io/TKCat/reference/as_fileMDB.md)
+    supports MDB without any table and therefore metaMDB without
+    relational table.
+  - [`filter_mdb_matrix()`](https://patzaw.github.io/TKCat/reference/filter_mdb_matrix.md)
+    keeps the dimensions of sparse matrices without any row or column.
+  - [`dims()`](https://patzaw.github.io/TKCat/reference/dims.md) returns
+    the “bytes” column for chMDB without any table.
+  - [`as_fileMDB()`](https://patzaw.github.io/TKCat/reference/as_fileMDB.md)
+    on a chMDB does not reduce the size of the batch after each table
+    anymore.
+  - `$.chMDB` is documented with chMDB instead of fileMDB.
+- When creating a fileMDB, the first records confronted to the data
+  model are now read by TKCat the same way as when getting the data.
+- **Authorship**: the parquetMDB implementation, the related conversion
+  functions,
+  [`scan_MDBs()`](https://patzaw.github.io/TKCat/reference/scan_MDBs.md),
+  their documentation and the tests added in this version were written
+  by Claude (Anthropic’s AI model, Claude Code), under the supervision
+  of the package maintainer.
 
 ## Version 1.3.1
 

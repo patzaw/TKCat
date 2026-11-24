@@ -32,6 +32,9 @@ x[i]
 x[[i]]
 
 # S3 method for class 'chMDB'
+x$i
+
+# S3 method for class 'chMDB'
 as.list(x, ...)
 ```
 

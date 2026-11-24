@@ -3,7 +3,7 @@
 ## Authors
 
 - **[Patrice Godard](https://patzaw.github.io)**. Author, maintainer,
-  copyright holder.
+  copyright holder. [](https://orcid.org/0000-0001-6257-9730)
 
 ## Citation
 

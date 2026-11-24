@@ -1,28 +1,37 @@
-# Get the size of data files from a [fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md) or a [parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md) object
+# Get the size of data files from an [MDB](https://patzaw.github.io/TKCat/reference/MDB.md) stored in files
 
-Get the size of data files from a
-[fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md) or a
-[parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
-object
+Get the size of data files from an
+[MDB](https://patzaw.github.io/TKCat/reference/MDB.md) stored in files
 
 ## Usage
 
 ``` r
-data_file_size(x, hr = FALSE)
+# S3 method for class 'fileMDB'
+data_file_size(x, hr = FALSE, ...)
+
+data_file_size(x, hr = FALSE, ...)
+
+# S3 method for class 'parquetMDB'
+data_file_size(x, hr = FALSE, ...)
 ```
 
 ## Arguments
 
 - x:
 
-  a [fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md) or a
+  an [MDB](https://patzaw.github.io/TKCat/reference/MDB.md) object
+  stored in files: a
+  [fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md) or a
   [parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
-  object
 
 - hr:
 
   a logical indicating if the values should be "human readable".
   (default: FALSE)
+
+- ...:
+
+  method specific parameters
 
 ## Value
 

@@ -8,9 +8,6 @@ Rename tables of a fileMDB object
 ## Usage
 
 ``` r
-# S3 method for class 'chMDB'
-x$i
-
 fileMDB(
   dataFiles,
   dbInfo,
@@ -42,14 +39,6 @@ as.list(x, ...)
 ```
 
 ## Arguments
-
-- x:
-
-  a fileMDB object
-
-- i:
-
-  the index or the name of the tables to take
 
 - dataFiles:
 
@@ -91,6 +80,10 @@ as.list(x, ...)
 
   if TRUE display the data confrontation report (default: FALSE)
 
+- x:
+
+  a fileMDB object
+
 - value:
 
   new table names
@@ -102,6 +95,10 @@ as.list(x, ...)
 - ...:
 
   additional parameters
+
+- i:
+
+  the index or the name of the tables to take
 
 ## Value
 
