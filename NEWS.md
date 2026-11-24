@@ -20,6 +20,22 @@ parquetMDB. `scan_fileMDBs()` is deprecated.
 - The [arrow](https://arrow.apache.org/docs/r/) package is now imported.
 - Tests relying on the testthat package have been added.
 - Vignettes: parquetMDB are described in `vignette("TKCat")`.
+- Bug fixes:
+   - Matrices without any value, row or column are now correctly read from
+   text files (fileMDB): `data_tables()`, `heads()`, `filter_mdb_matrix()`,
+   `filter_with_tables()` and `as_fileMDB()`.
+   - Sparse matrices read from text files keep the last rows and columns
+   when they do not have any value.
+   - `as_fileMDB()` supports MDB without any table and therefore
+   metaMDB without relational table.
+   - `filter_mdb_matrix()` keeps the dimensions of sparse matrices
+   without any row or column.
+   - `dims()` returns the "bytes" column for chMDB without any table.
+   - `as_fileMDB()` on a chMDB does not reduce the size of the batch
+   after each table anymore.
+   - `$.chMDB` is documented with chMDB instead of fileMDB.
+- When creating a fileMDB, the first records confronted to the data model are
+now read by TKCat the same way as when getting the data.
 - **Authorship**: the parquetMDB implementation, the related conversion
 functions, `scan_MDBs()`, their documentation and the tests added in this
 version were written by Claude (Anthropic's AI model, Claude Code),

@@ -6,6 +6,7 @@
 \alias{rename.chMDB}
 \alias{[.chMDB}
 \alias{[[.chMDB}
+\alias{$.chMDB}
 \alias{as.list.chMDB}
 \title{An \link{MDB} (Modeled DataBase) relying on ClickHouse: chMDB}
 \usage{
@@ -27,6 +28,8 @@ chMDB(
 \method{[}{chMDB}(x, i)
 
 \method{[[}{chMDB}(x, i)
+
+\method{$}{chMDB}(x, i)
 
 \method{as.list}{chMDB}(x, ...)
 }

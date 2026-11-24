@@ -65,25 +65,50 @@ fileMDB <- function(
 
   ## Confront data to model ----
   if (check) {
-    rnDataModel <- dataModel
     if (length(dataModel) > 0) {
-      names(rnDataModel) <- sub(
-        pattern = "(\\.[[:alnum:]]+)(\\.gz)?$",
-        replacement = "",
-        x = basename(dataFiles)
+      ## The first records are read the same way as when getting the data
+      hd <- lapply(
+        names(dataModel),
+        function(tn) {
+          td <- withCallingHandlers(
+            do.call(
+              .read_td,
+              c(
+                list(
+                  tm = dataModel[[tn]],
+                  f = dataFiles[[tn]],
+                  n_max = n_max
+                ),
+                readParameters
+              )
+            ),
+            warning = function(w) {
+              if (
+                grepl(
+                  "Be careful when using skip and n_max parameters",
+                  conditionMessage(w)
+                )
+              ) {
+                invokeRestart("muffleWarning")
+              }
+            }
+          )
+          if (inherits(td, c("matrix", "Matrix"))) {
+            stopifnot(
+              !any(duplicated(colnames(td))),
+              !any(duplicated(rownames(td)))
+            )
+          }
+          return(td)
+        }
       )
-      cr <- do.call(
-        ReDaMoR::confront_data,
-        c(
-          list(
-            rnDataModel,
-            paths = dataFiles,
-            returnData = FALSE,
-            verbose = FALSE,
-            n_max = n_max
-          ),
-          readParameters
-        )
+      names(hd) <- names(dataModel)
+      cr <- ReDaMoR::confront_data(
+        dataModel,
+        data = hd,
+        returnData = FALSE,
+        verbose = FALSE,
+        n_max = n_max
       )
       assign("confrontationReport", cr, envir = tkcatEnv)
       if (!cr$success) {
@@ -564,7 +589,12 @@ heads.fileMDB <- function(x, ..., n = 6L) {
         if (is.infinite(n)) {
           return(data_tables(x, dplyr::all_of(name))[[1]])
         }
-        ncol <- data_tables(x, dplyr::all_of(name), n_max = 1)[[1]] |> ncol()
+        d1 <- data_tables(x, dplyr::all_of(name), n_max = 1)[[1]]
+        if (nrow(d1) == 0 || ncol(d1) == 0) {
+          ## Empty matrix
+          return(d1)
+        }
+        ncol <- ncol(d1)
         mn <- min(floor(sqrt(n)), ncol)
         for (nc in mn:floor(mn / 2)) {
           if (n %% nc == 0) {
@@ -991,6 +1021,21 @@ as_fileMDB.fileMDB <- function(
             )
           )
         )
+        if (!file.exists(dfiles[tn])) {
+          ## No record in the file: only the header is written
+          toWrite <- .empty_td(data_model(x)[[tn]], ofiles[tn], rp)
+          if (is.matrix(toWrite)) {
+            toWrite <- dplyr::as_tibble(toWrite, rownames = "___ROWNAMES___")
+          }
+          readr::write_delim(
+            toWrite,
+            file = dfiles[tn],
+            delim = readParameters$delim,
+            na = readParameters$na,
+            quote = "all",
+            escape = "double"
+          )
+        }
       }
     }
   } else {
@@ -1157,6 +1202,15 @@ filter_with_tables.fileMDB <- function(
   tables <- .file_filtByConta(tables, x, fk, dm, by = by)
   dm <- dm[names(tables), rmForeignKeys = TRUE]
   tables <- .norm_data(tables, dm)
+  for (tn in names(tables)) {
+    ## The type of an empty matrix cannot be taken from its values
+    if (is.matrix(tables[[tn]]) && length(tables[[tn]]) == 0) {
+      vt <- setdiff(dm[[tn]]$fields$type, c("row", "column"))
+      if (!vt %in% c("Date", "POSIXct")) {
+        storage.mode(tables[[tn]]) <- .matrix_mode(vt)
+      }
+    }
+  }
 
   ## Collection members ----
   cm <- collection_members(x)
@@ -1240,16 +1294,18 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by = 10^5, ...) {
     }
     if (frc == "r") {
       fv$rows <- which(fheader$rownames %in% fr)
-      fv$columns <- 1:length(fheader$colnames)
+      fv$columns <- seq_along(fheader$colnames)
     }
     if (frc == "c") {
-      fv$rows <- 1:length(fheader$rownames)
+      fv$rows <- seq_along(fheader$rownames)
       fv$columns <- which(fheader$colnames %in% fc)
     }
     if (length(fv$rows) == 0 || length(fv$columns) == 0) {
-      toRet <- matrix(
-        nrow = length(fv$rows),
-        ncol = length(fv$columns),
+      toRet <- Matrix::sparseMatrix(
+        i = integer(),
+        j = integer(),
+        x = numeric(),
+        dims = c(length(fv$rows), length(fv$columns)),
         dimnames = list(
           fheader$rownames[fv$rows],
           fheader$colnames[fv$columns]
@@ -1369,18 +1425,40 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by = 10^5, ...) {
         )
       )
     )
+    if (is.null(toRet)) {
+      ## No row in the file: empty matrix
+      toRet <- .empty_td(tableModel, dfile, rp)
+      if (frc != "r") {
+        toRet <- toRet[, intersect(colnames(toRet), fc), drop = FALSE]
+      }
+    }
+    vt <- setdiff(tableModel$fields$type, c("row", "column"))
+    if (length(toRet) == 0 && !vt %in% c("Date", "POSIXct")) {
+      ## The type of an empty matrix cannot be taken from its values
+      storage.mode(toRet) <- .matrix_mode(vt)
+    }
   }
 
+  ## as.character() is required because dimnames of empty dimensions can be
+  ## NULL: indexing with NULL would drop the dimensions.
   if (frc == "r") {
-    toRet <- toRet[intersect(fr, rownames(toRet)), , drop = FALSE]
+    toRet <- toRet[
+      as.character(intersect(fr, rownames(toRet))),
+      ,
+      drop = FALSE
+    ]
   }
   if (frc == "c") {
-    toRet <- toRet[, intersect(fc, colnames(toRet)), drop = FALSE]
+    toRet <- toRet[
+      ,
+      as.character(intersect(fc, colnames(toRet))),
+      drop = FALSE
+    ]
   }
   if (frc == "cr") {
     toRet <- toRet[
-      intersect(fr, rownames(toRet)),
-      intersect(fc, colnames(toRet)),
+      as.character(intersect(fr, rownames(toRet))),
+      as.character(intersect(fc, colnames(toRet))),
       drop = FALSE
     ]
   }
@@ -1880,6 +1958,10 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
                 )
               )
             )
+            if (is.null(nv)) {
+              ## No record in the file
+              nv <- .empty_td(dm[[ntn]], files[ntn], rp)
+            }
           }
         }
         d[[ntn]] <<- nv
@@ -1997,6 +2079,23 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
   return(d)
 }
 
+## Storage mode of a matrix according to the type of its values
+.matrix_mode <- function(vt) {
+  switch(
+    vt,
+    "integer" = "integer",
+    "numeric" = "double",
+    "logical" = "logical",
+    "character"
+  )
+}
+
+## Table or matrix without any record
+.empty_td <- function(tm, f, rp) {
+  toRet <- do.call(.read_td, c(list(tm = tm, f = f, n_max = 1), rp))
+  return(toRet[0, , drop = FALSE])
+}
+
 .read_td <- function(
   tm, # table model
   f, # file name
@@ -2017,11 +2116,36 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
         )
       }
 
-      td <- ReDaMoR::read_named_MM(
-        f,
-        skip = skip,
-        n_max = n_max
-      )
+      fheader <- ReDaMoR::read_named_MM_header(f)
+      if (is.na(fheader$values) || fheader$values > skip) {
+        if (skip == 0 && is.infinite(n_max)) {
+          ## All the values: the dimensions are those documented in the file
+          ## even if the last rows or columns do not have any value
+          td <- ReDaMoR::read_named_MM(f, class = "tibble")
+          td <- Matrix::sparseMatrix(
+            i = td$i,
+            j = td$j,
+            x = td$x,
+            dims = c(fheader$rows, fheader$columns),
+            dimnames = list(fheader$rownames, fheader$colnames)
+          )
+        } else {
+          td <- ReDaMoR::read_named_MM(
+            f,
+            skip = skip,
+            n_max = n_max
+          )
+        }
+      } else {
+        ## No value to read: empty sparse matrix
+        td <- Matrix::sparseMatrix(
+          i = integer(),
+          j = integer(),
+          x = numeric(),
+          dims = c(fheader$rows, fheader$columns),
+          dimnames = list(fheader$rownames, fheader$colnames)
+        )
+      }
     } else {
       r1 <- attr(ismm, "r1")
       cn <- r1 |>
@@ -2035,19 +2159,40 @@ DEFAULT_READ_PARAMS <- list(delim = '\t', na = "NA")
         dplyr::pull("type")
 
       cclasses <- c("character", rep(vt, length(cn) - 1))
-      td <- utils::read.delim(
-        f,
-        sep = delim,
-        na.strings = na,
-        skip = skip + 1,
-        nrows = n_max,
-        header = FALSE,
-        col.names = c("___ROWNAMES___", cn)[-1],
-        colClasses = cclasses,
-        check.names = FALSE
+      td <- tryCatch(
+        utils::read.delim(
+          f,
+          sep = delim,
+          na.strings = na,
+          skip = skip + 1,
+          nrows = n_max,
+          header = FALSE,
+          col.names = c("___ROWNAMES___", cn)[-1],
+          colClasses = cclasses,
+          check.names = FALSE
+        ),
+        error = function(e) {
+          if (!grepl("no lines available in input", conditionMessage(e))) {
+            stop(e)
+          }
+          ## No row to read: empty matrix
+          return(NULL)
+        }
       )
-      rownames(td) <- td[[1]]
-      td <- as.matrix(td[, -1, drop = FALSE])
+      if (is.null(td)) {
+        td <- matrix(
+          nrow = 0,
+          ncol = length(cn) - 1,
+          dimnames = list(character(), cn[-1])
+        )
+      } else {
+        rownames(td) <- td[[1]]
+        td <- as.matrix(td[, -1, drop = FALSE])
+      }
+      if (length(td) == 0 && !vt %in% c("Date", "POSIXct")) {
+        ## The type of an empty matrix cannot be taken from its values
+        storage.mode(td) <- .matrix_mode(vt)
+      }
     }
   } else {
     td <- readr::read_delim(

@@ -487,7 +487,7 @@ as_fileMDB.parquetMDB <- function(
 
   ## Data ----
   ext <- ifelse(compress, ".txt.gz", ".txt")
-  dfiles <- file.path(sk$dataPath, paste0(names(x), ext))
+  dfiles <- file.path(sk$dataPath, paste0(names(x), rep(ext, length(x))))
   names(dfiles) <- names(x)
   writeTxt <- function(d, file) {
     readr::write_delim(

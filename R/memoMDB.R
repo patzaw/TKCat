@@ -613,7 +613,7 @@ as_fileMDB.memoMDB <- function(
   dataPath <- file.path(fullPath, "data")
   dir.create(dataPath)
   ext <- ifelse(compress, ".txt.gz", ".txt")
-  dfiles <- file.path(dataPath, paste0(names(x), ext))
+  dfiles <- file.path(dataPath, paste0(names(x), rep(ext, length(x))))
   names(dfiles) <- names(x)
   for (tn in names(x)) {
     if (inherits(x[[tn]], c("dgCMatrix", "dgTMatrix"))) {
@@ -825,10 +825,10 @@ filter_mdb_matrix.memoMDB <- function(x, tableName, ...) {
       dplyr::filter(.data$name == !!f) |>
       dplyr::pull("type")
     if (ft == "row") {
-      fr <- intersect(iFilter[[f]], rownames(x[[tableName]]))
+      fr <- as.character(intersect(iFilter[[f]], rownames(x[[tableName]])))
       frc <- c(frc, "r")
     } else {
-      fc <- intersect(iFilter[[f]], colnames(x[[tableName]]))
+      fc <- as.character(intersect(iFilter[[f]], colnames(x[[tableName]])))
       frc <- c(frc, "c")
     }
   }

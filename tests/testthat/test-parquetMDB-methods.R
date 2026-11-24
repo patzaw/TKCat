@@ -328,11 +328,7 @@ test_that("empty tables are supported", {
   expect_equal(nrow(p$samples), 0)
   expect_equal(colnames(p$samples), colnames(mdb$samples))
   expect_same_tables(p, empty)
-  ## Empty matrices are not supported in text files
-  f <- as_fileMDB(
-    p[c("samples", "genes")],
-    file.path(d, "file"),
-    htmlModel = FALSE
-  )
+  f <- as_fileMDB(p, file.path(d, "file"), htmlModel = FALSE)
   expect_equal(nrow(f$samples), 0)
+  expect_same_tables(f, empty)
 })

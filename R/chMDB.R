@@ -1176,6 +1176,7 @@ dims.chMDB <- function(x, ...) {
       ncol = numeric(),
       nrow = numeric(),
       records = numeric(),
+      bytes = numeric(),
       transposed = logical()
     ))
   }
@@ -1438,7 +1439,7 @@ db_tables <- function(x, host) {
     return(data_tables(x, dplyr::all_of(i))[[1]])
   }
 }
-#' @rdname fileMDB
+#' @rdname chMDB
 #' @export
 `$.chMDB` <- `[[.chMDB`
 
@@ -1532,7 +1533,7 @@ as_fileMDB.chMDB <- function(
   dataPath <- file.path(fullPath, "data")
   dir.create(dataPath)
   ext <- ifelse(compress, ".txt.gz", ".txt")
-  dfiles <- file.path(dataPath, paste0(names(x), ext))
+  dfiles <- file.path(dataPath, paste0(names(x), rep(ext, length(x))))
   names(dfiles) <- names(x)
   for (tn in names(x)) {
     ddim <- dims(x, dplyr::all_of(tn))
@@ -1638,9 +1639,9 @@ as_fileMDB.chMDB <- function(
           dplyr::arrange(.data$j, .data$i)
       }
     } else {
-      by <- max(1, floor(by / ddim$ncol))
+      tby <- max(1, floor(by / max(ddim$ncol, 1)))
       r <- 0
-      toWrite <- data_tables(x, dplyr::all_of(tn), skip = r, n_max = by)[[1]]
+      toWrite <- data_tables(x, dplyr::all_of(tn), skip = r, n_max = tby)[[1]]
       while (!is.null(toWrite) && nrow(toWrite) > 0) {
         if (is.matrix(toWrite)) {
           toWrite <- dplyr::as_tibble(toWrite, rownames = "___ROWNAMES___")
@@ -1656,7 +1657,12 @@ as_fileMDB.chMDB <- function(
         )
         r <- r + nrow(toWrite)
         message(sprintf("%s rows written over %s", r, ddim$nrow))
-        toWrite <- data_tables(x, dplyr::all_of(tn), skip = r, n_max = by)[[1]]
+        toWrite <- data_tables(
+          x,
+          dplyr::all_of(tn),
+          skip = r,
+          n_max = tby
+        )[[1]]
       }
     }
   }
