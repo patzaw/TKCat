@@ -45,12 +45,17 @@ test_that("a parquetMDB is pushed to and pulled from ClickHouse", {
 
     ## parquetMDB --> chMDB: no fallback expected for direct insertions
     expect_no_message(
-      chm <- as_chMDB(p, k, overwrite = TRUE),
+      ## timestamp = NA: the instance is overwritten at each iteration
+      ## (2 timestamps must be separated by more than 60 seconds)
+      chm <- as_chMDB(p, k, timestamp = NA, overwrite = TRUE),
       message = "cannot be directly inserted"
     )
     expect_s3_class(chm, "chMDB")
     expect_same_tables(chm, mdb, sorted = TRUE)
-    expect_equal(count_records(chm), count_records(mdb))
+    expect_equal(
+      count_records(chm)[sort(names(mdb))],
+      count_records(mdb)[sort(names(mdb))]
+    )
 
     ## chMDB --> parquetMDB
     p2 <- as_parquetMDB(

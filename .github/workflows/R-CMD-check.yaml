@@ -1,0 +1,89 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+
+name: R-CMD-check
+
+permissions: read-all
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macos-latest,   r: 'release'}
+          - {os: windows-latest, r: 'release'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'release', clickhouse: true}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
+          # Minimum R version declared in DESCRIPTION
+          - {os: ubuntu-latest,   r: '4.1'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::rcmdcheck
+          needs: check
+
+      # Disposable chTKCat instance for the tests writing in ClickHouse
+      # (tests/testthat/test-chMDB.R). Without it, these tests are skipped.
+      - name: Start a chTKCat test instance
+        if: matrix.config.clickhouse
+        run: |
+          docker build -t tkcat-ci-test ClickHouse/docker-init
+          docker run -d \
+            --name tkcat-ci-test \
+            --ulimit nofile=262144:262144 \
+            --publish 127.0.0.1:8123:8123 \
+            -e TKCAT_INSTANCE=ci \
+            -e TKCAT_VERSION=ci \
+            -e TKCAT_ADMIN=tkcat_admin \
+            -e TKCAT_CONTACT=CI \
+            tkcat-ci-test
+          ready=0
+          for i in $(seq 1 60); do
+            if curl -sf "http://localhost:8123/?user=tkcat_admin" \
+              --data-binary "SELECT count() FROM default.Users" > /dev/null
+            then
+              ready=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$ready" != "1" ]; then
+            docker logs tkcat-ci-test
+            echo "The chTKCat test instance did not start" >&2
+            exit 1
+          fi
+          {
+            echo "TKCAT_TEST_CH_HOST=localhost"
+            echo "TKCAT_TEST_CH_PORT=8123"
+            echo "TKCAT_TEST_CH_USER=tkcat_admin"
+          } >> "$GITHUB_ENV"
+
+      - uses: r-lib/actions/check-r-package@v2
+        with:
+          upload-snapshots: true

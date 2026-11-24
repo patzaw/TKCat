@@ -126,6 +126,12 @@ comparable_tables <- function(x, sorted = FALSE) {
       return(d)
     }
     d <- as.data.frame(d, stringsAsFactors = FALSE)
+    ## Date-times are compared as instants, whatever the displayed time zone
+    for (cn in colnames(d)) {
+      if (inherits(d[[cn]], "POSIXct")) {
+        attr(d[[cn]], "tzone") <- "UTC"
+      }
+    }
     if (sorted && nrow(d) > 0) {
       d <- d[do.call(order, unname(as.list(d))), , drop = FALSE]
     }

@@ -3,6 +3,7 @@
 
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/TKCat)](https://cran.r-project.org/package=TKCat)
 [![](https://cranlogs.r-pkg.org/badges/TKCat)](https://cran.r-project.org/package=TKCat)
+[![R-CMD-check](https://github.com/patzaw/TKCat/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/patzaw/TKCat/actions/workflows/R-CMD-check.yaml)
 
 The aim of [TKCat](https://patzaw.github.io/TKCat/) (Tailored Knowledge
 Catalog) is to facilitate the management of data from knowledge
