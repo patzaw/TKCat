@@ -568,7 +568,12 @@ heads.parquetMDB <- function(x, ..., n = 6L) {
       md <- .pq_matrix_dim(f)
       mn <- min(floor(sqrt(n)), md[2])
       if (mn < 1 || md[1] < 1) {
-        return(.pq_read_matrix_block(m[[name]], f, ri = integer(), ci = integer()))
+        return(.pq_read_matrix_block(
+          m[[name]],
+          f,
+          ri = integer(),
+          ci = integer()
+        ))
       }
       for (nc in mn:floor(mn / 2)) {
         if (n %% nc == 0) {
@@ -1127,7 +1132,12 @@ PQ_RG_ROWS <- 2^20
   if (dir.exists(f)) {
     hasf <- file.exists(file.path(
       f,
-      c("rows.parquet", "columns.parquet", "values.parquet", "all_values.parquet")
+      c(
+        "rows.parquet",
+        "columns.parquet",
+        "values.parquet",
+        "all_values.parquet"
+      )
     ))
     if (all(hasf[1:3]) && !hasf[4]) {
       return("sparse")

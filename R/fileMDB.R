@@ -1449,8 +1449,7 @@ filter_mdb_matrix.fileMDB <- function(x, tableName, .by = 10^5, ...) {
     ]
   }
   if (frc == "c") {
-    toRet <- toRet[
-      ,
+    toRet <- toRet[,
       as.character(intersect(fc, colnames(toRet))),
       drop = FALSE
     ]

@@ -15,3 +15,11 @@ supp/TBKM-requirements/*-TBKM
 
 /.quarto/
 **/*.quarto_ipynb
+inst/doc/TKCat-EndToEnd.R
+inst/doc/TKCat-KMR-POK.R
+inst/doc/TKCat-MCP.R
+inst/doc/TKCat.R
+vignettes/TKCat-EndToEnd.R
+vignettes/TKCat-KMR-POK.R
+vignettes/TKCat-MCP.R
+vignettes/TKCat.R

@@ -89,7 +89,14 @@ test_that("tables of a parquetMDB are dispatched to ClickHouse writers", {
       inserted[[tableName]] <<- dplyr::bind_rows(inserted[[tableName]], value)
       invisible()
     },
-    write_MergeTree = function(con, dbName, tableName, value, rtypes = NULL, ...) {
+    write_MergeTree = function(
+      con,
+      dbName,
+      tableName,
+      value,
+      rtypes = NULL,
+      ...
+    ) {
       created[[tableName]] <<- rtypes
       inserted[[tableName]] <<- dplyr::bind_rows(inserted[[tableName]], value)
       invisible()
@@ -125,7 +132,9 @@ test_that("tables of a parquetMDB are dispatched to ClickHouse writers", {
   expect_equal(
     vapply(
       inserted$docs$file,
-      function(x) if (length(x) == 0) NA_character_ else paste(x, collapse = ""),
+      function(x) {
+        if (length(x) == 0) NA_character_ else paste(x, collapse = "")
+      },
       character(1)
     ),
     mdb$docs$file

@@ -75,8 +75,14 @@ test_that("tables are accessed like in other MDB", {
   expect_equal(p[[3]], mdb$expr)
   expect_same_tables(as.list(p), mdb)
   expect_same_tables(data_tables(p, "genes", "docs"), mdb[c("genes", "docs")])
-  expect_equal(data_tables(p, "samples", skip = 2, n_max = 3)[[1]], mdb$samples[3:5, ])
-  expect_equal(data_tables(p, "expr", skip = 2, n_max = 3)[[1]], mdb$expr[3:5, ])
+  expect_equal(
+    data_tables(p, "samples", skip = 2, n_max = 3)[[1]],
+    mdb$samples[3:5, ]
+  )
+  expect_equal(
+    data_tables(p, "expr", skip = 2, n_max = 3)[[1]],
+    mdb$expr[3:5, ]
+  )
 
   sp <- p[c("samples", "expr")]
   expect_s3_class(sp, "parquetMDB")
