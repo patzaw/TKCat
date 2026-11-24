@@ -20,6 +20,10 @@ parquetMDB. `scan_fileMDBs()` is deprecated.
 - The [arrow](https://arrow.apache.org/docs/r/) package is now imported.
 - Tests relying on the testthat package have been added.
 - Vignettes: parquetMDB are described in `vignette("TKCat")`.
+- **Authorship**: the parquetMDB implementation, the related conversion
+functions, `scan_MDBs()`, their documentation and the tests added in this
+version were written by Claude (Anthropic's AI model, Claude Code),
+under the supervision of the package maintainer.
 
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
