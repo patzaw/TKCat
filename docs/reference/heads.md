@@ -18,6 +18,9 @@ heads(x, ..., n = 6L)
 
 # S3 method for class 'metaMDB'
 heads(x, ..., n = 6L)
+
+# S3 method for class 'parquetMDB'
+heads(x, ..., n = 6L)
 ```
 
 ## Arguments

@@ -4,10 +4,14 @@
 \alias{read_KMR}
 \title{Read \link{KMR} from a path}
 \usage{
-read_KMR(...)
+read_KMR(path, ...)
 }
 \arguments{
-\item{...}{parameters for \code{\link[=read_fileMDB]{read_fileMDB()}}}
+\item{path}{the path to a folder with a \link{fileMDB} or a \link{parquetMDB}
+(see \code{\link[=read_fileMDB]{read_fileMDB()}} and \code{\link[=read_parquetMDB]{read_parquetMDB()}})}
+
+\item{...}{additional parameters for \code{\link[=read_fileMDB]{read_fileMDB()}} or
+\code{\link[=read_parquetMDB]{read_parquetMDB()}}}
 }
 \value{
 A \link{KMR} object

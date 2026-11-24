@@ -1,5 +1,45 @@
 # Changelog
 
+## Version 1.4.0
+
+- New MDB implementation relying on
+  [parquet](https://parquet.apache.org/) files:
+  [`parquetMDB()`](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
+  and
+  [`read_parquetMDB()`](https://patzaw.github.io/TKCat/reference/read_parquetMDB.md).
+  A parquetMDB is similar to a fileMDB but columns are typed according
+  to the data model, the exact dimensions of the tables are read from
+  the metadata of the files
+  ([`dims()`](https://patzaw.github.io/TKCat/reference/dims.md)) and
+  filters are applied when reading the files
+  ([`filter()`](https://dplyr.tidyverse.org/reference/filter.html),
+  [`filter_with_tables()`](https://patzaw.github.io/TKCat/reference/filter_with_tables.md),
+  [`filter_mdb_matrix()`](https://patzaw.github.io/TKCat/reference/filter_mdb_matrix.md)).
+- New
+  [`as_parquetMDB()`](https://patzaw.github.io/TKCat/reference/as_parquetMDB.md)
+  function to write any MDB in parquet files. Text files of a fileMDB
+  are converted without loading the data in R. A parquetMDB can be
+  converted with
+  [`as_fileMDB()`](https://patzaw.github.io/TKCat/reference/as_fileMDB.md),
+  [`as_memoMDB()`](https://patzaw.github.io/TKCat/reference/as_memoMDB.md)
+  and
+  [`as_chMDB()`](https://patzaw.github.io/TKCat/reference/as_chMDB.md).
+- New
+  [`scan_MDBs()`](https://patzaw.github.io/TKCat/reference/scan_MDBs.md)
+  function scanning a directory for fileMDB and parquetMDB.
+  [`scan_fileMDBs()`](https://patzaw.github.io/TKCat/reference/scan_fileMDBs.md)
+  is deprecated.
+- [`read_KMR()`](https://patzaw.github.io/TKCat/reference/read_KMR.md)
+  reads KMR written in text or parquet files.
+- [`data_files()`](https://patzaw.github.io/TKCat/reference/data_files.md)
+  and
+  [`data_file_size()`](https://patzaw.github.io/TKCat/reference/data_file_size.md)
+  also support parquetMDB.
+- The [arrow](https://arrow.apache.org/docs/r/) package is now imported.
+- Tests relying on the testthat package have been added.
+- Vignettes: parquetMDB are described in
+  [`vignette("TKCat")`](https://patzaw.github.io/TKCat/articles/TKCat.md).
+
 ## Version 1.3.1
 
 - [`list_chMDB_timestamps()`](https://patzaw.github.io/TKCat/reference/list_chMDB_timestamps.md)

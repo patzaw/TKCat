@@ -37,6 +37,12 @@ collection_members(x) <- value
 
 # S3 method for class 'metaMDB'
 collection_members(x, ...)
+
+# S3 method for class 'parquetMDB'
+collection_members(x, ...)
+
+# S3 method for class 'parquetMDB'
+collection_members(x) <- value
 ```
 
 ## Arguments

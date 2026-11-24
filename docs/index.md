@@ -75,6 +75,8 @@ The following R packages available on CRAN are required:
 - [xml2](https://CRAN.R-project.org/package=xml2): Parse XML
 - [Matrix](https://CRAN.R-project.org/package=Matrix): Sparse and Dense
   Matrix Classes and Methods
+- [arrow](https://CRAN.R-project.org/package=arrow): Integration to
+  ‘Apache’ ‘Arrow’
 - [uuid](https://CRAN.R-project.org/package=uuid): Tools for Generating
   and Handling of UUIDs
 - [crayon](https://CRAN.R-project.org/package=crayon): Colored Terminal
@@ -96,6 +98,10 @@ And those are suggested:
   Purpose Hierarchical Data Structure
 - [BED](https://CRAN.R-project.org/package=BED): Biological Entity
   Dictionary (BED)
+- [testthat](https://CRAN.R-project.org/package=testthat): Unit Testing
+  for R
+- [withr](https://CRAN.R-project.org/package=withr): Run Code ‘With’
+  Temporarily Modified Global State
 
 ### From github
 
@@ -154,9 +160,10 @@ pak::pkg_install("github::patzaw/TKCat")
     [ClickHouse](https://clickhouse.com/) system through the
     [ClickHouseHTTP](https://github.com/patzaw/ClickHouseHTTP) or
     [RClickhouse](https://github.com/IMSMWU/RClickhouse) packages.
-  - **TKCat** implements 3 main types of MDB based on files, memory
-    tables or ClickHouse database. It also provides mechanisms to
-    automatically convert from and to any of these implementations.
+  - **TKCat** implements 4 main types of MDB based on text files,
+    parquet files, memory tables or ClickHouse database. It also
+    provides mechanisms to automatically convert from and to any of
+    these implementations.
   - **TKCat** supports catalogs of MDBs facilitating the exploration of
     existing data. It also allows the integration of different MDBs
     through the automatic identification of similar concepts

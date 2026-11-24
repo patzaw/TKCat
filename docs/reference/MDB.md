@@ -3,6 +3,7 @@
 The class "MDB" provides general functions for handling modeled
 databases. The MDB classes implemented in the TKCat package are:
 [fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md),
+[parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md),
 [memoMDB](https://patzaw.github.io/TKCat/reference/memoMDB.md), chMDB
 and [metaMDB](https://patzaw.github.io/TKCat/reference/metaMDB.md).
 These classes provide additional functions.
@@ -137,8 +138,10 @@ MDB methods:
 [collection_members](https://patzaw.github.io/TKCat/reference/collection_members.md),
 [count_records](https://patzaw.github.io/TKCat/reference/count_records.md),
 [filter_with_tables](https://patzaw.github.io/TKCat/reference/filter_with_tables.md),
-[as_fileMDB](https://patzaw.github.io/TKCat/reference/as_fileMDB.md)
+[as_fileMDB](https://patzaw.github.io/TKCat/reference/as_fileMDB.md),
+[as_parquetMDB](https://patzaw.github.io/TKCat/reference/as_parquetMDB.md)
 Additional documentation is provided for each specific class:
 [fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md),
+[parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md),
 [memoMDB](https://patzaw.github.io/TKCat/reference/memoMDB.md), chMDB
 and [metaMDB](https://patzaw.github.io/TKCat/reference/metaMDB.md).

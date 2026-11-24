@@ -1,6 +1,29 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 
+## Version 1.4.0
+
+- New MDB implementation relying on [parquet](https://parquet.apache.org/)
+files: `parquetMDB()` and `read_parquetMDB()`. A parquetMDB is similar to a
+fileMDB but columns are typed according to the data model, the exact dimensions
+of the tables are read from the metadata of the files (`dims()`) and filters
+are applied when reading the files (`filter()`, `filter_with_tables()`,
+`filter_mdb_matrix()`).
+- New `as_parquetMDB()` function to write any MDB in parquet files.
+Text files of a fileMDB are converted without loading the data in R.
+A parquetMDB can be converted with `as_fileMDB()`, `as_memoMDB()` and
+`as_chMDB()`.
+- New `scan_MDBs()` function scanning a directory for fileMDB and
+parquetMDB. `scan_fileMDBs()` is deprecated.
+- `read_KMR()` reads KMR written in text or parquet files.
+- `data_files()` and `data_file_size()` also support parquetMDB.
+- The [arrow](https://arrow.apache.org/docs/r/) package is now imported.
+- Tests relying on the testthat package have been added.
+- Vignettes: parquetMDB are described in `vignette("TKCat")`.
+
+<!----------------------------------------------------------------------------->
+<!----------------------------------------------------------------------------->
+
 ## Version 1.3.1
 
 - `list_chMDB_timestamps()` now warns when several current timestamps

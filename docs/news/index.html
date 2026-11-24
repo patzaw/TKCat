@@ -13,7 +13,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">TKCat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,19 @@
       <small>Source: <a href="https://github.com/patzaw/TKCat/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.4.0" id="version-140">Version 1.4.0<a class="anchor" aria-label="anchor" href="#version-140"></a></h2>
+<ul><li>New MDB implementation relying on <a href="https://parquet.apache.org/" class="external-link">parquet</a> files: <code><a href="../reference/parquetMDB.html">parquetMDB()</a></code> and <code><a href="../reference/read_parquetMDB.html">read_parquetMDB()</a></code>. A parquetMDB is similar to a fileMDB but columns are typed according to the data model, the exact dimensions of the tables are read from the metadata of the files (<code><a href="../reference/dims.html">dims()</a></code>) and filters are applied when reading the files (<code><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter()</a></code>, <code><a href="../reference/filter_with_tables.html">filter_with_tables()</a></code>, <code><a href="../reference/filter_mdb_matrix.html">filter_mdb_matrix()</a></code>).</li>
+<li>New <code><a href="../reference/as_parquetMDB.html">as_parquetMDB()</a></code> function to write any MDB in parquet files. Text files of a fileMDB are converted without loading the data in R. A parquetMDB can be converted with <code><a href="../reference/as_fileMDB.html">as_fileMDB()</a></code>, <code><a href="../reference/as_memoMDB.html">as_memoMDB()</a></code> and <code><a href="../reference/as_chMDB.html">as_chMDB()</a></code>.</li>
+<li>New <code><a href="../reference/scan_MDBs.html">scan_MDBs()</a></code> function scanning a directory for fileMDB and parquetMDB. <code><a href="../reference/scan_fileMDBs.html">scan_fileMDBs()</a></code> is deprecated.</li>
+<li>
+<code><a href="../reference/read_KMR.html">read_KMR()</a></code> reads KMR written in text or parquet files.</li>
+<li>
+<code><a href="../reference/data_files.html">data_files()</a></code> and <code><a href="../reference/data_file_size.html">data_file_size()</a></code> also support parquetMDB.</li>
+<li>The <a href="https://arrow.apache.org/docs/r/" class="external-link">arrow</a> package is now imported.</li>
+<li>Tests relying on the testthat package have been added.</li>
+<li>Vignettes: parquetMDB are described in <code><a href="../articles/TKCat.html">vignette("TKCat")</a></code>.</li>
+</ul><!-----------------------------------------------------------------------------><!-----------------------------------------------------------------------------></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.3.1" id="version-131">Version 1.3.1<a class="anchor" aria-label="anchor" href="#version-131"></a></h2>
 <ul><li>

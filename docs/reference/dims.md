@@ -25,6 +25,9 @@ dims(x, ...)
 
 # S3 method for class 'metaMDB'
 dims(x, ...)
+
+# S3 method for class 'parquetMDB'
+dims(x, ...)
 ```
 
 ## Arguments
@@ -76,3 +79,10 @@ columns:
 
 - transposed: FALSE by default. TRUE only for matrices stored in a
   transposed format.
+
+## Details
+
+For
+[parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md),
+the dimensions are read from the metadata of the parquet files: they are
+exact and the data are not read.

@@ -18,6 +18,9 @@ filter_mdb_matrix(x, tableName, ...)
 
 # S3 method for class 'metaMDB'
 filter_mdb_matrix(x, tableName, ...)
+
+# S3 method for class 'parquetMDB'
+filter_mdb_matrix(x, tableName, ...)
 ```
 
 ## Arguments

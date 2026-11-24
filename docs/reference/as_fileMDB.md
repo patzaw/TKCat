@@ -58,6 +58,17 @@ as_fileMDB(
   by = 10^7,
   ...
 )
+
+# S3 method for class 'parquetMDB'
+as_fileMDB(
+  x,
+  path,
+  readParameters = list(delim = "\t", na = "<NA>"),
+  htmlModel = TRUE,
+  compress = TRUE,
+  by = 10^7,
+  ...
+)
 ```
 
 ## Arguments

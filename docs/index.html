@@ -34,7 +34,7 @@
 
     <a class="navbar-brand me-2" href="index.html">TKCat</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.3.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,6 +131,8 @@
 <li>
 <a href="https://CRAN.R-project.org/package=Matrix" class="external-link">Matrix</a>: Sparse and Dense Matrix Classes and Methods</li>
 <li>
+<a href="https://CRAN.R-project.org/package=arrow" class="external-link">arrow</a>: Integration to ‘Apache’ ‘Arrow’</li>
+<li>
 <a href="https://CRAN.R-project.org/package=uuid" class="external-link">uuid</a>: Tools for Generating and Handling of UUIDs</li>
 <li>
 <a href="https://CRAN.R-project.org/package=crayon" class="external-link">crayon</a>: Colored Terminal Output</li>
@@ -151,6 +153,10 @@
 <a href="https://CRAN.R-project.org/package=data.tree" class="external-link">data.tree</a>: General Purpose Hierarchical Data Structure</li>
 <li>
 <a href="https://CRAN.R-project.org/package=BED" class="external-link">BED</a>: Biological Entity Dictionary (BED)</li>
+<li>
+<a href="https://CRAN.R-project.org/package=testthat" class="external-link">testthat</a>: Unit Testing for R</li>
+<li>
+<a href="https://CRAN.R-project.org/package=withr" class="external-link">withr</a>: Run Code ‘With’ Temporarily Modified Global State</li>
 </ul>
 </div>
 <div class="section level3">
@@ -182,7 +188,7 @@
 <li>
 <strong>dm</strong> supports connection to many different DBMS. It also takes advantage of constraints which are documented in the DBMS when available. <strong>TKCat</strong> only supports the <a href="https://clickhouse.com/" class="external-link">ClickHouse</a> system through the <a href="https://github.com/patzaw/ClickHouseHTTP" class="external-link">ClickHouseHTTP</a> or <a href="https://github.com/IMSMWU/RClickhouse" class="external-link">RClickhouse</a> packages.</li>
 <li>
-<strong>TKCat</strong> implements 3 main types of MDB based on files, memory tables or ClickHouse database. It also provides mechanisms to automatically convert from and to any of these implementations.</li>
+<strong>TKCat</strong> implements 4 main types of MDB based on text files, parquet files, memory tables or ClickHouse database. It also provides mechanisms to automatically convert from and to any of these implementations.</li>
 <li>
 <strong>TKCat</strong> supports catalogs of MDBs facilitating the exploration of existing data. It also allows the integration of different MDBs through the automatic identification of similar concepts (Collections) and the automatic conversion of the different vocabulary on which they rely.</li>
 </ul>

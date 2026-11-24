@@ -93,13 +93,13 @@ functions.
 The class "MDB" provides general functions for handling
 modeled databases.
 The MDB classes implemented in the TKCat package
-are: \link{fileMDB}, \link{memoMDB}, chMDB and \link{metaMDB}.
+are: \link{fileMDB}, \link{parquetMDB}, \link{memoMDB}, chMDB and \link{metaMDB}.
 These classes provide additional functions.
 }
 \seealso{
 MDB methods:
 \link{db_info}, \link{data_model}, \link{data_tables}, \link{collection_members},
-\link{count_records}, \link{filter_with_tables}, \link{as_fileMDB}
+\link{count_records}, \link{filter_with_tables}, \link{as_fileMDB}, \link{as_parquetMDB}
 Additional documentation is provided for each specific class:
-\link{fileMDB}, \link{memoMDB}, chMDB and \link{metaMDB}.
+\link{fileMDB}, \link{parquetMDB}, \link{memoMDB}, chMDB and \link{metaMDB}.
 }

@@ -56,4 +56,4 @@ a TKCat object
 
 ## See also
 
-[scan_fileMDBs](https://patzaw.github.io/TKCat/reference/scan_fileMDBs.md)
+[scan_MDBs](https://patzaw.github.io/TKCat/reference/scan_MDBs.md)

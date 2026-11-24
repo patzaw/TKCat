@@ -6,15 +6,27 @@ a path
 ## Usage
 
 ``` r
-read_KMR(...)
+read_KMR(path, ...)
 ```
 
 ## Arguments
 
+- path:
+
+  the path to a folder with a
+  [fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md) or a
+  [parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
+  (see
+  [`read_fileMDB()`](https://patzaw.github.io/TKCat/reference/read_fileMDB.md)
+  and
+  [`read_parquetMDB()`](https://patzaw.github.io/TKCat/reference/read_parquetMDB.md))
+
 - ...:
 
-  parameters for
+  additional parameters for
   [`read_fileMDB()`](https://patzaw.github.io/TKCat/reference/read_fileMDB.md)
+  or
+  [`read_parquetMDB()`](https://patzaw.github.io/TKCat/reference/read_parquetMDB.md)
 
 ## Value
 

@@ -729,61 +729,6 @@ dims.fileMDB <- function(
 
 
 ###############################################################################@
-#' Get the data files from a [fileMDB] object
-#'
-#' @param x a [fileMDB] object
-#'
-#' @return a list with "dataFiles" and "readParameters" for reading the files.
-#'
-#' @export
-#'
-data_files <- function(x) {
-  stopifnot(is.fileMDB(x))
-  x <- unclass(x)
-  toTake <- c("dataFiles", "readParameters")
-  stopifnot(all(toTake %in% names(x)))
-  return(x[toTake])
-}
-
-
-###############################################################################@
-#' Get the size of data files from a [fileMDB] object
-#'
-#' @param x a [fileMDB] object
-#' @param hr a logical indicating if the values should be "human readable".
-#' (default: FALSE)
-#'
-#' @return a numeric vector with size in bytes (hr=FALSE) or
-#' a character vector with size and units (hr=TRUE)
-#'
-#' @export
-#'
-data_file_size <- function(x, hr = FALSE) {
-  df <- data_files(x)$dataFiles
-  fs <- file.size(df)
-  if (hr) {
-    fs <- .format_bytes(fs)
-  }
-  fc <- lapply(
-    df,
-    function(x) {
-      fcon <- file(x)
-      toRet <- summary(fcon)$class
-      close(fcon)
-      return(toRet)
-    }
-  ) |>
-    unlist()
-  toRet <- dplyr::tibble(
-    table = names(df),
-    size = fs,
-    compressed = fc == "gzfile"
-  )
-  return(toRet)
-}
-
-
-###############################################################################@
 #'
 #' @param x a [fileMDB] object
 #' @param i index or names of the tables to take

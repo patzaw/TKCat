@@ -33,6 +33,7 @@
 <url><loc>https://patzaw.github.io/TKCat/reference/as_chMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/as_fileMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/as_memoMDB.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/as_parquetMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/chMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/chTKCat.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/chTKCat_mcp_http_server.html</loc></url>
@@ -71,6 +72,7 @@
 <url><loc>https://patzaw.github.io/TKCat/reference/filter.fileMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/filter.memoMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/filter.metaMDB.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/filter.parquetMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/filter_mdb_matrix.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/filter_with_tables.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/format.chTKCat.html</loc></url>
@@ -103,6 +105,7 @@
 <url><loc>https://patzaw.github.io/TKCat/reference/is.fileMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/is.memoMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/is.metaMDB.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/is.parquetMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/is_chMDB_public.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/is_current_chMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/join_mdb_tables.html</loc></url>
@@ -127,15 +130,18 @@
 <url><loc>https://patzaw.github.io/TKCat/reference/mergeTree_from_RelTableModel.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/mergeTrees_from_RelDataModel.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/metaMDB.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/parquetMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/parse_R_helpers.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/read_KMR.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/read_collection_members.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/read_fileMDB.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/read_parquetMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/relational_tables.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/remove_chMDB_user.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/remove_chTKCat_collection.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/rm_km_feature.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/rm_km_table.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/scan_MDBs.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/scan_fileMDBs.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/search_MDB_fields.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/search_MDB_tables.html</loc></url>
@@ -146,6 +152,7 @@
 <url><loc>https://patzaw.github.io/TKCat/reference/slice.fileMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/slice.memoMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/slice.metaMDB.html</loc></url>
+<url><loc>https://patzaw.github.io/TKCat/reference/slice.parquetMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/unarchive_chMDB.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/update_chMDB_grants.html</loc></url>
 <url><loc>https://patzaw.github.io/TKCat/reference/update_chTKCat_user.html</loc></url>

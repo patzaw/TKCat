@@ -1,7 +1,9 @@
-# Get the size of data files from a [fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md) object
+# Get the size of data files from a [fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md) or a [parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md) object
 
 Get the size of data files from a
-[fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md) object
+[fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md) or a
+[parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
+object
 
 ## Usage
 
@@ -13,7 +15,8 @@ data_file_size(x, hr = FALSE)
 
 - x:
 
-  a [fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md)
+  a [fileMDB](https://patzaw.github.io/TKCat/reference/fileMDB.md) or a
+  [parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
   object
 
 - hr:
@@ -23,5 +26,8 @@ data_file_size(x, hr = FALSE)
 
 ## Value
 
-a numeric vector with size in bytes (hr=FALSE) or a character vector
-with size and units (hr=TRUE)
+a tibble with the name of the table, the size of the files in bytes
+(hr=FALSE) or as a character vector with units (hr=TRUE) and a logical
+indicating if the file is compressed. For
+[parquetMDB](https://patzaw.github.io/TKCat/reference/parquetMDB.md) the
+compression is internal to the parquet files and not reported (NA).

@@ -74,6 +74,9 @@
 - [`as_memoMDB()`](https://patzaw.github.io/TKCat/reference/as_memoMDB.md)
   : Convert any MDB object in a memoMDB object
 
+- [`as_parquetMDB()`](https://patzaw.github.io/TKCat/reference/as_parquetMDB.md)
+  : Write an MDB object in parquet files
+
 - [`chMDB()`](https://patzaw.github.io/TKCat/reference/chMDB.md)
   [`` `names<-`( ``*`<chMDB>`*`)`](https://patzaw.github.io/TKCat/reference/chMDB.md)
   [`rename(`*`<chMDB>`*`)`](https://patzaw.github.io/TKCat/reference/chMDB.md)
@@ -134,10 +137,10 @@
   : Create a chTKCat user
 
 - [`data_file_size()`](https://patzaw.github.io/TKCat/reference/data_file_size.md)
-  : Get the size of data files from a fileMDB object
+  : Get the size of data files from a fileMDB or a parquetMDB object
 
 - [`data_files()`](https://patzaw.github.io/TKCat/reference/data_files.md)
-  : Get the data files from a fileMDB object
+  : Get the data files from a fileMDB or a parquetMDB object
 
 - [`data_model()`](https://patzaw.github.io/TKCat/reference/data_model.md)
   : Get object data model
@@ -206,6 +209,9 @@
 
 - [`filter(`*`<metaMDB>`*`)`](https://patzaw.github.io/TKCat/reference/filter.metaMDB.md)
   : Filter a metaMDB object
+
+- [`filter(`*`<parquetMDB>`*`)`](https://patzaw.github.io/TKCat/reference/filter.parquetMDB.md)
+  : Filter a parquetMDB object and return a memoMDB
 
 - [`filter_mdb_matrix()`](https://patzaw.github.io/TKCat/reference/filter_mdb_matrix.md)
   : Filter a matrix stored in an MDB
@@ -301,6 +307,9 @@
 - [`is.metaMDB()`](https://patzaw.github.io/TKCat/reference/is.metaMDB.md)
   : Check if the object is a metaMDB object
 
+- [`is.parquetMDB()`](https://patzaw.github.io/TKCat/reference/is.parquetMDB.md)
+  : Check if the object is a parquetMDB object
+
 - [`is_chMDB_public()`](https://patzaw.github.io/TKCat/reference/is_chMDB_public.md)
   : Is a chMDB public
 
@@ -391,6 +400,15 @@
   [`as.list(`*`<metaMDB>`*`)`](https://patzaw.github.io/TKCat/reference/metaMDB.md)
   : A metaMDB object
 
+- [`parquetMDB()`](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
+  [`` `names<-`( ``*`<parquetMDB>`*`)`](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
+  [`rename(`*`<parquetMDB>`*`)`](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
+  [`` `[`( ``*`<parquetMDB>`*`)`](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
+  [`` `[[`( ``*`<parquetMDB>`*`)`](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
+  [`` `$`( ``*`<parquetMDB>`*`)`](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
+  [`as.list(`*`<parquetMDB>`*`)`](https://patzaw.github.io/TKCat/reference/parquetMDB.md)
+  : An MDB (Modeled DataBase) based on parquet files: parquetMDB
+
 - [`parse_R_helpers()`](https://patzaw.github.io/TKCat/reference/parse_R_helpers.md)
   : Parse source code to get R helpers
 
@@ -402,6 +420,9 @@
 
 - [`read_fileMDB()`](https://patzaw.github.io/TKCat/reference/read_fileMDB.md)
   : Read a fileMDB from a path
+
+- [`read_parquetMDB()`](https://patzaw.github.io/TKCat/reference/read_parquetMDB.md)
+  : Read a parquetMDB from a path
 
 - [`relational_tables()`](https://patzaw.github.io/TKCat/reference/relational_tables.md)
   : Get a list of relational tables
@@ -418,8 +439,11 @@
 - [`rm_km_table()`](https://patzaw.github.io/TKCat/reference/rm_km_table.md)
   : Remove KM table specifications from an MDB object
 
+- [`scan_MDBs()`](https://patzaw.github.io/TKCat/reference/scan_MDBs.md)
+  : Scan a catalog of fileMDB and parquetMDB
+
 - [`scan_fileMDBs()`](https://patzaw.github.io/TKCat/reference/scan_fileMDBs.md)
-  : Scan a catalog of fileMDB
+  : Scan a catalog of fileMDB (deprecated)
 
 - [`search_MDB_fields()`](https://patzaw.github.io/TKCat/reference/search_MDB_fields.md)
   : Search fields in a TKCat related object
@@ -449,6 +473,10 @@
 
 - [`slice(`*`<metaMDB>`*`)`](https://patzaw.github.io/TKCat/reference/slice.metaMDB.md)
   : Subset a metaMDB object according to row position in one table
+
+- [`slice(`*`<parquetMDB>`*`)`](https://patzaw.github.io/TKCat/reference/slice.parquetMDB.md)
+  : Subset a parquetMDB object according to row position in one table
+  and return a memoMDB
 
 - [`unarchive_chMDB()`](https://patzaw.github.io/TKCat/reference/unarchive_chMDB.md)
   : Unarchive a chMDB in a chTKCat

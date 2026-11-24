@@ -120,14 +120,17 @@ as_KMR <- function(x) {
 ###############################################################################@
 #' Read [KMR] from a path
 #'
-#' @param ... parameters for [read_fileMDB()]
+#' @param path the path to a folder with a [fileMDB] or a [parquetMDB]
+#' (see [read_fileMDB()] and [read_parquetMDB()])
+#' @param ... additional parameters for [read_fileMDB()] or
+#' [read_parquetMDB()]
 #'
 #' @return A [KMR] object
 #'
 #' @export
 #'
-read_KMR <- function(...) {
-  read_fileMDB(...) |>
+read_KMR <- function(path, ...) {
+  .read_diskMDB(path = path, ...) |>
     as_KMR()
 }
 

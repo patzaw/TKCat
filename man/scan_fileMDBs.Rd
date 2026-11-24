@@ -2,28 +2,16 @@
 % Please edit documentation in R/TKCat.R
 \name{scan_fileMDBs}
 \alias{scan_fileMDBs}
-\title{Scan a catalog of \link{fileMDB}}
+\title{Scan a catalog of \link{fileMDB} (deprecated)}
 \usage{
-scan_fileMDBs(path, subdirs = NULL, check = TRUE, n_max = 10)
+scan_fileMDBs(...)
 }
 \arguments{
-\item{path}{directory from which all the \link{fileMDB} should be read}
-
-\item{subdirs}{the sub directories (relative to path) to take into account.
-If NULL (default) all the sub directories are considered.}
-
-\item{check}{logical: if TRUE (default) the data are confronted to the
-data model}
-
-\item{n_max}{maximum number of records to read
-for checks purpose (default: 10). See also \code{\link[ReDaMoR:confront_data]{ReDaMoR::confront_data()}}.}
+\item{...}{parameters for \code{\link[=scan_MDBs]{scan_MDBs()}}}
 }
 \value{
 a TKCat object
 }
 \description{
-Scan a catalog of \link{fileMDB}
-}
-\seealso{
-\link{read_fileMDB}
+This function is deprecated: use \code{\link[=scan_MDBs]{scan_MDBs()}} instead.
 }

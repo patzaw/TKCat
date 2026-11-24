@@ -22,8 +22,9 @@ gathered in catalogs that can be easily explored and shared. TKCat
 provides tools to easily subset, filter and combine MDBs and create new
 catalogs suited for specific needs.
 
-Currently, there are 3 different implementations of MDBs which are
-supported by TKCat: in R memory (memoMDB), in files (fileMDB) and in
+Currently, there are 4 different implementations of MDBs which are
+supported by TKCat: in R memory (memoMDB), in text files (fileMDB), in
+[parquet](https://parquet.apache.org/) files (parquetMDB) and in
 [ClickHouse](https://clickhouse.com/) (chMDB).
 
 This document is divided into four main sections:
@@ -386,7 +387,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-11-12 20:46:14.804
+    ## Timestamp: 2026-11-24 07:25:35.978469
     ## 
 
 ### Documenting collection members
@@ -435,7 +436,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-11-12 20:46:14.804
+    ## Timestamp: 2026-11-24 07:25:35.978469
     ## 
 
 However, as just discussed, the *HPO_hp* table refers to human
@@ -559,7 +560,7 @@ mhpo_db
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-11-12 20:46:14.804
+    ## Timestamp: 2026-11-24 07:25:35.978469
     ## 
 
 And the documented collection members of an MDB can be displayed as
@@ -612,6 +613,67 @@ collection members are written in json files in the *model* folder. The
 *DESCRIPTION.json* file gather db information and information about how
 to read the data files (i.e. `delim`, `na`).
 
+#### Writing an MDB in parquet files
+
+An MDB can also be written in [parquet](https://parquet.apache.org/)
+files instead of delimited text files:
+
+``` r
+
+tmpPqDir <- tempfile()
+pq_mhpo_db <- as_parquetMDB(mhpo_db, path=tmpPqDir, htmlModel=FALSE)
+```
+
+The structure of the created directory is similar to the one described
+above:
+
+    ## miniHPO                                         
+    ##  ¦--data                                        
+    ##  ¦   ¦--HPO_diseaseHP.parquet                   
+    ##  ¦   ¦--HPO_diseases.parquet                    
+    ##  ¦   °--HPO_hp.parquet                          
+    ##  ¦--DESCRIPTION.json                            
+    ##  °--model                                       
+    ##      ¦--Collections                             
+    ##      ¦   °--Condition-miniHPO_Condition_1.0.json
+    ##      °--miniHPO.json
+
+Each table is written in one parquet file in which the type of the
+columns corresponds to the type documented in the data model. Therefore,
+there is no need to provide information about how to read the data files
+in the *DESCRIPTION.json* file.
+
+Parquet files also provide metadata that are used by TKCat. For example,
+the exact dimensions of the tables are known without reading the data,
+whereas the number of rows of large text files can only be estimated.
+
+``` r
+
+dims(pq_mhpo_db)
+```
+
+    ## # A tibble: 3 × 7
+    ##   name          format  ncol  nrow records bytes transposed
+    ##   <chr>         <chr>  <dbl> <dbl>   <dbl> <dbl> <lgl>     
+    ## 1 HPO_hp        table      4   500     500 26266 FALSE     
+    ## 2 HPO_diseases  table      3  1903    1903 44343 FALSE     
+    ## 3 HPO_diseaseHP table      3  2594    2594 14367 FALSE
+
+The
+[`read_parquetMDB()`](https://patzaw.github.io/TKCat/reference/read_parquetMDB.md)
+function is used to read an MDB written this way. An MDB written in text
+files can be converted into parquet files using the
+[`as_parquetMDB()`](https://patzaw.github.io/TKCat/reference/as_parquetMDB.md)
+function. In this case, the data are not loaded in R: the files are
+directly converted by the [arrow](https://arrow.apache.org/docs/r/)
+package.
+
+``` r
+
+pq_mhpo_db_2 <- read_fileMDB(file.path(tmpDir, "miniHPO")) %>% 
+   as_parquetMDB(path=tempfile(), htmlModel=FALSE)
+```
+
 This folder can be shared and it’s then easy to get all the data and the
 corresponding documentation from it back in R:
 
@@ -636,7 +698,7 @@ read_fileMDB(file.path(tmpDir, "miniHPO"))
     ## For demonstrating ReDaMoR and TKCat capabilities, a very few information from the HPO (human phenotype ontology) has been extracted
     ## (https://hpo.jax.org/)
     ## 
-    ## Timestamp: 2026-11-12 20:46:14
+    ## Timestamp: 2026-11-24 07:25:35
     ## 
 
 Also writing these data and related information in text files make them
@@ -825,11 +887,17 @@ file_chembl
 
 ### MDB implementations
 
-There are 3 main implementations of MDBs:
+There are 4 main implementations of MDBs:
 
 - **fileMDB** objects keep the data in files and load them only when
   requested by the user. These implementation is the first one which is
   used when reading MDB as demonstrated in the examples above.
+
+- **parquetMDB** objects are similar to fileMDB objects but the data are
+  kept in [parquet](https://parquet.apache.org/) files instead of
+  delimited text files. The type of the columns and the exact dimensions
+  of the tables are recorded in these files, and filters are applied
+  when reading the data: only the relevant records are loaded in R.
 
 - **memoMDB** objects have all the data loaded in memory. These objects
   are very easy to use but can take time to load and can use a lot of
@@ -841,6 +909,7 @@ There are 3 main implementations of MDBs:
 
 The different implementations can be converted to each others using
 [`as_fileMDB()`](https://patzaw.github.io/TKCat/reference/as_fileMDB.md),
+[`as_parquetMDB()`](https://patzaw.github.io/TKCat/reference/as_parquetMDB.md),
 [`as_memoMDB()`](https://patzaw.github.io/TKCat/reference/as_memoMDB.md)
 and [`as_chMDB()`](https://patzaw.github.io/TKCat/reference/as_chMDB.md)
 functions.
@@ -859,6 +928,26 @@ object.size(memo_clinvar) %>% print(units="Kb")
 ```
 
     ## 760.5 Kb
+
+``` r
+
+parquet_clinvar <- as_parquetMDB(
+   file_clinvar, path=tempfile(), htmlModel=FALSE
+)
+parquet_clinvar
+```
+
+    ## parquetMDB ClinVar (version 0.9, Patrice Godard <patrice.godard@ucb.com>): Data extracted from the ClinVar database
+    ##    - 21 tables with 86 fields
+    ## 
+    ## Collection members: 
+    ##    - 1 BE member
+    ##    - 2 Condition members
+    ## 
+    ## ClinVar is a freely accessible, public archive of reports of the relationships among human variations and phenotypes, with supporting evidence. This is a very small subset of ClinVar! Visit the reference URL for more information.
+    ## (https://www.ncbi.nlm.nih.gov/clinvar/)
+    ## 
+    ## 
 
 A fourth implementation is **metaMDB** which combines several MDBs glued
 together with relational tables (see the [Merging with
@@ -1979,7 +2068,7 @@ potential existing version is overwritten without being archived.
 
 ``` r
 
-lc <- scan_fileMDBs("fileMDB_directory")
+lc <- scan_MDBs("MDB_directory")
 ## The commented line below allows the exploration of the data models in lc.
 # explore_MDBs(lc)
 for(r in toFeed){
@@ -2461,6 +2550,16 @@ m <- ReDaMoR::df_to_model(d) %>%
 md <- memoMDB(list(d=d), m, list(name="Matrix example"))
 plot(data_model(md))
 ```
+
+In a fileMDB, a matrix is written in a delimited text file (or in a
+MatrixMarket text file when the matrix is sparse). In a parquetMDB, a
+matrix is written in one parquet file with one column per column of the
+matrix when it has at most `maxCol` columns (1000 by default: see
+[`as_parquetMDB()`](https://patzaw.github.io/TKCat/reference/as_parquetMDB.md)).
+Matrices with more columns and sparse matrices are written in a long
+format in 3 parquet files: the names of the rows, the names of the
+columns and the values with the index of their row and column. Whatever
+the way they are stored, they are returned as matrices in R.
 
 #### Documents stored as base64 values
 

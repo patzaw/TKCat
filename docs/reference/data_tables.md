@@ -18,6 +18,9 @@ data_tables(x, ..., skip = 0, n_max = Inf)
 
 # S3 method for class 'metaMDB'
 data_tables(x, ..., skip = 0, n_max = Inf)
+
+# S3 method for class 'parquetMDB'
+data_tables(x, ..., skip = 0, n_max = Inf)
 ```
 
 ## Arguments

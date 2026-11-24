@@ -40,5 +40,5 @@ TKCat: a catalog of \link{MDB}
 Rename a \link{TKCat} object
 }
 \seealso{
-\link{scan_fileMDBs}
+\link{scan_MDBs}
 }

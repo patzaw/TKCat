@@ -18,6 +18,9 @@ data_model(x, ...)
 
 # S3 method for class 'metaMDB'
 data_model(x, rtOnly = FALSE, recursive = FALSE, ...)
+
+# S3 method for class 'parquetMDB'
+data_model(x, ...)
 ```
 
 ## Arguments

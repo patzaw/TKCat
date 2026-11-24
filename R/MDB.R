@@ -4,14 +4,14 @@
 #' The class "MDB" provides general functions for handling
 #' modeled databases.
 #' The MDB classes implemented in the TKCat package
-#' are: [fileMDB], [memoMDB], chMDB and [metaMDB].
+#' are: [fileMDB], [parquetMDB], [memoMDB], chMDB and [metaMDB].
 #' These classes provide additional functions.
 #'
 #' @seealso MDB methods:
 #' [db_info], [data_model], [data_tables], [collection_members],
-#' [count_records], [filter_with_tables], [as_fileMDB]
+#' [count_records], [filter_with_tables], [as_fileMDB], [as_parquetMDB]
 #' Additional documentation is provided for each specific class:
-#' [fileMDB], [memoMDB], chMDB and [metaMDB].
+#' [fileMDB], [parquetMDB], [memoMDB], chMDB and [metaMDB].
 #'
 #' @name MDB
 #'

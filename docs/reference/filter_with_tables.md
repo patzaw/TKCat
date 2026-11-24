@@ -19,6 +19,9 @@ filter_with_tables(x, tables, checkTables = TRUE, ...)
 
 # S3 method for class 'metaMDB'
 filter_with_tables(x, tables, checkTables = TRUE, ...)
+
+# S3 method for class 'parquetMDB'
+filter_with_tables(x, tables, checkTables = TRUE, ...)
 ```
 
 ## Arguments

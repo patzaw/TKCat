@@ -262,6 +262,43 @@ as_fileMDB <- function(
 
 
 ###############################################################################@
+#' Write an MDB object in parquet files
+#'
+#' @param x an MDB object
+#' @param path the path where the MDB should be written
+#' @param htmlModel a logical. If TRUE (default) the model is also plotted in
+#' an html file.
+#' @param compression the compression algorithm used in parquet files
+#' (default: "zstd"). See [arrow::write_parquet()] for available values.
+#' @param maxCol the maximum number of columns for writing a dense matrix in
+#' a wide format: one column in the parquet file per column of the matrix
+#' (default: 1000). Dense matrices with more columns are written in a long
+#' format (see [parquetMDB]). Sparse matrices are always written in a long
+#' format.
+#' @param by the size of the batch: number of records to write
+#' together (default: 10^7)
+#' @param ... method specific parameters
+#'
+#' @return A [parquetMDB] object.
+#'
+#' @seealso [read_parquetMDB()], [as_fileMDB()]
+#'
+#' @export
+#'
+as_parquetMDB <- function(
+  x,
+  path,
+  htmlModel = TRUE,
+  compression = "zstd",
+  maxCol = PQ_MAX_COL,
+  by = 10^7,
+  ...
+) {
+  UseMethod("as_parquetMDB", x)
+}
+
+
+###############################################################################@
 #' List available [MDB]
 #'
 #' @param x a [TKCat] related object (e.g. [chTKCat])

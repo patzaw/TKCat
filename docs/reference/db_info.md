@@ -34,6 +34,12 @@ db_info(x, ...)
 
 # S3 method for class 'metaMDB'
 db_info(x) <- value
+
+# S3 method for class 'parquetMDB'
+db_info(x, ...)
+
+# S3 method for class 'parquetMDB'
+db_info(x) <- value
 ```
 
 ## Arguments

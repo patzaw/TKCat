@@ -121,8 +121,8 @@ pieces of knowledge (POK) in a consistent way.
         [ClickHouse](https://clickhouse.com/) system through the
         [ClickHouseHTTP](https://github.com/patzaw/ClickHouseHTTP) or
         [RClickhouse](https://github.com/IMSMWU/RClickhouse) packages.
-    -   **TKCat** implements 3 main types of MDB based on files, memory tables
-        or ClickHouse database. It also provides mechanisms to automatically
+    -   **TKCat** implements 4 main types of MDB based on text files,
+        parquet files, memory tables or ClickHouse database. It also provides mechanisms to automatically
         convert from and to any of these implementations.
     -   **TKCat** supports catalogs of MDBs facilitating the exploration of
         existing data. It also allows the integration of different MDBs through

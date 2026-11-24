@@ -6,7 +6,7 @@
 #'
 #' @return a TKCat object
 #'
-#' @seealso [scan_fileMDBs]
+#' @seealso [scan_MDBs]
 #'
 #' @export
 #'
@@ -32,9 +32,13 @@ TKCat <- function(..., list = NULL) {
 
 
 ###############################################################################@
-#' Scan a catalog of [fileMDB]
+#' Scan a catalog of [fileMDB] and [parquetMDB]
 #'
-#' @param path directory from which all the [fileMDB] should be read
+#' Each sub directory is read as a [parquetMDB] if it contains parquet data
+#' files and as a [fileMDB] otherwise.
+#'
+#' @param path directory from which all the [fileMDB] and [parquetMDB]
+#' should be read
 #' @param subdirs the sub directories (relative to path) to take into account.
 #' If NULL (default) all the sub directories are considered.
 #' @param check logical: if TRUE (default) the data are confronted to the
@@ -44,11 +48,11 @@ TKCat <- function(..., list = NULL) {
 #'
 #' @return a TKCat object
 #'
-#' @seealso [read_fileMDB]
+#' @seealso [read_fileMDB], [read_parquetMDB]
 #'
 #' @export
 #'
-scan_fileMDBs <- function(path, subdirs = NULL, check = TRUE, n_max = 10) {
+scan_MDBs <- function(path, subdirs = NULL, check = TRUE, n_max = 10) {
   if (is.null(subdirs)) {
     files <- list.files(path = path, full.names = TRUE)
   } else {
@@ -57,10 +61,11 @@ scan_fileMDBs <- function(path, subdirs = NULL, check = TRUE, n_max = 10) {
   toRet <- list()
   for (f in files) {
     toAdd <- suppressWarnings(try(
-      read_fileMDB(
+      .read_diskMDB(
         path = f,
         check = check,
-        n_max = n_max
+        n_max = n_max,
+        verbose = TRUE
       ),
       silent = TRUE
     ))
@@ -71,6 +76,44 @@ scan_fileMDBs <- function(path, subdirs = NULL, check = TRUE, n_max = 10) {
     }
   }
   return(TKCat(list = toRet))
+}
+
+
+###############################################################################@
+#' Scan a catalog of [fileMDB] (deprecated)
+#'
+#' This function is deprecated: use [scan_MDBs()] instead.
+#'
+#' @param ... parameters for [scan_MDBs()]
+#'
+#' @return a TKCat object
+#'
+#' @export
+#'
+scan_fileMDBs <- function(...) {
+  .Deprecated("scan_MDBs")
+  scan_MDBs(...)
+}
+
+
+###############################################################################@
+## Helpers ----
+
+## Is there an MDB written in parquet files in the directory?
+.is_parquetMDB_dir <- function(path) {
+  dp <- file.path(path, "data")
+  if (!file.exists(dp)) {
+    dp <- path
+  }
+  length(list.files(dp, pattern = "[.]parquet$", recursive = TRUE)) > 0
+}
+
+## Read an MDB written on disk: a parquetMDB or a fileMDB
+.read_diskMDB <- function(path, ...) {
+  if (.is_parquetMDB_dir(path)) {
+    return(read_parquetMDB(path = path, ...))
+  }
+  return(read_fileMDB(path = path, ...))
 }
 
 
