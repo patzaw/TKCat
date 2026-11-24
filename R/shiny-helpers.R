@@ -680,7 +680,7 @@ TKCAT_LOGO_DIV <- shiny::div(
                     ) |>
                       as.character()
                   } else if (n %in% c("maintainer", "description")) {
-                    vt <- markdown::renderMarkdown(text = dbi[[n]])
+                    vt <- shiny::markdown(dbi[[n]])
                     vt <- gsub("<[/]?p>", "", as.character(vt))
                   } else if (n == "access") {
                     vt <- as.character(shiny::tags$span(
@@ -1602,13 +1602,13 @@ TKCAT_LOGO_DIV <- shiny::div(
               sprintf("(Version %s)", k$version)
             ),
             shiny::tags$li(
-              shiny::HTML(markdown::renderMarkdown(
-                text = paste(
+              shiny::markdown(
+                paste(
                   shiny::tags$strong("Administrator"),
                   ":",
                   k$contact
                 )
-              ))
+              )
             )
           )
         )
@@ -1655,9 +1655,9 @@ TKCAT_LOGO_DIV <- shiny::div(
                 "if you've forgotten your password",
                 "or if you want to sign up:"
               ),
-              shiny::HTML(markdown::renderMarkdown(
-                text = shiny::isolate(instance$tkcat$contact)
-              ))
+              shiny::markdown(
+                shiny::isolate(instance$tkcat$contact)
+              )
             ))
           ),
           size = "s",

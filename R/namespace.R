@@ -4,7 +4,6 @@
 #' @import shiny
 #' @import shinydashboard
 #' @import visNetwork
-#' @import promises
 #' @import crayon
 #'
 #' @importFrom future future plan multisession
@@ -21,8 +20,6 @@
 #' @importFrom utils packageName zip object.size str write.table head read.delim
 #' @importFrom graphics plot
 #' @importFrom stats setNames
-#'
-#' @importFrom markdown renderMarkdown
 #'
 #' @importFrom xml2 read_xml xml_children xml_name xml_replace write_xml
 #'

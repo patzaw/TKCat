@@ -299,7 +299,6 @@ import(DBI)
 import(ReDaMoR)
 import(crayon)
 import(dplyr)
-import(promises)
 import(shiny)
 import(shinydashboard)
 import(visNetwork)
@@ -323,7 +322,6 @@ importFrom(jsonlite,
   unbox
 )
 importFrom(jsonvalidate,json_validate)
-importFrom(markdown,renderMarkdown)
 importFrom(readr,
   DataFrameCallback,
   read_delim,
