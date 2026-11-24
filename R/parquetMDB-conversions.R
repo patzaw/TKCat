@@ -318,16 +318,10 @@ as_parquetMDB.metaMDB <- function(
   dataPath <- sk$dataPath
 
   ## Data ----
+  ## Each member is written in a temporary sub-directory and its files are
+  ## then moved in the data directory.
   adfiles <- character()
-  moveFiles <- function(tmp) {
-    ofiles <- data_files(tmp)$dataFiles
-    dfiles <- file.path(dataPath, basename(ofiles)) |>
-      rlang::set_names(names(ofiles))
-    file.rename(ofiles, dfiles)
-    unlink(file.path(dataPath, db_info(tmp)$name), recursive = TRUE)
-    return(dfiles)
-  }
-  for (mdb in MDBs(x)) {
+  writeMember <- function(mdb) {
     tmp <- as_parquetMDB(
       mdb,
       path = dataPath,
@@ -336,18 +330,34 @@ as_parquetMDB.metaMDB <- function(
       maxCol = maxCol,
       by = by
     )
-    adfiles <- c(adfiles, moveFiles(tmp))
+    ofiles <- data_files(tmp)$dataFiles
+    tmpPath <- file.path(dataPath, db_info(tmp)$name)
+    ## Release the files before moving them (required on Windows)
+    rm(tmp)
+    gc(verbose = FALSE)
+    dfiles <- file.path(dataPath, basename(ofiles)) |>
+      rlang::set_names(names(ofiles))
+    moved <- suppressWarnings(file.rename(ofiles, dfiles))
+    for (i in which(!moved)) {
+      file.copy(ofiles[i], dataPath, recursive = TRUE)
+    }
+    unlink(tmpPath, recursive = TRUE)
+    if (!all(file.exists(dfiles))) {
+      stop(sprintf(
+        "The following files could not be written in %s: %s",
+        dataPath,
+        paste(basename(dfiles)[!file.exists(dfiles)], collapse = ", ")
+      ))
+    }
+    return(dfiles)
   }
-  frdb <- as_memoMDB(x[names(relational_tables(x))])
-  tmp <- as_parquetMDB(
-    frdb,
-    path = dataPath,
-    htmlModel = FALSE,
-    compression = compression,
-    maxCol = maxCol,
-    by = by
+  for (mdb in MDBs(x)) {
+    adfiles <- c(adfiles, writeMember(mdb))
+  }
+  adfiles <- c(
+    adfiles,
+    writeMember(as_memoMDB(x[names(relational_tables(x))]))
   )
-  adfiles <- c(adfiles, moveFiles(tmp))
 
   ## Return parquetMDB ----
   return(parquetMDB(

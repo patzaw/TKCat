@@ -646,7 +646,7 @@ dims.parquetMDB <- function(x, ...) {
           format <- ifelse(layout == "file", "matrix", "MatrixMarket")
           records <- as.numeric(nr) * as.numeric(nc)
         } else {
-          r <- arrow::ParquetFileReader$create(f)
+          r <- .pq_reader(f)
           nr <- r$num_rows
           nc <- r$num_columns
           format <- "table"
@@ -860,7 +860,7 @@ slice.parquetMDB <- function(.data, ..., .preserve = FALSE) {
   i <- dots[[tn]]
   f <- unclass(x)$dataFiles[[tn]]
   rtypes <- .pq_rtypes(dm[[tn]])
-  r <- arrow::ParquetFileReader$create(f)
+  r <- .pq_reader(f)
   ## Reading only the row groups with requested rows
   sizes <- .pq_row_group_sizes(r)
   starts <- cumsum(c(0, sizes))
@@ -1171,12 +1171,19 @@ PQ_RG_ROWS <- 2^20
   return(sum(file.size(f)))
 }
 
+## Parquet files are not memory mapped: on Windows, a mapped file cannot be
+## overwritten, moved or removed as long as the reader has not been garbage
+## collected.
+.pq_reader <- function(f) {
+  arrow::ParquetFileReader$create(f, mmap = FALSE)
+}
+
 .pq_nrow <- function(f) {
-  arrow::ParquetFileReader$create(f)$num_rows
+  .pq_reader(f)$num_rows
 }
 
 .pq_colnames <- function(f) {
-  names(arrow::ParquetFileReader$create(f)$GetSchema())
+  names(.pq_reader(f)$GetSchema())
 }
 
 ## Number of rows of each row group: only the first column is read
@@ -1200,7 +1207,7 @@ PQ_RG_ROWS <- 2^20
 ## Apply a function on each row group read as a tibble.
 ## fun(y, pos): y is a tibble and pos the position of its first row
 .pq_map_row_groups <- function(f, fun, columns = NULL) {
-  r <- arrow::ParquetFileReader$create(f)
+  r <- .pq_reader(f)
   ci <- NULL
   if (!is.null(columns)) {
     ci <- match(columns, names(r$GetSchema())) - 1L
@@ -1226,17 +1233,18 @@ PQ_RG_ROWS <- 2^20
 .pq_read_df <- function(f, skip = 0, n_max = Inf, columns = NULL) {
   if (skip == 0 && is.infinite(n_max)) {
     if (is.null(columns)) {
-      tbl <- arrow::read_parquet(f, as_data_frame = FALSE)
+      tbl <- arrow::read_parquet(f, as_data_frame = FALSE, mmap = FALSE)
     } else {
       tbl <- arrow::read_parquet(
         f,
         col_select = dplyr::all_of(columns),
-        as_data_frame = FALSE
+        as_data_frame = FALSE,
+        mmap = FALSE
       )
     }
     return(dplyr::as_tibble(as.data.frame(tbl)))
   }
-  r <- arrow::ParquetFileReader$create(f)
+  r <- .pq_reader(f)
   ci <- NULL
   if (!is.null(columns)) {
     ci <- match(columns, names(r$GetSchema())) - 1L
@@ -1283,7 +1291,7 @@ PQ_RG_ROWS <- 2^20
 ## Number of rows and columns of a matrix
 .pq_matrix_dim <- function(f, layout = .pq_layout(f)) {
   if (layout == "file") {
-    r <- arrow::ParquetFileReader$create(f)
+    r <- .pq_reader(f)
     return(c(r$num_rows, r$num_columns - 1))
   }
   return(c(
@@ -1569,7 +1577,7 @@ PQ_RG_ROWS <- 2^20
     return(as.character(attr(layout, "condition")$message))
   }
   getTypes <- function(file) {
-    sch <- arrow::ParquetFileReader$create(file)$GetSchema()
+    sch <- .pq_reader(file)$GetSchema()
     toRet <- vapply(
       sch$fields,
       function(x) x$type$ToString(),

@@ -1,6 +1,13 @@
 <!----------------------------------------------------------------------------->
 <!----------------------------------------------------------------------------->
 
+## Version 1.4.1
+
+- Parquet files are not memory mapped anymore when read: on Windows, mapped
+files could not be overwritten, moved or removed, making
+`as_parquetMDB()` fail on metaMDB.
+
+<!----------------------------------------------------------------------------->
 ## Version 1.4.0
 
 - New MDB implementation relying on [parquet](https://parquet.apache.org/)

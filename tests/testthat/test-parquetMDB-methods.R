@@ -239,6 +239,8 @@ test_that("data are confronted to the data model when reading", {
   expect_true(get_confrontation_report()$success)
 
   ## Wrong type
+  rm(p)
+  gc() # release the files before overwriting them (required on Windows)
   arrow::write_parquet(
     dplyr::mutate(mdb$samples, n = as.character(n)),
     file.path(pdir, "data", "samples.parquet")
@@ -247,6 +249,7 @@ test_that("data are confronted to the data model when reading", {
   expect_s3_class(read_parquetMDB(pdir, check = FALSE), "parquetMDB")
 
   ## Missing and unexpected fields
+  gc()
   arrow::write_parquet(
     dplyr::select(mdb$samples, -"n") |> dplyr::mutate(other = 1),
     file.path(pdir, "data", "samples.parquet")
@@ -255,6 +258,7 @@ test_that("data are confronted to the data model when reading", {
   expect_error(read_parquetMDB(pdir), "unexpected fields: other")
 
   ## Compatible types written by other tools are converted
+  gc()
   arrow::write_parquet(
     arrow::arrow_table(
       dplyr::mutate(mdb$samples, grp = factor(grp)),
@@ -277,6 +281,7 @@ test_that("data are confronted to the data model when reading", {
   expect_type(p2$samples$grp, "character")
 
   ## Constraints of the model
+  gc()
   arrow::write_parquet(
     dplyr::mutate(mdb$samples, sid = c(NA, sid[-1])),
     file.path(pdir, "data", "samples.parquet")
@@ -287,6 +292,7 @@ test_that("data are confronted to the data model when reading", {
   )
 
   ## Missing file
+  gc()
   file.remove(file.path(pdir, "data", "samples.parquet"))
   expect_error(read_parquetMDB(pdir), "Cannot find a file for samples")
 
