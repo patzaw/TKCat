@@ -299,6 +299,44 @@ as_parquetMDB <- function(
 
 
 ###############################################################################@
+#' Get the data files from an [MDB] stored in files
+#'
+#' @param x an [MDB] object stored in files: a [fileMDB] or a [parquetMDB]
+#' @param ... method specific parameters
+#'
+#' @return a list with "dataFiles" and "readParameters" for reading the files.
+#' There is no read parameter for [parquetMDB] (empty list).
+#' For [parquetMDB] the data file of a matrix stored
+#' in a long format is a directory.
+#'
+#' @export
+#'
+data_files <- function(x, ...) {
+  UseMethod("data_files", x)
+}
+
+
+###############################################################################@
+#' Get the size of data files from an [MDB] stored in files
+#'
+#' @param x an [MDB] object stored in files: a [fileMDB] or a [parquetMDB]
+#' @param hr a logical indicating if the values should be "human readable".
+#' (default: FALSE)
+#' @param ... method specific parameters
+#'
+#' @return a tibble with the name of the table, the size of the files in
+#' bytes (hr=FALSE) or as a character vector with units (hr=TRUE)
+#' and a logical indicating if the file is compressed. For [parquetMDB]
+#' the compression is internal to the parquet files and not reported (NA).
+#'
+#' @export
+#'
+data_file_size <- function(x, hr = FALSE, ...) {
+  UseMethod("data_file_size", x)
+}
+
+
+###############################################################################@
 #' List available [MDB]
 #'
 #' @param x a [TKCat] related object (e.g. [chTKCat])

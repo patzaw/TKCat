@@ -997,72 +997,37 @@ filter_mdb_matrix.parquetMDB <- function(x, tableName, ...) {
 
 
 ###############################################################################@
-#' Get the data files from a [fileMDB] or a [parquetMDB] object
 #'
-#' @param x a [fileMDB] or a [parquetMDB] object
-#'
-#' @return a list with "dataFiles" and "readParameters" for reading the files.
-#' There is no read parameter for [parquetMDB] (empty list).
-#' For [parquetMDB] the data file of a matrix stored
-#' in a long format is a directory.
+#' @rdname data_files
+#' @method data_files parquetMDB
 #'
 #' @export
 #'
-data_files <- function(x) {
-  stopifnot(is.fileMDB(x) || is.parquetMDB(x))
-  if (is.parquetMDB(x)) {
-    return(list(
-      dataFiles = unclass(x)$dataFiles,
-      readParameters = list()
-    ))
-  }
-  x <- unclass(x)
-  toTake <- c("dataFiles", "readParameters")
-  stopifnot(all(toTake %in% names(x)))
-  return(x[toTake])
+data_files.parquetMDB <- function(x, ...) {
+  return(list(
+    dataFiles = unclass(x)$dataFiles,
+    readParameters = list()
+  ))
 }
 
 
 ###############################################################################@
-#' Get the size of data files from a [fileMDB] or a [parquetMDB] object
 #'
-#' @param x a [fileMDB] or a [parquetMDB] object
-#' @param hr a logical indicating if the values should be "human readable".
-#' (default: FALSE)
-#'
-#' @return a tibble with the name of the table, the size of the files in
-#' bytes (hr=FALSE) or as a character vector with units (hr=TRUE)
-#' and a logical indicating if the file is compressed. For [parquetMDB]
-#' the compression is internal to the parquet files and not reported (NA).
+#' @rdname data_file_size
+#' @method data_file_size parquetMDB
 #'
 #' @export
 #'
-data_file_size <- function(x, hr = FALSE) {
+data_file_size.parquetMDB <- function(x, hr = FALSE, ...) {
   df <- data_files(x)$dataFiles
-  if (is.parquetMDB(x)) {
-    fs <- vapply(df, .pq_file_size, numeric(1), USE.NAMES = FALSE)
-    fc <- rep(NA, length(df))
-  } else {
-    fs <- file.size(df)
-    fc <- lapply(
-      df,
-      function(x) {
-        fcon <- file(x)
-        toRet <- summary(fcon)$class
-        close(fcon)
-        return(toRet)
-      }
-    ) |>
-      unlist()
-    fc <- fc == "gzfile"
-  }
+  fs <- vapply(df, .pq_file_size, numeric(1), USE.NAMES = FALSE)
   if (hr) {
     fs <- .format_bytes(fs)
   }
   toRet <- dplyr::tibble(
     table = names(df),
     size = fs,
-    compressed = fc
+    compressed = rep(NA, length(df))
   )
   return(toRet)
 }

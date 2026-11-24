@@ -730,6 +730,53 @@ dims.fileMDB <- function(
 
 ###############################################################################@
 #'
+#' @rdname data_files
+#' @method data_files fileMDB
+#'
+#' @export
+#'
+data_files.fileMDB <- function(x, ...) {
+  x <- unclass(x)
+  toTake <- c("dataFiles", "readParameters")
+  stopifnot(all(toTake %in% names(x)))
+  return(x[toTake])
+}
+
+
+###############################################################################@
+#'
+#' @rdname data_file_size
+#' @method data_file_size fileMDB
+#'
+#' @export
+#'
+data_file_size.fileMDB <- function(x, hr = FALSE, ...) {
+  df <- data_files(x)$dataFiles
+  fs <- file.size(df)
+  if (hr) {
+    fs <- .format_bytes(fs)
+  }
+  fc <- lapply(
+    df,
+    function(x) {
+      fcon <- file(x)
+      toRet <- summary(fcon)$class
+      close(fcon)
+      return(toRet)
+    }
+  ) |>
+    unlist()
+  toRet <- dplyr::tibble(
+    table = names(df),
+    size = fs,
+    compressed = fc == "gzfile"
+  )
+  return(toRet)
+}
+
+
+###############################################################################@
+#'
 #' @param x a [fileMDB] object
 #' @param i index or names of the tables to take
 #'
